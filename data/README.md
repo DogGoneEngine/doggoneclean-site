@@ -14,27 +14,34 @@ discarded first-draft route template from the prior Nails-repo session.
    fill addresses/zips where the sheet had none. It is never the sole source for dog
    info or service type.
 
-## Cadence conflicts resolved (leaning to the sheet)
+## Cadence conflicts
 
 - **Chester Weber:** 3wk (sheet) over 4wk (calendar). Resolved -> 21 days, high.
 - **Greta Custer:** 6-8wk (sheet) over 16wk (calendar). Resolved -> 49 days, high.
-- **Kevin Cummings:** 4wk (sheet digest) vs 6wk (calendar). Leaning 4wk, medium. OPEN.
-- **Peter Moran:** ~8wk (Paul note) vs 12wk (calendar). Leaning ~8wk, medium. OPEN.
+- **Kevin Cummings:** PENDING. His contact sheet is an empty stub (no Frequency line).
+  The "4wk" was from Paul's notes digest, not the sheet; calendar shows ~6wk. This is
+  Paul-intent vs booking-history, not sheet vs calendar.
+- **Peter Moran:** PENDING. Sheet Frequency is blank. "~8wk" is only Paul's override
+  note; calendar shows ~12wk (10/13/25 -> 1/9/26 = ~88 days).
+
+## Base / anchor (Paul, 2026-05-24)
+
+Home is 3885 SW 114th Court, Ocala 34481 (rural SW Marion County). It sits adjacent to
+the SW Ocala / On Top of the World cluster, the densest part of the book, so no separate
+fictional anchor is needed: use home for drive-time math, treat SW as the launch/return
+cluster, and use Chester Weber (by base, flexible day, fixed 12pm) as the natural first
+stop. NE/NW/SE days commute into the city.
 
 ## Open data gaps (need Paul)
 
 Highest impact first:
 
-1. **Base location** is unconfirmed. Everything geographic depends on it. Best proxy is
-   Chester Weber (right by base; parking plus 5PG7+H6F, driveway 5PCC+68V Ocala).
-2. **Patty Brown:** no contact sheet at all. Missing dogs, real availability, service
+1. **Patty Brown:** no contact sheet at all. Missing dogs, real availability, service
    type, cadence. Currently modeled as nails-only-legacy Saturday cluster per Paul.
 3. **Steve Crandall:** dog names/breeds/count unknown (sheet header blank).
 4. **Lisa Irwin:** which dogs are current (recent visits show 2), and the current
    home-vs-office address alternation. Sheet plus codes (Evinston) are stale.
-5. **Lisa Prater service type:** Paul decision says nails-only legacy, but her sheet
-   shows past full grooms for Gypsy (boxer, $75). Reconcile.
-6. **Erich Blunt:** is Sophie (very old standard poodle) still being groomed? Recent
+5. **Erich Blunt:** is Sophie (very old standard poodle) still being groomed? Recent
    visits show only Koby (and Jethro?).
 7. **Kevin Cummings:** dog prices; cadence (see above).
 8. **Terri McDonnell:** confirm works-from-home (affects daytime availability).

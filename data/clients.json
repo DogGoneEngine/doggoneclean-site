@@ -8,7 +8,9 @@
     "cadence_units": "days",
     "cadence_confidence": "high = sheet states frequency; medium = sheet blank, inferred from roster/calendar; low = guess",
     "hardness_tags": "HARD=must respect; SOFT=preference; FLEX=movable; FLEX+=ultra-flex gap-filler",
-    "base_status": "UNCONFIRMED. Best proxy: Chester Weber (right by base), parking plus 5PG7+H6F / driveway 5PCC+68V Ocala. Confirm with Paul before routing."
+    "base_home": "3885 SW 114th Court, Ocala 34481 (Paul's home, rural SW Marion County)",
+    "base_anchor": "No separate anchor needed: home sits adjacent to the SW Ocala / On Top of the World client cluster (the densest in the book). Use home for drive-time math; SW cluster is the launch/return cluster; Chester Weber (right by base, flexible day, fixed 12pm) is the natural first-stop anchor. NE/NW/SE days commute into the city.",
+    "base_note": "Chester 'right by base' is consistent: his plus 5PG7+H6F is in the same SW area as home."
   },
 
   "standing": [
@@ -332,8 +334,8 @@
       "status": "standing",
       "service_type": "nails_focused",
       "cadence_days": 28,
-      "cadence_confidence": "medium",
-      "cadence_note": "CONFLICT: contact-sheet header digest says 4wk; calendar says ~6wk (42d). Leaning sheet (4wk) per policy. CONFIRM.",
+      "cadence_confidence": "low",
+      "cadence_note": "PENDING PAUL. His contact sheet is an empty stub (no Frequency line, no dog data). '4wk' is from Paul's notes digest, NOT the sheet. Only hard signal is the calendar (~42d/6wk). Not a sheet-vs-calendar conflict; it is Paul's-intent vs booking-history.",
       "dogs": [
         {"name": "Oakley", "breed": "Labrador", "price": null, "notes": "nails"},
         {"name": "Gibbs", "breed": "Labrador", "price": null, "notes": "nails"}
@@ -412,20 +414,20 @@
       "name": "Lisa Prater",
       "aka": null,
       "status": "standing",
-      "service_type": "nails_only_legacy",
+      "service_type": "mixed_groom_and_nails",
       "cadence_days": 28,
       "cadence_confidence": "medium",
       "cadence_note": "sheet blank (~4wk); roster q28",
       "dogs": [
-        {"name": "Gypsy", "breed": "Boxer", "price": 75, "notes": "history shows full grooms ($75) AND nails-only; reconcile service type"}
+        {"name": "Gypsy", "breed": "Boxer", "price": 75, "notes": "Paul confirmed: depends on visit - full groom ($75) some visits, nails-only between"}
       ],
       "location": {"address": "5636 SW 58th Pl, Ocala", "zip": "34474", "zone": "Ocala-SW", "plus": null, "geo_notes": "geographically right next to Nancy Franklin"},
       "access": {"parking": "park in street", "owner_present": null},
       "availability": {"hard": "Saturday (Paul decision: routed Saturday with Nancy + Patty)", "soft": null, "not_days": [], "seasonal": null},
       "hardness": "HARD",
-      "flags": ["recently added", "husband Larry died Oct 2025", "Paul decision: nails-only legacy, but sheet shows past full grooms - flag"],
+      "flags": ["recently added", "husband Larry died Oct 2025", "service varies by visit (Paul confirmed)"],
       "relationships": ["neighbor of Nancy Franklin; route together with Patty Brown on Saturday"],
-      "data_gaps": ["nails-only vs full groom (decision says nails-only legacy, history shows full grooms)"]
+      "data_gaps": []
     },
     {
       "name": "Marilyn Jamison",
@@ -515,7 +517,7 @@
       "service_type": "nails_only_legacy",
       "cadence_days": 28,
       "cadence_confidence": "high",
-      "cadence_note": "sheet: 4 weeks, nails only",
+      "cadence_note": "sheet: 4 weeks, nails only ($25)",
       "dogs": [
         {"name": "Ben", "breed": "Labrador Retriever", "price": 25, "notes": "$25 nails only ($50 if full)"}
       ],
@@ -552,8 +554,8 @@
       "status": "standing",
       "service_type": "full_groom",
       "cadence_days": 56,
-      "cadence_confidence": "medium",
-      "cadence_note": "CONFLICT: sheet blank; Paul note 'every 2 months' (~56d); calendar ~84d (12wk). Leaning Paul note (~56-84d). CONFIRM.",
+      "cadence_confidence": "low",
+      "cadence_note": "PENDING PAUL. His contact sheet Frequency field is BLANK. '~8wk' is only Paul's override note ('every 2 months'). Calendar shows ~12wk (last two visits 10/13/25 -> 1/9/26 = ~88 days). Not a sheet-vs-calendar conflict; it is Paul's-intent vs booking-history.",
       "dogs": [
         {"name": "Buddy", "breed": "Shih Tzu/Poodle mix (looks like Lhasa apso)", "price": 100, "notes": "GROWTH on side of front right leg; can be very uncooperative; #7 legs, 6mm body"}
       ],
