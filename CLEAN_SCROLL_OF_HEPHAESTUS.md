@@ -76,6 +76,19 @@
 - Added `scripts/check.py` (no deps, no DB): validates clients.json and scans tracked docs
   for em dashes, making a few enforcement cells real.
 
+### 2026-05-24 - Enforcement hardening + records audit
+
+- Broadened `scripts/check.py`: also validates cadence_confidence and hardness tags and that
+  no one-off, at-will, or banned client appears in `route_template.md` (guards 14 names).
+- Added a redesign checklist to `read_before_redesign` in the Oracle (run check.py, walk the
+  index confirming each rule still has a live layer, re-enforce or reject).
+- Audited `clients.json` for completeness: all 33 standing records have address, zone, dogs,
+  and service type; the records are the durable distillation of the contact sheets, which
+  remain the authoritative raw source in Drive. Empty `access` objects are genuine (those
+  clients have no gate/codes; parking notes live in `location.geo_notes`), not omissions.
+- Note on separation: DGN-site hardening that came up this session is tracked in the nails
+  thread, not here, per the no-merge rule.
+
 ---
 
 ## Decisions log (record every Q&A answer here)
