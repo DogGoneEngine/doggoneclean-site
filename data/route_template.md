@@ -21,10 +21,9 @@ Legend: [H]=HARD window, [S]=soft pref, [F]=flex, time = target arrival, qN = ev
 ### Monday - SE daytime + SE evening (lighter day; holds gap-fills)
 | Time | Client | Cadence | Why here |
 |---|---|---|---|
-| daytime | Harriet Woolf [S] | q28 | SE, weekdays |
-| daytime | Mary Beth Anderson [F] | q28 | SE |
-| daytime | Heather Albinson [F] | q42 | S Ocala (plus 3RM3+J29; confirm quadrant) |
-| 6:00pm | Steve Crandall [H] | q28 | SE, weekday 6-7pm only |
+| daytime | Harriet Woolf [H] | q28 | SE, weekdays, start by 5pm (earlier better) |
+| daytime | Mary Beth Anderson [F] | q28 | SE (Toby + Theo) |
+| 6:00pm | Steve Crandall [H] | q28 | SE, weekday 6-7pm only; NAILS ONLY (4 toy poodles, $65) |
 
 Note: Amy Blessing cannot be booked Monday (or Friday). Monday's light load is the
 landing spot for Tonya (big Williston day), Ligia gap-fills, and SE one-offs.
@@ -42,8 +41,8 @@ Note: Michelle Reiners is excluded Tuesdays, so no NE evening runs Tuesday.
 ### Wednesday - base + NW
 | Time | Client | Cadence | Why here |
 |---|---|---|---|
-| 12:00 | Chester Weber [H] | q21 | by base, fixed 12pm first-slot |
-| 4:00pm | Marilyn Jamison [H] | q28 | NW (Golden Ocala), ~4pm, husband WFH Wed |
+| 12:00 | Chester Weber [H] | q21 | by base, fixed 12pm first-slot (Ula only now; Windsor gone) |
+| ~2-3pm | Marilyn Jamison [H] | q28 | NW (Golden Ocala); arrive BEFORE 4pm (gate hard 4-5pm); husband WFH Wed |
 | flex | SW/base overflow | - | absorbs SW flex to relieve Friday |
 
 ### Thursday - NW noon anchor + NE evening run
@@ -70,8 +69,9 @@ weekend option, so she anchors the Thursday slot. Jun-Nov the noon anchor is emp
 | daytime | Terri McDonnell [F] | q42 | SW (On Top of the World, use Waze) |
 | daytime | Bradley Johnson [S] | q42 | SW, weekday daytime |
 | daytime | Greta Custer [F] | q49 | Dunnellon, <10 min from base |
-| daytime | Chris Votos / Erich / Jeanne / Patricia [F] | q56 each | SW, rotate by cadence |
-| 5:30pm | Peter Moran [H] | q~8wk (pending) | SW, late afternoon/evening only |
+| daytime | Chris Votos / Erich / Jeanne / Patricia / Kevin [F] | q56 / q42 | SW, rotate by cadence (Kevin is a big 7-dog ~half-day stop) |
+| late afternoon | Heather Albinson [F] | q42 | SW (near Kevin/Peter); evenings ok; use plus code 3RM3+J29 |
+| 5:30pm | Peter Moran [H] | q~8-12wk (pending) | SW, late afternoon/evening only |
 
 Note: with home in the SW cluster, most SW flex lives here, but they are q21-q98, so a
 typical Friday is ~4-5 stops (e.g. Barbara + Debra + one q42-56 + Peter evening). Spill
@@ -82,21 +82,20 @@ the rest to Wednesday and Saturday.
 |---|---|---|---|
 | ~10:00 | Nancy Franklin [H] | q28 (nails) | SW 34474, neighbor cluster |
 | ~10:20 | Lisa Prater [H] | q28 (mixed) | next to Nancy |
-| ~10:40 | Patty Brown [H] | q28 (nails) | nearby (no sheet; rides this cluster) |
-| midday | Hope Brooks [S] | q56 | SW-ish, prefers Saturday |
-| half-day | Tonya Hunt [F] | q28 | Williston (~20 min W); $300-500, 3-5 hrs |
-| flex | Kevin Cummings [F] | q? (pending) | SW, nails-focused |
+| ~10:40 | Patty Brown [H] | q28 (nails) | nearby (Bella + Gizmo, $45) |
+| after cluster | Hope Brooks [S] | q56 | SW; Saturday after the Franklin/Prater nail cluster works well |
+| half-day | Tonya Hunt [F] | q28 | Williston (~20 min W); Kai+Lydia regular, Koa/Ruthie sometimes; $300-500 |
 
 ## Per-client day assignment (all 33)
 
-SW: Chester(Wed), Barbara(Fri), Debra Koerner(Fri), Ray(Fri), Terri(Fri),
+SW: Chester(Wed 12), Barbara(Fri), Debra Koerner(Fri), Ray(Fri), Terri(Fri),
 Bradley(Fri), Greta(Fri), Chris Votos(Fri), Erich(Fri), Jeanne(Fri), Patricia(Fri),
-Peter(Fri eve), Cynthia(Tue 3pm), Kevin(Sat), Tonya(Sat/Williston), Nancy(Sat),
-Lisa Prater(Sat), Patty(Sat), Hope(Sat), Ligia(gap-fill).
-SE: Lisa Irwin(Tue 12), Donna DiPasqua(Tue), Amy(Tue), Harriet(Mon), Mary Beth(Mon),
-Steve(Mon 6pm), Heather(Mon, confirm quadrant).
-NW: Marilyn(Wed 4pm), Mary Jane(Thu 12).
-NE: Ginger(Thu 5pm), Michelle(Thu 5:15), Chloe(Thu 5-6), Linda Giza(Thu day).
+Kevin(Fri, big 7-dog), Heather(Fri late/eve), Peter(Fri eve), Cynthia(Tue 3pm),
+Tonya(Sat/Williston), Nancy(Sat), Lisa Prater(Sat), Patty(Sat), Hope(Sat), Ligia(gap-fill).
+SE: Lisa Irwin(Tue 12), Donna DiPasqua(Tue), Amy(Tue), Harriet(Mon, by 5pm),
+Mary Beth(Mon), Steve(Mon 6pm, nails).
+NW: Marilyn(Wed, before 4pm), Mary Jane(Thu 12).
+NE: Ginger(Thu 5pm), Michelle(Thu 5:15), Chloe(Thu 5-6), Linda Giza(Thu day, q3mo).
 
 ## Gap-fill plan
 
@@ -117,7 +116,8 @@ NE: Ginger(Thu 5pm), Michelle(Thu 5:15), Chloe(Thu 5-6), Linda Giza(Thu day).
 
 ## Pending (do not finalize cadence/zone until Paul confirms)
 
-- Kevin Cummings cadence (sheet is an empty stub; calendar ~6wk vs your note 4wk).
 - Peter Moran cadence (sheet blank; your note ~8wk vs calendar ~12wk).
-- Heather Albinson and Hope Brooks exact quadrant (resolve from plus codes).
-- Patty Brown: no sheet; everything assumed from the Saturday neighbor cluster.
+- Lisa Irwin: current home vs office address and the every-other-Tuesday alternation.
+- Terri McDonnell: confirm works-from-home (affects daytime availability).
+- Mary Beth Anderson: Theo's breed.
+- Patty Brown: real availability beyond the Saturday assumption.

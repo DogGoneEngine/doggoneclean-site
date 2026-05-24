@@ -16,17 +16,23 @@ history. The rough calendar extract was used only as a sanity check, never as a 
 
 ## Contact-sheet doc IDs (standing clients)
 
+NOTE: the original HANDOFF index pointed at stale or blank 2023-2024 spreadsheet
+duplicates for six clients (Bradley, Cynthia, Donna DiPasqua, Kevin, Linda, Mary Beth).
+The IDs below are the CURRENT populated Google Doc for each (verified 2026-05-24 by
+listing the folder and taking the most-recently-modified real file per name). Many
+clients have multiple files in the folder; always use the newest doc, not the spreadsheet.
+
 | Client | Doc ID |
 |---|---|
 | Amy Blessing | 16lvKiIbpDs3-pT9YV1a55_X4EK0Cue3f-Hq4QkHQoyc |
 | Barbara Lape | 1X29wwnLINp0JoFHrI4VpO1f4Roc0ppsQFkpQsvJZwBM |
-| Bradley Johnson | 104UyFtK5MGB1yJaRzNAldHH0xxc1TRVb2azzm6bvFjE |
+| Bradley Johnson | 1Hkzalovl-UCrdDIl_IpPG5ZSGus_RE_14lqbHFesewk |
 | Chester Weber | 1Rskcv8r7me-c6V2lOpzHFmhpJw60MlGTt4hTPHs9oeA |
 | Chloe Castellano | 1Ww--sJ8HKNQD-39eem1WqyyFK1Ds35eWkAA1F4W6oE8 |
 | Chris Votos (Donna Rodriquez) | 1llEQFkixZAKdZkGzpBdtzLMtEwvYBt9urneSHuWJsHo |
-| Cynthia Tieche | 1NRDwtd4UGWK0rOHWBwVGMBlymzVP2VOgFPozo5vgce0 |
+| Cynthia Tieche | 1YPWaaM3FCE99O9cqwh6Tz38UWGlnocFSCNIBe-R8XgI |
 | Debra Koerner (Raymond Koerner) | 1_NnDezfRjioHMaLI7Q95jM96a6mVRHBJ7yygEiQz58k |
-| Donna DiPasqua | 1TERLg-gX6F-ElssotBs7HqLGgO75hpzwBNPU_PCpd1Q |
+| Donna DiPasqua | 1ebz6__StLdVeXMtFZZoe31pFWJ21-XqLOwHyvwQVVpk |
 | Erich Blunt | 1ctopqs5QGk-WOIiN41R1TjdBupH9BCepwuHiSaz7BJA |
 | Ginger Fink | 13TMM7vCX8k042pbP8Xh2d5sFRoOTE5jDUfcLMUNom8g |
 | Greta Custer | 1QWYkBQrNq0jC8m2V1P3wlby9N8KvNv6QW0SdxgzFTdQ |
@@ -34,13 +40,13 @@ history. The rough calendar extract was used only as a sanity check, never as a 
 | Heather Albinson | 1GHzVAUEbzCCtv0-fD5T3C7D8YnTBpO_r2DM9FKDKupY |
 | Hope Brooks | 1GxxAME5P3r3vDyox7i40YgKP3zXC69bYS-QadCRNwx0 |
 | Jeanne Leuenberger | 1Eg05xkyDEfWCU7S4q5WnV-TrSb7zXV4MFiK7WqCnHfE |
-| Kevin Cummings | 1K-ntmASoN49vju9ZjL4bMdeJgSc2lPFuMoa6IxhFEBc |
+| Kevin Cummings | 1htI-PoFyx7TcwV6Zsc2k2bvaRaFR65PR4ahNku043I8 |
 | Ligia Amyotte | 1I5T6eDDUAX5m5PfCV1lIBBs7r0Xgi6QQmnz95KICd4c |
-| Linda Giza | 1qGuqeKzFG9y9tMhfuNfsfoCceOQ6F3NUPJ8D3YStvzc |
+| Linda Giza | 1s45X8E5PLwGsAdjojGrOQF17qafUBNSCbJ9PmH7S1R4 |
 | Lisa Irwin (Midgett) | 1rq7jyEvl1x3gx27ESnPHg62LNolToSrEkDSSOpdybRA |
 | Lisa Prater | 1j3Pv4YJHSsBKQqIeY6jIpff1RZzLdOY5e7Vip3Fs69Q |
 | Marilyn Jamison | 11CHjghZyxnnwlM8f_RDz7KTsLb30c6YBgF5w9L0GQXg |
-| Mary Beth Anderson | 17v7n5-79W-2Pldaim01dVKkPnmw9jry_ayN26RVNYCM |
+| Mary Beth Anderson | 1A2l1BINj_tJVLJh309QxUkyN45TpRfsX-29b0FTg-9M |
 | Mary Jane Hunt | 1mTunY_drypqBCZI-GdHaYOBWZ-S4ZeTin69qma6aSZQ |
 | Michelle Reiners | 1xgcTfMxO6NvnrKPJrpUnYngznpgEDynr2_JDv9T2w9s |
 | Nancy Franklin | 19Er1fGuN46wb0lVjf5btdh_kTVjZm7-iI-oKtmJdtBc |

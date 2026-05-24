@@ -59,31 +59,29 @@
       "status": "standing",
       "service_type": "full_groom",
       "cadence_days": 42,
-      "cadence_confidence": "medium",
-      "cadence_note": "sheet blank (old spreadsheet); roster q42 (6wk)",
+      "cadence_confidence": "high",
+      "cadence_note": "sheet: 6 weeks (verified from current doc 1Hkzal...)",
       "dogs": [
-        {"name": "Bella", "breed": "Cocker Spaniel", "price": 75, "notes": "#7 back, 8mm underside, blend"},
-        {"name": "(second Cocker Spaniel)", "breed": "Cocker Spaniel", "price": 75, "notes": "name not recorded in sheet"}
+        {"name": "Bella", "breed": "Cocker Spaniel", "price": 75, "notes": "$75 + $10 tip; Bradley provides special shampoo; bad knee, raw foot pads (shave first), growth on back left paw; skin tags removed 2025"}
       ],
-      "location": {"address": "11558 SW 72nd Cir, Ocala", "zip": "34476", "zone": "Ocala-SW", "plus": null, "geo_notes": null},
+      "location": {"address": "11558 SW 72nd Cir, Ocala", "zip": "34476", "zone": "Ocala-SW", "plus": null, "geo_notes": "park in driveway"},
       "access": {"owner_present": null},
       "availability": {"hard": null, "soft": "weekday daytime; Saturday if needed (Paul decision)", "not_days": [], "seasonal": null},
       "hardness": "FLEX",
-      "flags": [],
+      "flags": ["Gabby (lab) died March 2023 - one dog now"],
       "relationships": [],
-      "data_gaps": ["second dog's name", "cadence confidence (sheet blank)"]
+      "data_gaps": []
     },
     {
       "name": "Chester Weber",
       "aka": null,
       "status": "standing",
-      "service_type": "full_groom_plus_nails",
+      "service_type": "full_groom",
       "cadence_days": 21,
       "cadence_confidence": "high",
       "cadence_note": "sheet: 3 weeks (resolves 3wk-vs-4wk conflict in favor of sheet)",
       "dogs": [
-        {"name": "Ula", "breed": "Miniature Schnauzer", "price": 105, "notes": "schnauzer pattern, #7 body"},
-        {"name": "Windsor", "breed": "Great Dane (born Halloween 2021)", "price": 70, "notes": "nails / light; $50 rising to $70 grown"}
+        {"name": "Ula", "breed": "Miniature Schnauzer", "price": 105, "notes": "schnauzer pattern, #7 body"}
       ],
       "location": {"address": "PlusCode Ocala", "zip": null, "zone": "near-base", "plus": "driveway 5PCC+68V, parking 5PG7+H6F", "geo_notes": "right by Paul's house / base"},
       "access": {"owner_present": "never sees owner; housekeeper access", "contacts": "text Lillian 352-426-5626; Adina helps with Windsor", "billing": "invoice to office: Stacy Amerson, samerson@liveoakproperties.com (checks run 14th and 28th)"},
@@ -102,14 +100,13 @@
       "cadence_confidence": "high",
       "cadence_note": "sheet: 6 weeks",
       "dogs": [
-        {"name": "Whiskey", "breed": "German Shorthair Pointer", "price": 50, "notes": "groom with Louie at same time"},
-        {"name": "Louie", "breed": "Cocker Spaniel", "price": 75, "notes": "hunting dog in training"}
+        {"name": "Louie", "breed": "Boykin Spaniel", "price": 75, "notes": "hunting dog in training; only dog now"}
       ],
       "location": {"address": "1516 NE 17th Terrace, Ocala", "zip": "34470", "zone": "Ocala-NE", "plus": "6V2M+RWP", "geo_notes": null},
       "access": {"owner_present": null},
       "availability": {"hard": "weekday 5pm or 6pm", "soft": null, "not_days": [], "seasonal": null},
       "hardness": "HARD",
-      "flags": ["Skout (beagle mix) deceased Oct 2025"],
+      "flags": ["Whiskey (GSP) and Skout (beagle mix) both deceased; only Louie remains"],
       "relationships": [],
       "data_gaps": []
     },
@@ -141,16 +138,16 @@
       "cadence_confidence": "high",
       "cadence_note": "sheet: 2 weeks; Paul decision: Tuesday route, switched 12pm->3pm",
       "dogs": [
-        {"name": "Satin", "breed": "Cavapoo", "price": 75, "notes": null},
-        {"name": "Luna", "breed": "French Bulldog", "price": 45, "notes": null}
+        {"name": "Satin", "breed": "Cavapoo", "price": 85, "notes": "8mm body, leave eyelashes"},
+        {"name": "Luna", "breed": "French Bulldog", "price": 45, "notes": "on medicine/CBD; housekeeper sometimes can't catch her"}
       ],
       "location": {"address": "2165 SW 80th St, Ocala", "zip": "34476", "zone": "Ocala-SW", "plus": null, "geo_notes": null},
-      "access": {"owner_present": null},
+      "access": {"owner_present": "housekeeper Gloria; front-door bottom lock code 1206 (auto-locks)", "alt_location": "dog sometimes at the Recharge Clinic instead of home"},
       "availability": {"hard": "Tuesday ~3pm (Paul decision)", "soft": "flexible otherwise", "not_days": [], "seasonal": null},
       "hardness": "FLEX",
-      "flags": ["dog sometimes at Recharge Clinic"],
+      "flags": ["dog sometimes at Recharge Clinic", "Satin chews/skin irritation history"],
       "relationships": [],
-      "data_gaps": ["confirm Satin + Luna are current (old spreadsheet sheet)"]
+      "data_gaps": []
     },
     {
       "name": "Debra Koerner",
@@ -178,18 +175,18 @@
       "status": "standing",
       "service_type": "full_groom",
       "cadence_days": 28,
-      "cadence_confidence": "medium",
-      "cadence_note": "sheet blank (old spreadsheet); roster q28; Paul decision: Tuesday route, ~q28 (mid every-2-week Tuesday loop)",
+      "cadence_confidence": "high",
+      "cadence_note": "sheet: Monthly (verified from current doc 1ebz6...)",
       "dogs": [
-        {"name": "Fletch", "breed": "German Shepherd", "price": 95, "notes": null}
+        {"name": "Fledge", "breed": "German Shepherd (female)", "price": 100, "notes": "dry/flaky skin, heavy shedder; belly/tummy issues (vet); constantly on the move while grooming"}
       ],
-      "location": {"address": "1128 SE 95th St, Ocala", "zip": "34480", "zone": "Ocala-SE", "plus": null, "geo_notes": null},
+      "location": {"address": "1128 SE 95th St, Ocala", "zip": "34480", "zone": "Ocala-SE", "plus": null, "geo_notes": "house is all the way at the end of the driveway"},
       "access": {"owner_present": null},
       "availability": {"hard": null, "soft": "Tuesday (Paul decision)", "not_days": [], "seasonal": null},
       "hardness": "FLEX",
       "flags": [],
       "relationships": [],
-      "data_gaps": ["availability never recorded; assumed flexible"]
+      "data_gaps": []
     },
     {
       "name": "Erich Blunt",
@@ -200,17 +197,15 @@
       "cadence_confidence": "high",
       "cadence_note": "sheet: 8 weeks",
       "dogs": [
-        {"name": "Koby", "breed": "Standard Poodle", "price": 135, "notes": "favorite dog"},
-        {"name": "Jethro", "breed": "Standard Poodle", "price": 135, "notes": null},
-        {"name": "Sophie", "breed": "Standard Poodle", "price": 125, "notes": "very old/weak, skin tags everywhere; last seen 9/23/25, may be retired/deceased - confirm"}
+        {"name": "Koby", "breed": "Standard Poodle", "price": 135, "notes": "favorite dog; only dog now"}
       ],
       "location": {"address": "3550 SW 58th St, Ocala", "zip": "34471", "zone": "Ocala-SW", "plus": "4RH9+MH3", "geo_notes": null},
       "access": {"gate": "pull to gate, Erich opens or text him; park grass on left of driveway", "owner_present": "texts to open gate"},
       "availability": {"hard": null, "soft": null, "not_days": [], "seasonal": null},
       "hardness": "FLEX",
-      "flags": ["Sophie has growth on back left paw; very old"],
+      "flags": ["Sophie and Jethro no longer groomed here; only Koby remains"],
       "relationships": [],
-      "data_gaps": ["confirm whether Sophie still being groomed; recent visits show only Koby (and Jethro?)"]
+      "data_gaps": []
     },
     {
       "name": "Ginger Fink",
@@ -264,8 +259,8 @@
       ],
       "location": {"address": "1710 SE 34th Ln, Ocala", "zip": "34471", "zone": "Ocala-SE", "plus": null, "geo_notes": null},
       "access": {"gate": "gate code 1313# (if fails, 1234#)", "payment": "their credit card does not tap; bring scanner in", "contacts": "Bill", "owner_present": null},
-      "availability": {"hard": null, "soft": "weekdays", "not_days": [], "seasonal": null},
-      "hardness": "SOFT",
+      "availability": {"hard": "start no later than 5pm (earlier is better)", "soft": "weekdays", "not_days": [], "seasonal": null},
+      "hardness": "HARD",
       "flags": [],
       "relationships": [],
       "data_gaps": []
@@ -282,13 +277,13 @@
         {"name": "Spero", "breed": "Corgi", "price": 50, "notes": "GROWTH ON BACK - be careful; #7 feet/hocks"},
         {"name": "Mirakel", "breed": "Standard Poodle", "price": 125, "notes": "recurring eye/ear issues; 8mm body, poodle face"}
       ],
-      "location": {"address": "PlusCode Ocala", "zip": null, "zone": "Ocala", "plus": "3RM3+J29", "geo_notes": "GPS FAILS at this address - MUST use plus code"},
+      "location": {"address": "PlusCode Ocala", "zip": null, "zone": "Ocala-SW", "plus": "3RM3+J29", "geo_notes": "SW, near Kevin Cummings and Peter Moran; GPS FAILS at this address - MUST use plus code"},
       "access": {"owner_present": null},
-      "availability": {"hard": null, "soft": null, "not_days": [], "seasonal": null},
+      "availability": {"hard": null, "soft": "evening appointments ok", "not_days": [], "seasonal": null},
       "hardness": "FLEX",
       "flags": ["Spero has growth on back", "Jake (apprentice) groomed Spero solo here"],
       "relationships": [],
-      "data_gaps": ["precise zone (NE/SW?) - resolve from plus code 3RM3+J29 once base set"]
+      "data_gaps": []
     },
     {
       "name": "Hope Brooks",
@@ -303,11 +298,11 @@
       ],
       "location": {"address": "PlusCode Ocala (apartment complex)", "zip": "34474", "zone": "Ocala (34474, SW-ish)", "plus": "4QVR+6F5", "geo_notes": "park in grassy field behind apartment complex; text her to bring dog out"},
       "access": {"gate": "gate code #2161", "owner_present": "text her when ready"},
-      "availability": {"hard": null, "soft": "prefers Saturdays", "not_days": [], "seasonal": null},
+      "availability": {"hard": null, "soft": "Saturday, after Nancy Franklin and Lisa Prater nail appointments, usually works well", "not_days": [], "seasonal": null},
       "hardness": "SOFT",
       "flags": ["works in law, WFH Fridays"],
-      "relationships": [],
-      "data_gaps": ["confirm zone from plus code"]
+      "relationships": ["schedule Saturday after the Nancy Franklin / Lisa Prater nail cluster"],
+      "data_gaps": []
     },
     {
       "name": "Jeanne Leuenberger",
@@ -330,23 +325,28 @@
     },
     {
       "name": "Kevin Cummings",
-      "aka": null,
+      "aka": "+ Erin Cummings",
       "status": "standing",
-      "service_type": "nails_focused",
-      "cadence_days": 28,
-      "cadence_confidence": "low",
-      "cadence_note": "PENDING PAUL. His contact sheet is an empty stub (no Frequency line, no dog data). '4wk' is from Paul's notes digest, NOT the sheet. Only hard signal is the calendar (~42d/6wk). Not a sheet-vs-calendar conflict; it is Paul's-intent vs booking-history.",
+      "service_type": "full_groom",
+      "cadence_days": 42,
+      "cadence_confidence": "high",
+      "cadence_note": "sheet: 6 weeks (verified from current doc 1htI-Po...; calendar history confirms ~6wk)",
       "dogs": [
-        {"name": "Oakley", "breed": "Labrador", "price": null, "notes": "nails"},
-        {"name": "Gibbs", "breed": "Labrador", "price": null, "notes": "nails"}
+        {"name": "Klaus", "breed": "German Shepherd", "price": 105, "notes": null},
+        {"name": "Kacey", "breed": "German Shepherd", "price": 105, "notes": "getting frail/lame"},
+        {"name": "Molly", "breed": "Husky", "price": 135, "notes": "mats heavily, skin irritation; #7 feet/hocks"},
+        {"name": "Lexi", "breed": "Black Lab", "price": 55, "notes": "$55 full / $15 nails only"},
+        {"name": "Ace", "breed": "Yellow Lab", "price": 55, "notes": "$55 full / $15 nails only"},
+        {"name": "Izzie", "breed": "Black Lab", "price": 55, "notes": "$55 full / $15 nails only"},
+        {"name": "Kage", "breed": "Black Lab puppy", "price": null, "notes": "new from a Naples breeder; uncooperative (lays flat)"}
       ],
-      "location": {"address": "5312 SW 115th Street Rd, Ocala", "zip": "34476", "zone": "Ocala-SW", "plus": null, "geo_notes": null},
+      "location": {"address": "5312 SW 115th Street Rd, Ocala", "zip": "34476", "zone": "Ocala-SW", "plus": null, "geo_notes": "cars drive by extremely fast - back into the driveway"},
       "access": {"owner_present": null},
       "availability": {"hard": null, "soft": null, "not_days": [], "seasonal": null},
       "hardness": "FLEX",
-      "flags": ["multi-dog, nails-focused"],
+      "flags": ["large multi-dog account ($350-545/visit); partial sets some visits"],
       "relationships": [],
-      "data_gaps": ["dog prices", "cadence 4wk vs 6wk"]
+      "data_gaps": []
     },
     {
       "name": "Ligia Amyotte",
@@ -357,8 +357,8 @@
       "cadence_confidence": "high",
       "cadence_note": "sheet: 2 months / 8 weeks",
       "dogs": [
-        {"name": "Daisy", "breed": "Great Pyrenees", "price": 120, "notes": "the boss; bad/cauliflower ears, droopy eyes"},
-        {"name": "Sissy", "breed": "Great Pyrenees", "price": 120, "notes": null},
+        {"name": "Daisy", "breed": "Great Pyrenees", "price": 130, "notes": "the boss; bad/cauliflower ears, droopy eyes; price raised 120->130"},
+        {"name": "Sissy", "breed": "Great Pyrenees", "price": 130, "notes": "price raised 120->130"},
         {"name": "Tank", "breed": "Lab", "price": 50, "notes": null},
         {"name": "Lucy", "breed": "Lab", "price": 50, "notes": null}
       ],
@@ -375,19 +375,19 @@
       "aka": null,
       "status": "standing",
       "service_type": "full_groom",
-      "cadence_days": 84,
-      "cadence_confidence": "medium",
-      "cadence_note": "sheet blank (old spreadsheet); roster q84 (12wk). Paul decision: weekday daytime.",
+      "cadence_days": 90,
+      "cadence_confidence": "high",
+      "cadence_note": "sheet: 3 months (verified from current doc 1s45X8...)",
       "dogs": [
-        {"name": "Charlie", "breed": "Wheaton Terrier", "price": 100, "notes": "#7 body, 13mm head"}
+        {"name": "Charlie", "breed": "Wheaten Terrier", "price": 125, "notes": "#7 feet/hocks; wants 8mm body but uncooperative so #7 body; falls apart after ~45 min"}
       ],
-      "location": {"address": "2697 NE 60th Ln, Ocala", "zip": "34479", "zone": "Ocala-NE", "plus": null, "geo_notes": null},
-      "access": {"owner_present": null},
-      "availability": {"hard": null, "soft": "weekday daytime (Paul decision)", "not_days": [], "seasonal": null},
+      "location": {"address": "2697 NE 60th Ln, Ocala", "zip": "34479", "zone": "Ocala-NE", "plus": "6VXX+XR2", "geo_notes": "park on grass in front of front door; drive out through neighbor's driveway"},
+      "access": {"owner_present": "works from home (office in Jacksonville)"},
+      "availability": {"hard": null, "soft": "likes 12pm; works from home (daytime fine)", "not_days": [], "seasonal": null},
       "hardness": "FLEX",
       "flags": [],
       "relationships": [],
-      "data_gaps": ["cadence confidence (sheet blank)"]
+      "data_gaps": []
     },
     {
       "name": "Lisa Irwin",
@@ -399,16 +399,15 @@
       "cadence_note": "sheet: 2 weeks",
       "dogs": [
         {"name": "Mia", "breed": "Miniature Schnauzer", "price": 105, "notes": "8mm body, 13mm head, ears long"},
-        {"name": "Piper", "breed": "Australian Cattle Dog", "price": null, "notes": null},
-        {"name": "Bella", "breed": "Australian Cattle Dog", "price": null, "notes": null}
+        {"name": "Tao", "breed": "Great Pyrenees puppy", "price": 75, "notes": "price $75 for now, may rise as he grows"}
       ],
       "location": {"address": "home: 9250 SE 7th Ave, Ocala 34480 (gate 0305#); ALSO grooms at her office", "zip": "34480", "zone": "Ocala-SE", "plus": null, "geo_notes": "moved to Micanopy then BACK to Ocala; alternates home and office appointments; older sheet shows Evinston plus codes (stale)"},
       "access": {"gate": "home gate 0305#; office has changing signage", "owner_present": "staff present (Lou=chef, Isaiah)"},
       "availability": {"hard": "12pm every OTHER Tuesday (fixed), regardless; home sits inside the every-2-week Tuesday route", "soft": null, "not_days": [], "seasonal": null},
       "hardness": "HARD",
-      "flags": ["now 2 dogs being groomed regularly so duration grew", "new Belgian Malinois 'Akira' coming", "several past dogs deceased (Mick, Scout, Stella)"],
+      "flags": ["2 dogs now: Mia + Tao (Great Pyrenees puppy); several past dogs deceased (Mick, Scout, Stella)"],
       "relationships": [],
-      "data_gaps": ["which dogs are current (2 per recent visits)", "current home vs office addresses and the alternation pattern"]
+      "data_gaps": ["current home vs office addresses and the alternation pattern"]
     },
     {
       "name": "Lisa Prater",
@@ -442,9 +441,9 @@
       ],
       "location": {"address": "7799 NW 33rd Pl, Ocala", "zip": "34482", "zone": "Ocala-NW", "plus": null, "geo_notes": "Golden Ocala gated community, enter at 80th Avenue gate"},
       "access": {"gate": "Golden Ocala, 80th Ave gate", "contacts": "Mark (husband), Barbra (dog sitter)", "owner_present": "Mark WFH Wednesdays"},
-      "availability": {"hard": "weekday ~4:00pm (after 4:30 ok); schedule at 4pm per Marilyn", "soft": "Wed husband WFH (good access day)", "not_days": [], "seasonal": null},
+      "availability": {"hard": "weekday, EARLIER is better; arrive before 4pm (between 4 and 5 it gets hard to get through the gate)", "soft": "Wed husband WFH (good access day)", "not_days": [], "seasonal": null},
       "hardness": "HARD",
-      "flags": ["Winnie health watch (lethargy, high bilirubin history)"],
+      "flags": ["Winnie health watch (lethargy, high bilirubin history)", "gate gets hard to enter 4-5pm"],
       "relationships": [],
       "data_gaps": []
     },
@@ -457,17 +456,16 @@
       "cadence_confidence": "high",
       "cadence_note": "sheet: 4 weeks",
       "dogs": [
-        {"name": "Onyx", "breed": "Large long-haired mix", "price": 90, "notes": "$90 full / $50 touch-up; 7f body"},
-        {"name": "Toby", "breed": "Shih Tzu", "price": 80, "notes": "$80 full / $50 touch-up; great dog"},
-        {"name": "Benji", "breed": "Terrier mix", "price": 65, "notes": "Mary Beth's sister's dog, a stray"}
+        {"name": "Toby", "breed": "Shih Tzu", "price": 85, "notes": "great dog; back/ear issues history"},
+        {"name": "Theo", "breed": "unknown", "price": 85, "notes": "added to record fall 2025"}
       ],
       "location": {"address": "4610 SE 8th St, Ocala", "zip": "34471", "zone": "Ocala-SE", "plus": null, "geo_notes": null},
       "access": {"owner_present": null},
       "availability": {"hard": null, "soft": null, "not_days": [], "seasonal": null},
       "hardness": "FLEX",
-      "flags": ["'?' in old title was a pencil-in reminder, not unconfirmed status (confirmed standing)"],
+      "flags": ["Onyx (large long-haired mix) died June 20 2025", "Benji was sister's visiting stray, not a regular - do not count"],
       "relationships": [],
-      "data_gaps": []
+      "data_gaps": ["Theo's breed"]
     },
     {
       "name": "Mary Jane Hunt",
@@ -478,9 +476,9 @@
       "cadence_confidence": "high",
       "cadence_note": "sheet: 2 weeks",
       "dogs": [
-        {"name": "Caesar", "breed": "Medium size mix", "price": 45, "notes": "hit declaw once; health watch (lump)"},
-        {"name": "Ringo", "breed": "Cavalier King Charles Spaniel", "price": 55, "notes": null},
-        {"name": "Pancho", "breed": "Havanese", "price": 65, "notes": "leave beard long"}
+        {"name": "Caesar", "breed": "Medium size mix", "price": 55, "notes": "hit declaw once; health watch (lump)"},
+        {"name": "Ringo", "breed": "Cavalier King Charles Spaniel", "price": 85, "notes": null},
+        {"name": "Pancho", "breed": "Havanese", "price": 85, "notes": "leave beard long"}
       ],
       "location": {"address": "5083 NW 90th Ave, Ocala", "zip": "34482", "zone": "Ocala-NW", "plus": "6PRM+92C / 6PRP+5H3 (Fellowship/Ocala NW)", "geo_notes": "NW anchor"},
       "access": {"gate": "gate code #0009", "billing": "send invoice after dogs are done", "owner_present": null},
@@ -590,18 +588,23 @@
       "name": "Steve Crandall",
       "aka": null,
       "status": "standing",
-      "service_type": "full_groom",
+      "service_type": "nails_only_legacy",
       "cadence_days": 28,
       "cadence_confidence": "high",
       "cadence_note": "sheet: 4 weeks",
-      "dogs": [],
+      "dogs": [
+        {"name": "Moose", "breed": "Miniature/Toy Poodle", "price": null, "notes": "nails; $65 total for all four"},
+        {"name": "Pip", "breed": "Miniature/Toy Poodle", "price": null, "notes": "nails"},
+        {"name": "Gracie", "breed": "Miniature/Toy Poodle", "price": null, "notes": "nails"},
+        {"name": "Brewster", "breed": "Miniature/Toy Poodle", "price": null, "notes": "nails"}
+      ],
       "location": {"address": "3540 SE 29th Ct, Ocala", "zip": "34471", "zone": "Ocala-SE", "plus": null, "geo_notes": null},
       "access": {"parking": "park in the street, they bring the dogs out to the driveway", "owner_present": "they bring dogs out"},
       "availability": {"hard": "weekday 6:00-7:00pm", "soft": null, "not_days": [], "seasonal": null},
       "hardness": "HARD",
-      "flags": [],
+      "flags": ["nails-only legacy; 4 mini/toy poodles for $65 total"],
       "relationships": [],
-      "data_gaps": ["dog names/breeds/count (sheet header blank); ~41 min on-site suggests 1-2 small dogs"]
+      "data_gaps": []
     },
     {
       "name": "Terri McDonnell",
@@ -631,22 +634,20 @@
       "service_type": "full_groom",
       "cadence_days": 28,
       "cadence_confidence": "medium",
-      "cadence_note": "sheet blank; roster q28; big multi-dog account, books ~monthly, partial sets each visit",
+      "cadence_note": "sheet blank; roster q28; multi-dog account, books ~monthly, partial sets each visit",
       "dogs": [
-        {"name": "Andy", "breed": "Shepherd mix", "price": 100, "notes": null},
-        {"name": "Ruthie", "breed": "Great Pyrenees", "price": 150, "notes": null},
-        {"name": "Kai", "breed": "Australian Shepherd", "price": 100, "notes": null},
-        {"name": "Lydia", "breed": "Australian Shepherd", "price": 100, "notes": null},
-        {"name": "Koa", "breed": "Australian Shepherd", "price": 100, "notes": null},
-        {"name": "Scrappy & Pebbles", "breed": "Yorkie mixes", "price": 85, "notes": "pair"}
+        {"name": "Kai", "breed": "Australian Shepherd", "price": 100, "notes": "regular"},
+        {"name": "Lydia", "breed": "Australian Shepherd", "price": 100, "notes": "regular"},
+        {"name": "Koa", "breed": "Australian Shepherd", "price": 100, "notes": "sometimes"},
+        {"name": "Ruthie", "breed": "Great Pyrenees", "price": 150, "notes": "sometimes"}
       ],
       "location": {"address": "PlusCode East Williston", "zip": "32696", "zone": "Williston", "plus": "driveway 9J52+WJW / parking 9H6X+HWV", "geo_notes": "~20 min from base; below Paul's median drive; profitable, not a problem stop"},
       "access": {"owner_present": null},
       "availability": {"hard": null, "soft": null, "not_days": [], "seasonal": null},
       "hardness": "FLEX",
-      "flags": ["large multi-dog account ($300-500/visit); dog set varies per visit; visiting dogs appear (Charlie, Dash, Eula)"],
+      "flags": ["multi-dog account; Kai + Lydia regular, Koa + Ruthie sometimes; Andy (shepherd mix) died; Scrappy & Pebbles are her brother's dogs, done once - do not count"],
       "relationships": [],
-      "data_gaps": ["which dogs are routinely groomed vs occasional/visiting"]
+      "data_gaps": []
     },
     {
       "name": "Patty Brown",
@@ -655,15 +656,18 @@
       "service_type": "nails_only_legacy",
       "cadence_days": 28,
       "cadence_confidence": "low",
-      "cadence_note": "NO contact sheet; ~4wk from calendar only",
-      "dogs": [],
+      "cadence_note": "NO contact sheet; ~4wk from calendar; dogs/service per Paul directly",
+      "dogs": [
+        {"name": "Bella", "breed": "Pit Bull/Boxer mix", "price": null, "notes": "nails; $45 total for both"},
+        {"name": "Gizmo", "breed": "Chihuahua/Dachshund/Chihuahua mix", "price": null, "notes": "nails"}
+      ],
       "location": {"address": "9634 SW 67th St, Ocala", "zip": "34481", "zone": "Ocala-SW", "plus": null, "geo_notes": "near Nancy Franklin / Lisa Prater"},
       "access": {"owner_present": null},
       "availability": {"hard": "Saturday (Paul decision: routed with Nancy + Lisa Prater)", "soft": null, "not_days": [], "seasonal": null},
       "hardness": "HARD",
-      "flags": ["NO contact sheet - biggest data gap among standing"],
+      "flags": ["nails-only legacy; 2 dogs for $45 total; no contact sheet (data from Paul directly)"],
       "relationships": ["Saturday cluster with Nancy Franklin + Lisa Prater"],
-      "data_gaps": ["EVERYTHING: dogs, real availability, service type, cadence, exact cluster fit"]
+      "data_gaps": ["real availability beyond Saturday assumption"]
     }
   ],
 

@@ -34,28 +34,21 @@ stop. NE/NW/SE days commute into the city.
 
 ## Open data gaps (need Paul)
 
-Highest impact first:
+Small set remaining after Paul's 2026-05-24 corrections:
 
-1. **Patty Brown:** no contact sheet at all. Missing dogs, real availability, service
-   type, cadence. Currently modeled as nails-only-legacy Saturday cluster per Paul.
-3. **Steve Crandall:** dog names/breeds/count unknown (sheet header blank).
-4. **Lisa Irwin:** which dogs are current (recent visits show 2), and the current
-   home-vs-office address alternation. Sheet plus codes (Evinston) are stale.
-5. **Erich Blunt:** is Sophie (very old standard poodle) still being groomed? Recent
-   visits show only Koby (and Jethro?).
-7. **Kevin Cummings:** dog prices; cadence (see above).
-8. **Terri McDonnell:** confirm works-from-home (affects daytime availability).
-9. **Cynthia Tieche:** confirm Satin + Luna are current (old spreadsheet sheet).
-10. **Bradley Johnson:** name of the second cocker spaniel.
-11. **Tonya Hunt:** which dogs are routine vs occasional/visiting.
-12. **Heather Albinson / Hope Brooks:** precise NE/SW zone (resolve from plus codes once
-    base is set).
+1. **Peter Moran:** cadence (sheet blank; your note ~8wk vs calendar ~12wk).
+2. **Lisa Irwin:** current home vs office address and the every-other-Tuesday alternation.
+3. **Terri McDonnell:** confirm works-from-home (affects daytime availability).
+4. **Mary Beth Anderson:** Theo's breed.
+5. **Patty Brown:** real availability beyond the Saturday assumption (no contact sheet;
+   dogs and service now known from Paul: Bella + Gizmo, nails, $45).
+6. **Chester Weber:** exact zone/bearing vs base (minor).
 
 ## Standing roster at a glance (33)
 
-- Service types: 27 full groom, 1 full+nails (Chester), 1 bath (Debra Koerner),
-  1 nails-focused (Kevin), 3 nails-only legacy (Nancy, Lisa Prater, Patty).
-- Hardness: 14 HARD, 3 SOFT, 15 FLEX, 1 FLEX+ (Ligia).
+- Service types: 28 full groom, 1 bath (Debra Koerner), 1 mixed groom/nails
+  (Lisa Prater), 3 nails-only legacy (Nancy Franklin, Steve Crandall, Patty Brown).
+- Hardness: 15 HARD, 2 SOFT, 15 FLEX, 1 FLEX+ (Ligia).
 - Fixed-slot anchors: Mary Jane Hunt (Thu 12, away Jun-Nov), Chester Weber (weekday 12),
   Lisa Irwin (every-other-Tue 12).
 - Evening-locked: Ginger, Chloe, Michelle, Steve, Marilyn, Peter (and Barbara's gate).
