@@ -377,6 +377,15 @@ which governs Paul's own tools, not what clients use. Because a clear list stops
 wondering whether they need cash or an ATM stop, and naming the wallets removes a friction
 point at the trailer.
 
+`house_shampoo` (service):
+Clean washes everyone with one gentle, well-tolerated house shampoo; a client who wants a
+specific, medicated, prescription, or flea product provides it and Clean uses it without standing
+behind the result. Because at scale one reliably inoffensive shampoo avoids the steady stream of
+complaints any single product attracts, Clean cannot stock every medicated formula or know which
+one treats a given dog, and a single flea bath cannot fix an environmental flea problem the dog
+will just be re-exposed to. The specific house brand stays in the private record, not public copy
+(`dont_knock_competitors` and brand-neutral copy).
+
 ---
 
 ## Copy and terminology

@@ -54,6 +54,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | cancellation_24h | Money | Oracle | booking engine; site copy |
 | favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |
 | accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |
+| house_shampoo | Service | Oracle; convention | site copy; intake form |
 | grooming_vocab | Copy | CLAUDE.md; convention | lint allowlist |
 | no_dgn_import | Copy | CLAUDE.md; "Repo separation" | lint pattern |
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |

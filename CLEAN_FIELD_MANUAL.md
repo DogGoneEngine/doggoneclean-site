@@ -135,6 +135,27 @@ machine flush).
 
 ---
 
+## Shampoo and product policy
+
+- **House shampoo.** TropiClean papaya and mango 2-in-1 shampoo and conditioner, used for
+  everyone. Not necessarily the best on the market, but in years of use at scale no one has
+  complained about the smell or the dog's skin, which is exactly what a single house product needs
+  to be. Many others were tried over the years.
+- **Client-supplied products.** If a client prefers a specific shampoo, Clean uses it. The bottle
+  only needs loading into the system, so it goes in first and the bottle goes straight back to the
+  client before the bath.
+- **Medicated / prescription.** Clean stocks only the one house shampoo. Anything medicated or
+  vet-prescribed must be client-supplied, because Clean cannot know which formula treats a given
+  condition or stock every kind. Use what they bring; do not stand behind the result, which is
+  between the client and their vet.
+- **Fleas.** Same rule: the client provides flea shampoo. A single flea bath cannot solve fleas,
+  since the dog gets re-infested from its environment and even a perfect kill is undone the moment
+  it goes home. Use what they bring; do not promise it fixes the problem.
+
+See the Oracle rule `house_shampoo`.
+
+---
+
 ## Power and generators
 
 **Two generators, for redundancy.** Run two generators rather than one large unit (currently

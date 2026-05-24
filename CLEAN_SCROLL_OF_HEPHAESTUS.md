@@ -200,6 +200,14 @@ sessions add their own dated section below.
   as the first section of CLEAN_ORACLE.md, with the apex line and a pointer in CLAUDE.md "What
   this repo is". Paul approved the wording verbatim.
 
+### Shampoo policy (LOCKED)
+- **`house_shampoo`:** one gentle house shampoo for everyone (privately: TropiClean papaya and
+  mango 2-in-1, the one product years of use produced no complaints about); clients supply any
+  specific, medicated, prescription, or flea product and Clean uses it without standing behind the
+  result (cannot stock or vouch for every medicated formula, and a flea bath cannot fix an
+  environmental flea problem). Brand kept in the private record, not public copy. Lives in the
+  Oracle (Service) + index, with the full policy in CLEAN_FIELD_MANUAL.md.
+
 ### Brand voice: don't knock competitors (LOCKED)
 - **`dont_knock_competitors`:** never disparage other systems, products, or groomers in
   client-facing copy; sell why ours is great on its own merits (competitor weaknesses may be noted
