@@ -109,7 +109,52 @@ Assets Paul will provide (data gaps):
   client-supplied medicated or flea product will work belongs in the intake or terms fine print,
   where a disclaimer is appropriate, never in the hero copy (`reminder_voice`, `house_shampoo`).
 
+## Language bank (gold lines, flagged for future use)
+
+Strong lines pulled from the internal coyote story; work them into public copy when they fit
+(`language_bank`).
+
+- "A garden hose would have laughed at that dog. A bath by hand would have been an all-day act of
+  surrender." Safe and strong: it pokes at backyard methods, not at any product or competitor.
+- "Most setups would have just smeared it around." Hold or adapt. This one edges into knocking
+  other systems (`dont_knock_competitors`). Keep the rhythm, drop the knock, for example fold the
+  punch into the garden-hose line or end on "and the mud did not stand a chance."
+- "By the end, the only thing left on him was the smell of a job well done." Gold, safe, ready.
+- "...a coat you would never guess had been a crime scene an hour earlier." Adapt the "crime
+  scene" for general use, for example "a coat you would never guess had been a disaster an hour
+  earlier" or "...had been anything but spotless."
+
 ## Private record (DO NOT PUBLISH)
+
 The build is proprietary and is the moat. The canonical record lives in CLEAN_FIELD_MANUAL.md
 ("The Hurricane Bath"), and the shampoo brand and policy in "Shampoo and product policy." This
 showcase references the outcome, never the schematic or the brand.
+
+### Internal story (DO NOT PUBLISH): The Mud-Caked Guardian
+
+Kept for internal use and as a capability story, not for the public page.
+
+Somewhere out past the fence line, a livestock guard dog was doing the job he was bred for. The
+foals were his to watch, all wobbly legs and no sense, and a coyote had made the mistake of its
+short life by deciding they looked like dinner.
+
+It did not go the coyote's way.
+
+By the time the dust settled, the guardian had run the thing down through a low, wet, churned-up
+stretch of ground and finished the fight. He came trotting back the way heroes do, head high,
+tail easy, completely unbothered, and absolutely unrecognizable. Mud to the eyebrows. Mud in
+places mud has no business being. The whole story of the morning was written across his coat in
+earth and worse, packed down deep into a thick double coat that does not give anything up easily.
+
+A garden hose would have laughed at that dog. A bath by hand would have been an all-day act of
+surrender. Most setups would have just smeared it around.
+
+So Paul loaded him into the trailer and went to work. Dial the pressure down, soak the worst of
+it loose. Flush the system when the water turned to a churning brown soup, refill, go again. The
+mud puddle came out, clean water went in. Wash like he is filthy, then wash him like he is dirty,
+then wash him like he is just a regular dog having a regular bath. By the end, the only thing
+left on him was the smell of a job well done and a coat you would never guess had been a crime
+scene an hour earlier.
+
+The foals lived. The coyote did not. And the hero got the one bath in the county that could
+actually keep up with him.
