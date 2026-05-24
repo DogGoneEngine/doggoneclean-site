@@ -44,6 +44,17 @@ remove; (3) any rule that lost its last live layer is re-enforced (or the redesi
 rejected). Because dropped rules are how an operating business breaks silently, and the
 index is the audit that turns "we should preserve the rules" into a step that actually runs.
 
+`elons_algorithm` (process):
+Run any build or scope decision through the five-step order, never out of order: (1) make the
+requirement less dumb (every requirement traces to a real reason and a real person who wants it,
+never "because DGN had it"; requirements from smart people are the most dangerous because they
+go unquestioned); (2) delete the part or step (if you are not adding some of it back later, you
+deleted too little); (3) simplify what survives (only now, since optimizing a thing that should
+not exist is the trap); (4) accelerate the cycle time; (5) automate, last. Because the expensive
+mistake is optimizing, speeding up, or automating something that should have been deleted, and
+the solo-dev-forking-DGN risk is porting features Clean does not need. Named for Musk's design
+algorithm. Pairs with `clean_stays_saleable` and `no_mockups`.
+
 `lock_it_in_capture` (process):
 When Paul locks a decision or hands over a raw idea to keep (says "lock it in," "put it where it
 belongs," "capture this," or a clear equivalent), capture it the same turn: choose its live home

@@ -186,6 +186,14 @@ sessions add their own dated section below.
   Gboard text-expansion shortcuts. Aspirational equipment to-dos (three rotary setups, charging
   bucket cleanup, tire/bearing interval) live in CLEAN_FIELD_MANUAL.md open items.
 
+### Elon's algorithm (LOCKED)
+- **`elons_algorithm`:** run every build/scope decision through Musk's five-step order, never out
+  of order: (1) make the requirement less dumb (tie each to a real reason and person, never
+  "because DGN had it"), (2) delete the part or step, (3) simplify what survives, (4) accelerate
+  cycle time, (5) automate last. Guards against the solo-dev-forking-DGN trap of optimizing or
+  automating features Clean does not need. Lives in the Oracle (`elons_algorithm`), with a
+  pointer in CLAUDE.md "How Paul works" and a row in the enforcement index.
+
 ### Idea-capture workflow (LOCKED)
 - **Ideas come into a Claude thread now, not the Drive journal.** Paul describes the idea and
   the reason; the assistant chooses its home (Oracle rule, CLAUDE.md constraint, parking lot,

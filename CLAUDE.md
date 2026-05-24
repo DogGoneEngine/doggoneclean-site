@@ -76,6 +76,10 @@ See `lock_it_in_capture` in the Oracle.
   credentials/dashboards no tool exposes.
 - **Read before redesign.** Before any redesign, read CLEAN_SCROLL_OF_HEPHAESTUS.md and
   CLEAN_ORACLE.md in full. A redesign that drops an existing rule is rejected.
+- **Elon's algorithm (run every build/scope call through it).** In order: make the requirement
+  less dumb (tie each to a real reason and a real person, never "because DGN had it"), delete the
+  part or step, simplify what survives, accelerate cycle time, then automate last. Never optimize
+  or automate something that should have been deleted. See `elons_algorithm` in the Oracle.
 - **Device profile:** Pixel 8 Pro on Chrome, a Chromebook for desktop, occasionally
   Windows. No Apple devices ever. Never write instructions assuming Safari, iOS, Apple
   Pay, or Apple Sign In. Default mobile test target is Pixel + Chrome.
