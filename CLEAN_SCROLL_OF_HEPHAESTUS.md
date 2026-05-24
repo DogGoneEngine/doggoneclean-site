@@ -20,7 +20,7 @@
 - **Next action:** lock the last open cadence (Peter Moran, ~8wk vs ~12wk), then tighten
   the route template against corrected stop sizes (Kevin is now a half-day 7-dog stop;
   Steve and Patty are quick nails; Chester is shorter without Windsor).
-- **Parked:** one-off list as conversion candidates; see DGC_PARKING_LOT.md.
+- **Parked:** one-off list as conversion candidates; see CLEAN_PARKING_LOT.md.
 
 ---
 
@@ -30,8 +30,8 @@
   11 one-off + 2 at-will + 1 banned in `data/clients.json`.
 - **Phase 2 - First zone-day route template.** DRAFTED (`data/route_template.md`). Pending
   final cadences and any load rebalancing.
-- **Phase 3 - Doc/handoff system.** DONE (2026-05-24): CLAUDE.md + this file + DGC_RULES.md
-  + DGC_RULES_INDEX.md + DGC_PARKING_LOT.md.
+- **Phase 3 - Doc/handoff system.** DONE (2026-05-24): CLAUDE.md + this file + CLEAN_ORACLE.md
+  + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md.
 - **Phase 4 - Future (not started).** Possible: geocode plus codes for true drive-time;
   route automation; multi-specialist routing (apprentice Jake); an actual site.
 
@@ -82,7 +82,7 @@
   Kevin resolved to 6wk (the real doc states it; he is a 7-dog full-groom account, not a
   2-dog nails stop). Peter Moran still open (~8wk note vs ~12wk calendar).
 - **One-off list:** leave as-is; treat as candidates to convert to standing where
-  applicable; parked in DGC_PARKING_LOT.md.
+  applicable; parked in CLEAN_PARKING_LOT.md.
 - **From the original brief (baked):** evening/Saturday locks are real client constraints,
   not artifacts. Donna DiPasqua Tuesday route. Cynthia Tieche Tuesday 3pm. Nancy Franklin +
   Lisa Prater + Patty Brown Saturday nails cluster (neighbors). Garrett Little at-will

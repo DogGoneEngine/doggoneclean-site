@@ -1,7 +1,7 @@
 # DGC parking lot
 
 Deferred work and forward-looking ideas, parked so they survive a context reset. Nothing
-here is committed work; it is the backlog. Move an item into DGC_HISTORY.md's focus block
+here is committed work; it is the backlog. Move an item into CLEAN_SCROLL_OF_HEPHAESTUS.md's focus block
 when it becomes active.
 
 ## Conversion candidates (one-off -> standing)
@@ -38,6 +38,6 @@ are not routed until converted. Verify against the real sheet at conversion time
 - Geocode the plus codes to compute true drive-time clusters instead of NE/NW/SE/SW buckets.
 - Multi-specialist routing: apprentice Jake can take solo dogs (e.g. Spero at Heather's).
 - Possible actual site/app (repo is named "doggoneclean-site"); not started, no stack chosen.
-- Automation candidates (from DGC_RULES_INDEX gaps): JSON schema validation for
+- Automation candidates (from CLEAN_BUSINESS_RULES gaps): JSON schema validation for
   `clients.json`; a lint for em dashes and banned vocabulary; a check that banned/one-off
   clients never appear in the route template.

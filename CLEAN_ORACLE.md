@@ -1,7 +1,7 @@
 # DGC rulebook
 
 Every rule is "KEY (domain): Statement. Because <reason>." The because is mandatory; a rule
-without one is not a rule yet. Where a rule is enforced is tracked in DGC_RULES_INDEX.md.
+without one is not a rule yet. Where a rule is enforced is tracked in CLEAN_BUSINESS_RULES.md.
 
 ## Roster and classification
 
@@ -86,7 +86,7 @@ without one is not a rule yet. Where a rule is enforced is tracked in DGC_RULES_
 - **DO-THE-WORK (process):** Anything doable with available tools, do; do not hand Paul a
   task list for work the assistant can complete. Because his plate is decisions,
   physical-world actions, and credentials no tool exposes.
-- **READ-BEFORE-REDESIGN (process):** Read DGC_HISTORY.md and this rulebook in full before
+- **READ-BEFORE-REDESIGN (process):** Read CLEAN_SCROLL_OF_HEPHAESTUS.md and this rulebook in full before
   any redesign; a redesign that drops an existing rule is rejected. Because dropped rules are
   how an operating business breaks silently.
 - **NO-MERGE-ACROSS-REPOS (process):** Never share, symlink, or merge these docs between the

@@ -16,12 +16,12 @@ separation" below.
 ## Read order (the doc set)
 
 1. **CLAUDE.md** (this file) - operating manual. Permanent rules, stack, constraints.
-2. **DGC_HISTORY.md** - session-by-session history + phase map. Read it fully before
+2. **CLEAN_SCROLL_OF_HEPHAESTUS.md** - session-by-session history + phase map. Read it fully before
    doing work. Rebuild it only at end of session on Paul's explicit instruction, never
    mid-session. If history and reality disagree, reality wins and history is corrected.
-3. **DGC_RULES.md** - every business rule in "KEY (domain): Statement. Because <reason>."
-4. **DGC_RULES_INDEX.md** - table mapping each rule to every place it is enforced.
-5. **DGC_PARKING_LOT.md** - deferred work and forward-looking ideas, parked to survive
+3. **CLEAN_ORACLE.md** - every business rule in "KEY (domain): Statement. Because <reason>."
+4. **CLEAN_BUSINESS_RULES.md** - table mapping each rule to every place it is enforced.
+5. **CLEAN_PARKING_LOT.md** - deferred work and forward-looking ideas, parked to survive
    context resets.
 
 That read-order link is the only thing holding the set together. Keep the file names exact.
@@ -36,7 +36,7 @@ That read-order link is the only thing holding the set together. Keep the file n
 - **Do the work; don't punt it.** Anything doable with your tools, do. Don't hand Paul task
   lists for things you can do. His plate is decisions, physical-world actions, and
   credentials no tool exposes.
-- **Read before redesign.** Before any redesign, read DGC_HISTORY.md and DGC_RULES.md in
+- **Read before redesign.** Before any redesign, read CLEAN_SCROLL_OF_HEPHAESTUS.md and CLEAN_ORACLE.md in
   full. A redesign that drops an existing rule is rejected.
 - **Device profile:** Pixel 8 Pro on Chrome, a Chromebook for desktop, occasionally
   Windows. No Apple devices ever. Never write instructions assuming Safari, iOS, Apple

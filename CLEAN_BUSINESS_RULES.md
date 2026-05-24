@@ -1,6 +1,6 @@
 # DGC rules index
 
-Where each rule in DGC_RULES.md is actually enforced. This repo has no database, app code,
+Where each rule in CLEAN_ORACLE.md is actually enforced. This repo has no database, app code,
 or lint yet, so enforcement today is the rulebook, the data file, the route template, and
 plain convention. Started thin on purpose; split more out as automation appears.
 
@@ -13,7 +13,7 @@ plain convention. Started thin on purpose; split more out as automation appears.
 | REAL-DATA-ONLY | Data | `data/clients.json` `data_gaps[]`; convention |
 | SHEETS-ARE-TRUTH | Data | `data/sources.md`; CLAUDE.md source-of-truth section |
 | NEWEST-DOC | Data | `data/sources.md` (corrected IDs + caveat); CLAUDE.md |
-| REALITY-WINS | Data | DGC_HISTORY.md header mandate; convention |
+| REALITY-WINS | Data | CLEAN_SCROLL_OF_HEPHAESTUS.md header mandate; convention |
 | SERVICE-TYPE-REQUIRED | Data | `data/clients.json` `service_type` (every record) |
 | DATA-GAP-EXPLICIT | Data | `data/clients.json` `data_gaps[]`; `data/README.md` open-gaps list |
 | CADENCE-CONFLICT-LEANS-SHEET | Scheduling | `data/clients.json` `cadence_confidence` + `cadence_note`; `data/README.md` |
@@ -29,10 +29,10 @@ plain convention. Started thin on purpose; split more out as automation appears.
 | REC-WITH-REASON | Process | CLAUDE.md "How Paul works" |
 | OUTCOMES-NOT-ACTIONS | Process | CLAUDE.md "How Paul works" |
 | DO-THE-WORK | Process | CLAUDE.md "How Paul works" |
-| READ-BEFORE-REDESIGN | Process | CLAUDE.md; DGC_HISTORY.md header mandate |
+| READ-BEFORE-REDESIGN | Process | CLAUDE.md; CLEAN_SCROLL_OF_HEPHAESTUS.md header mandate |
 | NO-MERGE-ACROSS-REPOS | Process | CLAUDE.md "Repo separation" |
 | GIT-BRANCH-NO-PR | Process | CLAUDE.md "Stack and commands" |
 
 Gaps in enforcement (candidates for future automation): no schema validation on
 `clients.json` beyond JSON parse; no lint for em dashes or banned vocabulary; no automated
-check that banned/one-off clients stay out of the route. Parked in DGC_PARKING_LOT.md.
+check that banned/one-off clients stay out of the route. Parked in CLEAN_PARKING_LOT.md.
