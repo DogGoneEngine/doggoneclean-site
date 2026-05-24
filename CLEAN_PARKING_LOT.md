@@ -47,6 +47,16 @@ are not routed until converted. Verify against the real sheet at conversion time
   the productized businesses from a shared template (each with its own instance and infra)
   so the engine and lessons are reused without entangling them (per clean_stays_saleable);
   the legacy business stays lean.
+  - Newer thinking (2026-05-24): Paul may launch a family of "Dog Gone" brands named by
+    service (Clean, Walking, Sitting, Training). Under that taxonomy the legacy Ocala
+    business is full grooming, not "clean," so "Dog Gone Clean" fits the new Villages bath
+    business better; open whether to give the keeper name to the new business and let the
+    winding-down legacy take a distinct grooming name.
+  - Deeper fork that sets everything else: does Paul want a portfolio he owns and runs
+    together, or independent businesses each separately sellable? That, not "sell or not,"
+    sets the saleability scope and the shared-vs-separate infrastructure call.
+  - The Ocala legacy is the income bridge that funds the new builds, so keep it stable and
+    low-investment while the new businesses come up.
 - **Online payment:** does the Clean site take payment online, or stay in-person
   invoice/cash/card like the sheets show today? This one answer decides whether the entire
   DGN payment/skip/reschedule/card layer ever gets ported.
