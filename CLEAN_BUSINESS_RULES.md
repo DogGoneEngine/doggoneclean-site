@@ -18,6 +18,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | do_the_work | Process | CLAUDE.md; convention | `business_rules` row |
 | read_before_redesign | Process | CLAUDE.md; Scroll header mandate; redesign checklist (run `check.py` + walk this index) | `business_rules` row |
 | elons_algorithm | Process | CLAUDE.md "How Paul works"; Oracle | `business_rules` row |
+| dig_the_moat | Process | CLAUDE.md "How Paul works"; Oracle | `business_rules` row |
 | ship_to_completion | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | no_pr_activity_subscription_nudge | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | no_merge_across_repos | Process | CLAUDE.md "Repo separation" | n/a |

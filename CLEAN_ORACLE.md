@@ -54,6 +54,10 @@ off day.
 left better off. Because a business that only takes gets pushed out eventually, and one that
 genuinely adds is one people protect.
 
+Two decision lenses serve this directive and are run against every build or scope call:
+`elons_algorithm` (build it lean, in the right order) and `dig_the_moat` (does this deepen an
+advantage a smart AI cannot prompt past?).
+
 ---
 
 ## Process
@@ -97,6 +101,23 @@ not exist is the trap); (4) accelerate the cycle time; (5) automate, last. Becau
 mistake is optimizing, speeding up, or automating something that should have been deleted, and
 the solo-dev-forking-DGN risk is porting features Clean does not need. Named for Musk's design
 algorithm. Pairs with `clean_stays_saleable` and `no_mockups`.
+
+`dig_the_moat` (decision lens):
+Hold every build or scope decision against one question, the way Bezos asks "does this improve
+the customer experience" and Musk asks "does this get us to Mars": does this deepen an advantage
+a smart AI cannot prompt past? It counts as yes only if the moat is dug by becoming more
+genuinely valuable and harder to replace (deeper proprietary context, stronger relationships,
+better reputation, tighter local density, more grateful clients), never by trapping people or
+raising switching costs, which would violate the prime directive. As AI makes generic
+business-building cheap, value drains out of the scaffolding (tech stack, platform code, generic
+features, the "business in a box") and concentrates in what a prompt cannot conjure, so spend the
+effort there: capture tacit knowledge relentlessly into these docs, keep the corpus proprietary
+and portable (it is the asset a buyer pays for), and build the commodity layer lean rather than
+hand-crafting what the models will soon generate for free. Because once "make me a dog grooming
+business" is one prompt, any effort that does not deepen an un-promptable advantage is spent on
+what a competitor can conjure for free, and the smart AI is not the moat (every competitor will
+have it); the moat is that ours is pointed at twenty years of context no one else has. A peer of
+`elons_algorithm` in service of the prime directive; pairs with `clean_stays_saleable`.
 
 `lock_it_in_capture` (process):
 When Paul locks a decision or hands over a raw idea to keep (says "lock it in," "put it where it

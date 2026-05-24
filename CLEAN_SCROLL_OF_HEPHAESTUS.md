@@ -195,6 +195,20 @@ sessions add their own dated section below.
   as the first section of CLEAN_ORACLE.md, with the apex line and a pointer in CLAUDE.md "What
   this repo is". Paul approved the wording verbatim.
 
+### Dig the moat (LOCKED)
+- **`dig_the_moat`, a decision lens on a level with Elon's algorithm, in service of the prime
+  directive.** One recurring question for every build/scope call, the way Bezos asks "does this
+  improve the customer experience" and Musk asks "does this get us to Mars": does this deepen an
+  advantage a smart AI cannot prompt past? Counts as yes only when the moat is dug by genuine
+  value (proprietary context, relationships, reputation, local density, grateful clients), never
+  by lock-in (which would violate the directive). Rationale: as AI makes generic
+  business-building a single prompt, the scaffolding commoditizes and value concentrates in the
+  un-promptable, so spend effort there and build the commodity layer lean. Absorbed the earlier
+  proposed `the_moat_is_proprietary_context` (never committed). Lives in the Oracle, with a
+  pointer in CLAUDE.md "How Paul works" beside Elon's algorithm and a line in the prime-directive
+  section naming both lenses. Paul chose the decision-lens tier (not folded into the directive)
+  to keep defense from outranking the end it protects.
+
 ### Elon's algorithm (LOCKED)
 - **`elons_algorithm`:** run every build/scope decision through Musk's five-step order, never out
   of order: (1) make the requirement less dumb (tie each to a real reason and person, never

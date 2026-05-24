@@ -86,6 +86,11 @@ See `lock_it_in_capture` in the Oracle.
   less dumb (tie each to a real reason and a real person, never "because DGN had it"), delete the
   part or step, simplify what survives, accelerate cycle time, then automate last. Never optimize
   or automate something that should have been deleted. See `elons_algorithm` in the Oracle.
+- **Dig the moat (the decision lens for the AI era).** Run every build/scope call against one
+  question: does this deepen an advantage a smart AI cannot prompt past, by making us more
+  genuinely valuable (proprietary context, relationships, reputation, grateful clients), not by
+  locking anyone in? Spend effort on the un-promptable; build the commodity layer lean. Serves
+  the prime directive. See `dig_the_moat` in the Oracle.
 - **Device profile:** Pixel 8 Pro on Chrome, a Chromebook for desktop, occasionally
   Windows. No Apple devices ever. Never write instructions assuming Safari, iOS, Apple
   Pay, or Apple Sign In. Default mobile test target is Pixel + Chrome.
