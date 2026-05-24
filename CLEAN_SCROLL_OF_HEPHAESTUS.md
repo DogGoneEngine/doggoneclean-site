@@ -134,3 +134,9 @@
   subscriptions. The earlier prompt that contradicted this was a stale paste.
 - **Database guardrail:** no Supabase project, schema, `business_rules` table, or migration
   until the rules that shape the schema are agreed with Paul. Rules first, schema second.
+- **Saleability (recovered; was lost when another thread got too long):** Clean must remain
+  sellable as a standalone business and never be tangled with DGN or dependent on Paul
+  personally. He probably will not sell, but the option must stay open. Recorded as
+  `clean_stays_saleable` in the Oracle, a hard constraint in CLAUDE.md, and implications +
+  pre-sale cleanup (move source-of-truth data off Paul's personal Drive; brand rights) in
+  the Parking Lot.

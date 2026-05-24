@@ -66,6 +66,15 @@ Because merged history and shared infrastructure mis-apply rules across products
 
 ## Build and infrastructure
 
+`clean_stays_saleable` (build):
+Dog Gone Clean must remain sellable as a standalone business; nothing about it may be
+entangled with Dog Gone Nails (infrastructure, code, data, accounts, brand) or made to
+depend on Paul personally. Paul does not plan to sell, but the option must stay open.
+Because a sale means handing a buyer a clean, self-contained asset, and any DGN or personal
+entanglement created now becomes a sale blocker that is far cheaper to avoid than to
+untangle later. This is a guardrail, not a feature: do not build sale machinery; just keep
+every decision cleanly separable and operable by someone other than Paul.
+
 `no_database_until_rules_agreed` (build):
 Do not create a Supabase project, write schema, add a `business_rules` table, or run any
 migration until the rules that would shape the schema are agreed with Paul. Because schema
@@ -73,9 +82,10 @@ baked before the rules are settled hardens the wrong assumptions, and migrating 
 schema later costs more than waiting.
 
 `own_infrastructure` (build):
-Clean uses its own Supabase project, its own droplet path and domain, and its own Stripe
-account if payments ever happen; never DGN's. Because shared infrastructure is the same
-cross-contamination risk as merged docs.
+Clean uses its own Supabase project, its own droplet path and domain, its own API keys, and
+its own Stripe account if payments ever happen; never DGN's. Because shared infrastructure
+is both a cross-contamination risk and, per `clean_stays_saleable`, a sale blocker: a buyer
+must be able to take Clean whole while Paul keeps DGN whole.
 
 `reuse_dgn_stack` (build):
 The planned site mirrors the proven DGN stack (Astro 5 + React 18 islands, Node 20, npm,

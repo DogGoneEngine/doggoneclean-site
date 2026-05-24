@@ -112,6 +112,12 @@ until the site is stood up.
 
 ## Hard constraints
 
+- **Clean must stay sellable.** Paul wants the option to sell Dog Gone Clean someday (he
+  does not plan to, but it must stay possible). Never entangle Clean with DGN or with Paul's
+  personal accounts: separate Supabase project, domain, droplet, Stripe, API keys, and data,
+  and operations documented well enough that a buyer could run it without Paul. This is a
+  guardrail on every decision, not a feature to build; avoid entanglement now. See
+  `clean_stays_saleable` in the Oracle.
 - **No database changes yet.** Do not create a Supabase project, write schema, add a
   `business_rules` table, or run any migration until the rules that would shape the schema
   are agreed with Paul. Locking the rules comes first; schema follows.

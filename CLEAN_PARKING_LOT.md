@@ -44,6 +44,27 @@ are not routed until converted. Verify against the real sheet at conversion time
 - **Field/operator app:** is a Clean grooming-day app on the horizon? If yes, DGN's
   operator-app lessons are the most valuable thing to mine.
 
+## Saleability (keep the door open)
+
+Constraint (Oracle `clean_stays_saleable`): Clean must stay sellable as a standalone
+business, never tangled with DGN or dependent on Paul personally. Probably never sold, but
+the option stays open. Implications to honor as the build proceeds:
+
+- Separate everything from DGN: Supabase project, domain, droplet, Stripe, API keys, repo,
+  and data. No shared services or imports.
+- Operate without Paul: routes, rules, and the client book live in the system and the docs,
+  not in his head. No DGN-style dynastic/bloodline ownership; ownership and operator roles
+  must be transferable.
+- Keep Clean's docs self-contained: DGN references should be incidental, not load-bearing,
+  so a buyer can read the Oracle and records without needing DGN context.
+
+Pre-sale cleanup (not urgent, but would block a sale if left):
+- Authoritative client data currently lives in Paul's personal Google Drive. For a real
+  transfer, the source of truth should move into Clean's own infrastructure (its Supabase
+  project) so the asset is self-contained.
+- Brand/trademark: a buyer gets "Dog Gone Clean"; Paul keeps "Dog Gone Nails." Confirm what
+  rights to the shared "Dog Gone" name transfer. Real-world task for Paul, not a build task.
+
 ## Website build, when the rules are locked (the DB guardrail lifts first)
 
 Tooling to port from DGN at scaffold time (adapted, never shared): `package.json`,
