@@ -16,7 +16,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | outcomes_not_actions | Process | CLAUDE.md; convention | `business_rules` row |
 | no_mockups | Process | CLAUDE.md; convention | `business_rules` row |
 | do_the_work | Process | CLAUDE.md; convention | `business_rules` row |
-| read_before_redesign | Process | CLAUDE.md; Scroll header mandate | `business_rules` row |
+| read_before_redesign | Process | CLAUDE.md; Scroll header mandate; redesign checklist (run `check.py` + walk this index) | `business_rules` row |
 | ship_to_completion | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | no_pr_activity_subscription_nudge | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | no_merge_across_repos | Process | CLAUDE.md "Repo separation" | n/a |
@@ -26,16 +26,16 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | build_gate | Build | Oracle (planned) | `npm run build` (lint + smoke) |
 | classify_by_frequency | Roster | `clients.json` `status`; `data/README.md` | `business_rules` row |
 | active_set | Roster | `clients.json` scope; `check.py` (count=33) | `business_rules` row |
-| banned_excluded | Roster | `clients.json` `exclude_from_everything`; `check.py` | `business_rules` row; route check |
-| one_off_not_routed | Roster | `clients.json` `routed:false`; `route_template.md` | route-generation code |
+| banned_excluded | Roster | `clients.json` `exclude_from_everything`; **`check.py`** (record flag + absent from route) | `business_rules` row |
+| one_off_not_routed | Roster | `clients.json` `routed:false`; `route_template.md`; **`check.py`** (absent from route) | route-generation code |
 | real_data_only | Data | `clients.json` `data_gaps[]`; convention | n/a |
 | sheets_are_truth | Data | `data/sources.md`; CLAUDE.md | n/a |
 | newest_doc | Data | `data/sources.md` (corrected IDs + caveat); CLAUDE.md | sheet-resolver code |
 | reality_wins | Data | Scroll header mandate; convention | n/a |
 | service_type_required | Data | `clients.json` `service_type`; **`check.py`** | DB not-null; `src/business/` |
 | data_gap_explicit | Data | `clients.json` `data_gaps[]`; **`check.py`** | n/a |
-| cadence_conflict_leans_sheet | Scheduling | `clients.json` `cadence_confidence`/`cadence_note` | `business_rules` row |
-| hardness_respected | Scheduling | `clients.json` `hardness`/`availability`; `route_template.md` | scheduling engine |
+| cadence_conflict_leans_sheet | Scheduling | `clients.json` `cadence_confidence`/`cadence_note`; **`check.py`** (valid confidence) | `business_rules` row |
+| hardness_respected | Scheduling | `clients.json` `hardness`/`availability`; `route_template.md`; **`check.py`** (valid tag) | scheduling engine |
 | time_is_the_constraint | Scheduling | `route_template.md` design note | scheduling engine |
 | base_is_home_sw | Routing | `clients.json` `_meta`; `route_template.md` | drive-time code |
 | realistic_daily_load | Routing | `route_template.md` capacity notes | scheduling engine |

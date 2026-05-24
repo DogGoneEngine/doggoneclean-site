@@ -19,6 +19,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 CLIENTS = REPO / "data" / "clients.json"
+ROUTE = REPO / "data" / "route_template.md"
 
 ALLOWED_SERVICE = {
     "full_groom",
@@ -26,6 +27,8 @@ ALLOWED_SERVICE = {
     "nails_only_legacy",
     "mixed_groom_and_nails",
 }
+ALLOWED_CONFIDENCE = {"high", "medium", "low"}
+ALLOWED_HARDNESS = {"HARD", "SOFT", "FLEX", "FLEX+"}
 REQUIRED_STANDING_FIELDS = [
     "name", "status", "service_type", "cadence_days", "cadence_confidence",
     "dogs", "location", "access", "availability", "hardness", "flags",
@@ -56,6 +59,12 @@ def check_clients():
         st = c.get("service_type")
         if st not in ALLOWED_SERVICE:
             failures.append(f"{name}: service_type '{st}' not in {sorted(ALLOWED_SERVICE)}")
+        conf = c.get("cadence_confidence")
+        if conf not in ALLOWED_CONFIDENCE:
+            failures.append(f"{name}: cadence_confidence '{conf}' not in {sorted(ALLOWED_CONFIDENCE)}")
+        hard = c.get("hardness")
+        if hard not in ALLOWED_HARDNESS:
+            failures.append(f"{name}: hardness '{hard}' not in {sorted(ALLOWED_HARDNESS)}")
 
     for b in data.get("banned", []):
         if not b.get("exclude_from_everything"):
@@ -82,9 +91,31 @@ def check_dashes():
                 failures.append(f"{rel}:{lineno}: em/en dash found")
 
 
+def check_route_excludes():
+    """banned_excluded + one_off_not_routed: non-standing clients must never appear in the
+    recurring route template."""
+    try:
+        data = json.loads(CLIENTS.read_text())
+    except Exception:
+        return  # parse failure already reported by check_clients
+    try:
+        route = ROUTE.read_text(encoding="utf-8")
+    except Exception as exc:
+        failures.append(f"could not read route_template.md: {exc}")
+        return
+    for group in ("one_off", "at_will", "banned"):
+        for c in data.get(group, []):
+            nm = c.get("name", "")
+            if nm and nm in route:
+                failures.append(
+                    f"{group} client '{nm}' appears in route_template.md (must not be routed)"
+                )
+
+
 def main():
     check_clients()
     check_dashes()
+    check_route_excludes()
     if failures:
         print(f"CHECK FAILED ({len(failures)} issue(s)):")
         for f in failures:

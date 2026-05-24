@@ -37,8 +37,12 @@ tool exposes.
 
 `read_before_redesign` (process):
 Read `CLEAN_SCROLL_OF_HEPHAESTUS.md` and this rulebook in full before any redesign; a
-redesign that drops an existing rule is rejected. Because dropped rules are how an operating
-business breaks silently.
+redesign that drops an existing rule is rejected. Before a redesign merges, run the redesign
+checklist: (1) `python3 scripts/check.py` passes; (2) walk `CLEAN_BUSINESS_RULES.md` top to
+bottom and confirm each rule still traces to a live enforcement layer the redesign did not
+remove; (3) any rule that lost its last live layer is re-enforced (or the redesign is
+rejected). Because dropped rules are how an operating business breaks silently, and the
+index is the audit that turns "we should preserve the rules" into a step that actually runs.
 
 `ship_to_completion` (process):
 When a branch is committed and builds clean, open the PR and squash-merge it (same turn);
