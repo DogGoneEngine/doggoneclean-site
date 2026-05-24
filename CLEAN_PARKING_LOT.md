@@ -74,6 +74,10 @@ Pre-sale cleanup (not urgent, but would block a sale if left):
 
 ## Website build, when the rules are locked (the DB guardrail lifts first)
 
+**Hurricane Bath hero content is already drafted.** When building the marketing page, pull the
+copy, FAQ, and banked gold lines from `marketing/hurricane_bath_showcase.md`. Keep the build
+details (CLEAN_FIELD_MANUAL.md, "The Hurricane Bath") and the shampoo brand off the public page.
+
 Tooling to port from DGN at scaffold time (adapted, never shared): `package.json`,
 `astro.config.mjs`, `scripts/lint-business-rules.mjs` (rewrite patterns for Clean; keep
 em_dash and the generic ones, drop/invert the nail-terminology patterns),
