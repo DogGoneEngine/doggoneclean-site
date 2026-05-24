@@ -77,7 +77,9 @@ sellable is what forces it to be genuinely valuable, a clean self-contained asse
 without Paul; any DGN or personal entanglement is both a value leak and a sale blocker, far
 cheaper to avoid now than to untangle later. This is a guardrail, not a feature: do not build
 sale machinery; just keep every decision cleanly separable and operable by someone other
-than Paul.
+than Paul. A concrete way to apply the test: imagine (or ask a trusted outsider) why a
+serious buyer would decline, and treat each reason as the improvement backlog. The
+objections to buying are the to-do list for making the business valuable.
 
 `no_database_until_rules_agreed` (build):
 Do not create a Supabase project, write schema, add a `business_rules` table, or run any
