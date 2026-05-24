@@ -186,6 +186,15 @@ sessions add their own dated section below.
   Gboard text-expansion shortcuts. Aspirational equipment to-dos (three rotary setups, charging
   bucket cleanup, tire/bearing interval) live in CLEAN_FIELD_MANUAL.md open items.
 
+### Prime directive (LOCKED)
+- **The apex of the whole rulebook.** Dog Gone Clean exists to earn more every year while asking
+  less, not more, of the people who run it, and to leave everyone it touches better off. Seven
+  tests: earn more grind less; runs without Paul (no lapping scheme); fun to work on and in; good
+  for body and mind; a unicorn job; clients grateful it exists; the world better for it existing.
+  Every rule serves it, and if a rule fights it the directive wins and the rule gets fixed. Lives
+  as the first section of CLEAN_ORACLE.md, with the apex line and a pointer in CLAUDE.md "What
+  this repo is". Paul approved the wording verbatim.
+
 ### Elon's algorithm (LOCKED)
 - **`elons_algorithm`:** run every build/scope decision through Musk's five-step order, never out
   of order: (1) make the requirement less dumb (tie each to a real reason and person, never

@@ -19,6 +19,12 @@ There are two businesses total: DGN (the flagship, fully separate) and Clean (th
 
 This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 
+**Prime directive.** Dog Gone Clean exists to earn more every year while asking less, not more,
+of the people who run it, and to leave everyone it touches better off. The full directive (seven
+tests every decision is held against: earn more grind less, runs without Paul, fun to work on
+and in, good for body and mind, a unicorn job, clients grateful it exists, the world better for
+it) is the first section of CLEAN_ORACLE.md and is the apex every rule serves.
+
 ## Read order (the doc set)
 
 1. **CLAUDE.md** (this file) - operating manual. Permanent rules, stack, constraints.

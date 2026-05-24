@@ -13,6 +13,49 @@ How to read an entry: `key (domain): Statement. Because reason.`
 
 ---
 
+## Prime directive
+
+Dog Gone Clean exists to earn more every year while asking less, not more, of the people who
+run it, and to leave everyone it touches better off than it found them. Every rule in this book
+serves this. If a rule ever fights the prime directive, the directive wins and the rule gets
+fixed.
+
+1. **Earn more, grind less.** Profit should grow over time without Paul, or anyone, working
+harder to keep up. Growth comes from better systems, pricing, and leverage, never from just
+piling on hours. Because a business that only grows on the owner's sweat has a low ceiling and
+a hard cliff. Test: does this decision raise profit per hour, or just add hours?
+
+2. **It runs without Paul (no lapping scheme).** Paul can step away and everything keeps
+working. He takes real time off and nothing falls apart. The business must never lean on his
+daily presence to paper over gaps, the way a check-lapping scheme collapses the moment the
+bookkeeper stops. Because a business that needs the owner every day is a job, not an asset, and
+it is one bad week from breaking. Test: if Paul disappeared for two weeks, what breaks, and can
+we design that out now?
+
+3. **Fun to work on and in.** Building the business and doing the grooming should both be
+genuinely enjoyable, not a grind endured for a paycheck. Because staying power comes from work
+that is fun, and a business that bores or drains its people slowly rots.
+
+4. **Good for the body and the mind.** The work should leave the people who do it healthier, not
+used up. Because mobile grooming is physical, and a business that wears down its bodies is
+borrowing against its own future. Test: does this make the day easier on the body and mind, or
+harder?
+
+5. **A unicorn job.** If Paul hires, the job is good enough that a long line of people want it.
+Because great people make the great service, and you only keep great people by being the place
+everyone wants to work. It is also how the business comes to run without Paul.
+
+6. **Clients grateful it exists.** The service is good enough that clients feel lucky it is
+available to them, not like they are doing Paul a favor by booking. Because gratitude is the
+only moat that lasts: grateful clients stay for years, refer their friends, and forgive the rare
+off day.
+
+7. **The world is better because it exists.** Clients, dogs, workers, and the community are all
+left better off. Because a business that only takes gets pushed out eventually, and one that
+genuinely adds is one people protect.
+
+---
+
 ## Process
 
 `recommendation_with_reason` (process):
