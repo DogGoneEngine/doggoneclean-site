@@ -27,7 +27,7 @@
   rebuildably), then build the bath-forward marketing site + client portal + String of Pearls
   scheduling + operator app (photos) + pizza tracker + SMS notifications, forked from DGN and
   adapted (variable grooming durations, Square/in-person payment). Preview on
-  hurricanebath.com (kept private) while doggoneclean.com stays on the old site until launch.
+  hurricanebath.com (kept private) while doggoneclean.us stays on the old site until launch.
 - **Open:** Peter Moran cadence; route rebalance against corrected stop sizes.
 - **Parked:** one-off list as conversion candidates; see CLEAN_PARKING_LOT.md.
 
@@ -48,7 +48,7 @@
   clients and new bath clients) + String of Pearls scheduling + operator app with photos +
   pizza tracker + SMS notifications, forked from DGN onto Clean's own Supabase project, seeded
   from `data/clients.json`. In-person payment (Square). Preview on hurricanebath.com until
-  doggoneclean.com flips at launch.
+  doggoneclean.us flips at launch.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 
@@ -183,5 +183,7 @@
 - **Pizza tracker:** client-facing live status/ETA view, companion to the operator app,
   replaces the manual "on my way" location texts; included in v1 (details from Paul later).
 - **Staging:** build and preview on hurricanebath.com (kept private/non-indexed) while
-  doggoneclean.com keeps serving the old Squarespace site; flip the domain at launch. Local
+  doggoneclean.us keeps serving the old Squarespace site; flip the domain at launch. Local
   `npm run dev` is the fast loop.
+- **Domain (for the record):** the live site is www.DogGoneClean.us. Paul does NOT own
+  DogGoneClean.com. Staging/preview build on hurricanebath.com (a domain Paul owns).
