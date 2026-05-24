@@ -50,7 +50,7 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 - **Phase 2 - First zone-day route template.** DRAFTED (`data/route_template.md`). Pending
   the last cadence lock and a rebalance against corrected stop sizes.
 - **Phase 3 - Doc / handoff system.** DONE. CLAUDE.md + this Scroll + CLEAN_ORACLE.md +
-  CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + `scripts/check.py`.
+  CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + CLEAN_FIELD_MANUAL.md + `scripts/check.py`.
 - **Phase 4 - Clean website + ops app (fork of the DGN platform).** GREENLIT, starting.
   Astro marketing site (bath-forward) + client portal (existing + new clients) + String of
   Pearls scheduling + operator app with photos + pizza tracker + SMS notifications, on
@@ -162,3 +162,26 @@ sessions add their own dated section below.
 ### Facts for the record
 - **Domain:** the live site is www.DogGoneClean.us. Paul does NOT own DogGoneClean.com.
   Staging/preview on hurricanebath.com (a domain Paul owns).
+
+### Oracle journal absorption (from `the_oracle_journal` on Drive)
+- **Source:** Paul's original voice-dictated business journal on Google Drive (file id
+  `1ENkpSA6qYPQUcWgcWQGlDI_pE0JfWmr4j3Ft9mLp55I`), entries Feb 12 to Mar 28 2026. Studied and
+  split: real business rules into the Oracle, hands-on craft/equipment into a new manual, the
+  rest dropped as noise.
+- **New Oracle rules absorbed:** `persistent_status_update`; `no_doodles`;
+  `income_target_caps_the_day`, `heads_up_on_the_way`, `lock_in_timing`, `gated_community_hours`;
+  `cancellation_24h`, `favor_high_hourly_work`, `accepted_payment_methods`;
+  `website_is_ground_zero`, `reminder_voice`, `appointment_block_not_window`, `language_bank`,
+  `no_trailer_graphics`. All indexed in CLEAN_BUSINESS_RULES.md.
+- **New doc:** CLEAN_FIELD_MANUAL.md holds the grooming craft and trailer/equipment SOPs (a
+  saleability asset), kept out of the Oracle because they are how the job is done, not business
+  rules.
+- **Conflicts resolved with Paul:** (1) the journal's Acuity reminder system is superseded by
+  the custom String of Pearls scheduler; Acuity is cut as soon as the new system works (the
+  reminder content/standards were kept, the Acuity delivery detail folded into `lock_in_timing`).
+  (2) The no-Apple rule (`device_profile`) governs Paul's own tools only; accepting Apple Pay
+  from clients is fine, so the full wallet list stays in `accepted_payment_methods`. (3) Doodles
+  are declined entirely for now (`no_doodles`), not just full-groom doodles.
+- **Dropped as noise:** doc scaffolding, the "am I writing a training manual" musing, and the
+  Gboard text-expansion shortcuts. Aspirational equipment to-dos (three rotary setups, charging
+  bucket cleanup, tire/bearing interval) live in CLEAN_FIELD_MANUAL.md open items.

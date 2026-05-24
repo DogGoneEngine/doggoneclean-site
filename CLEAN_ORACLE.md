@@ -72,6 +72,12 @@ reviewers and no PR-level CI, so nothing on a PR is worth watching in this solo-
 Never share, symlink, or merge these docs or infrastructure between the DGN and DGC repos.
 Because merged history and shared infrastructure mis-apply rules across products.
 
+`persistent_status_update` (process):
+On any status request, do not report only what is top of mind; also surface important
+unfinished work that has gone quiet (weak spots, neglected systems, loose ends, underbuilt
+assets) until it is done enough to stop needing attention. Because important work should not
+vanish just because Paul has not mentioned it lately.
+
 ---
 
 ## Build and infrastructure
@@ -142,6 +148,12 @@ Because a client Paul has fired must never resurface in a plan.
 `one_off_not_routed` (roster):
 One-off and at-will clients are served on request and are not placed in the recurring route.
 Because the route template is the standing backbone; on-request work fills gaps around it.
+
+`no_doodles` (roster):
+Decline doodles. Because a doodle's coat takes so long that its revenue-per-hour falls far
+below what the same time earns on other dogs (Paul could finish several short-coat dogs in the
+time one doodle takes), and it is hard to make a doodle profitable under any circumstances.
+Current policy as of 2026-05-24; revisit only if Paul changes it.
 
 ---
 
@@ -222,6 +234,31 @@ The workday has a capped length and an earliest-start floor, raised only when Pa
 more work, never by the system. Because mobile grooming at volume is physically demanding
 and protecting the operator first is the longer bet.
 
+`income_target_caps_the_day` (scheduling):
+Decide the target income for a day and schedule as close to that as possible; do not stack
+extra appointments onto an already-lucrative day. Because energy depletes by how hard the day
+earned, not by clock hours, so a high-revenue partial day drains Paul as much as a full one;
+this sharpens `protect_the_operator` from a time cap into a revenue-and-energy cap.
+
+`heads_up_on_the_way` (scheduling):
+Always send the client a heads-up when Dog Gone Clean is on the way, with a live Google Maps
+link to track progress. Because no one wants to sit watching the window, and a heads-up lets
+the client go about their day until Clean is close. In v1 the pizza tracker is this rule's
+home, replacing the manual "on my way" text.
+
+`lock_in_timing` (scheduling):
+Send the tomorrow reminder about 26 hours out, reading like a normal reminder and never like a
+countdown or "last chance." Because the small buffer carries the client past the 24-hour
+cancellation line feeling fair rather than blindsided, while a countdown-styled message would
+manufacture cancellations that otherwise would not happen. The buffer is never mentioned in the
+message itself.
+
+`gated_community_hours` (routing):
+Some gated communities restrict the hours service vehicles may enter (for example no service
+entry after 5pm); treat those windows as real access constraints when sequencing a day.
+Because a stop Paul cannot enter at the planned time is a hole in the route, the same class of
+constraint as a client's HARD window.
+
 ---
 
 ## Money
@@ -238,6 +275,27 @@ If online payment is ever added, store all money in cents (convert to dollars on
 render boundary), fail loud rather than guess on a price lookup, and verify every payment
 webhook signature before processing. Because these are the money-handling lessons DGN paid
 for, and they prevent silent charge errors and forged events.
+
+`cancellation_24h` (money):
+Appointments canceled or rescheduled within 24 hours are billed in full; once inside 24 hours
+the slot is reserved for that client. Use this exact wording everywhere it appears. Because a
+route is built around held slots so a late cancel is unrecoverable revenue, and one standard
+sentence keeps the policy from drifting weaker as it gets reused. Pairs with `lock_in_timing`.
+
+`favor_high_hourly_work` (money):
+Steer the book toward the highest revenue-per-hour work (nail-only and bath) and away from
+labor-intensive low-margin work; price each breed to what its market bears, not by a flat rate.
+Because Paul tracks pay-per-job against time and nail-only and bath clear far more per hour than
+a long full groom, and this economics is the engine under Clean's bath-forward repositioning,
+not a separate idea. Pairs with `no_doodles`.
+
+`accepted_payment_methods` (money):
+State the full accepted-payment list consistently everywhere it appears: cash, Visa,
+Mastercard, American Express, Discover, Apple Pay, Google Pay, Samsung Pay. The Apple, Google,
+and Samsung wallets are methods clients pay with and do not conflict with `device_profile`,
+which governs Paul's own tools, not what clients use. Because a clear list stops clients
+wondering whether they need cash or an ATM stop, and naming the wallets removes a friction
+point at the trailer.
 
 ---
 
@@ -262,7 +320,45 @@ compresses meaning into noise clients tune out.
 `device_profile` (copy):
 Write instructions and test targets for Pixel 8 Pro on Chrome, a Chromebook, and
 occasionally Windows; never assume Safari, iOS, Apple Pay, or Apple Sign In. Because Paul
-uses no Apple devices, ever.
+uses no Apple devices, ever. This governs the tools Paul is told to use, not what clients pay
+with; accepting Apple Pay from clients is fine (see `accepted_payment_methods`).
+
+`website_is_ground_zero` (copy):
+The website holds the strongest version of every core message; every other channel (texts,
+email, social, reviews, in person) pulls from it, and any strong line discovered in use is
+promoted onto the website so it becomes official. Verify this consistency, never assume it.
+Because scattered wording drifts and waters down, and a single source of truth is what keeps
+the business sounding like one business everywhere.
+
+`reminder_voice` (copy):
+Client messages must each earn their place (reassure, clarify, strengthen the brand, reduce
+uncertainty, or add movement), carry forward energy ("Dog Gone Clean is rolling your way"),
+age well over hundreds of sends, and never read like automation. Extends `no_jargon` with a
+banned-phrase list: "friendly reminder," "just a reminder," "reaching out," "please be
+advised," "arrival window," "last chance," "make changes now." Because these messages are
+part of the brand, not admin exhaust, and a long-time client may receive them a hundred times.
+
+`appointment_block_not_window` (copy):
+Call the appointment time a block, not a window; explain once that the work is completed within
+the block and the opening minute is not a guaranteed arrival time, then stop re-explaining.
+Never use cable-company "arrival window" language. Because a block sets an honest expectation
+that leaves room for a mobile day's twists without promising a to-the-minute arrival.
+
+`language_bank` (copy):
+Keep a brand language bank of reassurance lines and promote them to the website. Two locked
+entries: the trailer as a familiar escape (for a dog who knows the service the trailer is calm,
+known ground when the house is chaotic with storms, guests, holidays, or noise) and the thunder
+reframe (thunder at home and thunder in the trailer are two different things; inside, the dog
+has enough going on that the weather stops being the story). Each also needs a short, natural
+spoken version for the doorstep. Because these answer the client's biggest unasked doubts
+before they ask, and a line strong enough to reassure in a text deserves to be official
+website language.
+
+`no_trailer_graphics` (copy):
+Keep the trailer unmarked: no business name or graphics on it. Because a marked trailer draws
+hagglers at gas stations and in traffic and attracts the wrong sort of inquiry, and the trade
+is a few missed casual leads for far less noise. Revisit only if a gated community requires a
+marked service vehicle for entry, as some once did.
 
 ---
 

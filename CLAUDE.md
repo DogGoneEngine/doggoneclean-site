@@ -29,6 +29,10 @@ This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 4. **CLEAN_BUSINESS_RULES.md** - the index: where each rule is enforced (four-layer map).
 5. **CLEAN_PARKING_LOT.md** - deferred work and forward-looking ideas, parked to survive
    context resets.
+6. **CLEAN_FIELD_MANUAL.md** - the hands-on SOPs for the work itself (grooming craft,
+   equipment, power, climate, trailer, maintenance). Reference manual, not a read-every-session
+   doc: read it when doing field, equipment, or operator-app-feature work. Absorbed from Paul's
+   original Drive journal (`the_oracle_journal`).
 
 That read-order link is the only thing holding the set together. Keep the file names exact.
 These are Clean's own scrolls; never share or merge them with DGN's.
