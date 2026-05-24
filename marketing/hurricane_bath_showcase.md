@@ -57,13 +57,10 @@ takes, until that dog is washing up like an already-clean dog. There is very lit
 hold that the Hurricane Bath cannot get out.
 
 ### Shampoo that suits your dog
-Clean washes with a gentle shampoo and conditioner that sits well with nearly every dog, the kind
-of thing no one has reason to complain about. If your dog does better on a specific product, bring
-it. It loads into the system before the bath even starts, so your bottle is back in your hands
-before your dog is wet. Medicated or prescription shampoo from your vet works the same way: bring
-it and we use it. Flea shampoo too, though it is worth knowing that no single bath solves fleas,
-since a dog picks them right back up at home or in the yard. For that, your vet's plan is what
-fixes it, and we are glad to use whatever they recommend.
+Clean washes every dog with a gentle shampoo and conditioner that sits well with nearly every
+coat and skin. If your dog needs something specific, a medicated or prescription shampoo or
+anything for a particular condition, bring it and we will use it. The bottle loads into the
+system before the bath even starts, so it is back in your hands before your dog is wet.
 
 ### Easy on water
 Most dogs are washed and rinsed with under five gallons. The power comes from how the system moves
@@ -96,10 +93,8 @@ Assets Paul will provide (data gaps):
   dishwasher does, an extra-dirty dog is flushed and washed again with fresh water, and every dog
   finishes on a clean-water rinse from a separate tank.
 - **What shampoo do you use?** A gentle shampoo and conditioner that suits nearly every dog. If
-  your dog needs something specific, bring it and we will use it.
-- **My dog needs a medicated or flea shampoo.** Bring it and we will use it. One note on fleas: no
-  single bath solves them, since a dog gets re-exposed at home, so your vet's plan is what fixes
-  the problem.
+  your dog needs something specific, medicated, or for a particular condition, bring it and we
+  will use it.
 - **How dirty is too dirty?** Just about nothing. Mud from nose to tail is a normal day.
 
 ---
@@ -107,11 +102,12 @@ Assets Paul will provide (data gaps):
 ## Open items
 - **Assets:** photos, video, before-and-afters (and which are safe to show without revealing the
   build).
-- **Confirm:** the "Built, not bought" headline and the overall voice; whether to name the house
-  shampoo brand publicly (default is not to).
-- **Optional, your call:** a bolder "no dog too dirty" version exists (the dog that came home from
-  chasing a coyote, caked in mud through the whole coat). It is a great capability story but more
-  intense than some visitors want on a grooming page, so it is held out of the default copy.
+- **Confirm:** the "Built, not bought" headline and the overall voice.
+- **Resolved:** the house shampoo brand stays unnamed on the page; the coyote story stays off the
+  public page (kept internal); the flea detail is trimmed to a simple "bring what your dog needs."
+- **For intake/terms, not the marketing page:** any wording that Clean does not guarantee a
+  client-supplied medicated or flea product will work belongs in the intake or terms fine print,
+  where a disclaimer is appropriate, never in the hero copy (`reminder_voice`, `house_shampoo`).
 
 ## Private record (DO NOT PUBLISH)
 The build is proprietary and is the moat. The canonical record lives in CLEAN_FIELD_MANUAL.md

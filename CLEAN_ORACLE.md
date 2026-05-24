@@ -384,7 +384,9 @@ behind the result. Because at scale one reliably inoffensive shampoo avoids the 
 complaints any single product attracts, Clean cannot stock every medicated formula or know which
 one treats a given dog, and a single flea bath cannot fix an environmental flea problem the dog
 will just be re-exposed to. The specific house brand stays in the private record, not public copy
-(`dont_knock_competitors` and brand-neutral copy).
+(`dont_knock_competitors` and brand-neutral copy). Any non-guarantee wording (Clean does not
+promise a client-supplied medicated or flea product will work) lives in the intake or terms,
+never the marketing copy, which stays positive and skips the flea lecture (`reminder_voice`).
 
 ---
 

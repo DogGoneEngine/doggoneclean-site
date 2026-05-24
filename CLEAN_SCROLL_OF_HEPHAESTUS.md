@@ -206,7 +206,9 @@ sessions add their own dated section below.
   specific, medicated, prescription, or flea product and Clean uses it without standing behind the
   result (cannot stock or vouch for every medicated formula, and a flea bath cannot fix an
   environmental flea problem). Brand kept in the private record, not public copy. Lives in the
-  Oracle (Service) + index, with the full policy in CLEAN_FIELD_MANUAL.md.
+  Oracle (Service) + index, with the full policy in CLEAN_FIELD_MANUAL.md. Public copy stays
+  positive, brand-free, and skips the flea lecture; any non-guarantee wording lives in the
+  intake/terms, not marketing. The coyote anecdote stays off the public page (internal only).
 
 ### Brand voice: don't knock competitors (LOCKED)
 - **`dont_knock_competitors`:** never disparage other systems, products, or groomers in
