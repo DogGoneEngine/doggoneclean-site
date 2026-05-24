@@ -78,6 +78,18 @@ Pre-sale cleanup (not urgent, but would block a sale if left):
 copy, FAQ, and banked gold lines from `marketing/hurricane_bath_showcase.md`. Keep the build
 details (CLEAN_FIELD_MANUAL.md, "The Hurricane Bath") and the shampoo brand off the public page.
 
+**Marketing-site features (forward-looking):**
+- **Before/after gallery.** A curated, rotating display (recent and best work, out with the old as
+  new comes in) backed by a permanent, growing archive of every shot. Show a fresh subset, keep
+  everything. Because rotation signals an active, in-demand business, lets quality stay high,
+  keeps pages fast, and the archive stays an owned asset that compounds. Needs client permission
+  to display, and curate so no shot reveals the Hurricane Bath build.
+- **Reviews built into the pizza tracker (recovered plan, was getting lost).** Track whether a
+  client clicked the Google review link; once they have left one, stop asking; never pester a
+  long-standing client who reviewed years ago; add a light "show someone" nudge to the
+  after-photo drop. Review volume is throughput-limited (near full capacity, few new clients a
+  week), so the system optimizes and times the ask, it does not manufacture volume.
+
 Tooling to port from DGN at scaffold time (adapted, never shared): `package.json`,
 `astro.config.mjs`, `scripts/lint-business-rules.mjs` (rewrite patterns for Clean; keep
 em_dash and the generic ones, drop/invert the nail-terminology patterns),
