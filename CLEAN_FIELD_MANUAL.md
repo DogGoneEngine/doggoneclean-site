@@ -74,6 +74,31 @@ free.
 
 ---
 
+## The Hurricane Bath (the wash system)
+
+Clean's signature equipment and a real competitive moat (`dig_the_moat`): a wash system Paul
+designed and built, more powerful than the commercial units it resembles. Treat the build below
+as proprietary. It is captured here so the business owns it, but it is NOT for the public
+website. The marketing showcase (`marketing/hurricane_bath_showcase.md`) sells what the bath
+does, never how it is built.
+
+- **Dual-pump core.** Two heavy-duty submersible pumps sit in an external 5-gallon bucket linked
+  to the main freshwater supply (5-gallon or 55-gallon). Because two heavy-duty submersibles move
+  far more water than the standard low-pressure RV pump, the system blasts the volume needed to
+  cut through thick coats fast.
+- **Command valve.** A custom directional valve mounted on the wall toggles two modes with a
+  flip:
+  - **Recirculation mode:** recycles the water and shampoo mix through the tub for aggressive,
+    deep, saturating cleaning.
+  - **Pump-out mode:** diverts water out of the system for fast, effortless draining.
+- **Open (data gaps):** pump make/model and power draw, the valve part, the plumbing layout, and
+  the real flow rate. Fill from the actual rig; do not guess.
+
+Operation and upkeep of the wash and drain lines is under Maintenance routine (the bathing
+machine flush).
+
+---
+
 ## Power and generators
 
 **Two generators, for redundancy.** Run two generators rather than one large unit (currently

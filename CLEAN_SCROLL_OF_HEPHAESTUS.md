@@ -37,6 +37,11 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   over URL + keys; create a Google Cloud project with a domain-locked Maps key and OAuth
   client; point hurricanebath.com at the droplet for staging. (If a literal fork of the DGN
   code is wanted, bring that source over; this repo cannot reach the DGN repo.)
+- **Hurricane Bath showcase (in progress):** drafting the bath-forward hero content in
+  `marketing/hurricane_bath_showcase.md` ahead of scaffold so it drops into the site later; the
+  proprietary build is captured in CLEAN_FIELD_MANUAL.md ("The Hurricane Bath") and kept off the
+  public page (`dig_the_moat`: sell the what, protect the how). Open: real benefit facts/numbers,
+  origin story, photos/video, and the reveal-level confirmation.
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
   Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
