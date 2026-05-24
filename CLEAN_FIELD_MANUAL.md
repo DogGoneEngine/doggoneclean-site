@@ -92,7 +92,8 @@ does, never how it is built.
   recirculating hose that washes. Pumps are deliberately not bigger; more horsepower is available
   but would deliver too much pressure.
 - **Pressure technique.** On a dry double coat, full pressure just splashes off, so dial it down
-  to soak the dog first, then up to drive water through the undercoat to the skin.
+  to soak the dog first, then up to drive water through the undercoat to the skin. Dial down also
+  for the face, eyes, and sensitive areas; never fire-hose them.
 - **Water thrift.** Most dogs are washed and rinsed with under 5 gallons.
 - **Shampoo.** Any product, dropped in anywhere the water recirculates (the bucket under the tub
   or the tub itself); the recirculation grabs and mixes it. Easy to use a client's own shampoo
@@ -102,18 +103,32 @@ does, never how it is built.
   - **Recirculation mode:** recycles the water and shampoo mix through the tub for aggressive,
     deep, saturating cleaning.
   - **Pump-out mode:** diverts water out of the system for fast, effortless draining.
+- **Clean-water finish.** The dog is washed in the recirculating bucket, then rinsed with fresh
+  water from the main freshwater tank, which is separate from the recirculating 5-gallon bucket.
+  Recirculation still gets the dog clean on the same principle as a dishwasher: the water is
+  reused and the result still comes out clean.
+- **Extra-dirty dogs.** When the recirculating water looks like a mud puddle, flush the system,
+  refill with clean water, and wash again; a very dirty dog may take a second or third pass until
+  it washes up like an already-clean dog. The system's speed is what makes this practical.
 - **Cleanability (the edge over built-in systems).** The external bucket pulls out for full
   access; rinse it and wipe hair off the pump intake screen between baths, and swap the bucket
   for a fresh one every few months.
-- **Design rationale (best of each, compromises dropped).** Hydrosurge recirculated but put the
-  pump in the tub with the dog; the Bathmaster kept the pump out but mixed shampoo into a
-  fresh-water flow that wastes a trailer's limited water; later built-in RV systems recirculated
-  with a separate pump but were permanently mounted under the tub and hard to clean. This system
-  combines pro-level power, recirculation thrift, a pump away from the dog, and a removable bucket
-  that cleans easily.
-- **Open (data gaps):** pump make/model and power draw, the valve part, the exact plumbing layout,
-  how water is heated / temperature control, and whether the dog finishes on a fresh-water rinse.
-  Fill from the actual rig; do not guess.
+- **Water temperature (internal only, do not feature publicly).** Source water runs about the
+  right temperature year-round, and the climate-controlled trailer keeps the tank warm through the
+  day. On cold nights, pump the tank out at end of day and refill with standard-temperature water
+  the next day so nothing sits and chills overnight. A water heater was considered and judged not
+  worth it for the few cold Florida days.
+- **Design rationale (internal; best of each).** Built from years with the professional systems,
+  keeping what each did well and fixing the rest, into one machine tuned the way Paul wants:
+  pro-level power, recirculation's water thrift, the pump kept out of the tub and away from the
+  dog, and a removable bucket that cleans easily. For reference, the old Hydrosurge recirculated
+  but sat the pump in the tub with the dog; the Bathmaster kept the pump out but mixed shampoo
+  into a fresh-water flow that wastes a trailer's limited water; later built-in RV systems
+  recirculated with a separate pump but were mounted permanently under the tub and hard to clean.
+  This is internal context to sharpen our design; per `dont_knock_competitors` the public copy
+  never names or knocks other systems.
+- **Open (data gaps):** pump make/model and power draw, the valve part, and the exact plumbing
+  layout. Fill from the actual rig; do not guess.
 
 Operation and upkeep of the wash and drain lines is under Maintenance routine (the bathing
 machine flush).

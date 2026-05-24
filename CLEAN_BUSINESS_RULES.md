@@ -61,6 +61,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | device_profile | Copy | CLAUDE.md "How Paul works" | n/a |
 | website_is_ground_zero | Copy | Oracle; convention | build copy check |
 | reminder_voice | Copy | Oracle; convention | lint pattern (banned phrases) |
+| dont_knock_competitors | Copy | Oracle; convention | lint pattern |
 | appointment_block_not_window | Copy | Oracle; convention | lint pattern |
 | language_bank | Copy | Oracle | site copy |
 | no_trailer_graphics | Copy | Oracle | n/a (real-world) |

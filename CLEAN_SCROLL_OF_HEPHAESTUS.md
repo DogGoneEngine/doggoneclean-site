@@ -200,6 +200,13 @@ sessions add their own dated section below.
   as the first section of CLEAN_ORACLE.md, with the apex line and a pointer in CLAUDE.md "What
   this repo is". Paul approved the wording verbatim.
 
+### Brand voice: don't knock competitors (LOCKED)
+- **`dont_knock_competitors`:** never disparage other systems, products, or groomers in
+  client-facing copy; sell why ours is great on its own merits (competitor weaknesses may be noted
+  privately to sharpen our design, never in public copy). Paul's call while drafting the Hurricane
+  Bath showcase, where the origin story was rewritten to drop all comparisons. Lives in the Oracle
+  (Copy) with an index row.
+
 ### Dig the moat (LOCKED)
 - **`dig_the_moat`, a decision lens on a level with Elon's algorithm, in service of the prime
   directive.** One recurring question for every build/scope call, the way Bezos asks "does this

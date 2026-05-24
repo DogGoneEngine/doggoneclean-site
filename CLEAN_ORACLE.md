@@ -418,6 +418,13 @@ banned-phrase list: "friendly reminder," "just a reminder," "reaching out," "ple
 advised," "arrival window," "last chance," "make changes now." Because these messages are
 part of the brand, not admin exhaust, and a long-time client may receive them a hundred times.
 
+`dont_knock_competitors` (copy):
+Never disparage other systems, products, or groomers in client-facing copy; make the case for
+why ours is great on its own merits. Because putting others down makes the brand look insecure
+and invites argument, a confident positive case ages better, and it fits the prime directive's
+bar of leaving everyone better off. Competitor weaknesses can still be noted privately in the
+corpus to sharpen our own design, never in public copy.
+
 `appointment_block_not_window` (copy):
 Call the appointment time a block, not a window; explain once that the work is completed within
 the block and the opening minute is not a guaranteed arrival time, then stop re-explaining.
