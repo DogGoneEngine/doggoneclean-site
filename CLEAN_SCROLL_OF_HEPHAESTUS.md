@@ -185,3 +185,12 @@ sessions add their own dated section below.
 - **Dropped as noise:** doc scaffolding, the "am I writing a training manual" musing, and the
   Gboard text-expansion shortcuts. Aspirational equipment to-dos (three rotary setups, charging
   bucket cleanup, tire/bearing interval) live in CLEAN_FIELD_MANUAL.md open items.
+
+### Idea-capture workflow (LOCKED)
+- **Ideas come into a Claude thread now, not the Drive journal.** Paul describes the idea and
+  the reason; the assistant chooses its home (Oracle rule, CLAUDE.md constraint, parking lot,
+  field manual, or record field), attaches the because (asking one quick question if missing),
+  commits same turn, and reports where it filed. Save triggers: "put it where it belongs,"
+  "capture this," "lock it in." Hold signal: "just thinking out loud." The Drive journal stays
+  only as the offline fallback for mid-route voice capture, batch-absorbed later. Baked into
+  CLAUDE.md ("Recording ideas and decisions") and the Oracle's `lock_it_in_capture`.

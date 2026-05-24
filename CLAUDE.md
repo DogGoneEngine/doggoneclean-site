@@ -37,15 +37,30 @@ This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 That read-order link is the only thing holding the set together. Keep the file names exact.
 These are Clean's own scrolls; never share or merge them with DGN's.
 
-## Recording decisions (lock it in)
+## Recording ideas and decisions (lock it in)
 
-When Paul locks a decision (says "lock it in" or a clear equivalent), capture it the same
-turn: write it to its live home (an Oracle rule, a constraint in this file, or a record
-field), add a dated line to the Scroll's decisions log, run `python3 scripts/check.py`, and
-commit/push. While he is still thinking out loud, record nothing. Committing on each lock is
-what makes a decision survive a long thread that compacts or a container that is reclaimed;
-the end-of-session scroll rebuild is then a polish pass, not a rescue. See
-`lock_it_in_capture` in the Oracle.
+Paul's ideas now come into a Claude thread, not a separate document. He may not know where any
+given idea should live, and that is fine: he describes the idea and the reason, and you choose
+its home. Default to thread-first capture, because the idea lands in its real home immediately
+instead of piling up for a later absorption pass.
+
+- **Triggers to save now:** "put it where it belongs," "capture this," "lock it in," or a clear
+  equivalent. On any of these, capture the same turn: write it to its live home (an Oracle rule,
+  a constraint in this file, the parking lot, the field manual, or a record field), add a dated
+  line to the Scroll's decisions log if it is a decision, run `python3 scripts/check.py`, and
+  commit/push. Then tell Paul where you filed it so he can redirect you.
+- **Hold signal:** "just thinking out loud," or Paul clearly still musing, means record nothing
+  yet.
+- **Always attach a because.** If an idea is becoming a rule and Paul did not say why, ask one
+  quick question for the reason rather than saving a reasonless rule. A rule without a because
+  is not a rule.
+- **Durability:** an idea in a thread is not safe until it is committed to git, since a thread
+  can compact and the container can be reclaimed. Committing on each capture is the whole point.
+- **Offline fallback:** when Paul is mid-route and cannot do a back-and-forth, voice-dumping
+  into the Drive journal (`the_oracle_journal`) is still the better quick inbox; absorb it into
+  the docs later in a batch. Threads when he can talk, journal as the offline buffer.
+
+See `lock_it_in_capture` in the Oracle.
 
 ## How Paul works (bake into every interaction)
 

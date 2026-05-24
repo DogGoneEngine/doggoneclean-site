@@ -45,14 +45,19 @@ rejected). Because dropped rules are how an operating business breaks silently, 
 index is the audit that turns "we should preserve the rules" into a step that actually runs.
 
 `lock_it_in_capture` (process):
-When Paul locks a decision (says "lock it in" or a clear equivalent like "that's decided" or
-"make it a rule"), capture it the same turn: write it to its live home (an Oracle rule, a
-CLAUDE.md constraint, or a record field), add a dated line to the Scroll's decisions log, run
-`scripts/check.py`, and commit/push. While Paul is still musing, record nothing. Because this
-is an ephemeral container and a long thread can compact or die before the end, committing
-each locked decision to git the moment it is made is the only thing that guarantees it
-survives; an uncommitted note can be lost with the session. The end-of-session scroll
-rebuild then becomes a polish-and-reconcile pass, not a rescue.
+When Paul locks a decision or hands over a raw idea to keep (says "lock it in," "put it where it
+belongs," "capture this," or a clear equivalent), capture it the same turn: choose its live home
+(an Oracle rule, a CLAUDE.md constraint, the parking lot, the field manual, or a record field),
+add a dated line to the Scroll's decisions log if it is a decision, run `scripts/check.py`, and
+commit/push, then tell Paul where you filed it. While Paul is still musing ("just thinking out
+loud"), record nothing. If an idea is becoming a rule and Paul did not give a reason, ask one
+quick question for the because rather than saving a reasonless rule. Ideas now arrive in a
+Claude thread rather than the Drive journal (`the_oracle_journal`), which stays only as the
+offline fallback for mid-route voice capture, batch-absorbed later. Because this is an ephemeral
+container and a long thread can compact or die before the end, committing each captured idea or
+decision to git the moment it lands is the only thing that guarantees it survives; an
+uncommitted note can be lost with the session. The end-of-session scroll rebuild then becomes a
+polish-and-reconcile pass, not a rescue.
 
 `ship_to_completion` (process):
 When a branch is committed and builds clean, open the PR and squash-merge it (same turn);
