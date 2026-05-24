@@ -57,6 +57,18 @@ are not routed until converted. Verify against the real sheet at conversion time
     sets the saleability scope and the shared-vs-separate infrastructure call.
   - The Ocala legacy is the income bridge that funds the new builds, so keep it stable and
     low-investment while the new businesses come up.
+  - Assistant recommendation (2026-05-24, for Paul to weigh, NOT decided): run this as a
+    platform-and-brands business funded by the legacy. (1) The reusable engine/playbook for
+    productized, density-routed mobile pet-service businesses is the real asset and the thing
+    to keep. (2) Each Dog Gone brand (nails, new Clean, later Walking/Sitting/Training) is a
+    separable, individually sellable instance forked from that template, each on its own
+    infra, so the platform is kept while any one brand stays sellable. (3) Legacy full
+    grooming in Ocala is the cash bridge: lean, priced to value, documented into a clean
+    transferable book, sold or sunset once the new brands carry the income. Structural crux:
+    the platform is a template each brand FORKS and OWNS, never one shared live system (a
+    shared live platform would entangle the brands and break saleability). Caution: solo
+    operator, so prove the model on one brand first (the Villages bath-Clean) before stamping
+    the next.
 - **Online payment:** does the Clean site take payment online, or stay in-person
   invoice/cash/card like the sheets show today? This one answer decides whether the entire
   DGN payment/skip/reschedule/card layer ever gets ported.
