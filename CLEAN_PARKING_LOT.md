@@ -35,6 +35,18 @@ are not routed until converted. Verify against the real sheet at conversion time
 
 ## Bigger questions for Paul (decide before the build needs them)
 
+- **Business architecture (raised 2026-05-24, UNRESOLVED).** Up to three businesses are
+  emerging: (1) legacy full-service grooming in Ocala (this repo's current book; keep,
+  maintain, keep sellable), (2) Dog Gone Nails (sculpt nails, Villages and other markets),
+  and (3) a reinvented productized service: bath + nails + sanitary shave, NO haircuts,
+  Villages-first then other high-density profitable areas (likely not Ocala). Two questions
+  decide the whole shape: (a) is (3) a separate brand or just DGN with a wider menu (three
+  businesses vs two)? (b) which business carries the "Dog Gone Clean" name, the legacy Ocala
+  grooming (what this repo holds today) or the new reinvented one? Answer to (b) decides
+  what THIS repo becomes. Working recommendation: one website per sellable brand, but build
+  the productized businesses from a shared template (each with its own instance and infra)
+  so the engine and lessons are reused without entangling them (per clean_stays_saleable);
+  the legacy business stays lean.
 - **Online payment:** does the Clean site take payment online, or stay in-person
   invoice/cash/card like the sheets show today? This one answer decides whether the entire
   DGN payment/skip/reschedule/card layer ever gets ported.
