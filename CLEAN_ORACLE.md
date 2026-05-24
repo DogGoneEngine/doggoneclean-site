@@ -92,16 +92,22 @@ serious buyer would decline, and treat each reason as the improvement backlog. T
 objections to buying are the to-do list for making the business valuable.
 
 `no_database_until_rules_agreed` (build):
-Do not create a Supabase project, write schema, add a `business_rules` table, or run any
-migration until the rules that would shape the schema are agreed with Paul. Because schema
-baked before the rules are settled hardens the wrong assumptions, and migrating a wrong
-schema later costs more than waiting.
+Do not build schema ahead of the business direction it serves; once a business is greenlit,
+build its schema iteratively and treat early tables as rebuildable until they settle. Clean
+is greenlit as of 2026-05-24. Because schema hardened before the direction is clear bakes
+wrong assumptions, but once the direction is set, iterating a rebuildable schema beats
+waiting on a rules summit. Pairs with `own_infrastructure`: a business's data lives only in
+its own Supabase project.
 
 `own_infrastructure` (build):
-Clean uses its own Supabase project, its own droplet path and domain, its own API keys, and
-its own Stripe account if payments ever happen; never DGN's. Because shared infrastructure
-is both a cross-contamination risk and, per `clean_stays_saleable`, a sale blocker: a buyer
-must be able to take Clean whole while Paul keeps DGN whole.
+Clean's data lives in its own Supabase project, never DGN's; that is the hard-separation
+line. Cheaper layers (a shared DigitalOcean droplet with its own directory/domain/Caddy
+block, a shared Supabase or Google Cloud account, shared tooling) may be shared with DGN to
+save money and overhead. Keep each set of API keys its own and domain-locked (a separate
+Google Cloud project for Maps and OAuth). Because shared data is the expensive, ugly
+entanglement that blocks a sale and risks cross-contamination, while a static site or a
+Supabase project moves to its own home with low effort; spend the separation effort where it
+actually matters, per `clean_stays_saleable`.
 
 `reuse_dgn_stack` (build):
 The planned site mirrors the proven DGN stack (Astro 5 + React 18 islands, Node 20, npm,
@@ -187,6 +193,14 @@ Build days around time-of-day windows first, then cluster by geography within th
 Because a large share of the book is evening- or Saturday-locked, so geography alone cannot
 drive the route.
 
+`use_the_smart_scheduler_from_day_one` (scheduling):
+Clean uses the String of Pearls intelligent scheduler from the start, not hand-scheduling
+until the route is dense. Because honoring hard windows, cadence, and availability is
+valuable at any client count, the engine is a fork of the one already built for DGN rather
+than new work, and the route-optimization part simply scales as density grows. The one
+adaptation Clean needs is variable grooming service durations, not DGN's fixed nail-time
+buckets.
+
 `base_is_home_sw` (routing):
 Use Paul's home (3885 SW 114th Court 34481) for drive-time math; treat the SW / On Top of
 the World cluster as the launch/return zone; no separate fictional anchor. Because home sits
@@ -213,9 +227,11 @@ and protecting the operator first is the longer bet.
 ## Money
 
 `bills_in_person_today` (money):
-Clean bills in person today (invoice, cash, card per the contact sheets); there is no online
-payment. Because that is how the 20-year business actually runs, and inventing an online
-payment flow before Paul wants one would be a mockup.
+Clean bills in person (cash, check, card); the right in-person tool is Square (reader plus
+invoices), not Stripe, and online payment is deferred until it earns its place. Because that
+is how the business actually runs; Stripe fits DGN's card-on-file auto-charge model, not
+Clean's pay-after-service model, and inventing an online payment flow before Paul wants one
+would be a mockup.
 
 `if_payments_added_handle_money_safely` (money):
 If online payment is ever added, store all money in cents (convert to dollars only at the

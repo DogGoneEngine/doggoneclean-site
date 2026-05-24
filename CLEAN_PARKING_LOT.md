@@ -35,48 +35,19 @@ are not routed until converted. Verify against the real sheet at conversion time
 
 ## Bigger questions for Paul (decide before the build needs them)
 
-- **Business architecture (raised 2026-05-24, UNRESOLVED).** Up to three businesses are
-  emerging: (1) legacy full-service grooming in Ocala (this repo's current book; keep,
-  maintain, keep sellable), (2) Dog Gone Nails (sculpt nails, Villages and other markets),
-  and (3) a reinvented productized service: bath + nails + sanitary shave, NO haircuts,
-  Villages-first then other high-density profitable areas (likely not Ocala). Two questions
-  decide the whole shape: (a) is (3) a separate brand or just DGN with a wider menu (three
-  businesses vs two)? (b) which business carries the "Dog Gone Clean" name, the legacy Ocala
-  grooming (what this repo holds today) or the new reinvented one? Answer to (b) decides
-  what THIS repo becomes. Working recommendation: one website per sellable brand, but build
-  the productized businesses from a shared template (each with its own instance and infra)
-  so the engine and lessons are reused without entangling them (per clean_stays_saleable);
-  the legacy business stays lean.
-  - Newer thinking (2026-05-24): Paul may launch a family of "Dog Gone" brands named by
-    service (Clean, Walking, Sitting, Training). Under that taxonomy the legacy Ocala
-    business is full grooming, not "clean," so "Dog Gone Clean" fits the new Villages bath
-    business better; open whether to give the keeper name to the new business and let the
-    winding-down legacy take a distinct grooming name.
-  - Deeper fork that sets everything else: does Paul want a portfolio he owns and runs
-    together, or independent businesses each separately sellable? That, not "sell or not,"
-    sets the saleability scope and the shared-vs-separate infrastructure call.
-  - The Ocala legacy is the income bridge that funds the new builds, so keep it stable and
-    low-investment while the new businesses come up.
-  - Assistant recommendation (2026-05-24, for Paul to weigh, NOT decided): run this as a
-    platform-and-brands business funded by the legacy. (1) The reusable engine/playbook for
-    productized, density-routed mobile pet-service businesses is the real asset and the thing
-    to keep. (2) Each Dog Gone brand (nails, new Clean, later Walking/Sitting/Training) is a
-    separable, individually sellable instance forked from that template, each on its own
-    infra, so the platform is kept while any one brand stays sellable. (3) Legacy full
-    grooming in Ocala is the cash bridge: lean, priced to value, documented into a clean
-    transferable book, sold or sunset once the new brands carry the income. Structural crux:
-    the platform is a template each brand FORKS and OWNS, never one shared live system (a
-    shared live platform would entangle the brands and break saleability). Caution: solo
-    operator, so prove the model on one brand first (the Villages bath-Clean) before stamping
-    the next.
-- **Online payment:** does the Clean site take payment online, or stay in-person
-  invoice/cash/card like the sheets show today? This one answer decides whether the entire
-  DGN payment/skip/reschedule/card layer ever gets ported.
-- **Paul's FL/GA travel:** does the biweekly Florida/Georgia travel that shapes DGN's
-  Villages schedule also constrain the Clean route, or is it DGN-only? Clean data today
+- **Business architecture (RESOLVED 2026-05-24).** Two businesses, not three: DGN (flagship)
+  and Clean (ONE evolving business, a fork of the DGN platform). The separate scalable "new
+  Clean" folds back into Clean. Full decision in the Scroll decisions log. Still parked as
+  forward-looking, not decided: a possible "Dog Gone" brand family named by service (Clean,
+  Walking, Sitting, Training) built as forks of the same platform, each its own instance; and
+  whether Paul ultimately runs a portfolio he keeps or builds units to sell.
+- **Online payment:** DECIDED 2026-05-24. In person via Square; online deferred until it
+  earns its place. The DGN payment/skip/reschedule/card layer is not ported now.
+- **Field/operator app:** DECIDED 2026-05-24. Yes, operator app plus pizza tracker in Clean
+  v1, forked from DGN. (Pizza-tracker details to come from Paul.)
+- **Paul's FL/GA travel:** still open. Does the biweekly Florida/Georgia travel that shapes
+  DGN's Villages schedule also constrain the Clean route, or is it DGN-only? Clean data today
   only has client seasonality (Mary Jane away Jun-Nov), not Paul's own travel.
-- **Field/operator app:** is a Clean grooming-day app on the horizon? If yes, DGN's
-  operator-app lessons are the most valuable thing to mine.
 
 ## Saleability (keep the door open)
 
@@ -84,8 +55,10 @@ Constraint (Oracle `clean_stays_saleable`): Clean must stay sellable as a standa
 business, never tangled with DGN or dependent on Paul personally. Probably never sold, but
 the option stays open. Implications to honor as the build proceeds:
 
-- Separate everything from DGN: Supabase project, domain, droplet, Stripe, API keys, repo,
-  and data. No shared services or imports.
+- Separate from DGN where it counts: the Supabase project (data) is the hard line, never
+  shared. A shared droplet, account, or tooling is acceptable to save cost since those are
+  cheap to separate before a sale. Keep API keys their own and domain-locked. No shared data
+  or imports.
 - Operate without Paul: routes, rules, and the client book live in the system and the docs,
   not in his head. No DGN-style dynastic/bloodline ownership; ownership and operator roles
   must be transferable.

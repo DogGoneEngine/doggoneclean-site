@@ -19,16 +19,16 @@
 
 ## Current focus / next action
 
-- **Data:** all 33 standing records re-verified against the current contact-sheet doc per
-  client and corrected per Paul's review (2026-05-24). Considered clean.
-- **Foundation:** the doc/handoff system is reworked for the coming website (CLAUDE.md,
-  Oracle, Business_rules index, Parking_lot), stack decided (reuse DGN, own instances),
-  ship-to-completion is the git rule, and a local `scripts/check.py` enforces the
-  enforceable rules. Guardrail: NO database/schema until the rules are agreed.
-- **Next action:** agree the rules that would shape a schema (so the DB guardrail can lift),
-  lock the last open cadence (Peter Moran, ~8wk vs ~12wk), then tighten the route template
-  against corrected stop sizes (Kevin is a half-day 7-dog stop; Steve and Patty are quick
-  nails; Chester is shorter without Windsor).
+- **Direction (locked 2026-05-24):** Clean is ONE evolving business and a fork of the DGN
+  platform, replacing the current Squarespace + Acuity + Drive-docs + Google-Voice +
+  manual-location/photos stack. Two businesses total: DGN (flagship) and Clean.
+- **Data:** 33 standing records clean; they are the Supabase seed for Clean's client book.
+- **Next action:** stand up Clean's own Supabase project (greenlit; build schema
+  rebuildably), then build the bath-forward marketing site + client portal + String of Pearls
+  scheduling + operator app (photos) + pizza tracker + SMS notifications, forked from DGN and
+  adapted (variable grooming durations, Square/in-person payment). Preview on
+  hurricanebath.com (kept private) while doggoneclean.com stays on the old site until launch.
+- **Open:** Peter Moran cadence; route rebalance against corrected stop sizes.
 - **Parked:** one-off list as conversion candidates; see CLEAN_PARKING_LOT.md.
 
 ---
@@ -43,11 +43,14 @@
   this file + CLEAN_ORACLE.md + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md, renamed to
   the CLEAN_ prefix, reworked for the coming website, with the carried DGN rules folded in
   and `scripts/check.py` enforcing what can be enforced today.
-- **Phase 4 - Website build.** NOT STARTED. Stack chosen: reuse the DGN stack (Astro +
-  React islands + Supabase + DigitalOcean/Caddy + GitHub Actions), Clean's own instances.
-  Blocked by the rules-before-schema guardrail: no database until the rules are agreed.
-- **Phase 5 - Later.** Geocode plus codes for true drive-time; route automation;
-  multi-specialist routing (apprentice Jake); possible field/operator app.
+- **Phase 4 - Clean website + ops app (fork of the DGN platform).** GREENLIT 2026-05-24,
+  starting. Astro marketing site (bath-forward) + client portal (serves existing grooming
+  clients and new bath clients) + String of Pearls scheduling + operator app with photos +
+  pizza tracker + SMS notifications, forked from DGN onto Clean's own Supabase project, seeded
+  from `data/clients.json`. In-person payment (Square). Preview on hurricanebath.com until
+  doggoneclean.com flips at launch.
+- **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
+  density grows; multi-specialist routing (apprentice Jake).
 
 ---
 
@@ -154,3 +157,31 @@
   nothing while still musing; the end-of-session scroll rebuild is a polish/reconcile pass,
   not a rescue. Baked into CLAUDE.md, the Oracle (`lock_it_in_capture`), and the header
   mandate above.
+- **Business architecture (RESOLVED, supersedes the parked question):** two businesses, not
+  three. DGN is the flagship, fully separate. Clean is ONE evolving business: it keeps its
+  existing full-grooming clients while the marketing leans into higher-profit bath work to
+  win new clients, one portal serves both, and it can expand to the Villages with bath
+  service. No separate "new Clean"; the legacy book and the new direction are the same
+  business being morphed ("send the legacy to the gym"). The scale-a-separate-Clean plan is
+  shelved.
+- **Clean is a fork of the DGN platform.** v1 replaces Paul's whole current stack
+  feature-for-feature: Squarespace -> Astro site (bath-forward); Acuity + confirmations ->
+  portal + String of Pearls + automated notifications; Drive folder of client Docs ->
+  Supabase client book (seeded from `data/clients.json`); Google Voice texting -> SMS
+  (Twilio, own number + A2P, in v1); manual location text -> pizza tracker; manual before/
+  after photos -> operator-app photo capture and share.
+- **String of Pearls from day one** (not deferred for low density), because it is a fork not
+  new work and honoring windows/cadence helps at any density; adaptation needed = variable
+  grooming durations, not DGN's fixed nail buckets.
+- **Infrastructure:** separate Supabase project is the hard line (data never shared with
+  DGN); a shared Supabase/DigitalOcean/Google account and a shared droplet (own dir/domain)
+  are acceptable to save cost (cheap to separate later); API keys their own and domain-locked
+  (own Google Cloud project for Maps + OAuth); SMS via Twilio in v1; payment in person via
+  Square, not Stripe; online payment and n8n deferred.
+- **DB guardrail lifted for Clean** (greenlit): build the schema iteratively and rebuildably
+  in Clean's own project.
+- **Pizza tracker:** client-facing live status/ETA view, companion to the operator app,
+  replaces the manual "on my way" location texts; included in v1 (details from Paul later).
+- **Staging:** build and preview on hurricanebath.com (kept private/non-indexed) while
+  doggoneclean.com keeps serving the old Squarespace site; flip the domain at launch. Local
+  `npm run dev` is the fast loop.

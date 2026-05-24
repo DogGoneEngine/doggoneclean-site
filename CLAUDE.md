@@ -5,12 +5,17 @@ For what happened and why, read the other docs in the order below.
 
 ## What this repo is
 
-Dog Gone Clean (DGC) is Paul Nickerson's mobile full-service dog grooming business in the
-Ocala, FL area (~20 years old). This repo is becoming the **DGC website**. Today it holds
-the authoritative client records and the recurring zone-day route template; the site is
-being built on top of that foundation, reusing the proven Dog Gone Nails (DGN) stack and
-lessons without merging the two repos. Treat this as a construction site for a building
-that is coming, not as a permanent data-only repo.
+Dog Gone Clean (DGC) is Paul's mobile dog grooming business in the Ocala, FL area (~20 years
+old). This repo is becoming the **DGC website and operations app**. Clean is one evolving
+business: it keeps serving its existing full-grooming clients while repositioning the
+marketing toward higher-profit bath work to attract new clients, and it can expand to the
+Villages with bath service. There is no separate "new Clean"; the existing book and the new
+direction are the same business being morphed (sending the legacy business to the gym). Clean
+is built as a fork of the proven Dog Gone Nails (DGN) platform, with its own instances and
+infrastructure, never merged with DGN. The authoritative client records in `data/` seed it.
+Treat this as a construction site for the building that is coming.
+
+There are two businesses total: DGN (the flagship, fully separate) and Clean (this repo).
 
 This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 
@@ -128,18 +133,29 @@ until the site is stood up.
   and operations documented well enough that a buyer could run it without Paul. This is a
   guardrail on every decision, not a feature to build; avoid entanglement now. See
   `clean_stays_saleable` in the Oracle.
-- **No database changes yet.** Do not create a Supabase project, write schema, add a
-  `business_rules` table, or run any migration until the rules that would shape the schema
-  are agreed with Paul. Locking the rules comes first; schema follows.
+- **Build Clean's data in its own Supabase project, iteratively.** Clean is greenlit to
+  build (2026-05-24). Build the schema in the flow and treat early tables as rebuildable
+  until they settle; no rules summit needed. The hard line is separation, not delay: Clean's
+  data lives only in its own Supabase project, never DGN's (`dgn-prod`).
+- **Data is the hard-separation line; host and accounts are soft.** Never share a database or
+  data with DGN (expensive and ugly to undo). The web host (a shared DigitalOcean droplet
+  with its own directory/domain/Caddy block) and even a shared Supabase or Google Cloud
+  account are cheaper layers where sharing to save money and overhead is acceptable, because
+  a static site and a Supabase project both move to their own home with low effort before any
+  sale. Keep each set of API keys its own (a separate Google Cloud project for Maps and
+  OAuth, domain-locked).
+- **Clean is paid in person.** Square (or the current method) for in-person card, cash, and
+  check; not Stripe. Online payment is deferred until it earns its place.
 - Real data only. Unknown fields are data gaps, never invented values.
 - No em dashes, anywhere.
 - Grooming terminology is correct here; never import DGN's bans.
 - Banned clients (Bonnie DiGraziano) are excluded everywhere.
 - HARD availability windows (evening locks, Saturday locks, fixed-noon slots, not-days) are
   the clients' real, permanent schedules. Plan around them.
-- Clean's infrastructure is its own: its own Supabase project (never `dgn-prod`), its own
-  droplet path/domain (never `/srv/doggonenails/`), its own Stripe account if payments ever
-  happen. The "don't merge scrolls" rule applies to infrastructure, not just docs.
+- Clean's infrastructure separates from DGN where it counts: its own Supabase project (never
+  `dgn-prod`) is the hard line. A shared droplet (own directory/domain), shared account, or
+  shared tooling is acceptable to save cost since those are cheap to separate later. Its own
+  Stripe/Square account if payments ever go online.
 
 ## Repo separation
 
