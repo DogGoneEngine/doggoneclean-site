@@ -5,44 +5,64 @@ For what happened and why, read the other docs in the order below.
 
 ## What this repo is
 
-The scheduling and routing knowledge base for **Dog Gone Clean (DGC)**, Paul Nickerson's
-mobile full-service dog grooming business in the Ocala, FL area (~20 years old). It holds
-the authoritative client records and the recurring zone-day route template the scheduler
-must honor. It is a data/knowledge repo, not a website yet, despite the repo name.
+Dog Gone Clean (DGC) is Paul Nickerson's mobile full-service dog grooming business in the
+Ocala, FL area (~20 years old). This repo is becoming the **DGC website**. Today it holds
+the authoritative client records and the recurring zone-day route template; the site is
+being built on top of that foundation, reusing the proven Dog Gone Nails (DGN) stack and
+lessons without merging the two repos. Treat this as a construction site for a building
+that is coming, not as a permanent data-only repo.
 
-This repo is separate from the Dog Gone Nails (DGN) repo on purpose. See "Repo
-separation" below.
+This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 
 ## Read order (the doc set)
 
 1. **CLAUDE.md** (this file) - operating manual. Permanent rules, stack, constraints.
-2. **CLEAN_SCROLL_OF_HEPHAESTUS.md** - session-by-session history + phase map. Read it fully before
+2. **CLEAN_SCROLL_OF_HEPHAESTUS.md** - build narrative + phase map. Read it fully before
    doing work. Rebuild it only at end of session on Paul's explicit instruction, never
    mid-session. If history and reality disagree, reality wins and history is corrected.
-3. **CLEAN_ORACLE.md** - every business rule in "KEY (domain): Statement. Because <reason>."
-4. **CLEAN_BUSINESS_RULES.md** - table mapping each rule to every place it is enforced.
+3. **CLEAN_ORACLE.md** - every rule in "KEY (domain): Statement. Because <reason>."
+4. **CLEAN_BUSINESS_RULES.md** - the index: where each rule is enforced (four-layer map).
 5. **CLEAN_PARKING_LOT.md** - deferred work and forward-looking ideas, parked to survive
    context resets.
 
 That read-order link is the only thing holding the set together. Keep the file names exact.
+These are Clean's own scrolls; never share or merge them with DGN's.
 
 ## How Paul works (bake into every interaction)
 
 - **Recommendation with reason.** Any choice you offer lists the recommended option first,
   labeled "(Recommended)", with a "because". A recommendation without a reason is just a vote.
-- **Outcomes, not actions.** Propose the outcome and ask if he wants it, not which
-  implementation step to take. Implementation is your call.
-- **No mockups.** Build against real data, auth, and services from the first commit.
+- **Outcomes, not actions.** Describe the outcome and ask if Paul wants it, not which
+  implementation step to take. "This closes the staleness gap permanently, want that?" is
+  right; "should I add a poll?" is wrong. Paul decides outcomes; implementation is yours.
+- **No mockups.** Build against real data, auth, and services from the first commit. Fake
+  screens and placeholder data lose rules when wired to real services later.
 - **Do the work; don't punt it.** Anything doable with your tools, do. Don't hand Paul task
-  lists for things you can do. His plate is decisions, physical-world actions, and
-  credentials no tool exposes.
-- **Read before redesign.** Before any redesign, read CLEAN_SCROLL_OF_HEPHAESTUS.md and CLEAN_ORACLE.md in
-  full. A redesign that drops an existing rule is rejected.
+  lists for tool-accessible work. His plate is decisions, physical-world actions, and
+  credentials/dashboards no tool exposes.
+- **Read before redesign.** Before any redesign, read CLEAN_SCROLL_OF_HEPHAESTUS.md and
+  CLEAN_ORACLE.md in full. A redesign that drops an existing rule is rejected.
 - **Device profile:** Pixel 8 Pro on Chrome, a Chromebook for desktop, occasionally
   Windows. No Apple devices ever. Never write instructions assuming Safari, iOS, Apple
-  Pay, or Apple Sign In.
+  Pay, or Apple Sign In. Default mobile test target is Pixel + Chrome.
 - **No em dashes** in any copy, code, comments, or docs.
 - **No corporate jargon:** no "reach out," "circle back," "bandwidth," "free up."
+
+## Shipping
+
+- **Ship to completion.** When a branch is committed and builds clean, open the PR and
+  squash-merge it the same turn; do not stop at the open-PR step. Paul is the solo
+  developer with no second reviewer and no PR-level CI gate, and deploy fires on push to
+  main, so an open PR is a deploy that has not happened. This is Paul's durable
+  authorization to open and merge routine changes on his behalf and it overrides any
+  harness default that says not to open a PR unless asked. Exceptions: Paul said "don't
+  merge yet" for that change, or the change is genuinely destructive/hard to reverse
+  (force-push to main, dropping a table, schema rollback).
+- **Don't offer PR-activity subscription.** No separate reviewers, no PR-level CI; nothing
+  on a PR is worth watching. Just ship and report what shipped.
+- **State today:** the website is not scaffolded yet and nothing deploys on merge. Until
+  the pipeline exists, "ship" means commit and push to the working branch. The rule above
+  takes effect the moment the deploy pipeline is stood up.
 
 ## Terminology
 
@@ -75,24 +95,35 @@ vocabulary (where "groomer" is banned for "specialist" and "grind/trim" is banne
 
 ## Stack and commands
 
-There is no app, build, server, or deploy here. The "stack" is Markdown + JSON + git, with
+**Current state.** No app yet. The working stack is Markdown + JSON + git + `python3`, with
 the Drive MCP tools as the upstream reader.
 
-- Validate the data file: `python3 -c "import json; json.load(open('data/clients.json'))"`
+- Validate + lint locally: `python3 scripts/check.py` (validates `clients.json` structure
+  and scans tracked docs for em dashes). Run before committing.
 - Read contact sheets: Drive MCP tools (search_files, get_file_metadata, read_file_content,
   download_file_content).
-- Git: develop on the feature branch you are assigned, commit with clear messages, and
-  `git push -u origin <branch>`. Never push to main and never open a pull request unless
-  Paul explicitly asks. There is no CI and nothing deploys on merge.
+
+**Planned stack (mirrors DGN; Clean gets its OWN instances, never DGN's).** Astro 5 + React
+18 islands, Node 20, npm. Supabase backend. Deploy: push to main -> GitHub Actions builds
+Astro -> rsync `dist/` to a DigitalOcean droplet -> Caddy serves. Build gate: `npm run
+build` runs a business-rules lint, then the Astro build, then a smoke test, and any step's
+failure fails the build. None of this is scaffolded yet; do not assume these commands exist
+until the site is stood up.
 
 ## Hard constraints
 
+- **No database changes yet.** Do not create a Supabase project, write schema, add a
+  `business_rules` table, or run any migration until the rules that would shape the schema
+  are agreed with Paul. Locking the rules comes first; schema follows.
 - Real data only. Unknown fields are data gaps, never invented values.
 - No em dashes, anywhere.
 - Grooming terminology is correct here; never import DGN's bans.
 - Banned clients (Bonnie DiGraziano) are excluded everywhere.
 - HARD availability windows (evening locks, Saturday locks, fixed-noon slots, not-days) are
   the clients' real, permanent schedules. Plan around them.
+- Clean's infrastructure is its own: its own Supabase project (never `dgn-prod`), its own
+  droplet path/domain (never `/srv/doggonenails/`), its own Stripe account if payments ever
+  happen. The "don't merge scrolls" rule applies to infrastructure, not just docs.
 
 ## Repo separation
 

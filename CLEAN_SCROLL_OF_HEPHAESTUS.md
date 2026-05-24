@@ -1,4 +1,4 @@
-# DGC build history
+# CLEAN_SCROLL_OF_HEPHAESTUS - Dog Gone Clean build narrative
 
 ## Header mandate (discipline for every session)
 
@@ -17,9 +17,14 @@
 
 - **Data:** all 33 standing records re-verified against the current contact-sheet doc per
   client and corrected per Paul's review (2026-05-24). Considered clean.
-- **Next action:** lock the last open cadence (Peter Moran, ~8wk vs ~12wk), then tighten
-  the route template against corrected stop sizes (Kevin is now a half-day 7-dog stop;
-  Steve and Patty are quick nails; Chester is shorter without Windsor).
+- **Foundation:** the doc/handoff system is reworked for the coming website (CLAUDE.md,
+  Oracle, Business_rules index, Parking_lot), stack decided (reuse DGN, own instances),
+  ship-to-completion is the git rule, and a local `scripts/check.py` enforces the
+  enforceable rules. Guardrail: NO database/schema until the rules are agreed.
+- **Next action:** agree the rules that would shape a schema (so the DB guardrail can lift),
+  lock the last open cadence (Peter Moran, ~8wk vs ~12wk), then tighten the route template
+  against corrected stop sizes (Kevin is a half-day 7-dog stop; Steve and Patty are quick
+  nails; Chester is shorter without Windsor).
 - **Parked:** one-off list as conversion candidates; see CLEAN_PARKING_LOT.md.
 
 ---
@@ -30,10 +35,15 @@
   11 one-off + 2 at-will + 1 banned in `data/clients.json`.
 - **Phase 2 - First zone-day route template.** DRAFTED (`data/route_template.md`). Pending
   final cadences and any load rebalancing.
-- **Phase 3 - Doc/handoff system.** DONE (2026-05-24): CLAUDE.md + this file + CLEAN_ORACLE.md
-  + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md.
-- **Phase 4 - Future (not started).** Possible: geocode plus codes for true drive-time;
-  route automation; multi-specialist routing (apprentice Jake); an actual site.
+- **Phase 3 - Doc/handoff system + website foundation.** DONE (2026-05-24): CLAUDE.md +
+  this file + CLEAN_ORACLE.md + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md, renamed to
+  the CLEAN_ prefix, reworked for the coming website, with the carried DGN rules folded in
+  and `scripts/check.py` enforcing what can be enforced today.
+- **Phase 4 - Website build.** NOT STARTED. Stack chosen: reuse the DGN stack (Astro +
+  React islands + Supabase + DigitalOcean/Caddy + GitHub Actions), Clean's own instances.
+  Blocked by the rules-before-schema guardrail: no database until the rules are agreed.
+- **Phase 5 - Later.** Geocode plus codes for true drive-time; route automation;
+  multi-specialist routing (apprentice Jake); possible field/operator app.
 
 ---
 
@@ -51,6 +61,20 @@
   Bradley, Mary Beth). Re-sourced every standing record from the newest populated doc per
   name (verified by listing the folder) and applied Paul's corrections. Fixed sources.md.
 - Set up this doc/handoff system (Phase 3).
+
+### 2026-05-24 - Website-foundation rework
+
+- Reframed the repo as the future DGC website, not a permanent data repo.
+- Evaluated DGN's CLAUDE.md, ORACLE.md, and BUSINESS_RULES.md for relevance and sorted
+  them into carry / adapt / drop for Clean.
+- Renamed the doc set to the CLEAN_ prefix (keeping the nails names) so DGC and DGN do not
+  blur at a glance: CLEAN_SCROLL_OF_HEPHAESTUS, CLEAN_ORACLE, CLEAN_BUSINESS_RULES,
+  CLEAN_PARKING_LOT; CLAUDE.md keeps its name.
+- Reworked CLAUDE.md and the Oracle for the coming-website reality (stack, ship-to-
+  completion, build gate, engineering constraints carried from DGN), and rebuilt the
+  Business_rules index on the four-layer model (thin now).
+- Added `scripts/check.py` (no deps, no DB): validates clients.json and scans tracked docs
+  for em dashes, making a few enforcement cells real.
 
 ---
 
@@ -87,3 +111,13 @@
   not artifacts. Donna DiPasqua Tuesday route. Cynthia Tieche Tuesday 3pm. Nancy Franklin +
   Lisa Prater + Patty Brown Saturday nails cluster (neighbors). Garrett Little at-will
   nails. Richard Vieira one-off (may convert). Bonnie DiGraziano banned, excluded everywhere.
+- **Naming convention:** doc set uses the DGN names with a CLEAN_ prefix (Paul chose this
+  over DGC_ because DGC and DGN look alike at a glance). CLAUDE.md keeps its exact name.
+- **Stack:** reuse the DGN stack for the Clean site (Astro 5 + React 18 islands, Node 20,
+  npm, Supabase, DigitalOcean droplet + Caddy, GitHub Actions deploy on push to main).
+  Clean gets its OWN Supabase project, droplet, domain, and Stripe account; never DGN's.
+- **Git/shipping:** ship-to-completion is THE rule (open PR and squash-merge when a branch
+  builds clean); it supersedes the earlier "no PR unless asked." Do not offer PR-activity
+  subscriptions. The earlier prompt that contradicted this was a stale paste.
+- **Database guardrail:** no Supabase project, schema, `business_rules` table, or migration
+  until the rules that shape the schema are agreed with Paul. Rules first, schema second.
