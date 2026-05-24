@@ -140,3 +140,8 @@
   `clean_stays_saleable` in the Oracle, a hard constraint in CLAUDE.md, and implications +
   pre-sale cleanup (move source-of-truth data off Paul's personal Drive; brand rights) in
   the Parking Lot.
+- **Why saleability (Paul's rationale):** it is a value test, not an exit plan. A business
+  is only buyable if it is valuable; if no one would buy it, it is probably not worth running
+  either, and if it is valuable enough to sell, that value is the reason to keep it.
+  Building to be sellable is what forces real value. Folded into the `clean_stays_saleable`
+  because in the Oracle.

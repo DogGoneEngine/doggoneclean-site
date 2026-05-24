@@ -70,10 +70,14 @@ Because merged history and shared infrastructure mis-apply rules across products
 Dog Gone Clean must remain sellable as a standalone business; nothing about it may be
 entangled with Dog Gone Nails (infrastructure, code, data, accounts, brand) or made to
 depend on Paul personally. Paul does not plan to sell, but the option must stay open.
-Because a sale means handing a buyer a clean, self-contained asset, and any DGN or personal
-entanglement created now becomes a sale blocker that is far cheaper to avoid than to
-untangle later. This is a guardrail, not a feature: do not build sale machinery; just keep
-every decision cleanly separable and operable by someone other than Paul.
+Because saleability is Paul's test for value, not an exit plan: a business is only buyable
+if it is valuable, so if no one would buy it it is probably not worth running either, and if
+it is valuable enough to sell, that same value is the reason to keep it. Building it to be
+sellable is what forces it to be genuinely valuable, a clean self-contained asset that runs
+without Paul; any DGN or personal entanglement is both a value leak and a sale blocker, far
+cheaper to avoid now than to untangle later. This is a guardrail, not a feature: do not build
+sale machinery; just keep every decision cleanly separable and operable by someone other
+than Paul.
 
 `no_database_until_rules_agreed` (build):
 Do not create a Supabase project, write schema, add a `business_rules` table, or run any
