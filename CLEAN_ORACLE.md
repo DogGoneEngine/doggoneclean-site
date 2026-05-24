@@ -44,6 +44,16 @@ remove; (3) any rule that lost its last live layer is re-enforced (or the redesi
 rejected). Because dropped rules are how an operating business breaks silently, and the
 index is the audit that turns "we should preserve the rules" into a step that actually runs.
 
+`lock_it_in_capture` (process):
+When Paul locks a decision (says "lock it in" or a clear equivalent like "that's decided" or
+"make it a rule"), capture it the same turn: write it to its live home (an Oracle rule, a
+CLAUDE.md constraint, or a record field), add a dated line to the Scroll's decisions log, run
+`scripts/check.py`, and commit/push. While Paul is still musing, record nothing. Because this
+is an ephemeral container and a long thread can compact or die before the end, committing
+each locked decision to git the moment it is made is the only thing that guarantees it
+survives; an uncommitted note can be lost with the session. The end-of-session scroll
+rebuild then becomes a polish-and-reconcile pass, not a rescue.
+
 `ship_to_completion` (process):
 When a branch is committed and builds clean, open the PR and squash-merge it (same turn);
 do not stop at the PR step. This is Paul's durable authorization to open and merge routine

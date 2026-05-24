@@ -28,6 +28,16 @@ This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 That read-order link is the only thing holding the set together. Keep the file names exact.
 These are Clean's own scrolls; never share or merge them with DGN's.
 
+## Recording decisions (lock it in)
+
+When Paul locks a decision (says "lock it in" or a clear equivalent), capture it the same
+turn: write it to its live home (an Oracle rule, a constraint in this file, or a record
+field), add a dated line to the Scroll's decisions log, run `python3 scripts/check.py`, and
+commit/push. While he is still thinking out loud, record nothing. Committing on each lock is
+what makes a decision survive a long thread that compacts or a container that is reclaimed;
+the end-of-session scroll rebuild is then a polish pass, not a rescue. See
+`lock_it_in_capture` in the Oracle.
+
 ## How Paul works (bake into every interaction)
 
 - **Recommendation with reason.** Any choice you offer lists the recommended option first,

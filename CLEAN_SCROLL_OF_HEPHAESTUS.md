@@ -4,9 +4,13 @@
 
 - **Read this file fully before doing any work.** It carries the decisions that context
   resets would otherwise erase.
-- **Rebuild it only at end of session, on Paul's explicit instruction.** Never rewrite it
-  mid-session.
-- **Record every answer Paul gives** in the Decisions log, so decisions survive resets.
+- **On "lock it in" (or a clear equivalent), capture immediately and commit.** Write the
+  decision to its live home (an Oracle rule, a CLAUDE.md constraint, a record field) and add
+  a dated line to the Decisions log below, then run `scripts/check.py` and commit/push the
+  same turn. While Paul is still musing, record nothing.
+- **Rebuild this file only at end of session, on Paul's explicit instruction**, as a
+  polish-and-reconcile pass (dedupe, reorganize, refresh the focus block), not a rescue;
+  durability already happened at each lock. Never rewrite it mid-session.
 - **If history and reality disagree, reality wins** and this file is corrected.
 - Keep the "Current focus / next action" block at the top current, so a session that ends
   abruptly still orients the next one fast.
@@ -145,3 +149,8 @@
   either, and if it is valuable enough to sell, that value is the reason to keep it.
   Building to be sellable is what forces real value. Folded into the `clean_stays_saleable`
   because in the Oracle.
+- **Decision-capture workflow (locked):** on "lock it in" or a clear equivalent, write the
+  decision to its live home plus this decisions log and commit/push the same turn; record
+  nothing while still musing; the end-of-session scroll rebuild is a polish/reconcile pass,
+  not a rescue. Baked into CLAUDE.md, the Oracle (`lock_it_in_capture`), and the header
+  mandate above.
