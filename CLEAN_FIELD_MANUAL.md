@@ -86,13 +86,34 @@ does, never how it is built.
   to the main freshwater supply (5-gallon or 55-gallon). Because two heavy-duty submersibles move
   far more water than the standard low-pressure RV pump, the system blasts the volume needed to
   cut through thick coats fast.
+- **Output and control.** Up to about 10 gallons per minute, the kind of flow you get from city
+  water and very high for a mobile rig. Two hoses, each with a nozzle and a lever that dials
+  pressure anywhere from roughly zero up to full: one fresh hose for rinsing and filling, one
+  recirculating hose that washes. Pumps are deliberately not bigger; more horsepower is available
+  but would deliver too much pressure.
+- **Pressure technique.** On a dry double coat, full pressure just splashes off, so dial it down
+  to soak the dog first, then up to drive water through the undercoat to the skin.
+- **Water thrift.** Most dogs are washed and rinsed with under 5 gallons.
+- **Shampoo.** Any product, dropped in anywhere the water recirculates (the bucket under the tub
+  or the tub itself); the recirculation grabs and mixes it. Easy to use a client's own shampoo
+  and hand the bottle back.
 - **Command valve.** A custom directional valve mounted on the wall toggles two modes with a
   flip:
   - **Recirculation mode:** recycles the water and shampoo mix through the tub for aggressive,
     deep, saturating cleaning.
   - **Pump-out mode:** diverts water out of the system for fast, effortless draining.
-- **Open (data gaps):** pump make/model and power draw, the valve part, the plumbing layout, and
-  the real flow rate. Fill from the actual rig; do not guess.
+- **Cleanability (the edge over built-in systems).** The external bucket pulls out for full
+  access; rinse it and wipe hair off the pump intake screen between baths, and swap the bucket
+  for a fresh one every few months.
+- **Design rationale (best of each, compromises dropped).** Hydrosurge recirculated but put the
+  pump in the tub with the dog; the Bathmaster kept the pump out but mixed shampoo into a
+  fresh-water flow that wastes a trailer's limited water; later built-in RV systems recirculated
+  with a separate pump but were permanently mounted under the tub and hard to clean. This system
+  combines pro-level power, recirculation thrift, a pump away from the dog, and a removable bucket
+  that cleans easily.
+- **Open (data gaps):** pump make/model and power draw, the valve part, the exact plumbing layout,
+  how water is heated / temperature control, and whether the dog finishes on a fresh-water rinse.
+  Fill from the actual rig; do not guess.
 
 Operation and upkeep of the wash and drain lines is under Maintenance routine (the bathing
 machine flush).
