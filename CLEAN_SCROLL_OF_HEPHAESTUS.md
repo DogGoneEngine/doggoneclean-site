@@ -239,6 +239,19 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 
 ## Decisions log (2026-05-25)
 
+### Business architecture (refined)
+- **Two businesses, the model sharpened.** The 2026-05-24 lock-in (two businesses not three,
+  Clean is one evolving business) was right, and the three-business plan stays retired (it lives
+  in history, commits `0c37403` and `9ee4aa3`). What was missing was Clean's precise arc, now
+  fixed. (1) DGN is the new nails-only business in the Villages, fully separate. (2) Clean is the
+  existing ~20-year full-grooming business in Ocala: legacy full grooming continues for legacy
+  Ocala clients, while Clean makes a HARD PIVOT to bath only (no-haircut dogs), because haircuts
+  are where cycle time drags and bath is faster and far higher revenue per hour
+  (`favor_high_hourly_work`, `core_is_no_haircut_dogs`). The bath pivot starts in Ocala, where
+  Paul already works, then migrates from Ocala to the Villages as the legacy book winds down.
+  Destination: bath only in the Villages, by morphing the same business. CLAUDE.md and the
+  parking lot updated to match.
+
 ### Database
 - **Clean's Supabase project:** `dgc-prod`, ref `urebdrosrxejhubpbxsa`, region us-east-1, in
   the shared "Mount Olympus" org (org id `rnswdmikyxxukefcikui`). Project URL

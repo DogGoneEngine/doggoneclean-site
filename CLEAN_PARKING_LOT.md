@@ -55,12 +55,17 @@ are not routed until converted. Verify against the real sheet at conversion time
 
 ## Bigger questions for Paul (decide before the build needs them)
 
-- **Business architecture (RESOLVED 2026-05-24).** Two businesses, not three: DGN (flagship)
-  and Clean (ONE evolving business, a fork of the DGN platform). The separate scalable "new
-  Clean" folds back into Clean. Full decision in the Scroll decisions log. Still parked as
-  forward-looking, not decided: a possible "Dog Gone" brand family named by service (Clean,
-  Walking, Sitting, Training) built as forks of the same platform, each its own instance; and
-  whether Paul ultimately runs a portfolio he keeps or builds units to sell.
+- **Business architecture (RESOLVED 2026-05-24, refined 2026-05-25).** Two businesses, not
+  three: DGN (Dog Gone Nails, new, nails only in the Villages, fully separate) and Clean (this
+  repo, one evolving business, a fork of the DGN platform). Clean's arc: legacy full grooming
+  continues for legacy Ocala clients, while Clean makes a hard pivot to bath only (no-haircut
+  dogs, because haircuts are the cycle-time drag and bath is higher revenue per hour), starting
+  in Ocala where Paul already works and migrating to the Villages as the legacy book winds down.
+  Destination: bath only in the Villages. The separate reinvented bath business folds into Clean
+  by evolving into it. Full decision in the Scroll decisions log. Still parked as forward-looking,
+  not decided: a possible "Dog Gone" brand family named by service (Clean, Walking, Sitting,
+  Training) built as forks of the same platform, each its own instance; and whether Paul
+  ultimately runs a portfolio he keeps or builds units to sell.
 - **Online payment:** DECIDED 2026-05-24. In person via Square; online deferred until it
   earns its place. The DGN payment/skip/reschedule/card layer is not ported now.
 - **Field/operator app:** DECIDED 2026-05-24. Yes, operator app plus pizza tracker in Clean

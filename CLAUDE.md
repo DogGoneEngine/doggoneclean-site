@@ -6,16 +6,24 @@ For what happened and why, read the other docs in the order below.
 ## What this repo is
 
 Dog Gone Clean (DGC) is Paul's mobile dog grooming business in the Ocala, FL area (~20 years
-old). This repo is becoming the **DGC website and operations app**. Clean is one evolving
-business: it keeps serving its existing full-grooming clients while repositioning the
-marketing toward higher-profit bath work to attract new clients, and it can expand to the
-Villages with bath service. There is no separate "new Clean"; the existing book and the new
-direction are the same business being morphed (sending the legacy business to the gym). Clean
+old). This repo is becoming the **DGC website and operations app**. Clean is one existing
+business that is evolving, not a new one. Today it is full grooming in Ocala, and it keeps
+serving its legacy full-grooming clients there. From that base it is making a hard pivot to
+**bath only** (dogs that do not get haircuts), because haircuts are where the cycle time drags
+and bath work is faster and far higher revenue per hour (`favor_high_hourly_work`,
+`core_is_no_haircut_dogs`). The bath pivot starts in Ocala, where Paul already works, then
+migrates from Ocala to the Villages as the legacy full-grooming clients wind down. The
+destination is bath only in the Villages, reached by morphing the same business, not by
+standing up a separate "new Clean". Clean
 is built as a fork of the proven Dog Gone Nails (DGN) platform, with its own instances and
 infrastructure, never merged with DGN. The authoritative client records in `data/` seed it.
 Treat this as a construction site for the building that is coming.
 
-There are two businesses total: DGN (the flagship, fully separate) and Clean (this repo).
+There are two businesses total: DGN (Dog Gone Nails, the new nails-only business in the
+Villages, fully separate) and Clean (this repo, the existing Ocala full-grooming business
+evolving to Villages bath only). A third, separate reinvented bath business was considered and
+dropped as too complicated; Clean absorbs that direction by evolving into it rather than as its
+own company.
 
 This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 
