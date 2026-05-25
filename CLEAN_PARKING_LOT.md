@@ -4,6 +4,26 @@ Deferred work and forward-looking ideas, parked so they survive a context reset.
 here is committed work; it is the backlog. Move an item into CLEAN_SCROLL_OF_HEPHAESTUS.md's focus block
 when it becomes active.
 
+## Website build (active next step)
+
+The site is live at hurricanebath.com (staging), built and deployed from `main` via
+`.github/workflows/deploy.yml`. The homepage is rebuilt in the Neural Expressive look (Paul
+approved the visuals) with the master logo (`public/logo.png`) and real content from
+`marketing/`. Next steps, decided 2026-05-25:
+
+- **Fork the DGN site structure into Clean (multi-page).** Clean's site is currently a single
+  page; it should be a multi-page site modeled on the proven Dog Gone Nails site (Clean is a
+  fork of the DGN platform; the separation line is data/accounts/docs, never the site shape).
+  Paul is granting this environment access to the DGN repo so a future session can read its
+  structure and fork it directly. Reuse DGN's page set and layout; keep Clean's own content,
+  Neural Expressive style, logo, and data. Do NOT merge DGN's docs or data.
+- **Copy pass (the live copy needs real work).** The hero "A cleaner dog, without leaving
+  home." is a provisional placeholder ("Dog grooming. No chaos." was rejected). Service area is
+  Ocala ONLY (no surrounding towns; one-off exceptions are not advertised). No "brush out" or
+  brush wording: the Hurricane Bath and high-velocity dryer do that work, Paul owns no brush.
+- **Logo check.** Confirm the logo renders cleanly on the light page (may need a
+  transparent-background version).
+
 ## Conversion candidates (one-off -> standing)
 
 Leave the one-off list as-is and treat it as people to try to convert to standing where
