@@ -55,6 +55,10 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |
 | accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |
 | house_shampoo | Service | Oracle; convention | site copy; intake form |
+| online_only_comms | Process | Oracle; convention | site copy; intake; `business_rules` row |
+| friendly_dogs_only | Safety | Oracle; convention | site copy; intake gate |
+| core_is_no_haircut_dogs | Roster | Oracle; convention | site copy; intake |
+| service_area_ocala | Routing | Oracle; `data/` | scheduling engine; intake address check |
 | grooming_vocab | Copy | CLAUDE.md; convention | lint allowlist |
 | no_dgn_import | Copy | CLAUDE.md; "Repo separation" | lint pattern |
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |

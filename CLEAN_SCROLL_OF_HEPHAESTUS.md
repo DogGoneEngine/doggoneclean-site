@@ -44,7 +44,8 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   origin story, photos/video, and the reveal-level confirmation.
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
-  Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
+  Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route; the
+  authoritative accepted-payment list (live site vs journal vs CLAUDE.md conflict).
 
 ---
 
@@ -203,6 +204,20 @@ sessions add their own dated section below.
   Every rule serves it, and if a rule fights it the directive wins and the rule gets fixed. Lives
   as the first section of CLEAN_ORACLE.md, with the apex line and a pointer in CLAUDE.md "What
   this repo is". Paul approved the wording verbatim.
+
+### Live-site mining: origin, voice, and policies (captured)
+- Pulled the real origin story ("Meet Paul Nickerson... The system came later. The dogs came
+  first.") and brand voice from the current site into `marketing/origin_and_brand.md` (the
+  environment cannot reach the live site; Paul pasted it). Folded the existing Hurricane Bath lines
+  into the showcase language bank.
+- New Oracle rules from published policies: `online_only_comms`, `friendly_dogs_only`,
+  `core_is_no_haircut_dogs`, `service_area_ocala` (Ocala; no unpaved roads; excludes Silver Springs
+  Shores, Summer Glen, Marion Oaks). Pack grooming added to CLEAN_FIELD_MANUAL.md.
+- Known cleanups for the rebuild (rules already win): "arrival windows" becomes block;
+  "same-day cancellations 100%" becomes within-24-hours; drop the "they trickle" knock.
+- OPEN, needs Paul: the payment list. Live site says cash, credit cards, PayPal, NO CHECKS; the
+  journal says cash plus the card networks plus Apple/Google/Samsung Pay; CLAUDE.md says checks are
+  accepted. Resolve and update `accepted_payment_methods` and CLAUDE.md.
 
 ### Shampoo policy (LOCKED)
 - **`house_shampoo`:** one gentle house shampoo for everyone (privately: TropiClean papaya and

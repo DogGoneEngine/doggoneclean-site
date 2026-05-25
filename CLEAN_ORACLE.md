@@ -390,6 +390,38 @@ never the marketing copy, which stays positive and skips the flea lecture (`remi
 
 ---
 
+## Service and operating policies
+
+`online_only_comms` (process):
+All client communication (scheduling, updates, questions) runs through the online system; Clean
+does not take or return phone calls. Because Paul is hands-on with dogs all day and cannot step
+away for calls, and an online record keeps every booking and change documented and clear. The
+outbound heads-up text still goes out (`heads_up_on_the_way`); this rule is about inbound calls.
+
+`friendly_dogs_only` (safety):
+Clean grooms friendly dogs; a dog must be handleable without aggression. Snapping, biting
+attempts, or aggression ends the appointment immediately, and resistance that prevents safe,
+efficient work can mean service is declined. Clients disclose behavior concerns before booking.
+Because a dog-bite injury can put the groomer out of work and the whole business runs on Paul's
+hands; it is a safety boundary, not personal. Serves `protect_the_operator` and the prime
+directive's good-for-the-body test.
+
+`core_is_no_haircut_dogs` (roster):
+Clean's core focus is dogs that do not need haircuts: short coats, double coats, heavy shedders,
+working breeds. Haircut breeds are still served but are not the focus, and doodles are declined
+outright (`no_doodles`). Because no-haircut natural-coat grooming is the fast,
+high-revenue-per-hour bath work the business is repositioning toward (`favor_high_hourly_work`),
+while haircut-heavy coats are slow and low-margin; this is the market position already on the live
+site.
+
+`service_area_ocala` (routing):
+The service area is Ocala, Florida (most Ocala mailing addresses). Hard exclusions: no unpaved
+roads, and no service to Silver Springs Shores, Summer Glen, or Marion Oaks. Because these are the
+real operating limits the route and intake must honor; a booking outside them is declined up
+front, not routed. Pairs with `base_is_home_sw`.
+
+---
+
 ## Copy and terminology
 
 `grooming_vocab` (copy):

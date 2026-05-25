@@ -76,6 +76,11 @@ dog first, give it a quick dryer pass, and set it on towels. Because in 30 perce
 finishes drying on its own while you groom the long-coat dog, so its drying time is effectively
 free.
 
+**Pack grooming.** Dogs that live together are usually groomed together, because dogs live as a
+pack and grooming is no reason to split them. Keep them together if they are calm together; give
+one space if it needs to relax while the other is worked on. The goal is always less stress and a
+stable experience.
+
 ---
 
 ## The Hurricane Bath (the wash system)

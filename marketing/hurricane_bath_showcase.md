@@ -114,6 +114,12 @@ Assets Paul will provide (data gaps):
 Strong lines pulled from the internal coyote story; work them into public copy when they fit
 (`language_bank`).
 
+From the live site (existing Hurricane Bath copy, already moat-safe, ready to lift):
+- "A controlled storm that leaves the coat refreshed and balanced."
+- "The movement lifts dirt, debris, and loose undercoat from deep within the coat while using less
+  total water than traditional hand washing."
+- "It is controlled. It is efficient. It is thorough."
+
 - "A garden hose would have laughed at that dog. A bath by hand would have been an all-day act of
   surrender." Safe and strong: it pokes at backyard methods, not at any product or competitor.
 - "Most setups would have just smeared it around." Hold or adapt. This one edges into knocking
