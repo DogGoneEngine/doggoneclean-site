@@ -2,7 +2,7 @@
 const services = [
   {
     name: "The Bath",
-    body: "A thorough wash, dry, brush out, ears, and nails at your door. The quick, fresh reset between full grooms.",
+    body: "A thorough wash, dry, brush out, ears, and nails at your door. The quick, fresh reset between full grooms, powered by the Hurricane Bath.",
   },
   {
     name: "The Full Groom",
@@ -11,6 +11,25 @@ const services = [
   {
     name: "Nails",
     body: "A fast nail visit for the dogs who just need a trim, kept on a steady schedule.",
+  },
+];
+
+const bathPoints = [
+  {
+    head: "Power, dialed to the dog",
+    body: "A lever at the nozzle sets the water from a soft trickle to full force. Full force drives water through a thick double coat to the skin. Soft is right for a face, eyes, and nervous dogs. Powerful does not have to mean rough.",
+  },
+  {
+    head: "Finishes on clean water",
+    body: "The wash recirculates and gets your dog clean the way a dishwasher does. Every dog finishes with a fresh water rinse from a separate tank.",
+  },
+  {
+    head: "No dog too dirty",
+    body: "Mud from nose to tail is a normal day. When the wash water turns to a puddle, we flush, refill, and wash again until your dog washes up clean.",
+  },
+  {
+    head: "Easy on water",
+    body: "Most dogs are washed and rinsed with under five gallons. The power comes from how the system moves water, not from wasting it.",
   },
 ];
 
@@ -25,10 +44,13 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
     <title>Dog Gone Clean | Mobile dog grooming and bath in the Ocala area</title>
     <meta
       name="description"
-      content="Dog Gone Clean is a mobile dog grooming and bath service in the Ocala, Florida area. We come to you."
+      content="Dog Gone Clean is a mobile dog grooming and bath service in the Ocala, Florida area. We bring the bath and the full groom to your driveway."
     />
   </head>
   <body>
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+
     <header class="site">
       <span class="brand">Dog Gone Clean</span>
       <a class="portal" href="/portal/">Client sign in</a>
@@ -37,15 +59,17 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
     <main>
       <section class="hero">
         <p class="eyebrow">Mobile dog grooming, Ocala and nearby</p>
-        <h1>A clean, happy dog without leaving home.</h1>
+        <h1>Dog grooming.<br /><span class="grad">No chaos.</span></h1>
         <p class="lede">
-          We bring the bath and the full groom to your driveway. Twenty years of
-          steady hands, one familiar face, and a van that comes to you.
+          Dogs are the reason. The system is how we do it right. We bring the
+          bath and the full groom to your driveway, with twenty years of steady
+          hands and one familiar face.
         </p>
         <div class="cta">
           <a class="button primary" href="/portal/">Book a visit</a>
-          <a class="button ghost" href="#services">See what we do</a>
+          <a class="button ghost" href="#bath">Meet the Hurricane Bath</a>
         </div>
+        <p class="trio">Structured. Reliable. Personal.</p>
       </section>
 
       <section id="services" class="services">
@@ -62,12 +86,71 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
         </div>
       </section>
 
+      <section id="bath" class="bath">
+        <p class="eyebrow light">The Hurricane Bath</p>
+        <h2>Built, <span class="grad">not bought.</span></h2>
+        <p class="lede">
+          The Hurricane Bath moves up to about ten gallons a minute, the kind of
+          flow you get from city water, and dials all the way down to a soft
+          trickle for a dog's face and eyes. Paul built it himself, and it gets a
+          dog genuinely clean, fast.
+        </p>
+        <div class="grid">
+          {
+            bathPoints.map((p) => (
+              <article class="card dark">
+                <h3>{p.head}</h3>
+                <p>{p.body}</p>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="power">
+        <h2>Power to spare</h2>
+        <p>
+          Dog Gone Clean runs on two heavy duty generators, together enough to
+          power a small house. Most of that goes straight into what your dog
+          actually feels: strong air conditioning, a dehumidifier that keeps the
+          trailer cool and dry, and high velocity dryers. Drying is a one two
+          punch, so your dog is dry quickly and back to doing what it does best.
+        </p>
+      </section>
+
+      <section class="doorstep">
+        <h2>We come to you</h2>
+        <p>
+          We bring the entire dog grooming system to your driveway. Our mobile
+          unit carries its own water, power, and climate control. We park at your
+          home, complete the groom, and send arrival notifications along the way.
+          No driving across town. No sitting in a lobby. No disruption to your
+          day. You stay home. Your dog gets focused care. The route keeps moving.
+        </p>
+      </section>
+
       <section class="area">
         <h2>Where we go</h2>
         <p>We serve the Ocala area and the towns around it.</p>
         <ul class="chips">
           {areas.map((a) => <li>{a}</li>)}
         </ul>
+      </section>
+
+      <section class="about">
+        <h2>Meet Paul Nickerson</h2>
+        <p>
+          Paul did not fall into this business by accident. He chose dogs. He
+          wanted to build his life around working with them, so he trained at the
+          Florida Institute of Animal Arts and built Dog Gone Clean from the
+          ground up in Ocala, Florida.
+        </p>
+        <p>
+          What started as one trailer and one decision became a focused mobile
+          dog grooming service built on calm handling and full attention. The
+          system came later. The dogs came first.
+        </p>
+        <p class="sign">Paul Nickerson, Owner, Dog Gone Clean</p>
       </section>
     </main>
 
@@ -78,12 +161,13 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
 
     <style>
       :root {
-        --ink: #1d2a24;
-        --muted: #5b6b63;
-        --bg: #f6f4ee;
+        --ink: #0c1322;
+        --muted: #5a6b7d;
+        --bg: #f7f9ff;
         --card: #ffffff;
-        --accent: #2f6f4f;
-        --line: #e2ded3;
+        --accent: #2563eb;
+        --accent2: #06b6d4;
+        --line: #e3e8f4;
       }
       * {
         box-sizing: border-box;
@@ -93,21 +177,51 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
       }
       body {
         margin: 0;
+        position: relative;
+        overflow-x: hidden;
         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         color: var(--ink);
         background: var(--bg);
         line-height: 1.55;
+      }
+      .glow {
+        position: absolute;
+        z-index: 0;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        pointer-events: none;
+      }
+      .glow-a {
+        top: -120px;
+        right: -80px;
+        width: 420px;
+        height: 420px;
+        background: radial-gradient(circle, #3b82f6, transparent 70%);
+      }
+      .glow-b {
+        top: 600px;
+        left: -120px;
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, #22d3ee, transparent 70%);
+      }
+      .site,
+      main,
+      .site-footer {
+        position: relative;
+        z-index: 1;
       }
       .site {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 1.1rem 1.4rem;
-        max-width: 960px;
+        max-width: 980px;
         margin: 0 auto;
       }
       .brand {
-        font-weight: 700;
+        font-weight: 800;
         letter-spacing: 0.01em;
       }
       .portal {
@@ -117,31 +231,42 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
         font-size: 0.95rem;
       }
       main {
-        max-width: 960px;
+        max-width: 980px;
         margin: 0 auto;
         padding: 0 1.4rem;
       }
-      .hero {
-        padding: 2.5rem 0 3rem;
-      }
       .eyebrow {
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.09em;
         font-size: 0.8rem;
         font-weight: 700;
         color: var(--accent);
-        margin: 0 0 0.6rem;
+        margin: 0 0 0.7rem;
+      }
+      .eyebrow.light {
+        color: var(--accent2);
+      }
+      .hero {
+        padding: 3rem 0 3.5rem;
       }
       h1 {
-        font-size: clamp(2rem, 6vw, 3.1rem);
-        line-height: 1.1;
-        margin: 0 0 1rem;
+        font-size: clamp(2.6rem, 9vw, 4.6rem);
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+        margin: 0 0 1.2rem;
+        font-weight: 800;
+      }
+      .grad {
+        background: linear-gradient(100deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
       }
       .lede {
-        font-size: 1.15rem;
-        color: var(--muted);
-        max-width: 32rem;
-        margin: 0 0 1.6rem;
+        font-size: 1.18rem;
+        color: #41506a;
+        max-width: 36rem;
+        margin: 0 0 1.7rem;
       }
       .cta {
         display: flex;
@@ -150,37 +275,51 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
       }
       .button {
         display: inline-block;
-        padding: 0.8rem 1.3rem;
+        padding: 0.85rem 1.4rem;
         border-radius: 999px;
         text-decoration: none;
-        font-weight: 600;
+        font-weight: 700;
       }
       .primary {
-        background: var(--accent);
+        background: linear-gradient(100deg, var(--accent), var(--accent2));
         color: #fff;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35);
       }
       .ghost {
-        background: transparent;
+        background: #fff;
         color: var(--ink);
         border: 1px solid var(--line);
       }
-      section h2 {
-        font-size: 1.5rem;
-        margin: 0 0 1.2rem;
+      .trio {
+        margin: 1.8rem 0 0;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #41506a;
       }
-      .services {
-        padding: 1.5rem 0 2.5rem;
+      section h2 {
+        font-size: clamp(1.6rem, 4vw, 2.2rem);
+        letter-spacing: -0.01em;
+        margin: 0 0 1.2rem;
+        font-weight: 800;
+      }
+      .services,
+      .power,
+      .doorstep,
+      .area,
+      .about {
+        padding: 1.8rem 0 2.6rem;
       }
       .grid {
         display: grid;
         gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       }
       .card {
         background: var(--card);
         border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 1.3rem;
+        border-radius: 16px;
+        padding: 1.4rem;
+        box-shadow: 0 6px 20px rgba(13, 30, 70, 0.05);
       }
       .card h3 {
         margin: 0 0 0.5rem;
@@ -188,10 +327,41 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
       }
       .card p {
         margin: 0;
-        color: var(--muted);
+        color: #41506a;
       }
-      .area {
-        padding: 1.5rem 0 3rem;
+      .bath {
+        position: relative;
+        margin: 1rem -1.4rem;
+        padding: 3rem 1.4rem;
+        color: #eaf2ff;
+        background: linear-gradient(160deg, #0c1322, #15233f 60%, #0e2a3a);
+        border-radius: 24px;
+      }
+      .bath h2 {
+        color: #fff;
+      }
+      .bath .lede {
+        color: #b9cae8;
+      }
+      .card.dark {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: none;
+      }
+      .card.dark h3 {
+        color: #67e8f9;
+      }
+      .card.dark p {
+        color: #b9cae8;
+      }
+      .power p,
+      .doorstep p,
+      .area p,
+      .about p {
+        font-size: 1.08rem;
+        color: #41506a;
+        max-width: 44rem;
+        margin: 0 0 1rem;
       }
       .chips {
         list-style: none;
@@ -205,18 +375,23 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
         background: #fff;
         border: 1px solid var(--line);
         border-radius: 999px;
-        padding: 0.4rem 0.9rem;
+        padding: 0.45rem 1rem;
         font-size: 0.95rem;
+        font-weight: 600;
+      }
+      .about .sign {
+        font-weight: 700;
+        color: var(--ink);
       }
       .site-footer {
-        max-width: 960px;
+        max-width: 980px;
         margin: 0 auto;
-        padding: 2rem 1.4rem 3rem;
+        padding: 2.5rem 1.4rem 3.5rem;
         display: flex;
         justify-content: space-between;
         flex-wrap: wrap;
         gap: 0.5rem;
-        color: var(--muted);
+        color: #5a6b7d;
         font-size: 0.9rem;
         border-top: 1px solid var(--line);
       }
