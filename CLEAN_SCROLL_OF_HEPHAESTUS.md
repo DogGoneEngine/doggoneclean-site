@@ -39,14 +39,14 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   with auth (the first RLS policies land with auth). After that the scheduling tables
   (services with variable grooming durations, subscriptions, appointments) forked from DGN's
   String of Pearls, and the `business_rules` table mirroring the Oracle.
-- **Needs Paul to unblock the remaining live pieces:** DONE: `dgc-prod`'s keys and DB
-  password are retrieved and stored in Dashlane. IN PROGRESS: Google Cloud project
-  `dog-gone-clean` is created (org `nickerson-paul-org`, billing attached, separate from
-  DGN's project per `own_infrastructure`); still to do there are the domain-locked Maps
-  JavaScript API key and, if Google login is chosen, an OAuth client whose redirect URI is
-  `https://urebdrosrxejhubpbxsa.supabase.co/auth/v1/callback`. PENDING: point
-  hurricanebath.com at the droplet for staging, blocked until a droplet exists. (A literal
-  fork of the DGN code must be brought over by hand; this repo cannot reach the DGN repo.)
+- **Needs Paul to unblock the remaining live pieces:** DONE: `dgc-prod`'s keys + DB password
+  (in Dashlane); Google Cloud (`dog-gone-clean`) with a domain-locked Maps JavaScript API
+  key, the OAuth consent screen published, an OAuth web client, and Google sign-in enabled on
+  dgc-prod. LEFT: (1) Clean's own Twilio account, phone number, and A2P registration, which
+  powers SMS notifications and the phone access-code login; (2) a DigitalOcean droplet (reuse
+  DGN's or new) plus pointing hurricanebath.com at it, needed only when ready to preview. (A
+  literal fork of the DGN code, if wanted, must be brought over by hand; this repo cannot
+  reach the DGN repo.)
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
   Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
@@ -216,13 +216,14 @@ sessions add their own dated section below.
 - **Supabase secrets:** retrieved and stored in Dashlane; the `dgc-prod` DB password was
   reset to a known value (the MCP-created project never surfaced one). Secrets live only in
   Dashlane and a future local `.env`, never in git.
-- **Google Cloud:** Clean's own project `dog-gone-clean` created under org
-  `nickerson-paul-org` with billing attached, deliberately separate from DGN's Google Cloud
-  project (account/billing shared, project not, per `own_infrastructure`). Next inside it:
-  enable the Maps JavaScript API and create a domain-locked key (referrers doggoneclean.us,
-  www.doggoneclean.us, hurricanebath.com, localhost:4321; restricted to Maps JavaScript API),
-  then optionally an OAuth client (redirect `https://urebdrosrxejhubpbxsa.supabase.co/auth/v1/callback`).
-  The Maps key is semi-sensitive even when domain-locked; keep it in Dashlane, not git.
+- **Google Cloud (done 2026-05-25):** Clean's own project `dog-gone-clean` under org
+  `nickerson-paul-org` (billing attached, separate from DGN's project per `own_infrastructure`).
+  Built: a browser Maps JavaScript API key locked to referrers doggoneclean.us,
+  www.doggoneclean.us, hurricanebath.com, localhost:4321 and restricted to the JS API; the
+  OAuth consent screen published to production; an OAuth web client with redirect
+  `https://urebdrosrxejhubpbxsa.supabase.co/auth/v1/callback`; Google sign-in enabled on
+  dgc-prod. Keys and the client secret live in Dashlane, not git. Remaining external deps for
+  the build are Twilio (SMS + phone login) and a droplet for hurricanebath.com staging.
 - **Two-key Maps architecture (locked 2026-05-25):** Clean uses two Google Maps keys, never
   one. A BROWSER key, restricted by HTTP referrer to Clean's four domains and scoped to the
   Maps JavaScript API, for displaying maps (created and locked now). A SERVER key, restricted
