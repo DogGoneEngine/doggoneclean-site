@@ -110,11 +110,18 @@ vocabulary (where "groomer" is banned for "specialist" and "grind/trim" is banne
 
 ## Stack and commands
 
-**Current state.** No app yet. The working stack is Markdown + JSON + git + `python3`, with
-the Drive MCP tools as the upstream reader.
+**Current state.** No web app yet, but the database layer exists. Clean's own Supabase
+project `dgc-prod` (ref `urebdrosrxejhubpbxsa`, us-east-1, in the shared "Mount Olympus"
+org) holds the client book: `public.clients` + `public.dogs`, seeded from
+`data/clients.json`, RLS-locked. Schema-as-code lives in `supabase/migrations/`. The rest of
+the working stack is Markdown + JSON + git + `python3`, with the Drive MCP tools as the
+upstream reader and the Supabase MCP tools for the database. `data/clients.json` stays the
+authoritative client file until the app writes back to Supabase.
 
 - Validate + lint locally: `python3 scripts/check.py` (validates `clients.json` structure
   and scans tracked docs for em dashes). Run before committing.
+- Regenerate the DB seed from the source of truth: `python3 scripts/gen_seed_sql.py`
+  (writes `supabase/seed.sql` from `data/clients.json`).
 - Read contact sheets: Drive MCP tools (search_files, get_file_metadata, read_file_content,
   download_file_content).
 

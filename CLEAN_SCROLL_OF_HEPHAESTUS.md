@@ -26,17 +26,24 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   businesses total: DGN (flagship, fully separate) and Clean (this repo). Clean keeps its
   existing full-grooming clients while the marketing leans into higher-profit bath work, one
   portal serves both, and it can expand to the Villages with bath.
-- **State:** client records clean (33 standing, seed-ready); route template drafted; doc and
-  handoff system built; strategy, infrastructure, and workflow decisions locked;
-  `scripts/check.py` enforces what can be enforced today. Clean is greenlit to build.
-- **Next chapter (best done in a fresh thread):** scaffold the Clean Astro app + bath-forward
-  marketing skeleton (needs no credentials), then the schema as migration files + seed from
-  `data/clients.json`, then the portal shell. Recommended first move: scaffold the Astro app
-  plus marketing skeleton.
-- **Needs Paul to unblock the live pieces:** create Clean's own Supabase project and hand
-  over URL + keys; create a Google Cloud project with a domain-locked Maps key and OAuth
-  client; point hurricanebath.com at the droplet for staging. (If a literal fork of the DGN
-  code is wanted, bring that source over; this repo cannot reach the DGN repo.)
+- **State:** Clean's own Supabase project is LIVE: `dgc-prod`, ref `urebdrosrxejhubpbxsa`,
+  us-east-1, inside the shared "Mount Olympus" org (account sharing is allowed; the project
+  is the hard line, never `dgn-prod`). The client book is built and seeded in it:
+  `public.clients` (47: 33 standing, 11 one-off, 2 at-will, 1 banned) and `public.dogs` (61),
+  RLS-locked with no policy (only the service role reaches it until portal auth exists).
+  Schema-as-code in `supabase/migrations/`, reproducible seed via `scripts/gen_seed_sql.py`
+  to `supabase/seed.sql`, TS types in `supabase/database.types.ts`. Route template drafted;
+  doc/handoff system built; strategy/infra/workflow locked; `scripts/check.py` green.
+- **Next chapter:** scaffold the Clean Astro app + bath-forward marketing skeleton (no
+  credentials needed), wire it to `dgc-prod` via the publishable key, then the portal shell
+  with auth (the first RLS policies land with auth). After that the scheduling tables
+  (services with variable grooming durations, subscriptions, appointments) forked from DGN's
+  String of Pearls, and the `business_rules` table mirroring the Oracle.
+- **Needs Paul to unblock the remaining live pieces:** grab `dgc-prod`'s publishable (anon)
+  key, service-role key, and DB password from the Supabase dashboard for app wiring and a
+  local `.env` (never committed); create a Google Cloud project with a domain-locked Maps key
+  and OAuth client; point hurricanebath.com at the droplet for staging. (A literal fork of the
+  DGN code must be brought over by hand; this repo cannot reach the DGN repo.)
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
   Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
@@ -51,11 +58,13 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   the last cadence lock and a rebalance against corrected stop sizes.
 - **Phase 3 - Doc / handoff system.** DONE. CLAUDE.md + this Scroll + CLEAN_ORACLE.md +
   CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + `scripts/check.py`.
-- **Phase 4 - Clean website + ops app (fork of the DGN platform).** GREENLIT, starting.
-  Astro marketing site (bath-forward) + client portal (existing + new clients) + String of
-  Pearls scheduling + operator app with photos + pizza tracker + SMS notifications, on
-  Clean's own Supabase project, seeded from `data/clients.json`. In-person payment (Square).
-  Preview on hurricanebath.com until doggoneclean.us flips at launch.
+- **Phase 4 - Clean website + ops app (fork of the DGN platform).** IN PROGRESS. The
+  database foundation is DONE: Clean's own Supabase project `dgc-prod` is live and holds the
+  client book (`clients` + `dogs`) seeded from `data/clients.json`, RLS-locked. Still to
+  build: Astro marketing site (bath-forward) + client portal (existing + new clients) +
+  String of Pearls scheduling + operator app with photos + pizza tracker + SMS
+  notifications. In-person payment (Square). Preview on hurricanebath.com until
+  doggoneclean.us flips at launch.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 
@@ -75,6 +84,21 @@ then reworked it for the coming website and renamed it to the CLEAN_ prefix. Add
 the business architecture (one evolving Clean, a fork of the DGN platform), infrastructure,
 payment, staging, and the decision-capture workflow. Corrected the live domain to .us. Ended
 by rebuilding this Scroll and recommending a fresh thread for the build phase.
+
+### 2026-05-25 (database setup)
+
+Stood up Clean's own Supabase project and built the client-book database layer. Created
+`dgc-prod` (ref `urebdrosrxejhubpbxsa`, us-east-1) in the shared "Mount Olympus" org, the
+hard-separation line per `own_infrastructure` (only `dgn-prod` existed before; nothing of
+Clean's touches it). Wrote the v1 schema (`public.clients` + `public.dogs`) as a migration
+in `supabase/migrations/`, RLS-locked with no policy so only the service role reaches the
+data until portal auth is built (the records carry gate codes and door codes). Added
+`scripts/gen_seed_sql.py`, which turns `data/clients.json` into a reproducible
+`supabase/seed.sql`, and seeded the project: 47 clients (33 standing, 11 one-off, 2 at-will,
+1 banned) and 61 dogs, prices stored in cents, verified with zero orphans and zero standing
+records missing required fields. Saved the generated TypeScript types to
+`supabase/database.types.ts`. Security advisor shows only the expected INFO
+(RLS-enabled-no-policy), which is the intended locked state.
 
 ---
 
@@ -162,3 +186,25 @@ sessions add their own dated section below.
 ### Facts for the record
 - **Domain:** the live site is www.DogGoneClean.us. Paul does NOT own DogGoneClean.com.
   Staging/preview on hurricanebath.com (a domain Paul owns).
+
+## Decisions log (2026-05-25)
+
+### Database
+- **Clean's Supabase project:** `dgc-prod`, ref `urebdrosrxejhubpbxsa`, region us-east-1, in
+  the shared "Mount Olympus" org (org id `rnswdmikyxxukefcikui`). Project URL
+  `https://urebdrosrxejhubpbxsa.supabase.co`. This is the hard-separation line
+  (`own_infrastructure`): account/org may be shared with DGN, the project never is. Cost is
+  $0/month in this org. Keys and DB password live only in the Supabase dashboard and a local
+  `.env`, never committed.
+- **v1 schema = the client book.** `public.clients` (one table for the whole book, grouped by
+  `roster_group`) plus `public.dogs`. Built as a migration (`supabase/migrations/
+  0001_init_client_book.sql`). Prices stored in cents (`if_payments_added_handle_money_safely`).
+  Scheduling tables (services/subscriptions/appointments) and the `business_rules` table are
+  the next layers, deliberately not built yet; the schema is rebuildable while it settles
+  (`no_database_until_rules_agreed`, guardrail lifted on greenlight).
+- **RLS on, no policy.** Both tables have row-level security enabled with no policy, so only
+  the service role reaches the data until portal auth exists. Chosen because the records hold
+  real PII and gate/door codes; a permissive policy must not be added without an auth model.
+- **Seed is reproducible from the source of truth.** `scripts/gen_seed_sql.py` regenerates
+  `supabase/seed.sql` from `data/clients.json`; re-running it fully refreshes the database.
+  `data/clients.json` stays the authoritative file until the app writes back to Supabase.
