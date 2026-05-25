@@ -40,13 +40,12 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   (services with variable grooming durations, subscriptions, appointments) forked from DGN's
   String of Pearls, and the `business_rules` table mirroring the Oracle.
 - **Needs Paul to unblock the remaining live pieces:** DONE: `dgc-prod`'s keys + DB password
-  (in Dashlane); Google Cloud (`dog-gone-clean`) with a domain-locked Maps JavaScript API
-  key, the OAuth consent screen published, an OAuth web client, and Google sign-in enabled on
-  dgc-prod. LEFT: (1) Clean's own Twilio account, phone number, and A2P registration, which
-  powers SMS notifications and the phone access-code login; (2) a DigitalOcean droplet (reuse
-  DGN's or new) plus pointing hurricanebath.com at it, needed only when ready to preview. (A
-  literal fork of the DGN code, if wanted, must be brought over by hand; this repo cannot
-  reach the DGN repo.)
+  (in Dashlane); Google Cloud (`dog-gone-clean`) Maps key + Google sign-in on dgc-prod; and
+  hurricanebath.com staging is live over HTTPS on the shared `dog-gone-engine` droplet (Caddy
+  block + GoDaddy DNS A record). LEFT: (1) Clean's own Twilio account, phone number, and A2P
+  registration (SMS + phone login); (2) a one-time SSH deploy key plus a GitHub secret so the
+  deploy Action can publish builds to the droplet. (A literal fork of the DGN code, if wanted,
+  must be brought over by hand; this repo cannot reach the DGN repo.)
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
   Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
@@ -238,10 +237,14 @@ sessions add their own dated section below.
   under a Compose project named `engine`, alongside an n8n container (`engine-n8n-1`, bound to
   localhost:5678). This is NOT Squarespace. Clean deploys here by adding its own Caddy site
   block (hurricanebath.com for staging, doggoneclean.us at launch) and a served directory,
-  reusing the existing Dockerized Caddy rather than installing a second web server. Next step
-  before touching it: read the live Caddyfile and the Compose file to see the volume mounts,
-  so Clean's block and file directory are added without disturbing the nails sites. A minimal
-  Astro homepage is scaffolded and builds clean.
+  reusing the existing Dockerized Caddy rather than installing a second web server. DONE
+  2026-05-25: hurricanebath.com staging is live over HTTPS, served from `/srv/doggoneclean`
+  via a dedicated Caddy block in `/root/engine/Caddyfile` plus a read-only volume added to the
+  engine Compose file (nails untouched, n8n stayed up, caddy recreated in ~1.4s). The DNS A
+  record (hurricanebath.com -> 178.128.144.219) is set at GoDaddy. It currently serves a
+  placeholder; the GitHub Actions auto-deploy that publishes real Astro builds to
+  `/srv/doggoneclean` on push is the next build task. A minimal Astro homepage is scaffolded
+  and builds clean.
 
 ### Auth / login (Clean)
 - **Client login = Google OAuth (decided 2026-05-25).** Clean's client portal uses Google
