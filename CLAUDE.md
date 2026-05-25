@@ -126,11 +126,11 @@ See `lock_it_in_capture` in the Oracle.
 - **Don't offer PR-activity subscription.** No separate reviewers, no PR-level CI; nothing
   on a PR is worth watching. Just ship and report what shipped.
 - **State today:** `main` is the trunk, and the deploy workflow (`.github/workflows/deploy.yml`)
-  fires on push to `main` and rsyncs the built site to the droplet at hurricanebath.com
-  (staging). The one remaining gap is the droplet SSH key: until Paul adds it as the
-  `DROPLET_SSH_KEY` GitHub secret plus a `cleandeploy` user on the droplet, the Action builds
-  but cannot publish. Trunk discipline (branch from `main`, merge to `main`) applies now
-  regardless; the publish step goes fully live the moment that secret lands.
+  fires on push to `main`, builds the Astro site, and publishes it to the droplet at
+  hurricanebath.com (staging), which is live and serving the rebuilt homepage. doggoneclean.us
+  still serves the old Squarespace site; flip it to production at launch. A planned build gate
+  (run `scripts/check.py` before deploy) is not wired yet, so a lint-failing push can still
+  reach staging; stand it up so bad copy cannot publish.
 
 ## Terminology
 

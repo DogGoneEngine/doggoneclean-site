@@ -25,44 +25,48 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Current focus / next action
 
-- **Direction:** Clean is ONE evolving business and a fork of the DGN platform. Two
-  businesses total: DGN (flagship, fully separate) and Clean (this repo). Clean keeps its
-  existing full-grooming clients while the marketing leans into higher-profit bath work, one
-  portal serves both, and it can expand to the Villages with bath.
-- **State:** Clean's own Supabase project is LIVE: `dgc-prod`, ref `urebdrosrxejhubpbxsa`,
-  us-east-1, inside the shared "Mount Olympus" org (account sharing is allowed; the project
-  is the hard line, never `dgn-prod`). The client book is built and seeded in it:
-  `public.clients` (47: 33 standing, 11 one-off, 2 at-will, 1 banned) and `public.dogs` (61),
-  RLS-locked with no policy (only the service role reaches it until portal auth exists).
-  Schema-as-code in `supabase/migrations/`, reproducible seed via `scripts/gen_seed_sql.py`
-  to `supabase/seed.sql`, TS types in `supabase/database.types.ts`. The foundation is deep: the
-  prime directive and two decision lenses (`elons_algorithm`, `dig_the_moat`) are locked, the
-  idea-capture workflow is baked in, `the_oracle_journal` is absorbed into the Oracle and
-  CLEAN_FIELD_MANUAL.md, and the live site is mined into brand and marketing assets. Route
-  template drafted; doc/handoff system built; strategy/infra/workflow locked; `scripts/check.py`
-  green. A bath-forward homepage is scaffolded (`src/pages/index.astro`, builds clean) and the
-  deploy workflow exists (`.github/workflows/deploy.yml`).
-- **Marketing content (drafted, in `marketing/`):** the Hurricane Bath hero showcase, the
-  power-and-fast-drying showcase, and the origin/brand source (story, hero "Grooming. No Chaos.",
-  taglines, doorstep copy). Waiting on Paul's real photos and video. Build details stay in
+- **Direction:** Two businesses total. DGN (Dog Gone Nails): new, nails only, the Villages,
+  fully separate (own repo `doggonenails-site`). Clean (this repo): the existing ~20-year
+  business, evolving and a fork of the DGN platform. Legacy full grooming continues for legacy
+  Ocala clients while Clean makes a hard pivot to bath only (no-haircut dogs, because haircuts
+  are the cycle-time drag and bath is far higher revenue per hour), starting in Ocala and
+  migrating to the Villages as the legacy book winds down. Destination: bath only in the
+  Villages, by morphing the same business. The three-business plan was retired as too
+  complicated (it survives in git history, `0c37403` and `9ee4aa3`).
+- **State:** Branches are consolidated. `main` is the single trunk: the per-session `claude/*`
+  branches that had scattered the work (build on one, brand content on another) were merged in,
+  so the build, the marketing content, and the docs now live together. Clean's own Supabase
+  project is LIVE: `dgc-prod`, ref `urebdrosrxejhubpbxsa`, us-east-1, in the shared "Mount
+  Olympus" org (the project is the hard line, never `dgn-prod`); the client book is built and
+  seeded (`public.clients` 47, `public.dogs` 61), RLS-locked with no policy, schema-as-code in
+  `supabase/migrations/`, reproducible seed via `scripts/gen_seed_sql.py`, TS types in
+  `supabase/database.types.ts`. The foundation is deep: the prime directive and two decision
+  lenses (`elons_algorithm`, `dig_the_moat`), the idea-capture workflow, `the_oracle_journal`
+  absorbed into the Oracle and CLEAN_FIELD_MANUAL.md, the live site mined into `marketing/`. The
+  homepage is REBUILT in the Neural Expressive look (blue gradient washes and glows, the master
+  logo in `public/logo.png`, bath-forward content) and is live at hurricanebath.com. A
+  `.claude/settings.json` permission allow-list is in place. `scripts/check.py` green.
+- **Marketing content (in `marketing/`):** the Hurricane Bath hero showcase, the
+  power-and-fast-drying showcase, and the origin/brand source (story, taglines, doorstep copy).
+  The live site's old "Grooming. No Chaos." hero is recorded there but was rejected for the new
+  bath-forward site. Waiting on Paul's real photos and video. Build details stay in
   CLEAN_FIELD_MANUAL.md, off the public page.
-- **Next chapter:** redesign the marketing site in the Neural Expressive visual language (see
-  `neural_expressive_design` in the Oracle), built from the existing DogGoneClean.us content that
-  is now captured in `marketing/` (no longer blocked on screenshots: a prior session mined the
-  live site into source copy). Then the portal shell with auth (the first RLS policies land with
-  auth), wired to `dgc-prod` via the publishable key; then the scheduling tables (services with
-  variable grooming durations, subscriptions, appointments) forked from DGN's String of Pearls,
-  and the `business_rules` table mirroring the Oracle.
-- **Needs Paul to unblock the remaining live pieces:** DONE: `dgc-prod`'s keys + DB password
-  (in Dashlane); Google Cloud (`dog-gone-clean`) Maps key + Google sign-in on dgc-prod;
-  hurricanebath.com staging is live over HTTPS on the shared `dog-gone-engine` droplet (Caddy
-  block + GoDaddy DNS A record); and the live site is mined into `marketing/` (screenshots no
-  longer needed). LEFT: (1) Clean's own Twilio account, phone number, and A2P registration (SMS
-  + phone login); (2) the droplet SSH deploy key as the `DROPLET_SSH_KEY` GitHub secret plus a
-  `cleandeploy` user on the droplet, so the deploy Action can publish builds. (A literal fork of
-  the DGN code, if wanted, must be brought over by hand; this repo cannot reach the DGN repo.)
-  Also supplies only Paul can give: real photos/video for the showcases, and starting the
-  review-gathering.
+- **Next chapter:** fork the DGN site structure (`doggonenails-site`) into a multi-page Clean
+  site. The current site is a single page; Paul is granting this environment access to the DGN
+  repo so a fresh session can read and fork its structure (reuse the page set and layout; keep
+  Clean's content, Neural Expressive look, logo, and data; never merge DGN's docs or data). Then
+  a real copy pass (the live hero "A serious bath, at your door." is provisional). Then the
+  portal shell with auth (the first RLS policies land with auth), the scheduling tables forked
+  from DGN's String of Pearls, and the `business_rules` table mirroring the Oracle.
+- **Needs Paul to unblock the remaining pieces:** (1) flip the GitHub default branch to `main`
+  (Settings > Branches) and delete the stale `claude/*` branches (branch delete is blocked from
+  this environment, so it is Paul's click); (2) grant this environment access to the
+  `doggonenails-site` repo so the next session can fork the DGN structure; (3) Clean's own
+  Twilio account, number, and A2P registration (SMS + phone login). DONE: `dgc-prod` keys + DB
+  password; Google Cloud Maps key + Google sign-in; the deploy publishes to hurricanebath.com
+  (confirmed live this session). (A literal fork of the DGN code is bridged by the repo-access
+  grant above.) Also supplies only Paul can give: real photos/video for the showcases, and
+  starting the review-gathering.
 - **Moat backlog (parked, do now, not website-gated):** gather Google reviews from grateful
   long-time clients, build an owned before/after photo and video library, start a per-appointment
   data log, keep feeding the Oracle and field manual, and protect the Hurricane Bath name. See
@@ -83,15 +87,14 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + CLEAN_FIELD_MANUAL.md + `scripts/check.py`,
   plus the prime directive, the two decision lenses, and the idea-capture workflow.
 - **Phase 4 - Clean website + ops app (fork of the DGN platform).** IN PROGRESS. The
-  database foundation is DONE: Clean's own Supabase project `dgc-prod` is live and holds the
-  client book (`clients` + `dogs`) seeded from `data/clients.json`, RLS-locked. A bath-forward
-  homepage is scaffolded and the deploy workflow exists; the active sub-task is restyling the
-  marketing site to the Neural Expressive look (`neural_expressive_design`), built from the
-  existing DogGoneClean.us content now captured in `marketing/` (Hurricane Bath hero, power/drying,
-  origin/brand). Still to build: the rest of the marketing site + client portal (existing + new
-  clients) + String of Pearls scheduling + operator app with photos + pizza tracker + SMS
-  notifications. In-person payment (Square). Preview on hurricanebath.com until doggoneclean.us
-  flips at launch. Build details stay in CLEAN_FIELD_MANUAL.md and off the public page.
+  database foundation is DONE (`dgc-prod` live, client book seeded, RLS-locked). Branches are
+  consolidated into `main`. The homepage is DONE: rebuilt in the Neural Expressive look with the
+  master logo and bath-forward content, live at hurricanebath.com. Next: fork the DGN site
+  structure (`doggonenails-site`) into a multi-page Clean site, then a real copy pass, then the
+  client portal (existing + new clients) + String of Pearls scheduling + operator app with
+  photos + pizza tracker + SMS notifications. In-person payment (Square). Preview on
+  hurricanebath.com until doggoneclean.us flips at launch. Build details stay in
+  CLEAN_FIELD_MANUAL.md and off the public page.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 
@@ -150,6 +153,23 @@ environment (403 / egress allowlist) and the live site 403s automated fetches, s
 is blocked pending screenshots from Paul. No code shipped; the direction is recorded in the
 Oracle (`neural_expressive_design`), CLAUDE.md, and the decisions log below.
 
+### 2026-05-25 (website rebuild + branch consolidation)
+
+Discovered the work was scattered across unmerged per-session branches with no `main`, the exact
+failure the "ship to completion" rule was meant to prevent (the interim "ship = push to working
+branch" clause, living in a branched CLAUDE.md, never retired, and no trunk ever established).
+Consolidated everything into `main` as the union of the three session branches (build + database
++ deploy, the mined brand content + showcases + field manual, and the docs), resolving the
+conflicts by hand with no decision dropped. Fixed the shipping rule (main is the single trunk;
+branch from it, merge back to it) and added a `.claude/settings.json` permission allow-list so a
+build stops prompting on every tool call. Rebuilt the homepage in the Neural Expressive look
+with the master logo and bath-forward content, build-verified, live at hurricanebath.com.
+Sharpened the business model after Paul caught that a prior session had flattened it: two
+businesses, Clean keeps legacy Ocala full grooming while making a hard pivot to bath only, Ocala
+then the Villages. Aligned the homepage (bath-forward, full groom as the legacy service, nails
+removed since that is DGN's business). Next session forks the DGN site structure
+(`doggonenails-site`) into a multi-page Clean site.
+
 ---
 
 ## Decisions log (2026-05-24)
@@ -201,6 +221,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   fully separate. Clean is ONE evolving business: existing grooming book + bath-forward new
   acquisition, one portal, one site, one Supabase, morphing toward the profitable mix, can
   expand to the Villages with bath. The separate scalable "new Clean" folds back into Clean.
+  (Refined 2026-05-25: Clean keeps legacy Ocala full grooming while making a hard pivot to bath
+  only, Ocala then the Villages; DGN is the new nails-only Villages business. See the 2026-05-25
+  business-architecture entry.)
 - **Clean is a fork of the DGN platform.** v1 replaces the current stack feature-for-feature:
   Squarespace -> Astro site; Acuity + confirmations -> portal + String of Pearls + automated
   notifications; Drive client Docs -> Supabase client book (seeded from `data/clients.json`);
@@ -217,7 +240,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   DigitalOcean droplet + Caddy, GitHub Actions deploy on push to main), Clean's own instances.
 - **Shipping:** ship-to-completion is the git rule (open PR and squash-merge when a branch
   builds clean); it supersedes the earlier "no PR unless asked." Don't offer PR-activity
-  subscriptions. Until the deploy pipeline exists, "ship" means commit and push to the branch.
+  subscriptions. (Superseded 2026-05-25: the deploy pipeline exists and `main` is the single
+  trunk; every session branches from `main` and merges back into it to count as shipped. See
+  CLAUDE.md "Shipping".)
 - **Separation:** data (Clean's own Supabase project, never `dgn-prod`) is the hard line. A
   shared droplet (own dir/domain/Caddy block), a shared Supabase/Google account, and shared
   tooling are acceptable to save cost since they are cheap to separate before a sale. API
