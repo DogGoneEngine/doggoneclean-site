@@ -88,7 +88,7 @@ then reworked it for the coming website and renamed it to the CLEAN_ prefix. Add
 the business architecture (one evolving Clean, a fork of the DGN platform), infrastructure,
 payment, staging, and the decision-capture workflow. Corrected the live domain to .us.
 
-### 2026-05-25 (foundation deepening + the_oracle_journal + marketing)
+### 2026-05-24 (continued: the_oracle_journal + foundation + marketing)
 
 Absorbed Paul's original Drive journal (`the_oracle_journal`) into the Oracle and a new
 CLEAN_FIELD_MANUAL.md. Laid in the prime directive as the apex of the rulebook, added two
@@ -175,7 +175,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   rebuildably in Clean's own project.
 - **Payment:** in person via Square, not Stripe; online payment deferred. SMS via Twilio
   (own number + A2P) is in v1 (replaces Google Voice). n8n deferred. (Accepted-method list
-  finalized 2026-05-25, see below.)
+  finalized 2026-05-24, see below.)
 - **Pizza tracker:** client-facing live status/ETA view, companion to the operator app,
   replaces the manual "on my way" texts; included in v1 (details from Paul later).
 - **Staging:** build and preview on hurricanebath.com (kept private/non-indexed) while
@@ -188,7 +188,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 
 ---
 
-## Decisions log (2026-05-25)
+## Decisions log (2026-05-24, continued)
 
 ### Foundation: apex and decision lenses
 - **Prime directive (LOCKED).** The apex of the whole rulebook: Dog Gone Clean exists to earn

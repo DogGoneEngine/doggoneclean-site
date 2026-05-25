@@ -3,7 +3,7 @@
 The hands-on operating manual for the work itself: grooming craft, equipment, power, climate,
 the trailer, supplies, and maintenance. The Oracle holds business rules; this file holds how
 the job is physically done. Most of it was absorbed from `the_oracle_journal` (Paul's original
-voice-dictated journal on Drive) on 2026-05-25.
+voice-dictated journal on Drive) on 2026-05-24.
 
 This is a saleability asset (per the Oracle's `clean_stays_saleable`): a buyer or a new
 operator needs these SOPs to run the trailer without Paul. Keep it current as methods change,

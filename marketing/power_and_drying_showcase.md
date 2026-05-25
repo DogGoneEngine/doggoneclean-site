@@ -5,7 +5,7 @@ fast, comfortable drying, a supporting differentiator alongside the Hurricane Ba
 the page: clean from the Hurricane Bath, then dried fast in a climate-controlled trailer. No
 component is built yet (`elons_algorithm`, the build waits for the site).
 
-**Status: DRAFT.** Grounded in Paul's account (2026-05-25). Nothing invented (`real_data_only`),
+**Status: DRAFT.** Grounded in Paul's account (2026-05-24). Nothing invented (`real_data_only`),
 and no competitor comparisons (`dont_knock_competitors`). The power level is a fun, shareable
 proof point, not a secret.
 
