@@ -67,6 +67,10 @@ Because staying in one place wastes time. Take a break between passes if needed.
 around 30 percent humidity regardless of the weather outside. Because dry air pulls water off
 the coat while you blow-dry and cuts drying time by more than half.
 
+**The one-two punch.** The dehumidifier pulls moisture out of the air so it lifts off the coat,
+while the high-velocity dryer pushes the rest off. Together they dry a dog fast, so it is back to
+what it does best sooner.
+
 **Multi-dog wash order.** When more than one dog is in the trailer at once, wash the short-coat
 dog first, give it a quick dryer pass, and set it on towels. Because in 30 percent humidity it
 finishes drying on its own while you groom the long-coat dog, so its drying time is effectively
@@ -173,6 +177,12 @@ capacity constantly. Because constant full load wears it out faster.
 **Throw power at problems.** Never skip a tool or device that makes the job easier or faster
 just because of a power shortfall. Buy a third or fourth generator if that is what it takes.
 Because the work earned by the tool is worth more than the cost of more power.
+
+**What the power buys.** Two Predator 5000s put out roughly enough to run a small-to-medium house.
+That headroom goes straight into what the dog feels: strong air conditioning, the dehumidifier,
+and high-velocity dryers, so climate and drying never get skimped. Most mobile units economize on
+power; Clean does the opposite on purpose (internal rationale; public copy makes the case for us,
+not against others, per `dont_knock_competitors`).
 
 **Dryer choice: Shernbao orange dual-motor.** Preferred dryer is the orange Shernbao with dual
 motors. Because it is powerful and its soft-start ramps up slowly, which avoids the surge that

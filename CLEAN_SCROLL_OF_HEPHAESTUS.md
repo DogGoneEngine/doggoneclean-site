@@ -60,9 +60,11 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   Astro marketing site (bath-forward) + client portal (existing + new clients) + String of
   Pearls scheduling + operator app with photos + pizza tracker + SMS notifications, on
   Clean's own Supabase project, seeded from `data/clients.json`. In-person payment (Square).
-  Preview on hurricanebath.com until doggoneclean.us flips at launch. The marketing hero is the
-  Hurricane Bath: use `marketing/hurricane_bath_showcase.md` for its copy, FAQ, and banked gold
-  lines (build details stay in CLEAN_FIELD_MANUAL.md and off the public page).
+  Preview on hurricanebath.com until doggoneclean.us flips at launch. Marketing showcase content
+  lives in the `marketing/` folder: the Hurricane Bath hero (`marketing/hurricane_bath_showcase.md`)
+  plus differentiator showcases like power and fast drying
+  (`marketing/power_and_drying_showcase.md`). Build details stay in CLEAN_FIELD_MANUAL.md and off
+  the public page.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 

@@ -74,11 +74,17 @@ Pre-sale cleanup (not urgent, but would block a sale if left):
 
 ## Website build, when the rules are locked (the DB guardrail lifts first)
 
-**Hurricane Bath hero content is already drafted.** When building the marketing page, pull the
-copy, FAQ, and banked gold lines from `marketing/hurricane_bath_showcase.md`. Keep the build
-details (CLEAN_FIELD_MANUAL.md, "The Hurricane Bath") and the shampoo brand off the public page.
+**Marketing showcase content lives in `marketing/`.** When building the marketing page, pull from
+there: the Hurricane Bath hero (`marketing/hurricane_bath_showcase.md`) and differentiator
+showcases like power and fast drying (`marketing/power_and_drying_showcase.md`), with their copy,
+FAQ, and banked gold lines. Keep build details (CLEAN_FIELD_MANUAL.md) and the shampoo brand off
+the public page.
 
 **Marketing-site features (forward-looking):**
+- **Photo-to-gallery toggle.** In the operator app, when Paul takes an after photo that looks
+  exceptional, a toggle marks it for the website gallery on the spot. Because the best moment to
+  curate is while looking at the shot, and it feeds the rotating gallery with no later sorting
+  chore.
 - **Before/after gallery.** A curated, rotating display (recent and best work, out with the old as
   new comes in) backed by a permanent, growing archive of every shot. Show a fresh subset, keep
   everything. Because rotation signals an active, in-demand business, lets quality stay high,
