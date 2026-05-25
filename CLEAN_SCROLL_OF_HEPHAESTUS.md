@@ -232,6 +232,16 @@ sessions add their own dated section below.
   key cannot authenticate server calls and a REST key cannot be domain-locked in the browser,
   so the split is what keeps each key both functional and tightly restricted. Full rationale
   lives in the Oracle's `maps_js_api_only`.
+- **Deploy host (verified 2026-05-25):** the shared droplet `dog-gone-engine` (DigitalOcean
+  NYC1, Ubuntu 24.04, 2 GB / 50 GB, public IP 178.128.144.219) runs Caddy in Docker
+  (`engine-caddy-1`, image `caddy:latest`, host ports 80/443, config `/etc/caddy/Caddyfile`)
+  under a Compose project named `engine`, alongside an n8n container (`engine-n8n-1`, bound to
+  localhost:5678). This is NOT Squarespace. Clean deploys here by adding its own Caddy site
+  block (hurricanebath.com for staging, doggoneclean.us at launch) and a served directory,
+  reusing the existing Dockerized Caddy rather than installing a second web server. Next step
+  before touching it: read the live Caddyfile and the Compose file to see the volume mounts,
+  so Clean's block and file directory are added without disturbing the nails sites. A minimal
+  Astro homepage is scaffolded and builds clean.
 
 ### Auth / login (Clean)
 - **Client login = Google OAuth (decided 2026-05-25).** Clean's client portal uses Google

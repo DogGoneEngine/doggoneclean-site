@@ -110,9 +110,9 @@ vocabulary (where "groomer" is banned for "specialist" and "grind/trim" is banne
 
 ## Stack and commands
 
-**Current state.** No web app yet, but the database layer exists. Clean's own Supabase
-project `dgc-prod` (ref `urebdrosrxejhubpbxsa`, us-east-1, in the shared "Mount Olympus"
-org) holds the client book: `public.clients` + `public.dogs`, seeded from
+**Current state.** A minimal Astro site is scaffolded (a homepage that builds) and the
+database layer exists. Clean's own Supabase project `dgc-prod` (ref `urebdrosrxejhubpbxsa`,
+us-east-1, in the shared "Mount Olympus" org) holds the client book: `public.clients` + `public.dogs`, seeded from
 `data/clients.json`, RLS-locked. Schema-as-code lives in `supabase/migrations/`. The rest of
 the working stack is Markdown + JSON + git + `python3`, with the Drive MCP tools as the
 upstream reader and the Supabase MCP tools for the database. `data/clients.json` stays the
@@ -127,10 +127,21 @@ authoritative client file until the app writes back to Supabase.
 
 **Planned stack (mirrors DGN; Clean gets its OWN instances, never DGN's).** Astro 5 + React
 18 islands, Node 20, npm. Supabase backend. Deploy: push to main -> GitHub Actions builds
-Astro -> rsync `dist/` to a DigitalOcean droplet -> Caddy serves. Build gate: `npm run
-build` runs a business-rules lint, then the Astro build, then a smoke test, and any step's
-failure fails the build. None of this is scaffolded yet; do not assume these commands exist
-until the site is stood up.
+Astro -> rsync `dist/` to the shared DigitalOcean droplet -> Caddy serves.
+
+**Deploy host (actual, verified 2026-05-25).** The shared droplet is `dog-gone-engine`
+(DigitalOcean, NYC1, Ubuntu 24.04, 2 GB / 50 GB, public IP 178.128.144.219). Web serving is
+Caddy running in Docker (container `engine-caddy-1`, image `caddy:latest`, holding host ports
+80/443, config `/etc/caddy/Caddyfile`), under a Docker Compose project named `engine`; an n8n
+container (`engine-n8n-1`, bound to localhost:5678) also runs there. This is the shared "Dog
+Gone Engine" host, acceptable to share per `own_infrastructure`. Clean deploys onto it by
+adding its OWN Caddy site block (hurricanebath.com for staging, doggoneclean.us at launch)
+and its own served directory, reusing the existing Dockerized Caddy rather than installing a
+second web server. The site is NOT Squarespace; do not assume so again.
+
+**Build gate (planned, not built yet).** `npm run build` runs a business-rules lint, then the
+Astro build, then a smoke test, and any step's failure fails the build. The GitHub Actions
+deploy, the lint, and the smoke test do not exist yet.
 
 ## Hard constraints
 
