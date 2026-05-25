@@ -13,6 +13,9 @@
   durability already happened at each lock. Never rewrite it mid-session, and never lose a
   decision in the rebuild.
 - **If history and reality disagree, reality wins** and this file is corrected.
+- **Dates use Paul's local time (US Eastern), not the container's UTC clock**, which can read a
+  day ahead in the evening Eastern. Stamp the decisions log, commits, and doc dates in Eastern;
+  when unsure, ask. See `dates_use_local_eastern`.
 - Keep the "Current focus / next action" block at the top current, so a session that ends
   abruptly still orients the next one fast.
 
@@ -32,28 +35,38 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   `public.clients` (47: 33 standing, 11 one-off, 2 at-will, 1 banned) and `public.dogs` (61),
   RLS-locked with no policy (only the service role reaches it until portal auth exists).
   Schema-as-code in `supabase/migrations/`, reproducible seed via `scripts/gen_seed_sql.py`
-  to `supabase/seed.sql`, TS types in `supabase/database.types.ts`. Route template drafted;
-  doc/handoff system built; strategy/infra/workflow locked; `scripts/check.py` green. A
-  minimal bath-forward homepage is scaffolded (`src/pages/index.astro`, builds clean) on a
-  placeholder green palette, and the deploy workflow exists (`.github/workflows/deploy.yml`).
+  to `supabase/seed.sql`, TS types in `supabase/database.types.ts`. The foundation is deep: the
+  prime directive and two decision lenses (`elons_algorithm`, `dig_the_moat`) are locked, the
+  idea-capture workflow is baked in, `the_oracle_journal` is absorbed into the Oracle and
+  CLEAN_FIELD_MANUAL.md, and the live site is mined into brand and marketing assets. Route
+  template drafted; doc/handoff system built; strategy/infra/workflow locked; `scripts/check.py`
+  green. A bath-forward homepage is scaffolded (`src/pages/index.astro`, builds clean) and the
+  deploy workflow exists (`.github/workflows/deploy.yml`).
+- **Marketing content (drafted, in `marketing/`):** the Hurricane Bath hero showcase, the
+  power-and-fast-drying showcase, and the origin/brand source (story, hero "Grooming. No Chaos.",
+  taglines, doorstep copy). Waiting on Paul's real photos and video. Build details stay in
+  CLEAN_FIELD_MANUAL.md, off the public page.
 - **Next chapter:** redesign the marketing site in the Neural Expressive visual language (see
-  `neural_expressive_design` in the Oracle), rebuilt from the existing DogGoneClean.us content
-  rather than reinvented, and reskinned from the placeholder green to the brand blues. This is
-  BLOCKED pending Paul's screenshots of the current site (this environment cannot fetch it; see
-  the Needs-Paul item below). Then the portal shell with auth (the first RLS policies land with
+  `neural_expressive_design` in the Oracle), built from the existing DogGoneClean.us content that
+  is now captured in `marketing/` (no longer blocked on screenshots: a prior session mined the
+  live site into source copy). Then the portal shell with auth (the first RLS policies land with
   auth), wired to `dgc-prod` via the publishable key; then the scheduling tables (services with
   variable grooming durations, subscriptions, appointments) forked from DGN's String of Pearls,
   and the `business_rules` table mirroring the Oracle.
 - **Needs Paul to unblock the remaining live pieces:** DONE: `dgc-prod`'s keys + DB password
-  (in Dashlane); Google Cloud (`dog-gone-clean`) Maps key + Google sign-in on dgc-prod; and
+  (in Dashlane); Google Cloud (`dog-gone-clean`) Maps key + Google sign-in on dgc-prod;
   hurricanebath.com staging is live over HTTPS on the shared `dog-gone-engine` droplet (Caddy
-  block + GoDaddy DNS A record). LEFT: (1) Clean's own Twilio account, phone number, and A2P
-  registration (SMS + phone login); (2) the droplet SSH deploy key as the `DROPLET_SSH_KEY`
-  GitHub secret plus a `cleandeploy` user on the droplet, so the existing deploy Action can
-  publish builds; (3) screenshots of the current DogGoneClean.us pages, so the redesign reuses
-  the existing content (the live site 403s automated fetches and this env cannot load external
-  pages). (A literal fork of the DGN code, if wanted, must be brought over by hand; this repo
-  cannot reach the DGN repo.)
+  block + GoDaddy DNS A record); and the live site is mined into `marketing/` (screenshots no
+  longer needed). LEFT: (1) Clean's own Twilio account, phone number, and A2P registration (SMS
+  + phone login); (2) the droplet SSH deploy key as the `DROPLET_SSH_KEY` GitHub secret plus a
+  `cleandeploy` user on the droplet, so the deploy Action can publish builds. (A literal fork of
+  the DGN code, if wanted, must be brought over by hand; this repo cannot reach the DGN repo.)
+  Also supplies only Paul can give: real photos/video for the showcases, and starting the
+  review-gathering.
+- **Moat backlog (parked, do now, not website-gated):** gather Google reviews from grateful
+  long-time clients, build an owned before/after photo and video library, start a per-appointment
+  data log, keep feeding the Oracle and field manual, and protect the Hurricane Bath name. See
+  CLEAN_PARKING_LOT.md.
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
   Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
@@ -66,17 +79,19 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   banned in `data/clients.json`, verified against the current contact sheets.
 - **Phase 2 - First zone-day route template.** DRAFTED (`data/route_template.md`). Pending
   the last cadence lock and a rebalance against corrected stop sizes.
-- **Phase 3 - Doc / handoff system.** DONE. CLAUDE.md + this Scroll + CLEAN_ORACLE.md +
-  CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + `scripts/check.py`.
+- **Phase 3 - Doc / handoff system + foundation.** DONE. CLAUDE.md + this Scroll + CLEAN_ORACLE.md
+  + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + CLEAN_FIELD_MANUAL.md + `scripts/check.py`,
+  plus the prime directive, the two decision lenses, and the idea-capture workflow.
 - **Phase 4 - Clean website + ops app (fork of the DGN platform).** IN PROGRESS. The
   database foundation is DONE: Clean's own Supabase project `dgc-prod` is live and holds the
-  client book (`clients` + `dogs`) seeded from `data/clients.json`, RLS-locked. A minimal
-  bath-forward homepage is scaffolded and the deploy workflow exists; the active sub-task is
-  restyling the marketing site to the Neural Expressive look (`neural_expressive_design`),
-  rebuilt from the existing DogGoneClean.us content. Still to build: the rest of the marketing
-  site + client portal (existing + new clients) + String of Pearls scheduling + operator app
-  with photos + pizza tracker + SMS notifications. In-person payment (Square). Preview on
-  hurricanebath.com until doggoneclean.us flips at launch.
+  client book (`clients` + `dogs`) seeded from `data/clients.json`, RLS-locked. A bath-forward
+  homepage is scaffolded and the deploy workflow exists; the active sub-task is restyling the
+  marketing site to the Neural Expressive look (`neural_expressive_design`), built from the
+  existing DogGoneClean.us content now captured in `marketing/` (Hurricane Bath hero, power/drying,
+  origin/brand). Still to build: the rest of the marketing site + client portal (existing + new
+  clients) + String of Pearls scheduling + operator app with photos + pizza tracker + SMS
+  notifications. In-person payment (Square). Preview on hurricanebath.com until doggoneclean.us
+  flips at launch. Build details stay in CLEAN_FIELD_MANUAL.md and off the public page.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 
@@ -84,7 +99,7 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
-### 2026-05-24 (one long session)
+### 2026-05-24 (foundation session)
 
 Set up the repo and built authoritative client records from the Google Drive contact sheets.
 Found and fixed a sourcing error where the handoff doc-ID index pointed at stale or blank
@@ -94,8 +109,18 @@ applied Paul's corrections. Built the first route template. Built the doc/handof
 then reworked it for the coming website and renamed it to the CLEAN_ prefix. Added
 `scripts/check.py` and hardened enforcement. Locked the strategy: the saleability rationale,
 the business architecture (one evolving Clean, a fork of the DGN platform), infrastructure,
-payment, staging, and the decision-capture workflow. Corrected the live domain to .us. Ended
-by rebuilding this Scroll and recommending a fresh thread for the build phase.
+payment, staging, and the decision-capture workflow. Corrected the live domain to .us.
+
+### 2026-05-24 (continued: the_oracle_journal + foundation + marketing)
+
+Absorbed Paul's original Drive journal (`the_oracle_journal`) into the Oracle and a new
+CLEAN_FIELD_MANUAL.md. Laid in the prime directive as the apex of the rulebook, added two
+top-level decision lenses (`elons_algorithm`, `dig_the_moat`), and made Claude threads the home
+for capturing ideas. Built the Hurricane Bath showcase and a power/drying showcase, kept the
+build proprietary, and banked an internal story plus gold lines. Mined the live site (Paul pasted
+it, since the environment cannot reach it) into the origin story, brand voice, taglines, doorstep
+copy, and four published policies now held as Oracle rules. Resolved the payment list. Rebuilt
+this Scroll.
 
 ### 2026-05-25 (database setup)
 
@@ -129,8 +154,7 @@ Oracle (`neural_expressive_design`), CLAUDE.md, and the decisions log below.
 
 ## Decisions log (2026-05-24)
 
-Append-only across sessions; grouped here for readability, with no decision dropped. Future
-sessions add their own dated section below.
+Append-only across sessions; grouped for readability, with no decision dropped.
 
 ### Data and records
 - **Base/home:** 3885 SW 114th Court, Ocala 34481 (rural SW). No separate anchor; the SW /
@@ -201,7 +225,8 @@ sessions add their own dated section below.
 - **Database guardrail lifted for Clean (greenlit):** build the schema iteratively and
   rebuildably in Clean's own project.
 - **Payment:** in person via Square, not Stripe; online payment deferred. SMS via Twilio
-  (own number + A2P) is in v1 (replaces Google Voice). n8n deferred.
+  (own number + A2P) is in v1 (replaces Google Voice). n8n deferred. (Accepted-method list
+  finalized 2026-05-24, see below.)
 - **Pizza tracker:** client-facing live status/ETA view, companion to the operator app,
   replaces the manual "on my way" texts; included in v1 (details from Paul later).
 - **Staging:** build and preview on hurricanebath.com (kept private/non-indexed) while
@@ -310,3 +335,90 @@ sessions add their own dated section below.
   pages and the live site cannot be loaded here; web search and the Drive/Supabase/GitHub MCP
   tools work. To reference the live site, get screenshots from Paul. Noted in CLAUDE.md "Stack
   and commands".
+
+---
+
+## Decisions log (2026-05-24, continued)
+
+### Foundation: apex and decision lenses
+- **Prime directive (LOCKED).** The apex of the whole rulebook: Dog Gone Clean exists to earn
+  more every year while asking less, not more, of the people who run it, and to leave everyone it
+  touches better off. Seven tests: earn more grind less; runs without Paul (no lapping scheme);
+  fun to work on and in; good for body and mind; a unicorn job; clients grateful it exists; the
+  world better for it existing. If a rule fights it, the directive wins and the rule gets fixed.
+  First section of CLEAN_ORACLE.md, with the apex line and a pointer in CLAUDE.md. Wording approved
+  verbatim.
+- **`elons_algorithm` (LOCKED).** Run every build/scope call through Musk's five-step order, never
+  out of order: (1) make the requirement less dumb (real reason, real person, never "because DGN
+  had it"), (2) delete the part or step, (3) simplify, (4) accelerate cycle time, (5) automate
+  last. Guards the solo-dev-forking-DGN trap of optimizing or automating what should be deleted.
+  Oracle rule + CLAUDE.md "How Paul works" pointer + index row.
+- **`dig_the_moat` (LOCKED).** A decision lens on a level with Elon's algorithm, in service of the
+  prime directive: does this deepen an advantage a smart AI cannot prompt past, by becoming more
+  genuinely valuable (proprietary context, relationships, reputation, local density, grateful
+  clients), never by lock-in? As generic business-building commoditizes, value concentrates in the
+  un-promptable, so spend effort there and build the commodity layer lean. Absorbed the earlier
+  proposed `the_moat_is_proprietary_context`. Oracle + CLAUDE.md pointer + a line in the
+  prime-directive section naming both lenses. Tiered as a lens (not folded into the directive) so
+  defense never outranks the end it protects.
+- **Idea-capture workflow (LOCKED).** Ideas come into a Claude thread now, not the Drive journal.
+  Paul describes the idea and the reason; the assistant chooses its home, attaches the because
+  (asking one quick question if missing), commits same turn, and reports where it filed. Save
+  triggers: "put it where it belongs," "capture this," "lock it in." Hold signal: "just thinking
+  out loud." The Drive journal stays only as the offline fallback for mid-route capture. Baked into
+  CLAUDE.md ("Recording ideas and decisions") and the Oracle's `lock_it_in_capture`.
+
+### the_oracle_journal absorption
+- **Source + split.** Paul's original voice-dictated journal on Drive (file id
+  `1ENkpSA6qYPQUcWgcWQGlDI_pE0JfWmr4j3Ft9mLp55I`, entries Feb 12 to Mar 28 2026). Real business
+  rules went into the Oracle; hands-on craft and equipment into the new CLEAN_FIELD_MANUAL.md; the
+  rest dropped as noise.
+- **New Oracle rules.** `persistent_status_update`; `no_doodles`; `income_target_caps_the_day`,
+  `heads_up_on_the_way`, `lock_in_timing`, `gated_community_hours`; `cancellation_24h`,
+  `favor_high_hourly_work`, `accepted_payment_methods`; `website_is_ground_zero`, `reminder_voice`,
+  `appointment_block_not_window`, `language_bank`, `no_trailer_graphics`. All indexed.
+- **Conflicts resolved.** Acuity reminder system superseded by the custom scheduler (content kept,
+  delivery folded into `lock_in_timing`); the no-Apple rule governs Paul's own tools only, so
+  client Apple Pay stays; doodles declined entirely.
+- **Dropped as noise.** Doc scaffolding, the "am I writing a training manual" musing, the Gboard
+  shortcuts. Aspirational equipment to-dos live in the field manual's open items.
+
+### Hurricane Bath, showcases, and service policy
+- **Hurricane Bath showcase.** Drop-in marketing content in `marketing/hurricane_bath_showcase.md`,
+  drafted from Paul's account. Moat rule: sell the what, protect the how. The build (dual-pump
+  core, command valve, ~10 GPM dialable, clean-water finish, flush-and-rewash) is the canonical
+  proprietary record in CLEAN_FIELD_MANUAL.md, kept off the public page. Internal coyote story and
+  gold lines banked.
+- **`house_shampoo` (LOCKED).** One gentle house shampoo for everyone (privately: TropiClean
+  papaya and mango 2-in-1); clients supply any specific, medicated, prescription, or flea product
+  and Clean uses it without standing behind the result. Brand and the flea rationale stay private;
+  public copy stays positive; any non-guarantee wording lives in intake/terms, not marketing.
+- **`dont_knock_competitors` (LOCKED).** Never disparage other systems in client-facing copy; sell
+  our own merits (competitor analysis stays private to sharpen our design). Oracle (Copy) + index.
+- **Power/drying showcase.** `marketing/power_and_drying_showcase.md`, pairs with the Hurricane
+  Bath (clean, then dried fast in a climate-controlled trailer). Two Predator 5000s (~a small
+  house of power) feeding strong climate control and high-velocity drying; the dehumidifier-plus-
+  dryer one-two punch. Field manual enriched to match.
+- **Parked backlog.** Photo-to-gallery toggle (operator app marks an exceptional after-shot on the
+  spot); a rotating, curated before/after gallery over a permanent archive; the pizza-tracker
+  review flow (click tracking, stop asking after a review, "show someone" nudge). In
+  CLEAN_PARKING_LOT.md.
+
+### Live-site mining and payment
+- **Captured.** The origin story ("Meet Paul Nickerson... The system came later. The dogs came
+  first."), the homepage hero ("Grooming. No Chaos."), the taglines ("Structured. Reliable.
+  Personal."), the doorstep/mobile-model copy, and the brand voice into
+  `marketing/origin_and_brand.md`. Existing Hurricane Bath lines folded into the showcase language
+  bank. (Paul pasted the pages; the environment cannot reach the live site, its host is not on the
+  network allowlist.)
+- **New Oracle rules from published policies.** `online_only_comms`, `friendly_dogs_only`,
+  `core_is_no_haircut_dogs`, `service_area_ocala` (Ocala; no unpaved roads; excludes Silver Springs
+  Shores, Summer Glen, Marion Oaks). Pack grooming (one household at a time, no cages) added to the
+  field manual.
+- **Rebuild cleanups (rules already win).** "Arrival windows" becomes "block"
+  (`appointment_block_not_window`); "same-day cancellations 100%" becomes within-24-hours
+  (`cancellation_24h`); drop the "they trickle" knock (`dont_knock_competitors`).
+- **Payment RESOLVED.** Public list is the journal's: cash plus Visa, Mastercard, Amex, Discover,
+  Apple Pay, Google Pay, Samsung Pay, all via Square. No checks. PayPal and Cash App exist but are
+  not advertised. `accepted_payment_methods`, `bills_in_person_today`, and CLAUDE.md updated to
+  match; the live site's PayPal mention gets dropped on rebuild.

@@ -13,6 +13,53 @@ How to read an entry: `key (domain): Statement. Because reason.`
 
 ---
 
+## Prime directive
+
+Dog Gone Clean exists to earn more every year while asking less, not more, of the people who
+run it, and to leave everyone it touches better off than it found them. Every rule in this book
+serves this. If a rule ever fights the prime directive, the directive wins and the rule gets
+fixed.
+
+1. **Earn more, grind less.** Profit should grow over time without Paul, or anyone, working
+harder to keep up. Growth comes from better systems, pricing, and leverage, never from just
+piling on hours. Because a business that only grows on the owner's sweat has a low ceiling and
+a hard cliff. Test: does this decision raise profit per hour, or just add hours?
+
+2. **It runs without Paul (no lapping scheme).** Paul can step away and everything keeps
+working. He takes real time off and nothing falls apart. The business must never lean on his
+daily presence to paper over gaps, the way a check-lapping scheme collapses the moment the
+bookkeeper stops. Because a business that needs the owner every day is a job, not an asset, and
+it is one bad week from breaking. Test: if Paul disappeared for two weeks, what breaks, and can
+we design that out now?
+
+3. **Fun to work on and in.** Building the business and doing the grooming should both be
+genuinely enjoyable, not a grind endured for a paycheck. Because staying power comes from work
+that is fun, and a business that bores or drains its people slowly rots.
+
+4. **Good for the body and the mind.** The work should leave the people who do it healthier, not
+used up. Because mobile grooming is physical, and a business that wears down its bodies is
+borrowing against its own future. Test: does this make the day easier on the body and mind, or
+harder?
+
+5. **A unicorn job.** If Paul hires, the job is good enough that a long line of people want it.
+Because great people make the great service, and you only keep great people by being the place
+everyone wants to work. It is also how the business comes to run without Paul.
+
+6. **Clients grateful it exists.** The service is good enough that clients feel lucky it is
+available to them, not like they are doing Paul a favor by booking. Because gratitude is the
+only moat that lasts: grateful clients stay for years, refer their friends, and forgive the rare
+off day.
+
+7. **The world is better because it exists.** Clients, dogs, workers, and the community are all
+left better off. Because a business that only takes gets pushed out eventually, and one that
+genuinely adds is one people protect.
+
+Two decision lenses serve this directive and are run against every build or scope call:
+`elons_algorithm` (build it lean, in the right order) and `dig_the_moat` (does this deepen an
+advantage a smart AI cannot prompt past?).
+
+---
+
 ## Process
 
 `recommendation_with_reason` (process):
@@ -44,15 +91,48 @@ remove; (3) any rule that lost its last live layer is re-enforced (or the redesi
 rejected). Because dropped rules are how an operating business breaks silently, and the
 index is the audit that turns "we should preserve the rules" into a step that actually runs.
 
+`elons_algorithm` (process):
+Run any build or scope decision through the five-step order, never out of order: (1) make the
+requirement less dumb (every requirement traces to a real reason and a real person who wants it,
+never "because DGN had it"; requirements from smart people are the most dangerous because they
+go unquestioned); (2) delete the part or step (if you are not adding some of it back later, you
+deleted too little); (3) simplify what survives (only now, since optimizing a thing that should
+not exist is the trap); (4) accelerate the cycle time; (5) automate, last. Because the expensive
+mistake is optimizing, speeding up, or automating something that should have been deleted, and
+the solo-dev-forking-DGN risk is porting features Clean does not need. Named for Musk's design
+algorithm. Pairs with `clean_stays_saleable` and `no_mockups`.
+
+`dig_the_moat` (decision lens):
+Hold every build or scope decision against one question, the way Bezos asks "does this improve
+the customer experience" and Musk asks "does this get us to Mars": does this deepen an advantage
+a smart AI cannot prompt past? It counts as yes only if the moat is dug by becoming more
+genuinely valuable and harder to replace (deeper proprietary context, stronger relationships,
+better reputation, tighter local density, more grateful clients), never by trapping people or
+raising switching costs, which would violate the prime directive. As AI makes generic
+business-building cheap, value drains out of the scaffolding (tech stack, platform code, generic
+features, the "business in a box") and concentrates in what a prompt cannot conjure, so spend the
+effort there: capture tacit knowledge relentlessly into these docs, keep the corpus proprietary
+and portable (it is the asset a buyer pays for), and build the commodity layer lean rather than
+hand-crafting what the models will soon generate for free. Because once "make me a dog grooming
+business" is one prompt, any effort that does not deepen an un-promptable advantage is spent on
+what a competitor can conjure for free, and the smart AI is not the moat (every competitor will
+have it); the moat is that ours is pointed at twenty years of context no one else has. A peer of
+`elons_algorithm` in service of the prime directive; pairs with `clean_stays_saleable`.
+
 `lock_it_in_capture` (process):
-When Paul locks a decision (says "lock it in" or a clear equivalent like "that's decided" or
-"make it a rule"), capture it the same turn: write it to its live home (an Oracle rule, a
-CLAUDE.md constraint, or a record field), add a dated line to the Scroll's decisions log, run
-`scripts/check.py`, and commit/push. While Paul is still musing, record nothing. Because this
-is an ephemeral container and a long thread can compact or die before the end, committing
-each locked decision to git the moment it is made is the only thing that guarantees it
-survives; an uncommitted note can be lost with the session. The end-of-session scroll
-rebuild then becomes a polish-and-reconcile pass, not a rescue.
+When Paul locks a decision or hands over a raw idea to keep (says "lock it in," "put it where it
+belongs," "capture this," or a clear equivalent), capture it the same turn: choose its live home
+(an Oracle rule, a CLAUDE.md constraint, the parking lot, the field manual, or a record field),
+add a dated line to the Scroll's decisions log if it is a decision, run `scripts/check.py`, and
+commit/push, then tell Paul where you filed it. While Paul is still musing ("just thinking out
+loud"), record nothing. If an idea is becoming a rule and Paul did not give a reason, ask one
+quick question for the because rather than saving a reasonless rule. Ideas now arrive in a
+Claude thread rather than the Drive journal (`the_oracle_journal`), which stays only as the
+offline fallback for mid-route voice capture, batch-absorbed later. Because this is an ephemeral
+container and a long thread can compact or die before the end, committing each captured idea or
+decision to git the moment it lands is the only thing that guarantees it survives; an
+uncommitted note can be lost with the session. The end-of-session scroll rebuild then becomes a
+polish-and-reconcile pass, not a rescue.
 
 `ship_to_completion` (process):
 When a branch is committed and builds clean, open the PR and squash-merge it (same turn);
@@ -71,6 +151,18 @@ reviewers and no PR-level CI, so nothing on a PR is worth watching in this solo-
 `no_merge_across_repos` (process):
 Never share, symlink, or merge these docs or infrastructure between the DGN and DGC repos.
 Because merged history and shared infrastructure mis-apply rules across products.
+
+`persistent_status_update` (process):
+On any status request, do not report only what is top of mind; also surface important
+unfinished work that has gone quiet (weak spots, neglected systems, loose ends, underbuilt
+assets) until it is done enough to stop needing attention. Because important work should not
+vanish just because Paul has not mentioned it lately.
+
+`dates_use_local_eastern` (process):
+Stamp every date (the decisions log, commits, and doc dates) in Paul's local time, US Eastern, not
+the container's UTC clock. Because the container runs on UTC, which rolls to the next day in the
+evening Eastern, so trusting it near midnight stamps work a day ahead; that happened once and had
+to be reverted. When the date matters and is uncertain, ask Paul.
 
 ---
 
@@ -142,6 +234,12 @@ Because a client Paul has fired must never resurface in a plan.
 `one_off_not_routed` (roster):
 One-off and at-will clients are served on request and are not placed in the recurring route.
 Because the route template is the standing backbone; on-request work fills gaps around it.
+
+`no_doodles` (roster):
+Decline doodles. Because a doodle's coat takes so long that its revenue-per-hour falls far
+below what the same time earns on other dogs (Paul could finish several short-coat dogs in the
+time one doodle takes), and it is hard to make a doodle profitable under any circumstances.
+Current policy as of 2026-05-24; revisit only if Paul changes it.
 
 ---
 
@@ -222,12 +320,37 @@ The workday has a capped length and an earliest-start floor, raised only when Pa
 more work, never by the system. Because mobile grooming at volume is physically demanding
 and protecting the operator first is the longer bet.
 
+`income_target_caps_the_day` (scheduling):
+Decide the target income for a day and schedule as close to that as possible; do not stack
+extra appointments onto an already-lucrative day. Because energy depletes by how hard the day
+earned, not by clock hours, so a high-revenue partial day drains Paul as much as a full one;
+this sharpens `protect_the_operator` from a time cap into a revenue-and-energy cap.
+
+`heads_up_on_the_way` (scheduling):
+Always send the client a heads-up when Dog Gone Clean is on the way, with a live Google Maps
+link to track progress. Because no one wants to sit watching the window, and a heads-up lets
+the client go about their day until Clean is close. In v1 the pizza tracker is this rule's
+home, replacing the manual "on my way" text.
+
+`lock_in_timing` (scheduling):
+Send the tomorrow reminder about 26 hours out, reading like a normal reminder and never like a
+countdown or "last chance." Because the small buffer carries the client past the 24-hour
+cancellation line feeling fair rather than blindsided, while a countdown-styled message would
+manufacture cancellations that otherwise would not happen. The buffer is never mentioned in the
+message itself.
+
+`gated_community_hours` (routing):
+Some gated communities restrict the hours service vehicles may enter (for example no service
+entry after 5pm); treat those windows as real access constraints when sequencing a day.
+Because a stop Paul cannot enter at the planned time is a hole in the route, the same class of
+constraint as a client's HARD window.
+
 ---
 
 ## Money
 
 `bills_in_person_today` (money):
-Clean bills in person (cash, check, card); the right in-person tool is Square (reader plus
+Clean bills in person (cash and card, no checks); the right in-person tool is Square (reader plus
 invoices), not Stripe, and online payment is deferred until it earns its place. Because that
 is how the business actually runs; Stripe fits DGN's card-on-file auto-charge model, not
 Clean's pay-after-service model, and inventing an online payment flow before Paul wants one
@@ -238,6 +361,72 @@ If online payment is ever added, store all money in cents (convert to dollars on
 render boundary), fail loud rather than guess on a price lookup, and verify every payment
 webhook signature before processing. Because these are the money-handling lessons DGN paid
 for, and they prevent silent charge errors and forged events.
+
+`cancellation_24h` (money):
+Appointments canceled or rescheduled within 24 hours are billed in full; once inside 24 hours
+the slot is reserved for that client. Use this exact wording everywhere it appears. Because a
+route is built around held slots so a late cancel is unrecoverable revenue, and one standard
+sentence keeps the policy from drifting weaker as it gets reused. Pairs with `lock_in_timing`.
+
+`favor_high_hourly_work` (money):
+Steer the book toward the highest revenue-per-hour work (nail-only and bath) and away from
+labor-intensive low-margin work; price each breed to what its market bears, not by a flat rate.
+Because Paul tracks pay-per-job against time and nail-only and bath clear far more per hour than
+a long full groom, and this economics is the engine under Clean's bath-forward repositioning,
+not a separate idea. Pairs with `no_doodles`.
+
+`accepted_payment_methods` (money):
+State the accepted-payment list consistently everywhere it appears: cash, Visa, Mastercard,
+American Express, Discover, Apple Pay, Google Pay, and Samsung Pay, all run through Square (the
+in-person processor). No checks. PayPal and Cash App can be taken if a client insists, but are
+deliberately not advertised, because they are an extra hassle and usually a fumble at the trailer.
+The Apple, Google, and Samsung wallets are methods clients pay with and do not conflict with
+`device_profile`, which governs Paul's own tools, not what clients use. Because a clear list stops
+clients wondering whether they need cash or an ATM stop, and naming the wallets removes a friction
+point at the trailer.
+
+`house_shampoo` (service):
+Clean washes everyone with one gentle, well-tolerated house shampoo; a client who wants a
+specific, medicated, prescription, or flea product provides it and Clean uses it without standing
+behind the result. Because at scale one reliably inoffensive shampoo avoids the steady stream of
+complaints any single product attracts, Clean cannot stock every medicated formula or know which
+one treats a given dog, and a single flea bath cannot fix an environmental flea problem the dog
+will just be re-exposed to. The specific house brand stays in the private record, not public copy
+(`dont_knock_competitors` and brand-neutral copy). Any non-guarantee wording (Clean does not
+promise a client-supplied medicated or flea product will work) lives in the intake or terms,
+never the marketing copy, which stays positive and skips the flea lecture (`reminder_voice`).
+
+---
+
+## Service and operating policies
+
+`online_only_comms` (process):
+All client communication (scheduling, updates, questions) runs through the online system; Clean
+does not take or return phone calls. Because Paul is hands-on with dogs all day and cannot step
+away for calls, and an online record keeps every booking and change documented and clear. The
+outbound heads-up text still goes out (`heads_up_on_the_way`); this rule is about inbound calls.
+
+`friendly_dogs_only` (safety):
+Clean grooms friendly dogs; a dog must be handleable without aggression. Snapping, biting
+attempts, or aggression ends the appointment immediately, and resistance that prevents safe,
+efficient work can mean service is declined. Clients disclose behavior concerns before booking.
+Because a dog-bite injury can put the groomer out of work and the whole business runs on Paul's
+hands; it is a safety boundary, not personal. Serves `protect_the_operator` and the prime
+directive's good-for-the-body test.
+
+`core_is_no_haircut_dogs` (roster):
+Clean's core focus is dogs that do not need haircuts: short coats, double coats, heavy shedders,
+working breeds. Haircut breeds are still served but are not the focus, and doodles are declined
+outright (`no_doodles`). Because no-haircut natural-coat grooming is the fast,
+high-revenue-per-hour bath work the business is repositioning toward (`favor_high_hourly_work`),
+while haircut-heavy coats are slow and low-margin; this is the market position already on the live
+site.
+
+`service_area_ocala` (routing):
+The service area is Ocala, Florida (most Ocala mailing addresses). Hard exclusions: no unpaved
+roads, and no service to Silver Springs Shores, Summer Glen, or Marion Oaks. Because these are the
+real operating limits the route and intake must honor; a booking outside them is declined up
+front, not routed. Pairs with `base_is_home_sw`.
 
 ---
 
@@ -267,7 +456,52 @@ compresses meaning into noise clients tune out.
 `device_profile` (copy):
 Write instructions and test targets for Pixel 8 Pro on Chrome, a Chromebook, and
 occasionally Windows; never assume Safari, iOS, Apple Pay, or Apple Sign In. Because Paul
-uses no Apple devices, ever.
+uses no Apple devices, ever. This governs the tools Paul is told to use, not what clients pay
+with; accepting Apple Pay from clients is fine (see `accepted_payment_methods`).
+
+`website_is_ground_zero` (copy):
+The website holds the strongest version of every core message; every other channel (texts,
+email, social, reviews, in person) pulls from it, and any strong line discovered in use is
+promoted onto the website so it becomes official. Verify this consistency, never assume it.
+Because scattered wording drifts and waters down, and a single source of truth is what keeps
+the business sounding like one business everywhere.
+
+`reminder_voice` (copy):
+Client messages must each earn their place (reassure, clarify, strengthen the brand, reduce
+uncertainty, or add movement), carry forward energy ("Dog Gone Clean is rolling your way"),
+age well over hundreds of sends, and never read like automation. Extends `no_jargon` with a
+banned-phrase list: "friendly reminder," "just a reminder," "reaching out," "please be
+advised," "arrival window," "last chance," "make changes now." Because these messages are
+part of the brand, not admin exhaust, and a long-time client may receive them a hundred times.
+
+`dont_knock_competitors` (copy):
+Never disparage other systems, products, or groomers in client-facing copy; make the case for
+why ours is great on its own merits. Because putting others down makes the brand look insecure
+and invites argument, a confident positive case ages better, and it fits the prime directive's
+bar of leaving everyone better off. Competitor weaknesses can still be noted privately in the
+corpus to sharpen our own design, never in public copy.
+
+`appointment_block_not_window` (copy):
+Call the appointment time a block, not a window; explain once that the work is completed within
+the block and the opening minute is not a guaranteed arrival time, then stop re-explaining.
+Never use cable-company "arrival window" language. Because a block sets an honest expectation
+that leaves room for a mobile day's twists without promising a to-the-minute arrival.
+
+`language_bank` (copy):
+Keep a brand language bank of reassurance lines and promote them to the website. Two locked
+entries: the trailer as a familiar escape (for a dog who knows the service the trailer is calm,
+known ground when the house is chaotic with storms, guests, holidays, or noise) and the thunder
+reframe (thunder at home and thunder in the trailer are two different things; inside, the dog
+has enough going on that the weather stops being the story). Each also needs a short, natural
+spoken version for the doorstep. Because these answer the client's biggest unasked doubts
+before they ask, and a line strong enough to reassure in a text deserves to be official
+website language.
+
+`no_trailer_graphics` (copy):
+Keep the trailer unmarked: no business name or graphics on it. Because a marked trailer draws
+hagglers at gas stations and in traffic and attracts the wrong sort of inquiry, and the trade
+is a few missed casual leads for far less noise. Revisit only if a gated community requires a
+marked service vehicle for entry, as some once did.
 
 ---
 

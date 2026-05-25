@@ -17,9 +17,13 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | no_mockups | Process | CLAUDE.md; convention | `business_rules` row |
 | do_the_work | Process | CLAUDE.md; convention | `business_rules` row |
 | read_before_redesign | Process | CLAUDE.md; Scroll header mandate; redesign checklist (run `check.py` + walk this index) | `business_rules` row |
+| elons_algorithm | Process | CLAUDE.md "How Paul works"; Oracle | `business_rules` row |
+| dig_the_moat | Process | CLAUDE.md "How Paul works"; Oracle | `business_rules` row |
 | ship_to_completion | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | no_pr_activity_subscription_nudge | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | no_merge_across_repos | Process | CLAUDE.md "Repo separation" | n/a |
+| persistent_status_update | Process | Oracle; convention | `business_rules` row |
+| dates_use_local_eastern | Process | Oracle; Scroll header mandate; CLAUDE.md | `business_rules` row |
 | no_database_until_rules_agreed | Build | CLAUDE.md "Hard constraints"; Oracle | lifts once rules agreed |
 | own_infrastructure | Build | CLAUDE.md "Hard constraints" | infra config |
 | reuse_dgn_stack | Build | CLAUDE.md "Stack"; Oracle | `package.json`, deploy workflow |
@@ -28,6 +32,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | active_set | Roster | `clients.json` scope; `check.py` (count=33) | `business_rules` row |
 | banned_excluded | Roster | `clients.json` `exclude_from_everything`; **`check.py`** (record flag + absent from route) | `business_rules` row |
 | one_off_not_routed | Roster | `clients.json` `routed:false`; `route_template.md`; **`check.py`** (absent from route) | route-generation code |
+| no_doodles | Roster | Oracle; convention | intake/booking gate; `business_rules` row |
 | real_data_only | Data | `clients.json` `data_gaps[]`; convention | n/a |
 | sheets_are_truth | Data | `data/sources.md`; CLAUDE.md | n/a |
 | newest_doc | Data | `data/sources.md` (corrected IDs + caveat); CLAUDE.md | sheet-resolver code |
@@ -41,14 +46,32 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | realistic_daily_load | Routing | `route_template.md` capacity notes | scheduling engine |
 | the_slot_is_the_clients | Scheduling | Oracle; `route_template.md` | booking engine |
 | protect_the_operator | Scheduling | Oracle | scheduling engine constants |
+| income_target_caps_the_day | Scheduling | Oracle | scheduling engine constants |
+| heads_up_on_the_way | Scheduling | Oracle | pizza tracker; notifications code |
+| lock_in_timing | Scheduling | Oracle | scheduling engine; notifications code |
+| gated_community_hours | Routing | Oracle; `clients.json` access notes | scheduling engine |
 | bills_in_person_today | Money | Oracle; `clients.json` (per-dog prices) | n/a |
 | if_payments_added_handle_money_safely | Money | Oracle (deferred) | pricing code; webhook fn |
 | grooming_vocab | Copy | CLAUDE.md; **`check.py`** (dog-qualified, over `src/`) | lint allowlist |
+| cancellation_24h | Money | Oracle | booking engine; site copy |
+| favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |
+| accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |
+| house_shampoo | Service | Oracle; convention | site copy; intake form |
+| online_only_comms | Process | Oracle; convention | site copy; intake; `business_rules` row |
+| friendly_dogs_only | Safety | Oracle; convention | site copy; intake gate |
+| core_is_no_haircut_dogs | Roster | Oracle; convention | site copy; intake |
+| service_area_ocala | Routing | Oracle; `data/` | scheduling engine; intake address check |
 | no_dgn_import | Copy | CLAUDE.md; "Repo separation" | lint pattern |
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |
 | no_jargon | Copy | CLAUDE.md; convention | lint pattern |
 | device_profile | Copy | CLAUDE.md "How Paul works" | n/a |
 | neural_expressive_design | Design | CLAUDE.md "Design language"; Oracle | design tokens in `src/`; restyle lint when the site is rebuilt |
+| website_is_ground_zero | Copy | Oracle; convention | build copy check |
+| reminder_voice | Copy | Oracle; convention | lint pattern (banned phrases) |
+| dont_knock_competitors | Copy | Oracle; convention | lint pattern |
+| appointment_block_not_window | Copy | Oracle; convention | lint pattern |
+| language_bank | Copy | Oracle | site copy |
+| no_trailer_graphics | Copy | Oracle | n/a (real-world) |
 | maps_js_api_only | Engineering | Oracle (carried) | code + lint when site exists |
 | supabase_rpc_not_raw_fetch | Engineering | Oracle (carried) | code + `raw_fetch` lint |
 | auth_listener_sets_state_only | Engineering | Oracle (carried) | portal code |

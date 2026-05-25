@@ -19,6 +19,12 @@ There are two businesses total: DGN (the flagship, fully separate) and Clean (th
 
 This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 
+**Prime directive.** Dog Gone Clean exists to earn more every year while asking less, not more,
+of the people who run it, and to leave everyone it touches better off. The full directive (seven
+tests every decision is held against: earn more grind less, runs without Paul, fun to work on
+and in, good for body and mind, a unicorn job, clients grateful it exists, the world better for
+it) is the first section of CLEAN_ORACLE.md and is the apex every rule serves.
+
 ## Read order (the doc set)
 
 1. **CLAUDE.md** (this file) - operating manual. Permanent rules, stack, constraints.
@@ -29,19 +35,41 @@ This repo is separate from the DGN repo on purpose. See "Repo separation" below.
 4. **CLEAN_BUSINESS_RULES.md** - the index: where each rule is enforced (four-layer map).
 5. **CLEAN_PARKING_LOT.md** - deferred work and forward-looking ideas, parked to survive
    context resets.
+6. **CLEAN_FIELD_MANUAL.md** - the hands-on SOPs for the work itself (grooming craft,
+   equipment, power, climate, trailer, maintenance). Reference manual, not a read-every-session
+   doc: read it when doing field, equipment, or operator-app-feature work. Absorbed from Paul's
+   original Drive journal (`the_oracle_journal`).
 
 That read-order link is the only thing holding the set together. Keep the file names exact.
 These are Clean's own scrolls; never share or merge them with DGN's.
 
-## Recording decisions (lock it in)
+## Recording ideas and decisions (lock it in)
 
-When Paul locks a decision (says "lock it in" or a clear equivalent), capture it the same
-turn: write it to its live home (an Oracle rule, a constraint in this file, or a record
-field), add a dated line to the Scroll's decisions log, run `python3 scripts/check.py`, and
-commit/push. While he is still thinking out loud, record nothing. Committing on each lock is
-what makes a decision survive a long thread that compacts or a container that is reclaimed;
-the end-of-session scroll rebuild is then a polish pass, not a rescue. See
-`lock_it_in_capture` in the Oracle.
+Paul's ideas now come into a Claude thread, not a separate document. He may not know where any
+given idea should live, and that is fine: he describes the idea and the reason, and you choose
+its home. Default to thread-first capture, because the idea lands in its real home immediately
+instead of piling up for a later absorption pass.
+
+- **Triggers to save now:** "put it where it belongs," "capture this," "lock it in," or a clear
+  equivalent. On any of these, capture the same turn: write it to its live home (an Oracle rule,
+  a constraint in this file, the parking lot, the field manual, or a record field), add a dated
+  line to the Scroll's decisions log if it is a decision, run `python3 scripts/check.py`, and
+  commit/push. Then tell Paul where you filed it so he can redirect you.
+- **Hold signal:** "just thinking out loud," or Paul clearly still musing, means record nothing
+  yet.
+- **Always attach a because.** If an idea is becoming a rule and Paul did not say why, ask one
+  quick question for the reason rather than saving a reasonless rule. A rule without a because
+  is not a rule.
+- **Durability:** an idea in a thread is not safe until it is committed to git, since a thread
+  can compact and the container can be reclaimed. Committing on each capture is the whole point.
+- **Dates:** stamp dates (the decisions log, commits, doc dates) in Paul's local US Eastern time,
+  not the container's UTC clock, which can read a day ahead in the evening Eastern. When unsure,
+  ask. See `dates_use_local_eastern` in the Oracle.
+- **Offline fallback:** when Paul is mid-route and cannot do a back-and-forth, voice-dumping
+  into the Drive journal (`the_oracle_journal`) is still the better quick inbox; absorb it into
+  the docs later in a batch. Threads when he can talk, journal as the offline buffer.
+
+See `lock_it_in_capture` in the Oracle.
 
 ## How Paul works (bake into every interaction)
 
@@ -57,6 +85,15 @@ the end-of-session scroll rebuild is then a polish pass, not a rescue. See
   credentials/dashboards no tool exposes.
 - **Read before redesign.** Before any redesign, read CLEAN_SCROLL_OF_HEPHAESTUS.md and
   CLEAN_ORACLE.md in full. A redesign that drops an existing rule is rejected.
+- **Elon's algorithm (run every build/scope call through it).** In order: make the requirement
+  less dumb (tie each to a real reason and a real person, never "because DGN had it"), delete the
+  part or step, simplify what survives, accelerate cycle time, then automate last. Never optimize
+  or automate something that should have been deleted. See `elons_algorithm` in the Oracle.
+- **Dig the moat (the decision lens for the AI era).** Run every build/scope call against one
+  question: does this deepen an advantage a smart AI cannot prompt past, by making us more
+  genuinely valuable (proprietary context, relationships, reputation, grateful clients), not by
+  locking anyone in? Spend effort on the un-promptable; build the commodity layer lean. Serves
+  the prime directive. See `dig_the_moat` in the Oracle.
 - **Device profile:** Pixel 8 Pro on Chrome, a Chromebook for desktop, occasionally
   Windows. No Apple devices ever. Never write instructions assuming Safari, iOS, Apple
   Pay, or Apple Sign In. Default mobile test target is Pixel + Chrome.
@@ -185,8 +222,9 @@ secret to publish); the business-rules lint and smoke test do not exist yet.
   a static site and a Supabase project both move to their own home with low effort before any
   sale. Keep each set of API keys its own (a separate Google Cloud project for Maps and
   OAuth, domain-locked).
-- **Clean is paid in person.** Square (or the current method) for in-person card, cash, and
-  check; not Stripe. Online payment is deferred until it earns its place.
+- **Clean is paid in person.** Square for in-person card, cash, and the major wallets (Apple Pay,
+  Google Pay, Samsung Pay); no checks; not Stripe. PayPal and Cash App exist but are not
+  advertised. Online payment is deferred until it earns its place. See `accepted_payment_methods`.
 - Real data only. Unknown fields are data gaps, never invented values.
 - No em dashes, anywhere.
 - Grooming terminology is correct here; never import DGN's bans.
