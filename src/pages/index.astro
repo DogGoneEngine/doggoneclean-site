@@ -2,7 +2,7 @@
 const services = [
   {
     name: "The Bath",
-    body: "A thorough wash, dry, brush out, ears, and nails at your door. The quick, fresh reset between full grooms, powered by the Hurricane Bath.",
+    body: "A thorough wash, dry, ears, and nails at your door. The quick, fresh reset between full grooms, powered by the Hurricane Bath.",
   },
   {
     name: "The Full Groom",
@@ -33,7 +33,6 @@ const bathPoints = [
   },
 ];
 
-const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthony"];
 ---
 
 <!doctype html>
@@ -52,14 +51,14 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
     <div class="glow glow-b"></div>
 
     <header class="site">
-      <span class="brand">Dog Gone Clean</span>
+      <img class="brand-logo" src="/logo.png" alt="Dog Gone Clean" />
       <a class="portal" href="/portal/">Client sign in</a>
     </header>
 
     <main>
       <section class="hero">
-        <p class="eyebrow">Mobile dog grooming, Ocala and nearby</p>
-        <h1>Dog grooming.<br /><span class="grad">No chaos.</span></h1>
+        <p class="eyebrow">Mobile dog grooming in Ocala</p>
+        <h1>A cleaner dog,<br /><span class="grad">without leaving home.</span></h1>
         <p class="lede">
           Dogs are the reason. The system is how we do it right. We bring the
           bath and the full groom to your driveway, with twenty years of steady
@@ -131,10 +130,7 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
 
       <section class="area">
         <h2>Where we go</h2>
-        <p>We serve the Ocala area and the towns around it.</p>
-        <ul class="chips">
-          {areas.map((a) => <li>{a}</li>)}
-        </ul>
+        <p>We serve Ocala, Florida. We come to you.</p>
       </section>
 
       <section class="about">
@@ -220,9 +216,10 @@ const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthon
         max-width: 980px;
         margin: 0 auto;
       }
-      .brand {
-        font-weight: 800;
-        letter-spacing: 0.01em;
+      .brand-logo {
+        height: 40px;
+        width: auto;
+        display: block;
       }
       .portal {
         color: var(--accent);
