@@ -158,6 +158,12 @@ unfinished work that has gone quiet (weak spots, neglected systems, loose ends, 
 assets) until it is done enough to stop needing attention. Because important work should not
 vanish just because Paul has not mentioned it lately.
 
+`dates_use_local_eastern` (process):
+Stamp every date (the decisions log, commits, and doc dates) in Paul's local time, US Eastern, not
+the container's UTC clock. Because the container runs on UTC, which rolls to the next day in the
+evening Eastern, so trusting it near midnight stamps work a day ahead; that happened once and had
+to be reverted. When the date matters and is uncertain, ask Paul.
+
 ---
 
 ## Build and infrastructure

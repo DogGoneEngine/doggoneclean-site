@@ -13,6 +13,9 @@
   durability already happened at each lock. Never rewrite it mid-session, and never lose a
   decision in the rebuild.
 - **If history and reality disagree, reality wins** and this file is corrected.
+- **Dates use Paul's local time (US Eastern), not the container's UTC clock**, which can read a
+  day ahead in the evening Eastern. Stamp the decisions log, commits, and doc dates in Eastern;
+  when unsure, ask. See `dates_use_local_eastern`.
 - Keep the "Current focus / next action" block at the top current, so a session that ends
   abruptly still orients the next one fast.
 

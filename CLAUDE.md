@@ -62,6 +62,9 @@ instead of piling up for a later absorption pass.
   is not a rule.
 - **Durability:** an idea in a thread is not safe until it is committed to git, since a thread
   can compact and the container can be reclaimed. Committing on each capture is the whole point.
+- **Dates:** stamp dates (the decisions log, commits, doc dates) in Paul's local US Eastern time,
+  not the container's UTC clock, which can read a day ahead in the evening Eastern. When unsure,
+  ask. See `dates_use_local_eastern` in the Oracle.
 - **Offline fallback:** when Paul is mid-route and cannot do a back-and-forth, voice-dumping
   into the Drive journal (`the_oracle_journal`) is still the better quick inbox; absorb it into
   the docs later in a batch. Threads when he can talk, journal as the offline buffer.

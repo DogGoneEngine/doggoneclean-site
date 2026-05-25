@@ -23,6 +23,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | no_pr_activity_subscription_nudge | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | no_merge_across_repos | Process | CLAUDE.md "Repo separation" | n/a |
 | persistent_status_update | Process | Oracle; convention | `business_rules` row |
+| dates_use_local_eastern | Process | Oracle; Scroll header mandate; CLAUDE.md | `business_rules` row |
 | no_database_until_rules_agreed | Build | CLAUDE.md "Hard constraints"; Oracle | lifts once rules agreed |
 | own_infrastructure | Build | CLAUDE.md "Hard constraints" | infra config |
 | reuse_dgn_stack | Build | CLAUDE.md "Stack"; Oracle | `package.json`, deploy workflow |
