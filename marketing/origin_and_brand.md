@@ -1,7 +1,7 @@
 # Origin and brand - source copy and voice (from the live site)
 
 **What this is.** The real origin story and brand voice from the current site (www.DogGoneClean.us),
-captured 2026-05-24 from Paul because this environment cannot reach the live site (its host is not
+captured 2026-05-25 from Paul because this environment cannot reach the live site (its host is not
 on the network allowlist). Authentic source material for the rebuild, in Paul's own words
 (`real_data_only`).
 
@@ -82,7 +82,7 @@ The live site predates several locked decisions. On rebuild, apply the rules:
   hours are billed in full" (`cancellation_24h`).
 - "Most mobile grooming units rely on RV-style water pumps. They trickle. We don't." drops the
   knock, keeps "water flow similar to city water" (`dont_knock_competitors`).
-- **Payment (RESOLVED 2026-05-24).** Public list is the journal's: cash plus Visa, Mastercard,
+- **Payment (RESOLVED 2026-05-25).** Public list is the journal's: cash plus Visa, Mastercard,
   Amex, Discover, Apple Pay, Google Pay, Samsung Pay, all through Square. No checks. PayPal and
   Cash App exist but are not advertised. Drop the live site's PayPal mention on rebuild;
   `accepted_payment_methods`, `bills_in_person_today`, and CLAUDE.md are updated to match.

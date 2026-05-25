@@ -233,7 +233,7 @@ Because the route template is the standing backbone; on-request work fills gaps 
 Decline doodles. Because a doodle's coat takes so long that its revenue-per-hour falls far
 below what the same time earns on other dogs (Paul could finish several short-coat dogs in the
 time one doodle takes), and it is hard to make a doodle profitable under any circumstances.
-Current policy as of 2026-05-24; revisit only if Paul changes it.
+Current policy as of 2026-05-25; revisit only if Paul changes it.
 
 ---
 

@@ -9,7 +9,7 @@ the build waits for the site; what is scarce now is the content, not the code).
 `dig_the_moat` asset: it sells what the bath does and that Paul invented it, while keeping the
 build private.
 
-**Status: DRAFT.** Grounded in Paul's own account (2026-05-24). The shampoo brand and the build
+**Status: DRAFT.** Grounded in Paul's own account (2026-05-25). The shampoo brand and the build
 specs stay in the private record. Nothing here is invented (`real_data_only`), and per
 `dont_knock_competitors` it never names or knocks other systems.
 
