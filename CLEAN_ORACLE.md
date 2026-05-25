@@ -271,6 +271,25 @@ uses no Apple devices, ever.
 
 ---
 
+## Design
+
+`neural_expressive_design` (design):
+Clean's website visual design follows Google's "Neural Expressive" language, the Gemini app
+redesign unveiled at Google I/O 2026 and rolled out 2026-05-19, NOT Material 3 (which was
+proposed this session and explicitly rejected). Translate its hallmarks to a marketing site:
+vibrant blue gradient washes and soft "illuminated" glows (Neural Expressive's signature, and
+a fit for DGC's brand blues), ombre/gradient fills on key words, a simple sans-serif with
+strong size contrast between headings and body, an editorial hierarchy that puts the key
+message big and bold at the top with lighter detail below, and gentle fluid motion. The
+expressiveness comes from color, gradient, and glow, not a special typeface, so no web-font
+dependency is needed. Restyle, do not reinvent: rebuild the existing DogGoneClean.us content
+and structure in this look rather than inventing new copy (pairs with `real_data_only` and
+`no_mockups`). Because Paul chose this look by name and rejected Material 3, and recording the
+exact reference plus its concrete tokens stops a future session from re-guessing the style or
+sliding back to the wrong system.
+
+---
+
 ## Engineering constraints that protect outcomes (apply when the relevant tech exists)
 
 These are carried from DGN's hard-won lessons. They are not active yet because Clean has no

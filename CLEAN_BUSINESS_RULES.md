@@ -48,6 +48,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |
 | no_jargon | Copy | CLAUDE.md; convention | lint pattern |
 | device_profile | Copy | CLAUDE.md "How Paul works" | n/a |
+| neural_expressive_design | Design | CLAUDE.md "Design language"; Oracle | design tokens in `src/`; restyle lint when the site is rebuilt |
 | maps_js_api_only | Engineering | Oracle (carried) | code + lint when site exists |
 | supabase_rpc_not_raw_fetch | Engineering | Oracle (carried) | code + `raw_fetch` lint |
 | auth_listener_sets_state_only | Engineering | Oracle (carried) | portal code |

@@ -33,19 +33,27 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   RLS-locked with no policy (only the service role reaches it until portal auth exists).
   Schema-as-code in `supabase/migrations/`, reproducible seed via `scripts/gen_seed_sql.py`
   to `supabase/seed.sql`, TS types in `supabase/database.types.ts`. Route template drafted;
-  doc/handoff system built; strategy/infra/workflow locked; `scripts/check.py` green.
-- **Next chapter:** scaffold the Clean Astro app + bath-forward marketing skeleton (no
-  credentials needed), wire it to `dgc-prod` via the publishable key, then the portal shell
-  with auth (the first RLS policies land with auth). After that the scheduling tables
-  (services with variable grooming durations, subscriptions, appointments) forked from DGN's
-  String of Pearls, and the `business_rules` table mirroring the Oracle.
+  doc/handoff system built; strategy/infra/workflow locked; `scripts/check.py` green. A
+  minimal bath-forward homepage is scaffolded (`src/pages/index.astro`, builds clean) on a
+  placeholder green palette, and the deploy workflow exists (`.github/workflows/deploy.yml`).
+- **Next chapter:** redesign the marketing site in the Neural Expressive visual language (see
+  `neural_expressive_design` in the Oracle), rebuilt from the existing DogGoneClean.us content
+  rather than reinvented, and reskinned from the placeholder green to the brand blues. This is
+  BLOCKED pending Paul's screenshots of the current site (this environment cannot fetch it; see
+  the Needs-Paul item below). Then the portal shell with auth (the first RLS policies land with
+  auth), wired to `dgc-prod` via the publishable key; then the scheduling tables (services with
+  variable grooming durations, subscriptions, appointments) forked from DGN's String of Pearls,
+  and the `business_rules` table mirroring the Oracle.
 - **Needs Paul to unblock the remaining live pieces:** DONE: `dgc-prod`'s keys + DB password
   (in Dashlane); Google Cloud (`dog-gone-clean`) Maps key + Google sign-in on dgc-prod; and
   hurricanebath.com staging is live over HTTPS on the shared `dog-gone-engine` droplet (Caddy
   block + GoDaddy DNS A record). LEFT: (1) Clean's own Twilio account, phone number, and A2P
-  registration (SMS + phone login); (2) a one-time SSH deploy key plus a GitHub secret so the
-  deploy Action can publish builds to the droplet. (A literal fork of the DGN code, if wanted,
-  must be brought over by hand; this repo cannot reach the DGN repo.)
+  registration (SMS + phone login); (2) the droplet SSH deploy key as the `DROPLET_SSH_KEY`
+  GitHub secret plus a `cleandeploy` user on the droplet, so the existing deploy Action can
+  publish builds; (3) screenshots of the current DogGoneClean.us pages, so the redesign reuses
+  the existing content (the live site 403s automated fetches and this env cannot load external
+  pages). (A literal fork of the DGN code, if wanted, must be brought over by hand; this repo
+  cannot reach the DGN repo.)
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
   Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
@@ -62,11 +70,13 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + `scripts/check.py`.
 - **Phase 4 - Clean website + ops app (fork of the DGN platform).** IN PROGRESS. The
   database foundation is DONE: Clean's own Supabase project `dgc-prod` is live and holds the
-  client book (`clients` + `dogs`) seeded from `data/clients.json`, RLS-locked. Still to
-  build: Astro marketing site (bath-forward) + client portal (existing + new clients) +
-  String of Pearls scheduling + operator app with photos + pizza tracker + SMS
-  notifications. In-person payment (Square). Preview on hurricanebath.com until
-  doggoneclean.us flips at launch.
+  client book (`clients` + `dogs`) seeded from `data/clients.json`, RLS-locked. A minimal
+  bath-forward homepage is scaffolded and the deploy workflow exists; the active sub-task is
+  restyling the marketing site to the Neural Expressive look (`neural_expressive_design`),
+  rebuilt from the existing DogGoneClean.us content. Still to build: the rest of the marketing
+  site + client portal (existing + new clients) + String of Pearls scheduling + operator app
+  with photos + pizza tracker + SMS notifications. In-person payment (Square). Preview on
+  hurricanebath.com until doggoneclean.us flips at launch.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 
@@ -101,6 +111,19 @@ data until portal auth is built (the records carry gate codes and door codes). A
 records missing required fields. Saved the generated TypeScript types to
 `supabase/database.types.ts`. Security advisor shows only the expected INFO
 (RLS-enabled-no-policy), which is the intended locked state.
+
+### 2026-05-25 (design direction)
+
+A short thread that set the website's visual direction and surfaced an environment limit. Paul
+named the look he wants: Google's "Neural Expressive" design language (the Gemini app redesign
+from Google I/O 2026, rolled out 2026-05-19), and rejected an earlier wrong guess of Material 3.
+Researched it via web search and captured the concrete tokens (blue gradient washes and glows,
+ombre/gradient key words, a simple sans-serif with strong size contrast, editorial hierarchy,
+fluid motion; no special typeface needed). Set "restyle, do not reinvent": rebuild the existing
+DogGoneClean.us content in the new look. Found that WebFetch is blocked in this remote
+environment (403 / egress allowlist) and the live site 403s automated fetches, so the redesign
+is blocked pending screenshots from Paul. No code shipped; the direction is recorded in the
+Oracle (`neural_expressive_design`), CLAUDE.md, and the decisions log below.
 
 ---
 
@@ -242,9 +265,11 @@ sessions add their own dated section below.
   via a dedicated Caddy block in `/root/engine/Caddyfile` plus a read-only volume added to the
   engine Compose file (nails untouched, n8n stayed up, caddy recreated in ~1.4s). The DNS A
   record (hurricanebath.com -> 178.128.144.219) is set at GoDaddy. It currently serves a
-  placeholder; the GitHub Actions auto-deploy that publishes real Astro builds to
-  `/srv/doggoneclean` on push is the next build task. A minimal Astro homepage is scaffolded
-  and builds clean.
+  placeholder. The GitHub Actions deploy workflow now exists (`.github/workflows/deploy.yml`:
+  build Astro, rsync `dist/` to `/srv/doggoneclean` over SSH, triggered on push to main or the
+  working branch); it cannot publish until Paul adds the droplet SSH deploy key as the
+  `DROPLET_SSH_KEY` GitHub secret and a `cleandeploy` user on the droplet. A minimal Astro
+  homepage is scaffolded and builds clean.
 
 ### Copy / terminology
 - **Always "dog grooming", never bare "grooming" (locked 2026-05-25).** Customer-facing copy
@@ -269,3 +294,19 @@ sessions add their own dated section below.
   locked to the service role until portal auth and RLS policies are built. That is not a
   decision to keep clients out. Any "only Paul can log in / wait for clients" rule Paul
   recalls is DGN's, recorded in DGN's Oracle, not here, and must not be imported.
+
+### Design and environment
+- **Website look = Neural Expressive (decided 2026-05-25).** Clean's site follows Google's
+  "Neural Expressive" design language (the Gemini app redesign from Google I/O 2026, rolled out
+  2026-05-19), NOT Material 3 (proposed this session and explicitly rejected). Concrete tokens:
+  vibrant blue gradient washes and soft glows, ombre/gradient fills on key words, a simple
+  sans-serif with strong heading/body size contrast, an editorial hierarchy (key message big
+  and bold at the top, lighter detail below), and gentle fluid motion. The expressiveness is
+  color/gradient/glow, not a special typeface, so no web-font dependency. Restyle, do not
+  reinvent: rebuild the existing DogGoneClean.us content in this look. Lives in the Oracle
+  (`neural_expressive_design`) and CLAUDE.md "Design language".
+- **Environment limit (noted 2026-05-25).** WebFetch is blocked in this remote/web session
+  (403 / egress allowlist), and the live DogGoneClean.us 403s automated fetches, so external
+  pages and the live site cannot be loaded here; web search and the Drive/Supabase/GitHub MCP
+  tools work. To reference the live site, get screenshots from Paul. Noted in CLAUDE.md "Stack
+  and commands".

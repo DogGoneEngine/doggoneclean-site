@@ -90,6 +90,18 @@ Architecture to clone, not reinvent:
   advance controls always visible, manual time corrections, persistent End Day) if a Clean
   field app is built.
 
+## Website redesign (Neural Expressive) - blocked on screenshots
+
+The marketing site's visual direction is Google's "Neural Expressive" language (decided
+2026-05-25; full rule `neural_expressive_design` in the Oracle): blue gradient washes and
+glows, ombre/gradient key words, a simple sans-serif with strong size contrast, editorial
+hierarchy, gentle motion; expressiveness from color, not a special typeface. Approach is
+restyle-not-reinvent: rebuild the existing DogGoneClean.us content in the new look, replacing
+the current placeholder green palette (`src/pages/index.astro`) with the brand blues. BLOCKED
+pending Paul's screenshots of the current DogGoneClean.us pages: the live site 403s automated
+fetches and WebFetch is blocked in this remote environment, so the existing content cannot be
+pulled here.
+
 ## Future / bigger ideas
 
 - **Apple Sign In for clients (parked 2026-05-25).** Add Apple sign-in as an extra client

@@ -75,9 +75,12 @@ the end-of-session scroll rebuild is then a polish pass, not a rescue. See
   (force-push to main, dropping a table, schema rollback).
 - **Don't offer PR-activity subscription.** No separate reviewers, no PR-level CI; nothing
   on a PR is worth watching. Just ship and report what shipped.
-- **State today:** the website is not scaffolded yet and nothing deploys on merge. Until
-  the pipeline exists, "ship" means commit and push to the working branch. The rule above
-  takes effect the moment the deploy pipeline is stood up.
+- **State today:** a minimal Astro homepage is scaffolded and the deploy workflow exists
+  (`.github/workflows/deploy.yml`), but it cannot publish until Paul adds the droplet SSH
+  deploy key as the `DROPLET_SSH_KEY` GitHub secret plus a `cleandeploy` user on the droplet.
+  Until that secret lands nothing actually deploys on push, so "ship" still means commit and
+  push to the working branch. The ship-to-completion rule takes full effect once the pipeline
+  can publish.
 
 ## Terminology
 
@@ -88,6 +91,17 @@ dog ("we groom your dog") and "a full groom" are fine. Build DGC's vocabulary fr
 talks about itself. Do NOT import DGN's nail vocabulary (where "groomer" is banned for
 "specialist" and "grind/trim" is banned for "sculpt nails"). DGC is the opposite of DGN on
 the craft, but qualifies it as "dog grooming." See `grooming_vocab` in the Oracle.
+
+## Design language
+
+The website's visual design follows Google's **Neural Expressive** language (the Gemini app
+redesign from Google I/O 2026, rolled out 2026-05-19), NOT Material 3. Hallmarks to apply:
+vibrant blue gradient washes and soft glows, ombre/gradient fills on key words, a simple
+sans-serif with strong heading/body size contrast, an editorial hierarchy (key message big
+and bold at top, lighter detail below), and gentle fluid motion. The expressiveness comes from
+color and gradient, not a special typeface, so no web-font dependency is needed. Restyle the
+existing DogGoneClean.us content into this look; do not reinvent the copy. See
+`neural_expressive_design` in the Oracle.
 
 ## Source of truth and data model
 
@@ -127,6 +141,11 @@ authoritative client file until the app writes back to Supabase.
   (writes `supabase/seed.sql` from `data/clients.json`).
 - Read contact sheets: Drive MCP tools (search_files, get_file_metadata, read_file_content,
   download_file_content).
+- Reading external web pages: WebFetch is blocked in this remote/web environment (returns 403
+  / egress allowlist), so it cannot load article pages or the live site; web search works (it
+  is proxied), and the Drive, Supabase, and GitHub MCP tools work normally. DogGoneClean.us
+  also 403s automated fetches, so to reference the live site ask Paul for screenshots rather
+  than reporting that it cannot be seen.
 
 **Planned stack (mirrors DGN; Clean gets its OWN instances, never DGN's).** Astro 5 + React
 18 islands, Node 20, npm. Supabase backend. Deploy: push to main -> GitHub Actions builds
@@ -144,7 +163,8 @@ second web server. The site is NOT Squarespace; do not assume so again.
 
 **Build gate (planned, not built yet).** `npm run build` runs a business-rules lint, then the
 Astro build, then a smoke test, and any step's failure fails the build. The GitHub Actions
-deploy, the lint, and the smoke test do not exist yet.
+deploy workflow now exists (`.github/workflows/deploy.yml`, awaiting the `DROPLET_SSH_KEY`
+secret to publish); the business-rules lint and smoke test do not exist yet.
 
 ## Hard constraints
 
