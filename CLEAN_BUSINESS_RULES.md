@@ -43,7 +43,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | protect_the_operator | Scheduling | Oracle | scheduling engine constants |
 | bills_in_person_today | Money | Oracle; `clients.json` (per-dog prices) | n/a |
 | if_payments_added_handle_money_safely | Money | Oracle (deferred) | pricing code; webhook fn |
-| grooming_vocab | Copy | CLAUDE.md; convention | lint allowlist |
+| grooming_vocab | Copy | CLAUDE.md; **`check.py`** (dog-qualified, over `src/`) | lint allowlist |
 | no_dgn_import | Copy | CLAUDE.md; "Repo separation" | lint pattern |
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |
 | no_jargon | Copy | CLAUDE.md; convention | lint pattern |

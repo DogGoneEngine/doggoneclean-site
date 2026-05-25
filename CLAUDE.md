@@ -81,10 +81,13 @@ the end-of-session scroll rebuild is then a polish pass, not a rescue. See
 
 ## Terminology
 
-DGC is a **full-service grooming** business. **groom / groomer / grooming** are the correct
-words here. Build DGC's vocabulary from how DGC talks about itself. Do NOT import DGN's nail
-vocabulary (where "groomer" is banned for "specialist" and "grind/trim" is banned for
-"sculpt nails"). DGC is the opposite of DGN on this.
+DGC is a **full-service dog grooming** business. In customer-facing copy always write
+**dog grooming** and **dog groomer**, never the bare words "grooming" or "groomer" (the
+unqualified term reads as the predatory sense and undercuts trust). "Groom" as a verb on a
+dog ("we groom your dog") and "a full groom" are fine. Build DGC's vocabulary from how DGC
+talks about itself. Do NOT import DGN's nail vocabulary (where "groomer" is banned for
+"specialist" and "grind/trim" is banned for "sculpt nails"). DGC is the opposite of DGN on
+the craft, but qualifies it as "dog grooming." See `grooming_vocab` in the Oracle.
 
 ## Source of truth and data model
 

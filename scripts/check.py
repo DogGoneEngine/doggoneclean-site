@@ -13,6 +13,7 @@ Exit code 0 = all checks pass, 1 = at least one failure.
 """
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -20,6 +21,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 CLIENTS = REPO / "data" / "clients.json"
 ROUTE = REPO / "data" / "route_template.md"
+SITE = REPO / "src"
 
 ALLOWED_SERVICE = {
     "full_groom",
@@ -112,10 +114,33 @@ def check_route_excludes():
                 )
 
 
+def check_dog_grooming():
+    """grooming_vocab: customer-facing copy in src/ must say 'dog grooming' / 'dog groomer',
+    never the bare words 'grooming' or 'groomer'."""
+    if not SITE.exists():
+        return
+    exts = {".astro", ".md", ".mdx", ".html", ".js", ".jsx", ".ts", ".tsx"}
+    pat = re.compile(r"groom(?:ing|er)", re.IGNORECASE)
+    for path in sorted(SITE.rglob("*")):
+        if not path.is_file() or path.suffix not in exts:
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for m in pat.finditer(text):
+            before = text[max(0, m.start() - 4):m.start()].lower()
+            if before.endswith("dog ") or before.endswith("dog-"):
+                continue
+            line = text.count("\n", 0, m.start()) + 1
+            failures.append(
+                f"{path.relative_to(REPO)}:{line}: '{m.group()}' must be qualified as "
+                f"'dog {m.group()}' (grooming_vocab)"
+            )
+
+
 def main():
     check_clients()
     check_dashes()
     check_route_excludes()
+    check_dog_grooming()
     if failures:
         print(f"CHECK FAILED ({len(failures)} issue(s)):")
         for f in failures:

@@ -246,6 +246,13 @@ sessions add their own dated section below.
   `/srv/doggoneclean` on push is the next build task. A minimal Astro homepage is scaffolded
   and builds clean.
 
+### Copy / terminology
+- **Always "dog grooming", never bare "grooming" (locked 2026-05-25).** Customer-facing copy
+  must qualify the craft as "dog grooming" / "dog groomer"; the unqualified words carry the
+  predatory connotation and undercut trust. "Groom" as a verb on a dog and "a full groom" are
+  fine. Lives in the Oracle (`grooming_vocab`), CLAUDE.md terminology, and is enforced by
+  `scripts/check.py` over `src/`. Homepage copy corrected accordingly.
+
 ### Auth / login (Clean)
 - **Client login = Google OAuth (decided 2026-05-25).** Clean's client portal uses Google
   sign-in for seamless one-tap access, not an email-only magic-link. The reason is Clean's

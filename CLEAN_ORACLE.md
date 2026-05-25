@@ -244,8 +244,13 @@ for, and they prevent silent charge errors and forged events.
 ## Copy and terminology
 
 `grooming_vocab` (copy):
-"groom / groomer / grooming" are correct Clean terms; build vocabulary from how Clean talks
-about itself. Because Clean is a full-service grooming business.
+In customer-facing copy always write "dog grooming" and "dog groomer", never the bare words
+"grooming" or "groomer". The craft itself is correct for Clean (unlike DGN), but the
+unqualified terms read as the predatory sense of the word and undercut trust on sight, so the
+"dog" qualifier is mandatory. "Groom" as a verb with a dog object ("we groom your dog") and
+"a full groom" as a noun are fine; it is the bare "grooming"/"groomer" that is banned. Because
+the brand voice has to read unambiguously as pet care. Enforced by `scripts/check.py` over
+`src/` (the website copy).
 
 `no_dgn_import` (copy):
 Never import DGN's nail vocabulary or bans into Clean. Because the two businesses describe
