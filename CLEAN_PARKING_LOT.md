@@ -92,6 +92,11 @@ Architecture to clone, not reinvent:
 
 ## Future / bigger ideas
 
+- **Apple Sign In for clients (parked 2026-05-25).** Add Apple sign-in as an extra client
+  login provider once Google login is live. Deferred to keep the first auth pass simple. This
+  is a client-facing option for iPhone owners and does NOT change `device_profile`: that rule
+  is about Paul's own environment (he uses no Apple devices) and how instructions are written,
+  not which login providers clients are offered.
 - Geocode the plus codes to compute true drive-time clusters instead of NE/NW/SE/SW buckets.
 - Multi-specialist routing: apprentice Jake can take solo dogs (e.g. Spero at Heather's).
 - Route-generation automation that reads `clients.json` + the template and honors every
