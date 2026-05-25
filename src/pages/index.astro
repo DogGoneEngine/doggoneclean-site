@@ -1,0 +1,225 @@
+---
+const services = [
+  {
+    name: "The Bath",
+    body: "A thorough wash, dry, brush out, ears, and nails at your door. The quick, fresh reset between full grooms.",
+  },
+  {
+    name: "Full grooming",
+    body: "Breed and coat specific haircuts, hand finished, for the clients we have served for years. Same groomer every visit.",
+  },
+  {
+    name: "Nails",
+    body: "A fast nail visit for the dogs who just need a trim, kept on a steady schedule.",
+  },
+];
+
+const areas = ["Ocala", "On Top of the World", "Dunnellon", "Williston", "Anthony"];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dog Gone Clean | Mobile dog grooming and bath in the Ocala area</title>
+    <meta
+      name="description"
+      content="Dog Gone Clean is a mobile dog grooming and bath service in the Ocala, Florida area. We come to you."
+    />
+  </head>
+  <body>
+    <header class="site">
+      <span class="brand">Dog Gone Clean</span>
+      <a class="portal" href="/portal/">Client sign in</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">Mobile grooming, Ocala and nearby</p>
+        <h1>A clean, happy dog without leaving home.</h1>
+        <p class="lede">
+          We bring the bath and the full groom to your driveway. Twenty years of
+          steady hands, one familiar face, and a van that comes to you.
+        </p>
+        <div class="cta">
+          <a class="button primary" href="/portal/">Book a visit</a>
+          <a class="button ghost" href="#services">See what we do</a>
+        </div>
+      </section>
+
+      <section id="services" class="services">
+        <h2>What we do</h2>
+        <div class="grid">
+          {
+            services.map((s) => (
+              <article class="card">
+                <h3>{s.name}</h3>
+                <p>{s.body}</p>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="area">
+        <h2>Where we go</h2>
+        <p>We serve the Ocala area and the towns around it.</p>
+        <ul class="chips">
+          {areas.map((a) => <li>{a}</li>)}
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Dog Gone Clean</span>
+      <span>Mobile dog grooming, Ocala FL</span>
+    </footer>
+
+    <style>
+      :root {
+        --ink: #1d2a24;
+        --muted: #5b6b63;
+        --bg: #f6f4ee;
+        --card: #ffffff;
+        --accent: #2f6f4f;
+        --line: #e2ded3;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      .site {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.1rem 1.4rem;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      .brand {
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+      .portal {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 1.4rem;
+      }
+      .hero {
+        padding: 2.5rem 0 3rem;
+      }
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 0 0 0.6rem;
+      }
+      h1 {
+        font-size: clamp(2rem, 6vw, 3.1rem);
+        line-height: 1.1;
+        margin: 0 0 1rem;
+      }
+      .lede {
+        font-size: 1.15rem;
+        color: var(--muted);
+        max-width: 32rem;
+        margin: 0 0 1.6rem;
+      }
+      .cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+      }
+      .button {
+        display: inline-block;
+        padding: 0.8rem 1.3rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .ghost {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      section h2 {
+        font-size: 1.5rem;
+        margin: 0 0 1.2rem;
+      }
+      .services {
+        padding: 1.5rem 0 2.5rem;
+      }
+      .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 1.3rem;
+      }
+      .card h3 {
+        margin: 0 0 0.5rem;
+        color: var(--accent);
+      }
+      .card p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .area {
+        padding: 1.5rem 0 3rem;
+      }
+      .chips {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+      }
+      .chips li {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.95rem;
+      }
+      .site-footer {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 2rem 1.4rem 3rem;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+        border-top: 1px solid var(--line);
+      }
+    </style>
+  </body>
+</html>
