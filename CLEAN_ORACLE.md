@@ -272,9 +272,17 @@ These are carried from DGN's hard-won lessons. They are not active yet because C
 app, but they are recorded here so they are not re-learned the hard way during the build.
 
 `maps_js_api_only` (engineering):
-Google Maps usage is via the JS API, never the REST API from the browser. Because the REST
-API has CORS issues in the browser and the JS API allows domain-locked keys. Directly
-relevant since Clean is a routing business.
+Google Maps usage from the browser is via the JS API, never a REST API; the routing and
+drive-time REST calls (Routes API, formerly Distance Matrix) run server-side. This means two
+separate keys, never one: a BROWSER key restricted by HTTP referrer to Clean's domains and
+scoped to the Maps JavaScript API (for displaying maps), and a SERVER key restricted by IP to
+the backend and scoped to the routing API (for the scheduler's drive-time math). Because the
+REST API has CORS issues in the browser and cannot be domain-locked there, while a
+referrer-locked browser key cannot authenticate a server call (no referrer is sent), so
+splitting the keys is the only way each one is both functional and tightly restricted. Make a
+key only when its lock target exists: the browser key now (the domains are known), the server
+key once the droplet exists and its IP is known. Directly relevant since Clean is a routing
+business.
 
 `supabase_rpc_not_raw_fetch` (engineering):
 In a Supabase client app, use the client's `rpc()` for database/auth calls, not raw

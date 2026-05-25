@@ -223,3 +223,11 @@ sessions add their own dated section below.
   www.doggoneclean.us, hurricanebath.com, localhost:4321; restricted to Maps JavaScript API),
   then optionally an OAuth client (redirect `https://urebdrosrxejhubpbxsa.supabase.co/auth/v1/callback`).
   The Maps key is semi-sensitive even when domain-locked; keep it in Dashlane, not git.
+- **Two-key Maps architecture (locked 2026-05-25):** Clean uses two Google Maps keys, never
+  one. A BROWSER key, restricted by HTTP referrer to Clean's four domains and scoped to the
+  Maps JavaScript API, for displaying maps (created and locked now). A SERVER key, restricted
+  by IP to the backend and scoped to the routing API (Routes API / Distance Matrix), for the
+  scheduler's drive-time math, created later when the droplet's IP exists. A referrer-locked
+  key cannot authenticate server calls and a REST key cannot be domain-locked in the browser,
+  so the split is what keeps each key both functional and tightly restricted. Full rationale
+  lives in the Oracle's `maps_js_api_only`.
