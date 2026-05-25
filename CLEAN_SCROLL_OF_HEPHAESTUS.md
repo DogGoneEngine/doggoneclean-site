@@ -237,9 +237,10 @@ sessions add their own dated section below.
   sign-in for seamless one-tap access, not an email-only magic-link. The reason is Clean's
   own: most clients already carry a Google account and one tap is the lowest-friction way in.
   (DGN reached the same conclusion, but that precedent is incidental, not the reason.)
-- **Magic-link fallback: proposed, pending Paul.** Run email magic-link alongside Google so
-  clients without a Google account are not locked out. Supabase supports both providers at
-  once; Google stays the default.
+- **Phone/email access-code fallback: decided 2026-05-25.** Run a phone-or-email one-time
+  access code alongside Google, matching the nails portal's "Continue with Google" plus
+  "Phone or email - Send Access Code" layout, so no client is locked out. Google stays the
+  default; this is Clean's own portal, consistent UX, not a shared component.
 - **Apple Sign In: parked,** not built now (see Parking lot). The `device_profile` no-Apple
   stance governs Paul's own devices and how ops instructions are written; offering Apple
   Sign In to CLIENTS who use iPhones is a separate product question, deferred, not banned.
