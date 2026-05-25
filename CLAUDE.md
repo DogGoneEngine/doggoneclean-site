@@ -178,8 +178,9 @@ until the site is stood up.
   a static site and a Supabase project both move to their own home with low effort before any
   sale. Keep each set of API keys its own (a separate Google Cloud project for Maps and
   OAuth, domain-locked).
-- **Clean is paid in person.** Square (or the current method) for in-person card, cash, and
-  check; not Stripe. Online payment is deferred until it earns its place.
+- **Clean is paid in person.** Square for in-person card, cash, and the major wallets (Apple Pay,
+  Google Pay, Samsung Pay); no checks; not Stripe. PayPal and Cash App exist but are not
+  advertised. Online payment is deferred until it earns its place. See `accepted_payment_methods`.
 - Real data only. Unknown fields are data gaps, never invented values.
 - No em dashes, anywhere.
 - Grooming terminology is correct here; never import DGN's bans.

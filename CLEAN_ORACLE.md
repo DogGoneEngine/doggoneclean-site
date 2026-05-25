@@ -344,7 +344,7 @@ constraint as a client's HARD window.
 ## Money
 
 `bills_in_person_today` (money):
-Clean bills in person (cash, check, card); the right in-person tool is Square (reader plus
+Clean bills in person (cash and card, no checks); the right in-person tool is Square (reader plus
 invoices), not Stripe, and online payment is deferred until it earns its place. Because that
 is how the business actually runs; Stripe fits DGN's card-on-file auto-charge model, not
 Clean's pay-after-service model, and inventing an online payment flow before Paul wants one
@@ -370,11 +370,13 @@ a long full groom, and this economics is the engine under Clean's bath-forward r
 not a separate idea. Pairs with `no_doodles`.
 
 `accepted_payment_methods` (money):
-State the full accepted-payment list consistently everywhere it appears: cash, Visa,
-Mastercard, American Express, Discover, Apple Pay, Google Pay, Samsung Pay. The Apple, Google,
-and Samsung wallets are methods clients pay with and do not conflict with `device_profile`,
-which governs Paul's own tools, not what clients use. Because a clear list stops clients
-wondering whether they need cash or an ATM stop, and naming the wallets removes a friction
+State the accepted-payment list consistently everywhere it appears: cash, Visa, Mastercard,
+American Express, Discover, Apple Pay, Google Pay, and Samsung Pay, all run through Square (the
+in-person processor). No checks. PayPal and Cash App can be taken if a client insists, but are
+deliberately not advertised, because they are an extra hassle and usually a fumble at the trailer.
+The Apple, Google, and Samsung wallets are methods clients pay with and do not conflict with
+`device_profile`, which governs Paul's own tools, not what clients use. Because a clear list stops
+clients wondering whether they need cash or an ATM stop, and naming the wallets removes a friction
 point at the trailer.
 
 `house_shampoo` (service):

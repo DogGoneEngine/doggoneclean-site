@@ -44,8 +44,7 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   origin story, photos/video, and the reveal-level confirmation.
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
-  Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route; the
-  authoritative accepted-payment list (live site vs journal vs CLAUDE.md conflict).
+  Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
 
 ---
 
@@ -215,9 +214,9 @@ sessions add their own dated section below.
   Shores, Summer Glen, Marion Oaks). Pack grooming added to CLEAN_FIELD_MANUAL.md.
 - Known cleanups for the rebuild (rules already win): "arrival windows" becomes block;
   "same-day cancellations 100%" becomes within-24-hours; drop the "they trickle" knock.
-- OPEN, needs Paul: the payment list. Live site says cash, credit cards, PayPal, NO CHECKS; the
-  journal says cash plus the card networks plus Apple/Google/Samsung Pay; CLAUDE.md says checks are
-  accepted. Resolve and update `accepted_payment_methods` and CLAUDE.md.
+- Payment RESOLVED (2026-05-24): public list is the journal's (cash plus the card networks plus
+  Apple/Google/Samsung Pay, all via Square), no checks; PayPal and Cash App exist but are not
+  advertised. `accepted_payment_methods`, `bills_in_person_today`, and CLAUDE.md updated to match.
 
 ### Shampoo policy (LOCKED)
 - **`house_shampoo`:** one gentle house shampoo for everyone (privately: TropiClean papaya and
