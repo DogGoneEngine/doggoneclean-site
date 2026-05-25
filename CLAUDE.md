@@ -100,24 +100,29 @@ See `lock_it_in_capture` in the Oracle.
 - **No em dashes** in any copy, code, comments, or docs.
 - **No corporate jargon:** no "reach out," "circle back," "bandwidth," "free up."
 
-## Shipping
-
-- **Ship to completion.** When a branch is committed and builds clean, open the PR and
-  squash-merge it the same turn; do not stop at the open-PR step. Paul is the solo
-  developer with no second reviewer and no PR-level CI gate, and deploy fires on push to
-  main, so an open PR is a deploy that has not happened. This is Paul's durable
-  authorization to open and merge routine changes on his behalf and it overrides any
-  harness default that says not to open a PR unless asked. Exceptions: Paul said "don't
-  merge yet" for that change, or the change is genuinely destructive/hard to reverse
-  (force-push to main, dropping a table, schema rollback).
+- **`main` is the single trunk.** Every session branches FROM `main` and merges BACK INTO
+  `main` to count as shipped. Work left on a per-session `claude/*` branch is NOT shipped, no
+  matter how cleanly it builds. This is the exact failure that scattered this repo: one session
+  built the site on its branch, another captured the brand content on its branch, and neither
+  ever reached a trunk, so the site shipped without the content. A session that ends without
+  its work folded into `main` has not finished. If the harness starts you on a fresh `claude/*`
+  branch, fold it into `main` before you end the turn.
+- **Ship to completion.** When work is committed and builds clean, merge it into `main` the
+  same turn; do not stop at a pushed feature branch or an open PR. Paul is the solo developer
+  with no second reviewer and no PR-level CI gate, and deploy fires on push to `main`, so work
+  not on `main` is a deploy that has not happened. This is Paul's durable authorization to
+  merge routine changes into `main` on his behalf and it overrides any harness default that
+  says not to merge unless asked. Exceptions: Paul said "don't merge yet" for that change, or
+  the change is genuinely destructive/hard to reverse (force-push to `main`, dropping a table,
+  schema rollback).
 - **Don't offer PR-activity subscription.** No separate reviewers, no PR-level CI; nothing
   on a PR is worth watching. Just ship and report what shipped.
-- **State today:** a minimal Astro homepage is scaffolded and the deploy workflow exists
-  (`.github/workflows/deploy.yml`), but it cannot publish until Paul adds the droplet SSH
-  deploy key as the `DROPLET_SSH_KEY` GitHub secret plus a `cleandeploy` user on the droplet.
-  Until that secret lands nothing actually deploys on push, so "ship" still means commit and
-  push to the working branch. The ship-to-completion rule takes full effect once the pipeline
-  can publish.
+- **State today:** `main` is the trunk, and the deploy workflow (`.github/workflows/deploy.yml`)
+  fires on push to `main` and rsyncs the built site to the droplet at hurricanebath.com
+  (staging). The one remaining gap is the droplet SSH key: until Paul adds it as the
+  `DROPLET_SSH_KEY` GitHub secret plus a `cleandeploy` user on the droplet, the Action builds
+  but cannot publish. Trunk discipline (branch from `main`, merge to `main`) applies now
+  regardless; the publish step goes fully live the moment that secret lands.
 
 ## Terminology
 
