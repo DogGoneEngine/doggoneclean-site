@@ -206,9 +206,10 @@ sessions add their own dated section below.
 
 ### Live-site mining: origin, voice, and policies (captured)
 - Pulled the real origin story ("Meet Paul Nickerson... The system came later. The dogs came
-  first.") and brand voice from the current site into `marketing/origin_and_brand.md` (the
-  environment cannot reach the live site; Paul pasted it). Folded the existing Hurricane Bath lines
-  into the showcase language bank.
+  first."), the homepage hero ("Grooming. No Chaos."), the doorstep/mobile-model copy, and the
+  brand voice from the current site into `marketing/origin_and_brand.md` (the environment cannot
+  reach the live site; Paul pasted it). Folded the existing Hurricane Bath lines into the showcase
+  language bank.
 - New Oracle rules from published policies: `online_only_comms`, `friendly_dogs_only`,
   `core_is_no_haircut_dogs`, `service_area_ocala` (Ocala; no unpaved roads; excludes Silver Springs
   Shores, Summer Glen, Marion Oaks). Pack grooming added to CLEAN_FIELD_MANUAL.md.

@@ -79,7 +79,8 @@ free.
 **Pack grooming.** Dogs that live together are usually groomed together, because dogs live as a
 pack and grooming is no reason to split them. Keep them together if they are calm together; give
 one space if it needs to relax while the other is worked on. The goal is always less stress and a
-stable experience.
+stable experience. Clean works one household at a time, with no cages and no assembly-line
+crowding; the trailer serves a single household per stop.
 
 ---
 

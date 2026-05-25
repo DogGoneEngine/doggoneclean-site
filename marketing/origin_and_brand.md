@@ -23,6 +23,18 @@ on the network allowlist). Authentic source material for the rebuild, in Paul's 
 
 Keep this close to as-is for the rebuild's About. It is authentic and un-promptable.
 
+## Homepage hero and taglines
+
+The current homepage hero and brand taglines, strong and worth keeping:
+- Hero: "Grooming. No Chaos." with "Dogs are the reason. The system is how we do it right."
+- Tagline trio: "Structured. Reliable. Personal."
+- "Calm handling. Clear communication. Clean dogs."
+- "Comfort is engineered."
+- Owner's statement signs as: Paul Nickerson, Owner, Dog Gone Clean.
+
+The brand hero is "Grooming. No Chaos."; the product hero is the Hurricane Bath. They coexist on
+the site.
+
 ## Brand voice (keep this)
 
 The live "How We Operate" page nails the DGC voice: functional, plainspoken, system-first, no
@@ -43,6 +55,16 @@ Climate, power, drying:
   around 30 percent regardless of what Florida is doing outside."
 - "Powerful vacuums contain loose coat. High-output dryers move moisture efficiently so dogs can
   get back to their day."
+
+Service at your doorstep and the mobile model:
+- "We bring the entire grooming system to your driveway."
+- "Our mobile unit carries its own water, power, and climate control. We park at your home,
+  complete the groom, and send arrival notifications along the way."
+- "No driving across town. No sitting in a lobby. No disruption to your day. You stay home. Your
+  dog gets focused care. The route keeps moving."
+- "Every appointment runs on a structured system built over two decades."
+- "We groom one household at a time. No cages. No assembly line. No crowded lobby."
+- "The process is deliberate. The workflow is repeatable. The results are consistent."
 
 Hurricane Bath (existing, already moat-safe, no build revealed):
 - "A recirculating bathing system we call the Hurricane Bath."
