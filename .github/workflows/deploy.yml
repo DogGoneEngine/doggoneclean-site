@@ -1,0 +1,43 @@
+name: Deploy staging
+
+# Builds the Astro site and publishes it to the shared dog-gone-engine droplet,
+# where Caddy serves it at hurricanebath.com from /srv/doggoneclean.
+# Triggers on the active working branch for now; when doggoneclean.us (production)
+# is wired, main will deploy there and this staging trigger gets cleaned up.
+
+on:
+  push:
+    branches:
+      - main
+      - claude/doggone-clean-db-setup-0XFOw
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Publish dist to the droplet
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H 178.128.144.219 >> ~/.ssh/known_hosts 2>/dev/null
+          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" dist/ cleandeploy@178.128.144.219:/srv/doggoneclean/
