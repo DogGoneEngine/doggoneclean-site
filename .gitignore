@@ -1,0 +1,9 @@
+# Secrets - never commit real env files
+.env
+.env.*
+!.env.example
+
+# Node / Astro (when the app is scaffolded)
+node_modules/
+dist/
+.astro/
