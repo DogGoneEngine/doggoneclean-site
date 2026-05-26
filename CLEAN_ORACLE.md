@@ -342,6 +342,24 @@ the free skip allowance. Because two real no-shows is enough signal that the
 client and the slot need a reset, and auto-pausing protects route stability
 without requiring the operator to make a judgment call mid-day.
 
+### Skip and reschedule
+
+The skip and reschedule rules below are ported from DGN's canonical policy
+(DGN SCROLL_OF_HEPHAESTUS.md sections 6.2-6.8 and DGN ORACLE.md), locked
+identical for Hurricane Bath on 2026-05-26. Skip pricing and reschedule
+pricing are distinct curves, not the same curve: a paid skip jumps in one
+step to the single-visit rate, while a reschedule beyond grace steps up
+weekly toward it.
+
+`one_free_skip_per_52w` (skip):
+Each subscription includes one free skip per rolling 12-month window.
+Unadvertised. The clock starts on the skip date and resets exactly 12 months
+later. A within-24-hour cancellation does NOT consume the free skip (the
+visit is already paid for per `within_24h_non_refundable`). Because clients
+need a release valve to keep a subscription emotionally easy to keep, but
+unlimited skips destroy route stability and the operator's working-capital
+model.
+
 ---
 
 ## Money
