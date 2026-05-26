@@ -148,13 +148,21 @@ const faqs = [
       </section>
 
       <section class="power">
-        <h2>Power to spare</h2>
+        <h2>Power to spare, <span class="grad">quiet by choice.</span></h2>
         <p>
-          Dog Gone Clean runs on two heavy duty generators, together enough to
-          power a small house. Most of that goes straight into what your dog
-          actually feels: strong air conditioning, a dehumidifier that keeps the
-          trailer cool and dry, and high velocity dryers. Drying is a one two
-          punch, so your dog is dry quickly and back to doing what it does best.
+          The two generators that run this trailer were chosen for what they
+          do not do: make noise. They are inverter models that run at about
+          sixty decibels from a few steps away, around the volume of a normal
+          conversation. Paul paid more for them on purpose. Your driveway is
+          not a construction site, and the dogs already in the house, the
+          neighbor's baby napping next door, your own peace, all stay
+          undisturbed while we work.
+        </p>
+        <p>
+          That quiet power feeds what your dog actually feels: strong air
+          conditioning, a dehumidifier that keeps the trailer cool and dry,
+          and high-velocity dryers. Drying is fast, so your dog is back to
+          doing what it does best.
         </p>
       </section>
 
@@ -258,9 +266,14 @@ const faqs = [
         margin: 0 auto;
       }
       .brand-logo {
-        height: 40px;
+        height: 72px;
         width: auto;
         display: block;
+      }
+      @media (max-width: 480px) {
+        .brand-logo {
+          height: 56px;
+        }
       }
       .portal {
         color: var(--accent);
