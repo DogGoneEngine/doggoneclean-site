@@ -334,6 +334,14 @@ Because the 24-hour mark is the operator's commitment point (route locked,
 capacity allocated), and asymmetric refund policy past that point would
 re-introduce no-show losses that the auto-charge rule exists to eliminate.
 
+`no_show_pause_at_two` (money):
+Two no-shows on a recurring subscription auto-pause the subscription via a
+counter on the subscription row. The client self-reactivates from the portal
+and selects a new slot from current availability. A no-show does NOT consume
+the free skip allowance. Because two real no-shows is enough signal that the
+client and the slot need a reset, and auto-pausing protects route stability
+without requiring the operator to make a judgment call mid-day.
+
 ---
 
 ## Money
