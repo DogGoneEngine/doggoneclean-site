@@ -66,6 +66,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | card_on_file_at_signup | Hurricane Bath: money | Oracle | `create-setup-intent` edge function; booking step 4 Stripe Elements; DB `subscriptions.stripe_payment_method_id` not-null |
 | auto_charge_at_24h | Hurricane Bath: money | Oracle | `charge-appointment` edge function (hourly cron); query ceiling `scheduled_start <= NOW() + 24h`; lint pattern banning earlier charge windows |
 | card_expiry_60_30_7 | Hurricane Bath: money | Oracle | `card-expiry-alert` cron; portal banner component; `stripe-webhook` `payment_method.updated` handler |
+| within_24h_non_refundable | Hurricane Bath: money | Oracle | portal cancel/skip button visibility; `portal_cancel_subscription` + `portal_skip_appointment` RPC guards; payment row preserved on cancel |
 
 ## How to add a row
 

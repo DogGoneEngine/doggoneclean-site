@@ -324,6 +324,16 @@ a real charge fails the next visit is at risk and the operator has no time to
 reach the client. Three-tier notification gives the client three chances to
 update before the route is affected.
 
+`within_24h_non_refundable` (money):
+Once an appointment enters the 24-hour window before its scheduled start, the
+card has been (or is about to be) charged and that payment is non-refundable.
+The portal hides the cancel and skip buttons in this window. The visit is
+removed from the operator's day if the client cancels, but the captured payment
+stays. A within-24h cancellation does NOT consume the free skip allowance.
+Because the 24-hour mark is the operator's commitment point (route locked,
+capacity allocated), and asymmetric refund policy past that point would
+re-introduce no-show losses that the auto-charge rule exists to eliminate.
+
 ---
 
 ## Money
