@@ -455,6 +455,15 @@ freshness-to-cadence mapping legible at the decision moment, and a clearly
 defaulted 4-week with an obvious "more freshness" path positions the 2-week
 option as upgrade rather than penalty.
 
+`calendar_shows_price_per_date` (ux):
+The portal reschedule date picker displays the price for each candidate date
+on the date itself, hotel/airline style: a cheap Maintenance date and a more
+expensive Reset date look different at a glance. The skip-then-new-pick flow
+uses the same display. Because the reschedule step-up curve is the rule's
+enforcement at the moment of choice; surfacing the price on each candidate
+date is what makes the curve a real decision input rather than a surprise on
+the next invoice.
+
 ---
 
 ## Money
