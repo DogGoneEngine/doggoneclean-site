@@ -71,6 +71,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | one_free_skip_per_52w | Hurricane Bath: skip | Oracle | `subscriptions.last_skip_at`; `portal_skip_appointment` RPC; skip counter in portal |
 | free_skip_keeps_maintenance_rate | Hurricane Bath: skip | Oracle | `portal_skip_appointment` next-appointment pricing branch; portal copy "This is your free skip" |
 | paid_skip_resets_next_visit_to_single_rate | Hurricane Bath: skip | Oracle | `portal_skip_appointment` paid branch; `subscriptions.last_skip_priced_at`; next-appointment `amount_cents` set to Reset rate |
+| five_week_grace_returns_to_maintenance | Hurricane Bath: skip | Oracle | pricing function gap check (skipped -> next visit <= 35d => Maintenance); never surfaced in client copy |
 
 ## How to add a row
 

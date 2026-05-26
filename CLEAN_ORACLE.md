@@ -382,6 +382,15 @@ rate." Because coat maintenance labor really does go up when intervals
 stretch, and the one-step jump matches that labor reality without inventing
 a fee-stacking curve that would feel punitive.
 
+`five_week_grace_returns_to_maintenance` (skip):
+Unadvertised. If the gap between a skipped appointment and the next
+appointment is 5 weeks or less, the Maintenance rate applies even without a
+free skip remaining. Quiet business decision; never advertised, never
+explained. Because at 5 weeks the coat has not grown significantly more than
+the normal 4-week cadence, so charging the higher rate would not match labor
+reality. Quiet because surfacing it would invite negotiation and turn a
+goodwill rule into a haggling tool.
+
 ---
 
 ## Money
