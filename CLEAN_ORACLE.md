@@ -255,6 +255,14 @@ the tier. Because The Villages caps households at 2 dogs with 3 grandfathered;
 capacity for a 4th dog does not exist in the target market, and the per-dog
 decrement matches the marginal labor of an additional dog at the same stop.
 
+`premium_inclusive_no_addons` (product):
+Hurricane Bath sells one premium-inclusive bath at one price per tier. No
+add-ons, no de-shed upcharge, no premium-shampoo upsell, no per-visit extras.
+Tip capture post-service is the only optional money path. Because nickel-and-
+diming kills the premium positioning the whole brand is built on, and a
+subscription with surprise upcharges erodes the auto-charge trust that the
+24-hour rule depends on.
+
 ---
 
 ## Money
