@@ -290,6 +290,14 @@ first-dog rate per tier. Because a one-off loses the recurring efficiency and
 the slot's annuity value, and the spread is what keeps the recurring offer the
 obvious better deal at the moment of choice.
 
+`tiered_founders_rate` (pricing):
+The Founders Rate is tier-aware. Placeholder first-dog rates locked 2026-05-26:
+$55 smoothcoat / $80 doublecoat, locked for 12 months from signup (per DGN's
+founders pattern), triggered by the `?founders=1` URL parameter. Second and
+third dogs step down by $20 within tier. Because a flat founders rate would
+over-subsidize doublecoat work, and a tier-aware rate keeps the unit economics
+honest across the founding cohort.
+
 ---
 
 ## Money

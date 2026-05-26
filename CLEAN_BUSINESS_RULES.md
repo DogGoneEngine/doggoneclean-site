@@ -62,6 +62,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | breed_tier_pricing | Hurricane Bath: pricing | Oracle; `src/data/breeds.json` (Phase 4) | `src/business/pricing.js`; DB `subscriptions.base_price_cents` + `additional_dog_cents`; `business_rules` row |
 | cadence_4wk_or_2wk_same_price | Hurricane Bath: pricing | Oracle | booking step 2 cadence picker; `src/business/pricing.js` quoter |
 | single_oneoff_higher | Hurricane Bath: pricing | Oracle | `src/business/pricing.js` Reset rate = Maintenance + $20 first dog |
+| tiered_founders_rate | Hurricane Bath: pricing | Oracle | `?founders=1` URL handling; `subscriptions.founders_locked_until`; `src/business/pricing.js` |
 
 ## How to add a row
 
