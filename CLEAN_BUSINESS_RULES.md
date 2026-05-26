@@ -55,6 +55,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | overlay_opacity_pairs_pointer_events | Engineering | Oracle (carried) | component CSS |
 | smoke_test_on_every_build | Engineering | Oracle (carried) | `scripts/smoke-build.mjs` |
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
+| bath_only_no_mats | Hurricane Bath: product | Oracle | `src/data/breeds.json`; booking-flow gating; lint pattern for accepted-breed list |
 
 ## How to add a row
 

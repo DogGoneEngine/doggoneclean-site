@@ -224,6 +224,25 @@ and protecting the operator first is the longer bet.
 
 ---
 
+## Hurricane Bath (Dog Gone Clean v2.0)
+
+These rules govern Hurricane Bath, the subscription bath-only operation at
+hurricanebath.com built as Dog Gone Clean v2.0. They apply to the Hurricane Bath
+surface and supersede `bills_in_person_today` in that context only; the legacy
+doggoneclean.us full-grooming surface continues paying in person via Square until
+its own rebuild. The full plan that locked these rules lives at the dated
+2026-05-26 block in CLEAN_SCROLL_OF_HEPHAESTUS.md.
+
+### Product scope and eligibility
+
+`bath_only_no_mats` (product):
+Hurricane Bath accepts only short-haired and double-coated breeds that do not
+require haircuts and have low mat risk. Because cycle time depends on no mat
+surprise, and the premium-inclusive promise breaks if the operator has to charge
+for unexpected work or skip a booked dog at the door.
+
+---
+
 ## Money
 
 `bills_in_person_today` (money):
