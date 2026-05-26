@@ -24,6 +24,18 @@ approved the visuals) with the master logo (`public/logo.png`) and real content 
 - **Logo check.** Confirm the logo renders cleanly on the light page (may need a
   transparent-background version).
 
+## Marketing copy ideas (parked, not ready to use)
+
+Kernels for the site copy, captured so they are not lost. Not approved and not for publish yet.
+
+- **Shedding interception (the two-week routine).** Paul's kernel, 2026-05-25, verbatim:
+  > We can't change your dog's natural shedding cycle, but by getting on a strict two-week
+  > routine, we can intercept a massive amount of that dead undercoat in our van before it ever
+  > has a chance to land on your rugs, your furniture, or your clothes.
+
+  Angle: sells the recurring two-week bath cadence as shedding control. Ties straight to the
+  bath-forward pivot and to recurring standing visits. Hold until the copy pass.
+
 ## Conversion candidates (one-off -> standing)
 
 Leave the one-off list as-is and treat it as people to try to convert to standing where
