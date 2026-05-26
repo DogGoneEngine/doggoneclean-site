@@ -263,6 +263,20 @@ diming kills the premium positioning the whole brand is built on, and a
 subscription with surprise upcharges erodes the auto-charge trust that the
 24-hour rule depends on.
 
+### Pricing
+
+`breed_tier_pricing` (pricing):
+Hurricane Bath pricing has two accepted tiers driven by breed: smoothcoat
+(Tier 1) and doublecoat (Tier 2). A not_accepted list rejects ineligible
+breeds at booking step 1. Placeholder rates locked 2026-05-26 (Paul revises
+after field measurement): smoothcoat first dog $75 recurring / $95 one-off;
+doublecoat first dog $100 recurring / $120 one-off. Second and third dogs
+step down by $20 within tier. Because cycle time and operator effort vary
+materially between a smooth Lab and a short-coat double like a Corgi, and a
+single flat rate would over-charge smoothcoats or under-pay for doublecoat
+work. Mixed-breed dogs route through an eligibility questionnaire that
+classifies into a tier or rejects.
+
 ---
 
 ## Money

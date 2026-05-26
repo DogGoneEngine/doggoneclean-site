@@ -59,6 +59,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check; `villages` zone config |
 | three_dog_cap | Hurricane Bath: product | Oracle | booking flow dog-count limit; `src/business/pricing.js`; DB constraint on `appointments.dog_count` |
 | premium_inclusive_no_addons | Hurricane Bath: product | Oracle | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy |
+| breed_tier_pricing | Hurricane Bath: pricing | Oracle; `src/data/breeds.json` (Phase 4) | `src/business/pricing.js`; DB `subscriptions.base_price_cents` + `additional_dog_cents`; `business_rules` row |
 
 ## How to add a row
 
