@@ -54,6 +54,18 @@ Kernels for the site copy, captured so they are not lost. Not approved and not f
   - Build note: this is subscription cancellation (stop billing, free the route slot), separate
     from the per-appointment `cancellation_24h` fee; keep the two distinct.
 
+## Service eligibility ideas (parked, needs work before use)
+
+- **The Breed Firewall classification (draft).** Paul's idea, 2026-05-25. A coat-type rule for
+  who the bath-only model accepts, aligning intake with `core_is_no_haircut_dogs`. Still needs
+  work before it goes into intake, copy, or code.
+  - **Excluded category:** any coat type that requires a haircut or styling, or that can knot,
+    mat, or pack loose undercoat against the skin.
+  - **Approved, smooth category:** single, short-haired coats that do not trap water and dry
+    within minutes.
+  - **Approved, dense category:** short or medium double-coats that shed heavily but do not mat,
+    needing a standard undercoat blowout within the route time limit.
+
 ## Conversion candidates (one-off -> standing)
 
 Leave the one-off list as-is and treat it as people to try to convert to standing where
