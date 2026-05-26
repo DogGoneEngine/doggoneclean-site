@@ -391,6 +391,20 @@ the normal 4-week cadence, so charging the higher rate would not match labor
 reality. Quiet because surfacing it would invite negotiation and turn a
 goodwill rule into a haggling tool.
 
+`reschedule_step_up_weekly` (reschedule):
+When a client reschedules an appointment, the price for the rescheduled
+appointment is calculated based on distance from the ORIGINAL scheduled
+date, not from today. Curve:
+- 0 to 7 days from original (grace, unadvertised): Maintenance rate
+- 8 to 14 days from original: Maintenance + 1/3 of (Reset minus Maintenance)
+- 15 to 21 days from original: Maintenance + 2/3 of (Reset minus Maintenance)
+- 22 or more days from original: full Reset rate
+After the rescheduled appointment, if the next visit falls within 5-week
+grace, Maintenance resumes. Because aligning client incentive with route
+stability requires the cost of late changes to be visible at the decision
+moment; calculating from the original date (not today) is what makes the
+curve a real incentive rather than a way to game the picker.
+
 ---
 
 ## Money
