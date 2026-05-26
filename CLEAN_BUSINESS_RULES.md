@@ -63,6 +63,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | cadence_4wk_or_2wk_same_price | Hurricane Bath: pricing | Oracle | booking step 2 cadence picker; `src/business/pricing.js` quoter |
 | single_oneoff_higher | Hurricane Bath: pricing | Oracle | `src/business/pricing.js` Reset rate = Maintenance + $20 first dog |
 | tiered_founders_rate | Hurricane Bath: pricing | Oracle | `?founders=1` URL handling; `subscriptions.founders_locked_until`; `src/business/pricing.js` |
+| card_on_file_at_signup | Hurricane Bath: money | Oracle | `create-setup-intent` edge function; booking step 4 Stripe Elements; DB `subscriptions.stripe_payment_method_id` not-null |
 
 ## How to add a row
 

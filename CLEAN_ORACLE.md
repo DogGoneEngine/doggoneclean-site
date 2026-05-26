@@ -298,6 +298,16 @@ third dogs step down by $20 within tier. Because a flat founders rate would
 over-subsidize doublecoat work, and a tier-aware rate keeps the unit economics
 honest across the founding cohort.
 
+### Money flow and charges
+
+`card_on_file_at_signup` (money):
+Hurricane Bath booking requires a Stripe SetupIntent at completion. No
+exceptions, no pay-on-day-of fallback. Supersedes `bills_in_person_today` for
+the Hurricane Bath surface only; legacy doggoneclean.us continues in person via
+Square. Because the entire 24-hour auto-charge loop depends on a card already
+authorized at booking, and a single "pay later" exception breaks the route's
+working-capital model.
+
 ---
 
 ## Money
