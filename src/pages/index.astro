@@ -136,20 +136,15 @@ const faqs = [
         </p>
       </section>
 
-      <section class="doorstep">
-        <h2>We come to you</h2>
+      <section class="arrival">
+        <p class="eyebrow">Now in The Villages, Florida</p>
+        <h2>The trailer parks in your driveway.<br />The bath happens.<br /><span class="grad">Your dog walks back inside, clean.</span></h2>
         <p>
-          We bring the entire dog grooming system to your driveway. Our mobile
-          unit carries its own water, power, and climate control. We park at your
-          home, complete the groom, and send arrival notifications along the way.
-          No driving across town. No sitting in a lobby. No disruption to your
-          day. You stay home. Your dog gets focused care. The route keeps moving.
+          That is the whole visit. You stay home. Your dog gets focused care.
+          The trailer carries its own water, power, and climate control, so
+          nothing about your day has to change. Just your dog, the Hurricane
+          Bath, and one familiar face.
         </p>
-      </section>
-
-      <section class="area">
-        <h2>Where we go</h2>
-        <p>We serve The Villages, Florida. We come to you.</p>
       </section>
 
       <section class="about">
@@ -325,12 +320,20 @@ const faqs = [
       }
       .services,
       .power,
-      .doorstep,
-      .area,
+      .arrival,
       .about,
       .why,
       .faq {
         padding: 1.8rem 0 2.6rem;
+      }
+      .arrival h2 {
+        line-height: 1.15;
+        max-width: 30rem;
+      }
+      .arrival p {
+        font-size: 1.08rem;
+        color: #41506a;
+        max-width: 40rem;
       }
       .why h2 {
         max-width: 40rem;
@@ -412,8 +415,6 @@ const faqs = [
         color: #b9cae8;
       }
       .power p,
-      .doorstep p,
-      .area p,
       .about p {
         font-size: 1.08rem;
         color: #41506a;
