@@ -415,6 +415,17 @@ rate. Because clients reschedule for two different reasons (one-off conflict
 versus an ongoing rhythm change) and conflating them either over-charges
 casual reschedulers or under-charges true cadence changes.
 
+### UX and copy
+
+`no_reason_field_ever` (ux):
+The portal never asks a client why they are skipping, rescheduling, or
+canceling. No textbox, no dropdown, no "tell us why" prompt. The client picks
+the action (or the new slot) and confirms. Because reason-collection is
+friction theater that signals the client owes an explanation; it erodes the
+stop-sign promise of frictionless exit and turns a routine action into a
+small negotiation. The data that matters (when, what, gap) is already on the
+row.
+
 ---
 
 ## Money

@@ -74,6 +74,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | five_week_grace_returns_to_maintenance | Hurricane Bath: skip | Oracle | pricing function gap check (skipped -> next visit <= 35d => Maintenance); never surfaced in client copy |
 | reschedule_step_up_weekly | Hurricane Bath: reschedule | Oracle | `src/business/pricing.js` reschedule quoter (curve keyed on days from original); `portal_reschedule_appointment` RPC; calendar price preview |
 | reschedule_two_paths_for_recurring | Hurricane Bath: reschedule | Oracle | portal reschedule UI two-button choice; `portal_reschedule_appointment` `change_cadence` param; subscription cadence update branch |
+| no_reason_field_ever | Hurricane Bath: ux | Oracle | absence of reason textbox/dropdown in skip + reschedule + cancel flows; lint pattern banning `cancel_reason` / `skip_reason` form fields in portal code |
 
 ## How to add a row
 
