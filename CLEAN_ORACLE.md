@@ -368,6 +368,20 @@ at your regular rate." Because the free skip is a quiet trust-builder, not a
 fee event; charging extra on the next visit would convert a goodwill
 mechanism into a hidden surcharge clients would resent on discovery.
 
+`paid_skip_resets_next_visit_to_single_rate` (skip):
+After the free skip in a 12-month window has been used, a subsequent skip in
+the same window prices the very next appointment at the single-visit (Reset)
+rate, in one step. NOT a weekly step-up curve. After that single-rate
+appointment, if the following visit falls within 4 weeks (5 with grace per
+`five_week_grace_returns_to_maintenance`), Maintenance resumes automatically.
+Tracked via `subscriptions.last_skip_at` and `last_skip_priced_at`. Portal
+copy on the paid skip: "Your next appointment will be at the single-visit
+rate. That is because coat maintenance costs more when nails or coat have
+grown longer between visits. After that, you will go back to your regular
+rate." Because coat maintenance labor really does go up when intervals
+stretch, and the one-step jump matches that labor reality without inventing
+a fee-stacking curve that would feel punitive.
+
 ---
 
 ## Money
