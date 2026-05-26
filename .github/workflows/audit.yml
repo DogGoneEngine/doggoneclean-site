@@ -1,0 +1,23 @@
+name: Audit
+
+# Runs the full repo audit on every push and pull request. Same script that powers the
+# SessionStart hook and the local pre-commit hook, so what passes here is what passes
+# everywhere. If this fails on main, the deploy will too; if it fails on a PR, the PR
+# is blocked from merging.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python3 scripts/check.py

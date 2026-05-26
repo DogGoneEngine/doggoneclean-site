@@ -77,8 +77,25 @@ if [ -f package.json ]; then
 fi
 
 if [ -f scripts/check.py ]; then
-  echo "--- running scripts/check.py ---"
-  python3 scripts/check.py || echo "warning: check.py failed; investigate before editing docs"
+  echo "--- running scripts/check.py (full audit) ---"
+  if ! python3 scripts/check.py; then
+    echo ""
+    echo "!!  AUDIT FAILED. The repo is in a drifted state. Fix the issues above"
+    echo "!!  before doing any other work. Do not edit docs or ship code until the"
+    echo "!!  audit passes."
+    echo ""
+  fi
+fi
+
+# Install the pre-commit hook so every commit from this session runs the same audit.
+# Idempotent: re-running this just overwrites with the current content.
+if [ -d .git/hooks ] && [ -f scripts/check.py ]; then
+  cat > .git/hooks/pre-commit << 'PRECOMMIT'
+#!/bin/bash
+# Auto-installed by .claude/hooks/session-start.sh. Runs the full audit before every commit.
+exec python3 scripts/check.py
+PRECOMMIT
+  chmod +x .git/hooks/pre-commit
 fi
 
 echo ""

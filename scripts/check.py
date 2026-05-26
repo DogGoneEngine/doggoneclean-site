@@ -1,12 +1,27 @@
 #!/usr/bin/env python3
 """Local checks for the Clean repo. No database, no dependencies.
 
-Enforces the rules that are enforceable today:
+Enforces every rule that can be checked mechanically. Same script powers three layers:
+SessionStart hook, pre-commit hook, and CI. If a check passes here, drift cannot enter
+the repo from any of those vectors.
+
+Data + roster checks:
 - clients.json parses and every standing record has the required fields
   (service_type_required, data_gap_explicit, hardness present).
 - service_type is one of the allowed values.
 - banned clients carry exclude_from_everything (banned_excluded).
+- banned, one-off, and at-will clients never appear in route_template.md
+  (banned_excluded, one_off_not_routed).
+
+Copy checks:
 - no em dashes or en dashes in tracked .md / .json files (no_em_dashes).
+- src/ never uses bare 'grooming'/'groomer' without 'dog' qualifier (grooming_vocab).
+
+Structural integrity (added to catch the drift modes that bit us before):
+- no git merge conflict markers anywhere in tracked files.
+- every Oracle rule key has a Business Rules index row, and vice versa.
+- no references to the old data/ path outside legacy/data/ (the move happened 2026-05-26).
+- no references to deleted claude/* branches inside .github/workflows/.
 
 Run: python3 scripts/check.py
 Exit code 0 = all checks pass, 1 = at least one failure.
@@ -136,17 +151,131 @@ def check_dog_grooming():
             )
 
 
+ORACLE = REPO / "CLEAN_ORACLE.md"
+INDEX = REPO / "CLEAN_BUSINESS_RULES.md"
+WORKFLOWS = REPO / ".github" / "workflows"
+CONFLICT_MARKERS = ("<<<<<<< ", "=======\n", ">>>>>>> ")
+
+
+def _tracked(*patterns):
+    try:
+        return subprocess.check_output(
+            ["git", "ls-files", *patterns], cwd=REPO, text=True
+        ).split()
+    except Exception as exc:
+        failures.append(f"could not list tracked files for {patterns}: {exc}")
+        return []
+
+
+def check_no_conflict_markers():
+    for rel in _tracked():
+        path = REPO / rel
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        # Skip this file itself: it defines the marker strings as data.
+        if path.resolve() == Path(__file__).resolve():
+            continue
+        for lineno, line in enumerate(text.splitlines(keepends=True), 1):
+            for marker in CONFLICT_MARKERS:
+                if line.startswith(marker.rstrip("\n")) and (
+                    marker.endswith("\n") and line.strip() == marker.strip()
+                    or not marker.endswith("\n")
+                ):
+                    failures.append(f"{rel}:{lineno}: git conflict marker '{marker.strip()}'")
+                    break
+
+
+def check_oracle_index_consistency():
+    if not ORACLE.exists() or not INDEX.exists():
+        return
+    oracle_text = ORACLE.read_text(encoding="utf-8")
+    index_text = INDEX.read_text(encoding="utf-8")
+    # Oracle rules: lines starting with `name` ( and a domain in parens.
+    rule_def = re.compile(r"^`([a-z_0-9]+)`\s*\([a-zA-Z_ :]+\):\s*$", re.MULTILINE)
+    oracle_rules = set(rule_def.findall(oracle_text))
+    # Index rows: markdown table rows starting with | name |
+    row = re.compile(r"^\|\s*([a-z_0-9]+)\s*\|", re.MULTILINE)
+    index_rules = {m for m in row.findall(index_text) if m not in {"rule"}}
+    missing_in_index = sorted(oracle_rules - index_rules)
+    missing_in_oracle = sorted(index_rules - oracle_rules)
+    for r in missing_in_index:
+        failures.append(
+            f"CLEAN_BUSINESS_RULES.md: missing index row for Oracle rule '{r}'"
+        )
+    for r in missing_in_oracle:
+        failures.append(
+            f"CLEAN_ORACLE.md: index row '{r}' has no matching rule definition"
+        )
+
+
+def check_no_stale_data_paths():
+    """data/ moved to legacy/data/ on 2026-05-26. Any present-tense reference to the
+    old path outside legacy/data/ is drift."""
+    # Match data/<file> but NOT legacy/data/<file>.
+    pat = re.compile(r"(?<!legacy/)\bdata/(?:clients\.json|route_template\.md|sources\.md|README\.md)\b")
+    skip = {"scripts/check.py"}  # this file mentions the pattern as a literal
+    for rel in _tracked("*.md", "*.py", "*.json", "*.sql", "*.astro", "*.mjs", "*.ts", "*.tsx", "*.js", "*.jsx", "*.yml", "*.yaml"):
+        if rel in skip:
+            continue
+        if rel.startswith("legacy/data/"):
+            continue
+        path = REPO / rel
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        for lineno, line in enumerate(text.splitlines(), 1):
+            if pat.search(line):
+                # Allow historical-record framing: line explicitly notes the path was
+                # data/ at the time and was moved.
+                if "was `data/" in line or "(then `data/" in line or "moved 2026-05-26" in line:
+                    continue
+                failures.append(
+                    f"{rel}:{lineno}: stale path reference; use legacy/data/ "
+                    f"(the move happened 2026-05-26)"
+                )
+
+
+def check_workflows_no_deleted_branches():
+    """Deleted claude/* branches must not be referenced in deploy/CI workflows; a stale
+    trigger silently disables deploys when the branch is gone."""
+    if not WORKFLOWS.exists():
+        return
+    for path in sorted(WORKFLOWS.rglob("*.yml")):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        for lineno, line in enumerate(text.splitlines(), 1):
+            stripped = line.strip()
+            if stripped.startswith("-") and "claude/" in stripped:
+                failures.append(
+                    f"{path.relative_to(REPO)}:{lineno}: references a claude/* branch; "
+                    f"only main should trigger workflows"
+                )
+
+
 def main():
     check_clients()
     check_dashes()
     check_route_excludes()
     check_dog_grooming()
+    check_no_conflict_markers()
+    check_oracle_index_consistency()
+    check_no_stale_data_paths()
+    check_workflows_no_deleted_branches()
     if failures:
-        print(f"CHECK FAILED ({len(failures)} issue(s)):")
+        print(f"AUDIT FAIL ({len(failures)} issue(s)):")
         for f in failures:
             print(f"  - {f}")
         sys.exit(1)
-    print("CHECK PASSED: clients.json valid, no em/en dashes in tracked docs.")
+    print("AUDIT PASS: clients.json valid, no dashes, Oracle/index in sync, no conflict markers, no stale paths, workflows clean.")
     sys.exit(0)
 
 
