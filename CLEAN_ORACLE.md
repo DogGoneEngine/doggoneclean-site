@@ -308,6 +308,14 @@ Square. Because the entire 24-hour auto-charge loop depends on a card already
 authorized at booking, and a single "pay later" exception breaks the route's
 working-capital model.
 
+`auto_charge_at_24h` (money):
+The card on file is charged exactly at the 24-hour mark before the scheduled
+appointment, never before. Once charged the appointment is non-refundable. The
+charge query ceiling is `scheduled_start <= NOW() + 24h`. Because pre-collecting
+money creates refund liability that erodes trust, and post-collecting after a
+no-show kills the route's working-capital model; the 24-hour mark is the
+operator's commitment point and matches it with the client's.
+
 ---
 
 ## Money
