@@ -248,6 +248,13 @@ later cities can be added without rework. Because launching one zone densely
 beats spreading thin across Florida, and a Villages-shaped route is the operator
 load model the pricing is calibrated against.
 
+`three_dog_cap` (product):
+Maximum 3 dogs per appointment and per household. The per-dog price decrement
+is $20 (each additional dog priced at the prior dog's rate minus $20), within
+the tier. Because The Villages caps households at 2 dogs with 3 grandfathered;
+capacity for a 4th dog does not exist in the target market, and the per-dog
+decrement matches the marginal labor of an additional dog at the same stop.
+
 ---
 
 ## Money

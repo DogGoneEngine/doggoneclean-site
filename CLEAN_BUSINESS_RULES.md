@@ -57,6 +57,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
 | bath_only_no_mats | Hurricane Bath: product | Oracle | `src/data/breeds.json`; booking-flow gating; lint pattern for accepted-breed list |
 | villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check; `villages` zone config |
+| three_dog_cap | Hurricane Bath: product | Oracle | booking flow dog-count limit; `src/business/pricing.js`; DB constraint on `appointments.dog_count` |
 
 ## How to add a row
 
