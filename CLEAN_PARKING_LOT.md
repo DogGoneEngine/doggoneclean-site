@@ -232,6 +232,14 @@ pending Paul's screenshots of the current DogGoneClean.us pages: the live site 4
 fetches and WebFetch is blocked in this remote environment, so the existing content cannot be
 pulled here.
 
+## Session ergonomics (parked, not urgent)
+
+- **End-of-session documents-touched summary (parked 2026-05-26).** Paul wants, at the
+  end of every session, a summary of which documents the session updated. Don't work
+  out the mechanism now; decide later. Likely options when picked up: a Stop hook that
+  runs `git log --name-only` against the session's commit range and prints the changed
+  paths; or a session-end skill; or a footer the assistant prints from memory.
+
 ## Future / bigger ideas
 
 - **Apple Sign In for clients (parked 2026-05-25).** Add Apple sign-in as an extra client
