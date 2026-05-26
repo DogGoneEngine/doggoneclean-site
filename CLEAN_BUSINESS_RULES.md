@@ -60,6 +60,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | three_dog_cap | Hurricane Bath: product | Oracle | booking flow dog-count limit; `src/business/pricing.js`; DB constraint on `appointments.dog_count` |
 | premium_inclusive_no_addons | Hurricane Bath: product | Oracle | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy |
 | breed_tier_pricing | Hurricane Bath: pricing | Oracle; `src/data/breeds.json` (Phase 4) | `src/business/pricing.js`; DB `subscriptions.base_price_cents` + `additional_dog_cents`; `business_rules` row |
+| cadence_4wk_or_2wk_same_price | Hurricane Bath: pricing | Oracle | booking step 2 cadence picker; `src/business/pricing.js` quoter |
 
 ## How to add a row
 

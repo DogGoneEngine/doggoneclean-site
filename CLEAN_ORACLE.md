@@ -277,6 +277,13 @@ single flat rate would over-charge smoothcoats or under-pay for doublecoat
 work. Mixed-breed dogs route through an eligibility questionnaire that
 classifies into a tier or rejects.
 
+`cadence_4wk_or_2wk_same_price` (pricing):
+Two recurring cadences are offered: every 4 weeks (default) and every 2 weeks,
+at the same per-visit price. Because the 2-week option is positioned as a
+freshness upgrade (more visits per year at the recurring rate), not a savings
+play; pricing the higher-frequency option lower would invite gaming and the
+goal is to make freshness, not discount, the upgrade reason.
+
 ---
 
 ## Money
