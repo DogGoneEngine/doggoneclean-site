@@ -316,6 +316,14 @@ money creates refund liability that erodes trust, and post-collecting after a
 no-show kills the route's working-capital model; the 24-hour mark is the
 operator's commitment point and matches it with the client's.
 
+`card_expiry_60_30_7` (money):
+The portal surfaces card-expiry banners at 60, 30, and 7 days before the card
+on file expires, escalating in tone (informational, urgent, blocking-soon).
+Because card expiry silently kills the auto-charge loop otherwise; by the time
+a real charge fails the next visit is at risk and the operator has no time to
+reach the client. Three-tier notification gives the client three chances to
+update before the route is affected.
+
 ---
 
 ## Money
