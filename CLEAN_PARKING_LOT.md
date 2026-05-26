@@ -148,13 +148,14 @@ Mechanical work the container cannot do itself.
   records live under `legacy/data/` in this repo, which is fine; move them out only if and
   when the legacy book moves into Supabase and the static files become true archive.
 
-## Repo housekeeping (very low priority)
+## Repo housekeeping
 
-- **Delete the stale `claude/*` remote branches** on github.com (Settings > Branches or
-  the branch list). They are leftover session snapshots from before the reconciliation;
-  their content is all in `main`, they cannot deploy (the workflow only fires on `main`),
-  and they conflict with nothing. Only cost is visual clutter in the branch list. Safe to
-  defer indefinitely; do it whenever the list bothers you.
+- **Default branch + stale `claude/*` branches: DONE 2026-05-26.** Repo default branch was
+  pointing at a stale `claude/amazing-noether-4Mo5W` snapshot, which is why every new
+  session kept opening on stale state regardless of which branch was picked: GitHub itself
+  was telling them that was the trunk. Switched the default to `main` (Settings > General),
+  deleted every `claude/*` branch. The SessionStart hook in `.claude/hooks/session-start.sh`
+  is now the belt-and-suspenders defense; the default-branch fix is the root cause cure.
 
 ## Saleability (keep the door open)
 

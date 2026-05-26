@@ -119,6 +119,17 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-05-26 (root-cause fix: GitHub default branch)
+
+Found the actual root cause of the "every session starts on a stale branch" failure
+pattern: the GitHub repository default branch was set to `claude/amazing-noether-4Mo5W`,
+a two-day-old session snapshot. Every fresh session, every fresh clone, every harness
+spin-up was being pointed there by GitHub itself, regardless of what the user picked.
+Paul switched the default to `main` in Settings > General, then deleted every `claude/*`
+branch from the branch list. The SessionStart hook added earlier stays as a belt-and-
+suspenders defense, but this default-branch fix is the cure: the hook was protecting
+against the symptom, the default-branch change removes the cause.
+
 ### 2026-05-26 (scroll reconciliation)
 
 Discovered the docs had split across two parallel branches: `main` had carried the
