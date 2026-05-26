@@ -159,6 +159,15 @@ and saying "done" on unverified work compounds (errors aren't caught until later
 in past sessions' "done" claims is destroyed, which is what blew up the afternoon of
 2026-05-26).
 
+`ci_workflows_capped_and_validated` (engineering):
+Every GitHub Actions job in `.github/workflows/` must declare `timeout-minutes:` on the
+job, and any new workflow must have been run end-to-end successfully at least once before
+the file is merged to `main`. Because a workflow without a cap can hang for ~6 hours
+before GitHub kills it, accumulating runs that jam the Actions queue and block all
+deploys (this is exactly what `verify.yml` did on 2026-05-26), and a workflow shipped
+without ever running is shipping a guess. No exceptions for "low-risk" workflows: the cap
+costs one line, the failure mode costs a day.
+
 `no_merge_across_repos` (process):
 Never share, symlink, or merge these docs or infrastructure between the DGN and DGC repos.
 Because merged history and shared infrastructure mis-apply rules across products.

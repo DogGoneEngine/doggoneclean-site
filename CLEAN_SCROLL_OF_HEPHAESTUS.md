@@ -119,6 +119,18 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-05-26 (workflow-cap follow-up)
+
+A sibling session on `doggonenails-site`, after cleaning up the verify gate, swept the
+last 24 hours of changes for "same shape" risks and found three. Checked here:
+`audit.yml` had no `timeout-minutes` cap (same shape as the verify-gate hang risk, even
+though the audit script runs sub-second); `deploy.yml` was already correct
+(`timeout-minutes: 5`, `npm ci --omit=dev`); `.claude/settings.json` was already tighter
+than nails (no `Bash(curl *)`, no `Bash(git reset *)`, with `git reset --hard`, `rm -rf`,
+and force-push in the deny list). Added the cap to audit.yml and locked the lesson into
+the Oracle as `ci_workflows_capped_and_validated` (engineering), indexed in the
+business-rules index, so a future workflow can't be added without a cap.
+
 ### 2026-05-26 (verify-gate salvage)
 
 The prior 2026-05-26 session shipped a Playwright-based `verify.yml` CI workflow without a
