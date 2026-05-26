@@ -25,52 +25,62 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Current focus / next action
 
-- **Direction:** Two businesses total. DGN (Dog Gone Nails): new, nails only, the Villages,
-  fully separate (own repo `doggonenails-site`). Clean (this repo): the existing ~20-year
-  business, evolving and a fork of the DGN platform. Legacy full grooming continues for legacy
-  Ocala clients while Clean makes a hard pivot to bath only (no-haircut dogs, because haircuts
-  are the cycle-time drag and bath is far higher revenue per hour), starting in Ocala and
-  migrating to the Villages as the legacy book winds down. Destination: bath only in the
-  Villages, by morphing the same business. The three-business plan was retired as too
-  complicated (it survives in git history, `0c37403` and `9ee4aa3`).
-- **State:** Branches are consolidated. `main` is the single trunk: the per-session `claude/*`
-  branches that had scattered the work (build on one, brand content on another) were merged in,
-  so the build, the marketing content, and the docs now live together. Clean's own Supabase
+- **Direction:** Two businesses in Paul's portfolio. DGN (Dog Gone Nails): new, nails only,
+  the Villages, fully separate (own repo `doggonenails-site`). Clean (this repo): the
+  existing ~20-year business, one evolving business, a fork of the DGN platform, running on
+  TWO URL surfaces during the transition. **Legacy surface** (doggoneclean.us): the
+  ~20-year Ocala full-grooming book, continues on Squarespace + Square + Acuity (with the
+  scheduler swapped out per `string_of_pearls_is_a_service`) until its own rebuild. **v2.0
+  surface** (hurricanebath.com): Dog Gone Clean v2.0, the bath-only, subscription-default
+  product, launches in The Villages with Stripe card-on-file at signup. Both surfaces
+  carry the Dog Gone Clean brand. Destination: bath only in the Villages by morphing the
+  same business; the two surfaces eventually converge as the legacy book winds down. The
+  three-business plan was retired as too complicated (it survives in git history, `0c37403`
+  and `9ee4aa3`).
+- **State:** Branches reconciled into `main` (this commit folds in the Hurricane Bath rule
+  pack that lived on a parallel branch). `main` is the single trunk. Clean's own Supabase
   project is LIVE: `dgc-prod`, ref `urebdrosrxejhubpbxsa`, us-east-1, in the shared "Mount
-  Olympus" org (the project is the hard line, never `dgn-prod`); the client book is built and
-  seeded (`public.clients` 47, `public.dogs` 61), RLS-locked with no policy, schema-as-code in
-  `supabase/migrations/`, reproducible seed via `scripts/gen_seed_sql.py`, TS types in
-  `supabase/database.types.ts`. The foundation is deep: the prime directive and two decision
-  lenses (`elons_algorithm`, `dig_the_moat`), the idea-capture workflow, `the_oracle_journal`
-  absorbed into the Oracle and CLEAN_FIELD_MANUAL.md, the live site mined into `marketing/`. The
-  homepage is REBUILT in the Neural Expressive look (blue gradient washes and glows, the master
-  logo in `public/logo.png`, bath-forward content) and is live at hurricanebath.com. A
-  `.claude/settings.json` permission allow-list is in place. `scripts/check.py` green.
+  Olympus" org (the project is the hard line, never `dgn-prod`); the client book is built
+  and seeded (`public.clients` 47, `public.dogs` 61), RLS-locked with no policy,
+  schema-as-code in `supabase/migrations/`, reproducible seed via `scripts/gen_seed_sql.py`
+  from `legacy/data/clients.json`, TS types in `supabase/database.types.ts`. The foundation
+  is deep: the prime directive and two decision lenses (`elons_algorithm`, `dig_the_moat`),
+  the idea-capture workflow, `the_oracle_journal` absorbed into the Oracle and
+  CLEAN_FIELD_MANUAL.md, the live site mined into `marketing/`. The homepage is REBUILT in
+  the Neural Expressive look (blue gradient washes and glows, the master logo in
+  `public/logo.png`, bath-forward content) and is live at hurricanebath.com as a
+  single-page placeholder. A `.claude/settings.json` permission allow-list is in place.
+  The Hurricane Bath v2.0 rule pack (24 rules: pricing, skip, reschedule, UX, money) is
+  locked in the Oracle but no code behind it yet. `scripts/check.py` green.
 - **Marketing content (in `marketing/`):** the Hurricane Bath hero showcase, the
-  power-and-fast-drying showcase, and the origin/brand source (story, taglines, doorstep copy).
-  The live site's old "Grooming. No Chaos." hero is recorded there but was rejected for the new
-  bath-forward site. Waiting on Paul's real photos and video. Build details stay in
-  CLEAN_FIELD_MANUAL.md, off the public page.
-- **Next chapter:** fork the DGN site structure (`doggonenails-site`) into a multi-page Clean
-  site. The current site is a single page; Paul is granting this environment access to the DGN
-  repo so a fresh session can read and fork its structure (reuse the page set and layout; keep
-  Clean's content, Neural Expressive look, logo, and data; never merge DGN's docs or data). Then
-  a real copy pass (the live hero "A serious bath, at your door." is provisional). Then the
-  portal shell with auth (the first RLS policies land with auth), the scheduling tables forked
-  from DGN's String of Pearls, and the `business_rules` table mirroring the Oracle.
-- **Needs Paul to unblock the remaining pieces:** (1) flip the GitHub default branch to `main`
-  (Settings > Branches) and delete the stale `claude/*` branches (branch delete is blocked from
-  this environment, so it is Paul's click); (2) grant this environment access to the
-  `doggonenails-site` repo so the next session can fork the DGN structure; (3) Clean's own
-  Twilio account, number, and A2P registration (SMS + phone login). DONE: `dgc-prod` keys + DB
-  password; Google Cloud Maps key + Google sign-in; the deploy publishes to hurricanebath.com
-  (confirmed live this session). (A literal fork of the DGN code is bridged by the repo-access
-  grant above.) Also supplies only Paul can give: real photos/video for the showcases, and
-  starting the review-gathering.
-- **Moat backlog (parked, do now, not website-gated):** gather Google reviews from grateful
-  long-time clients, build an owned before/after photo and video library, start a per-appointment
-  data log, keep feeding the Oracle and field manual, and protect the Hurricane Bath name. See
-  CLEAN_PARKING_LOT.md.
+  power-and-fast-drying showcase, and the origin/brand source (story, taglines, doorstep
+  copy). The live site's old "Grooming. No Chaos." hero is recorded there but was rejected.
+  Waiting on Paul's real photos and video. Build details stay in CLEAN_FIELD_MANUAL.md, off
+  the public page.
+- **Next chapter:** build the Hurricane Bath v2.0 booking surface against the locked rule
+  pack. That means: a real signup flow (Stripe SetupIntent at booking per
+  `card_on_file_at_signup`), the octane cadence picker, three-dog cap selector,
+  breed-tier-priced single bath, the two-tap stop sign in the portal, the calendar that
+  shows price per date. Parallel track: fork the DGN site structure
+  (`doggonenails-site`) into a multi-page shell that holds both surfaces and the marketing
+  pages, then a real copy pass on the placeholder hero. Then the portal shell with auth
+  (first RLS policies land with auth), scheduling tables forked from DGN's String of
+  Pearls, and the `business_rules` table mirroring the Oracle.
+- **Needs Paul to unblock the remaining pieces:** (1) flip the GitHub default branch to
+  `main` (Settings > Branches) and delete the stale `claude/*` branches (branch delete is
+  blocked from this environment, so it is Paul's click); (2) push the local
+  `pre-hurricane-snapshot` tag at `f65a096` (harness proxy 403s tag push); (3) grant this
+  environment access to the `doggonenails-site` repo so the next session can fork the DGN
+  structure; (4) create the Dog Gone Clean Stripe account (separate from any DGN/personal
+  account per `own_infrastructure`) and hand over the publishable + secret keys; (5)
+  Clean's own Twilio account, number, and A2P registration (SMS + phone login). DONE:
+  `dgc-prod` keys + DB password; Google Cloud Maps key + Google sign-in; the deploy
+  publishes to hurricanebath.com (confirmed live). Also supplies only Paul can give: real
+  photos/video for the showcases, and starting the review-gathering.
+- **Moat backlog (parked, do now, not website-gated):** gather Google reviews from
+  grateful long-time clients, build an owned before/after photo and video library, start a
+  per-appointment data log, keep feeding the Oracle and field manual, and protect the
+  Hurricane Bath name. See CLEAN_PARKING_LOT.md.
 - **Open questions:** Peter Moran cadence (~8 vs ~12wk); Lisa Irwin current home vs office
   address; Terri McDonnell works-from-home; Mary Beth's Theo breed; Patty Brown availability;
   Chester bearing from base; whether Paul's FL/GA travel constrains the Clean route.
@@ -80,27 +90,75 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 ## Phase map
 
 - **Phase 1 - Authoritative client records.** DONE. 33 standing + 11 one-off + 2 at-will + 1
-  banned in `data/clients.json`, verified against the current contact sheets.
-- **Phase 2 - First zone-day route template.** DRAFTED (`data/route_template.md`). Pending
-  the last cadence lock and a rebalance against corrected stop sizes.
-- **Phase 3 - Doc / handoff system + foundation.** DONE. CLAUDE.md + this Scroll + CLEAN_ORACLE.md
-  + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + CLEAN_FIELD_MANUAL.md + `scripts/check.py`,
-  plus the prime directive, the two decision lenses, and the idea-capture workflow.
+  banned in `legacy/data/clients.json`, verified against the current contact sheets. (Path
+  moved from `data/` to `legacy/data/` on 2026-05-26 because these records belong to the
+  legacy doggoneclean.us surface; the v2.0 surface gets its own subscriber data in Supabase.)
+- **Phase 2 - First zone-day route template.** DRAFTED (`legacy/data/route_template.md`).
+  Pending the last cadence lock and a rebalance against corrected stop sizes.
+- **Phase 3 - Doc / handoff system + foundation.** DONE. CLAUDE.md + this Scroll +
+  CLEAN_ORACLE.md + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + CLEAN_FIELD_MANUAL.md +
+  `scripts/check.py`, plus the prime directive, the two decision lenses, and the
+  idea-capture workflow.
 - **Phase 4 - Clean website + ops app (fork of the DGN platform).** IN PROGRESS. The
-  database foundation is DONE (`dgc-prod` live, client book seeded, RLS-locked). Branches are
-  consolidated into `main`. The homepage is DONE: rebuilt in the Neural Expressive look with the
-  master logo and bath-forward content, live at hurricanebath.com. Next: fork the DGN site
-  structure (`doggonenails-site`) into a multi-page Clean site, then a real copy pass, then the
-  client portal (existing + new clients) + String of Pearls scheduling + operator app with
-  photos + pizza tracker + SMS notifications. In-person payment (Square). Preview on
-  hurricanebath.com until doggoneclean.us flips at launch. Build details stay in
-  CLEAN_FIELD_MANUAL.md and off the public page.
+  database foundation is DONE (`dgc-prod` live, client book seeded, RLS-locked). Branches
+  reconciled into `main`. The homepage placeholder is DONE: rebuilt in the Neural
+  Expressive look with the master logo and bath-forward content, live at hurricanebath.com.
+  The Hurricane Bath v2.0 rule pack is locked in the Oracle (24 rules covering pricing,
+  skip, reschedule, UX, money). Next: build the v2.0 booking surface against those rules
+  (Stripe SetupIntent signup, octane cadence picker, three-dog cap selector, two-tap stop
+  sign, calendar-shows-price-per-date), then fork the DGN site structure
+  (`doggonenails-site`) into a multi-page shell, then a real copy pass, then the client
+  portal + String of Pearls scheduling + operator app with photos + pizza tracker + SMS +
+  Resend email. Surface-scoped payments: Hurricane Bath uses Stripe card-on-file (new Dog
+  Gone Clean Stripe account); legacy doggoneclean.us continues in person via Square. The
+  scheduler is built as a service callable from both the new Astro app and the legacy
+  Squarespace site (per `string_of_pearls_is_a_service`) so Acuity can be dropped before
+  the legacy rebuild. Build details stay in CLEAN_FIELD_MANUAL.md and off the public page.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 
 ---
 
 ## Session history
+
+### 2026-05-26 (scroll reconciliation)
+
+Discovered the docs had split across two parallel branches: `main` had carried the
+2026-05-25/26 work (site scaffolded and deployed, Supabase `dgc-prod` built, journal
+absorption, Field Manual, Prime Directive + lenses, Neural Expressive homepage,
+"dog grooming" lock, `dates_use_local_eastern`, plus same-day parking-lot adds for
+Breed Firewall and shedding-interception copy and the two-tap cancellation idea), while
+`claude/inspiring-mayer-ionnB` had branched off the 2026-05-24 base (`f65a096`) and
+captured the Hurricane Bath rule pack on a stale view of the world (24 new Oracle rules,
+data/ moved to legacy/data/, two-tap cancellation locked as `stop_sign_two_taps`,
+hurricanebath.com framed as Dog Gone Clean v2.0). Reconciled both branches into `main`
+by union, no decision dropped: kept every Oracle rule from both sides (89 rules total),
+folded the parked two-tap idea into a pointer to the locked rule, rewrote
+`bills_in_person_today` and `accepted_payment_methods` as surface-scoped (legacy via
+Square; Hurricane Bath via Stripe card-on-file per the new rules), refreshed the focus
+block to match real state (site live + database seeded + v2.0 rules locked + next step
+= build the v2.0 booking surface), kept the 2026-05-26 Hurricane Bath session entry
+below. Lesson recorded: every future session must start by reading `main` and refusing
+to branch off a stale snapshot; the harness's habit of putting fresh sessions on the
+oldest branch is what produced the parallel-reality failure.
+
+### 2026-05-26 (Hurricane Bath rule capture + plan reconciliation)
+
+A prior 2026-05-26 thread did extensive planning for Hurricane Bath (Dog Gone
+Clean v2.0) but admitted late that it had hallucinated and committed nothing.
+The session's ExitPlanMode body survived in Claude Code's side panel and was
+re-pasted into the recovery session. The pasted plan was reconciled against
+DGN's canonical skip/reschedule policy (per Paul's "use the dgn policy"
+instruction) and against Paul's in-chat correction to the breed list
+("exclude any breed that can mat or impact"). The final plan was approved
+and the locked rule set was captured into the Oracle one rule per commit,
+24 commits, all pushed. The `pre-hurricane-snapshot` git tag was created
+locally at `f65a096`; pushing it to the remote was blocked by the harness
+proxy with HTTP 403 and is a Paul-action. Forensic record of the two failed
+sessions and recovery procedure was produced inline for Paul to save outside
+the container. (This session was performed on the stale `f65a096` base, not
+on `main`; that branch divergence was reconciled in the 2026-05-26 scroll
+reconciliation entry above.)
 
 ### 2026-05-24 (foundation session)
 
@@ -294,8 +352,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the service role reaches the data until portal auth exists. Chosen because the records hold
   real PII and gate/door codes; a permissive policy must not be added without an auth model.
 - **Seed is reproducible from the source of truth.** `scripts/gen_seed_sql.py` regenerates
-  `supabase/seed.sql` from `data/clients.json`; re-running it fully refreshes the database.
-  `data/clients.json` stays the authoritative file until the app writes back to Supabase.
+  `supabase/seed.sql` from `legacy/data/clients.json`; re-running it fully refreshes the
+  database. `legacy/data/clients.json` stays the authoritative file until the app writes
+  back to Supabase.
 
 ### Infrastructure handoff (in progress)
 - **Supabase secrets:** retrieved and stored in Dashlane; the `dgc-prod` DB password was
@@ -460,3 +519,73 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Apple Pay, Google Pay, Samsung Pay, all via Square. No checks. PayPal and Cash App exist but are
   not advertised. `accepted_payment_methods`, `bills_in_person_today`, and CLAUDE.md updated to
   match; the live site's PayPal mention gets dropped on rebuild.
+
+---
+
+## Decisions log (2026-05-26)
+
+### Hurricane Bath v2.0 plan reconciliation (RESOLVED 2026-05-26, reconfirmed during the scroll reconciliation)
+- **One business, two URL surfaces.** Dog Gone Clean is the business. Hurricane Bath
+  (hurricanebath.com) is the new bath-only, subscription-default v2.0 surface. Legacy
+  doggoneclean.us is the existing Squarespace surface for full-grooming clients, sunsetting
+  eventually. They converge later; for now they coexist with the String of Pearls scheduler
+  shared between them as a service. This supersedes the 2026-05-24 "preview on
+  hurricanebath.com until doggoneclean.us flips at launch" framing, per `reality_wins`.
+- **Online payment for Hurricane Bath only.** The 2026-05-24 decision "online deferred until
+  it earns its place" still applies to legacy doggoneclean.us, which stays on Square.
+  Hurricane Bath launches with Stripe card-on-file plus auto-charge at the 24-hour mark, per
+  the new `card_on_file_at_signup` and `auto_charge_at_24h` rules. `bills_in_person_today`
+  and `accepted_payment_methods` are rewritten as surface-scoped (legacy = Square, v2.0 =
+  Stripe), not deleted.
+- **DGN's skip and reschedule policy is ported verbatim** for Hurricane Bath per Paul's
+  "use the dgn policy" instruction. Source: DGN `SCROLL_OF_HEPHAESTUS.md` sections 6.2 to
+  6.8 and DGN `ORACLE.md`. Skip and reschedule are distinct curves: a paid skip jumps in
+  one step to the single-visit rate, while a reschedule beyond grace steps up weekly.
+- **Subscription-default, one-off allowed** (locked during the 2026-05-26 reconciliation).
+  Hurricane Bath sells recurring (4wk default, 2wk freshness upgrade at the same price); a
+  single one-off bath is allowed at +$20 above the recurring first-dog rate per tier
+  (`single_oneoff_higher`).
+- **data/ moved to legacy/data/.** These records are the legacy Ocala client book and
+  belong to the legacy doggoneclean.us surface; the v2.0 surface gets its own subscriber
+  data in Supabase. `scripts/check.py`, `scripts/gen_seed_sql.py`, and CLAUDE.md updated
+  to point at the new path.
+
+### Rules captured into the Oracle (24, one commit each, originally on `claude/inspiring-mayer-ionnB`, folded into main during reconciliation)
+- Product scope: `bath_only_no_mats`, `villages_only_at_launch`, `three_dog_cap`,
+  `premium_inclusive_no_addons`.
+- Pricing: `breed_tier_pricing`, `cadence_4wk_or_2wk_same_price`, `single_oneoff_higher`,
+  `tiered_founders_rate`.
+- Money flow: `card_on_file_at_signup`, `auto_charge_at_24h`, `card_expiry_60_30_7`,
+  `within_24h_non_refundable`, `no_show_pause_at_two`.
+- Skip and reschedule (ported from DGN canon): `one_free_skip_per_52w`,
+  `free_skip_keeps_maintenance_rate`, `paid_skip_resets_next_visit_to_single_rate`,
+  `five_week_grace_returns_to_maintenance`, `reschedule_step_up_weekly`,
+  `reschedule_two_paths_for_recurring`.
+- UX: `no_reason_field_ever`, `stop_sign_two_taps`, `octane_selector_cadence_picker`,
+  `calendar_shows_price_per_date`.
+- Engineering: `string_of_pearls_is_a_service`.
+
+### Parking-lot adds (earlier on 2026-05-26, on `main`)
+- Breed Firewall coat-eligibility classification (draft) for who the bath-only model
+  accepts; needs work before intake/copy/code use.
+- Two-tap cancellation idea: locked the same day as `stop_sign_two_taps`; the parking-lot
+  entry now points to the locked rule.
+- Marketing copy kernel: shedding interception via the two-week routine. Holds until the
+  copy pass.
+
+### Open decisions (captured in CLEAN_PARKING_LOT.md)
+- Cycle time per appointment (1hr placeholder; Paul measures in Villages).
+- Tier slug names (smoothcoat / doublecoat recommended; Paul may rename).
+- Breed list refinement (first attempt seeded for Phase 4; Paul iterates).
+
+### Paul-actions deferred from these sessions
+- Flip the GitHub default branch to `main` (Settings > Branches) and delete the stale
+  `claude/*` remote branches (branch delete is blocked from this environment).
+- Push the `pre-hurricane-snapshot` git tag at `f65a096` (the harness proxy returns 403 on
+  tag pushes; the tag exists locally).
+- Grant this environment access to the `doggonenails-site` repo so a future session can
+  fork the DGN structure.
+- Create the new Dog Gone Clean Stripe account and hand over the publishable + secret keys.
+- Twilio account, number, and A2P registration (SMS + phone login).
+- Already done (do NOT re-do): `dgc-prod` Supabase project exists; Google Maps key
+  domain-locked to hurricanebath.com and the Clean domains; Google sign-in enabled.

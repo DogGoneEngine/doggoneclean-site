@@ -9,7 +9,6 @@ on:
   push:
     branches:
       - main
-      - claude/doggone-clean-db-setup-0XFOw
   workflow_dispatch:
 
 permissions:

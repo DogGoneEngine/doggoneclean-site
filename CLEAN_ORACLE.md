@@ -347,14 +347,274 @@ constraint as a client's HARD window.
 
 ---
 
+## Hurricane Bath (Dog Gone Clean v2.0)
+
+These rules govern Hurricane Bath, the subscription bath-only operation at
+hurricanebath.com built as Dog Gone Clean v2.0. They apply to the Hurricane Bath
+surface and supersede `bills_in_person_today` in that context only; the legacy
+doggoneclean.us full-grooming surface continues paying in person via Square until
+its own rebuild. The full plan that locked these rules lives at the dated
+2026-05-26 block in CLEAN_SCROLL_OF_HEPHAESTUS.md.
+
+### Product scope and eligibility
+
+`bath_only_no_mats` (product):
+Hurricane Bath accepts only short-haired and double-coated breeds that do not
+require haircuts and have low mat risk. Because cycle time depends on no mat
+surprise, and the premium-inclusive promise breaks if the operator has to charge
+for unexpected work or skip a booked dog at the door.
+
+`villages_only_at_launch` (product):
+Hurricane Bath's service area at launch is The Villages, FL, with the address
+polygon enforced at booking step 1. The schema keeps the zone abstraction so
+later cities can be added without rework. Because launching one zone densely
+beats spreading thin across Florida, and a Villages-shaped route is the operator
+load model the pricing is calibrated against.
+
+`three_dog_cap` (product):
+Maximum 3 dogs per appointment and per household. The per-dog price decrement
+is $20 (each additional dog priced at the prior dog's rate minus $20), within
+the tier. Because The Villages caps households at 2 dogs with 3 grandfathered;
+capacity for a 4th dog does not exist in the target market, and the per-dog
+decrement matches the marginal labor of an additional dog at the same stop.
+
+`premium_inclusive_no_addons` (product):
+Hurricane Bath sells one premium-inclusive bath at one price per tier. No
+add-ons, no de-shed upcharge, no premium-shampoo upsell, no per-visit extras.
+Tip capture post-service is the only optional money path. Because nickel-and-
+diming kills the premium positioning the whole brand is built on, and a
+subscription with surprise upcharges erodes the auto-charge trust that the
+24-hour rule depends on.
+
+### Pricing
+
+`breed_tier_pricing` (pricing):
+Hurricane Bath pricing has two accepted tiers driven by breed: smoothcoat
+(Tier 1) and doublecoat (Tier 2). A not_accepted list rejects ineligible
+breeds at booking step 1. Placeholder rates locked 2026-05-26 (Paul revises
+after field measurement): smoothcoat first dog $75 recurring / $95 one-off;
+doublecoat first dog $100 recurring / $120 one-off. Second and third dogs
+step down by $20 within tier. Because cycle time and operator effort vary
+materially between a smooth Lab and a short-coat double like a Corgi, and a
+single flat rate would over-charge smoothcoats or under-pay for doublecoat
+work. Mixed-breed dogs route through an eligibility questionnaire that
+classifies into a tier or rejects.
+
+`cadence_4wk_or_2wk_same_price` (pricing):
+Two recurring cadences are offered: every 4 weeks (default) and every 2 weeks,
+at the same per-visit price. Because the 2-week option is positioned as a
+freshness upgrade (more visits per year at the recurring rate), not a savings
+play; pricing the higher-frequency option lower would invite gaming and the
+goal is to make freshness, not discount, the upgrade reason.
+
+`single_oneoff_higher` (pricing):
+A single one-off (non-recurring) appointment is priced $20 above the recurring
+first-dog rate per tier. Because a one-off loses the recurring efficiency and
+the slot's annuity value, and the spread is what keeps the recurring offer the
+obvious better deal at the moment of choice.
+
+`tiered_founders_rate` (pricing):
+The Founders Rate is tier-aware. Placeholder first-dog rates locked 2026-05-26:
+$55 smoothcoat / $80 doublecoat, locked for 12 months from signup (per DGN's
+founders pattern), triggered by the `?founders=1` URL parameter. Second and
+third dogs step down by $20 within tier. Because a flat founders rate would
+over-subsidize doublecoat work, and a tier-aware rate keeps the unit economics
+honest across the founding cohort.
+
+### Money flow and charges
+
+`card_on_file_at_signup` (money):
+Hurricane Bath booking requires a Stripe SetupIntent at completion. No
+exceptions, no pay-on-day-of fallback. Supersedes `bills_in_person_today` for
+the Hurricane Bath surface only; legacy doggoneclean.us continues in person via
+Square. Because the entire 24-hour auto-charge loop depends on a card already
+authorized at booking, and a single "pay later" exception breaks the route's
+working-capital model.
+
+`auto_charge_at_24h` (money):
+The card on file is charged exactly at the 24-hour mark before the scheduled
+appointment, never before. Once charged the appointment is non-refundable. The
+charge query ceiling is `scheduled_start <= NOW() + 24h`. Because pre-collecting
+money creates refund liability that erodes trust, and post-collecting after a
+no-show kills the route's working-capital model; the 24-hour mark is the
+operator's commitment point and matches it with the client's.
+
+`card_expiry_60_30_7` (money):
+The portal surfaces card-expiry banners at 60, 30, and 7 days before the card
+on file expires, escalating in tone (informational, urgent, blocking-soon).
+Because card expiry silently kills the auto-charge loop otherwise; by the time
+a real charge fails the next visit is at risk and the operator has no time to
+reach the client. Three-tier notification gives the client three chances to
+update before the route is affected.
+
+`within_24h_non_refundable` (money):
+Once an appointment enters the 24-hour window before its scheduled start, the
+card has been (or is about to be) charged and that payment is non-refundable.
+The portal hides the cancel and skip buttons in this window. The visit is
+removed from the operator's day if the client cancels, but the captured payment
+stays. A within-24h cancellation does NOT consume the free skip allowance.
+Because the 24-hour mark is the operator's commitment point (route locked,
+capacity allocated), and asymmetric refund policy past that point would
+re-introduce no-show losses that the auto-charge rule exists to eliminate.
+
+`no_show_pause_at_two` (money):
+Two no-shows on a recurring subscription auto-pause the subscription via a
+counter on the subscription row. The client self-reactivates from the portal
+and selects a new slot from current availability. A no-show does NOT consume
+the free skip allowance. Because two real no-shows is enough signal that the
+client and the slot need a reset, and auto-pausing protects route stability
+without requiring the operator to make a judgment call mid-day.
+
+### Skip and reschedule
+
+The skip and reschedule rules below are ported from DGN's canonical policy
+(DGN SCROLL_OF_HEPHAESTUS.md sections 6.2-6.8 and DGN ORACLE.md), locked
+identical for Hurricane Bath on 2026-05-26. Skip pricing and reschedule
+pricing are distinct curves, not the same curve: a paid skip jumps in one
+step to the single-visit rate, while a reschedule beyond grace steps up
+weekly toward it.
+
+`one_free_skip_per_52w` (skip):
+Each subscription includes one free skip per rolling 12-month window.
+Unadvertised. The clock starts on the skip date and resets exactly 12 months
+later. A within-24-hour cancellation does NOT consume the free skip (the
+visit is already paid for per `within_24h_non_refundable`). Because clients
+need a release valve to keep a subscription emotionally easy to keep, but
+unlimited skips destroy route stability and the operator's working-capital
+model.
+
+`free_skip_keeps_maintenance_rate` (skip):
+When a free skip is available and used, the next appointment after the skip
+is charged at the normal recurring (Maintenance) rate. No change, no penalty.
+Portal copy on skip: "This is your free skip. Your next appointment will be
+at your regular rate." Because the free skip is a quiet trust-builder, not a
+fee event; charging extra on the next visit would convert a goodwill
+mechanism into a hidden surcharge clients would resent on discovery.
+
+`paid_skip_resets_next_visit_to_single_rate` (skip):
+After the free skip in a 12-month window has been used, a subsequent skip in
+the same window prices the very next appointment at the single-visit (Reset)
+rate, in one step. NOT a weekly step-up curve. After that single-rate
+appointment, if the following visit falls within 4 weeks (5 with grace per
+`five_week_grace_returns_to_maintenance`), Maintenance resumes automatically.
+Tracked via `subscriptions.last_skip_at` and `last_skip_priced_at`. Portal
+copy on the paid skip: "Your next appointment will be at the single-visit
+rate. That is because coat maintenance costs more when nails or coat have
+grown longer between visits. After that, you will go back to your regular
+rate." Because coat maintenance labor really does go up when intervals
+stretch, and the one-step jump matches that labor reality without inventing
+a fee-stacking curve that would feel punitive.
+
+`five_week_grace_returns_to_maintenance` (skip):
+Unadvertised. If the gap between a skipped appointment and the next
+appointment is 5 weeks or less, the Maintenance rate applies even without a
+free skip remaining. Quiet business decision; never advertised, never
+explained. Because at 5 weeks the coat has not grown significantly more than
+the normal 4-week cadence, so charging the higher rate would not match labor
+reality. Quiet because surfacing it would invite negotiation and turn a
+goodwill rule into a haggling tool.
+
+`reschedule_step_up_weekly` (reschedule):
+When a client reschedules an appointment, the price for the rescheduled
+appointment is calculated based on distance from the ORIGINAL scheduled
+date, not from today. Curve:
+- 0 to 7 days from original (grace, unadvertised): Maintenance rate
+- 8 to 14 days from original: Maintenance + 1/3 of (Reset minus Maintenance)
+- 15 to 21 days from original: Maintenance + 2/3 of (Reset minus Maintenance)
+- 22 or more days from original: full Reset rate
+After the rescheduled appointment, if the next visit falls within 5-week
+grace, Maintenance resumes. Because aligning client incentive with route
+stability requires the cost of late changes to be visible at the decision
+moment; calculating from the original date (not today) is what makes the
+curve a real incentive rather than a way to game the picker.
+
+`reschedule_two_paths_for_recurring` (reschedule):
+Recurring clients see two reschedule buttons. "Just this visit" reschedules
+the one appointment, leaves the subscription cadence unchanged, and applies
+the step-up to this visit only. "Change my regular schedule" reschedules this
+appointment AND updates the subscription cadence going forward, applying the
+step-up to this visit and pricing future appointments at the new cadence's
+rate. Because clients reschedule for two different reasons (one-off conflict
+versus an ongoing rhythm change) and conflating them either over-charges
+casual reschedulers or under-charges true cadence changes.
+
+### UX and copy
+
+`no_reason_field_ever` (ux):
+The portal never asks a client why they are skipping, rescheduling, or
+canceling. No textbox, no dropdown, no "tell us why" prompt. The client picks
+the action (or the new slot) and confirms. Because reason-collection is
+friction theater that signals the client owes an explanation; it erodes the
+stop-sign promise of frictionless exit and turns a routine action into a
+small negotiation. The data that matters (when, what, gap) is already on the
+row.
+
+`stop_sign_two_taps` (ux):
+The cancel-subscription control in the portal is two taps from portal home,
+with a clear consequence preview between them: tap "Stop my subscription",
+see a screen that lists what cascades (future not-within-24h appointments
+removed; any appointment inside the 24-hour window still charges per
+`within_24h_non_refundable`), tap "Confirm cancel". The two-tap promise is
+marketed on four surfaces: the homepage block, booking step 2 cadence-picker
+tagline, booking step 4 card-entry reassurance, and the portal control
+itself. Homepage copy: "Cancel in two taps. No phone calls, no scripts, no
+guilt." Booking step 2 tagline: "Try it. If it is not for you, cancel in two
+taps." Booking step 4 reassurance: "Cancel anytime in two taps from your
+portal. No questions asked." The portal cancel screen carries no reason
+field per `no_reason_field_ever`. Because frictionless exit is a marketing
+feature that drives signups, and the visible cancel commitment is what makes
+a card-on-file subscription emotionally signable; hard-to-cancel is what
+gives subscriptions their bad name.
+
+`octane_selector_cadence_picker` (ux):
+Booking step 2 presents three cadence options as three buttons laid out left
+to right: "Every 4 weeks" (default, highlighted), "Every 2 weeks", and
+"One-off". Above the buttons sits a horizontal arrow pointing left to right
+with the copy: "Want your dog fresher?" The visual metaphor is a racetrack
+octane selector: same product, increasing freshness as you move up the row.
+The upgrade path is freshness, not savings, per
+`cadence_4wk_or_2wk_same_price`. Because the visual metaphor makes the
+freshness-to-cadence mapping legible at the decision moment, and a clearly
+defaulted 4-week with an obvious "more freshness" path positions the 2-week
+option as upgrade rather than penalty.
+
+`calendar_shows_price_per_date` (ux):
+The portal reschedule date picker displays the price for each candidate date
+on the date itself, hotel/airline style: a cheap Maintenance date and a more
+expensive Reset date look different at a glance. The skip-then-new-pick flow
+uses the same display. Because the reschedule step-up curve is the rule's
+enforcement at the moment of choice; surfacing the price on each candidate
+date is what makes the curve a real decision input rather than a surprise on
+the next invoice.
+
+### Engineering
+
+`string_of_pearls_is_a_service` (engineering):
+The String of Pearls scheduler is built as a backend service from day one,
+callable both from the Hurricane Bath Astro app (direct Supabase RPC) and
+from the legacy doggoneclean.us Squarespace site (CORS-locked Supabase edge
+functions plus an embeddable `/schedule-widget` iframe route). Edge functions
+are service-type aware: `?service=bath` carries Hurricane Bath durations and
+rules, `?service=full-groom` carries the legacy variable durations. Keys are
+domain-locked per `own_infrastructure`. Because the doggoneclean.us rebuild
+is sequenced after Hurricane Bath, but dropping Acuity should not wait that
+long; building the scheduler as a service from day one lets the legacy site
+adopt it via embed while the new site uses it natively.
+
+---
+
 ## Money
 
 `bills_in_person_today` (money):
-Clean bills in person (cash and card, no checks); the right in-person tool is Square (reader plus
-invoices), not Stripe, and online payment is deferred until it earns its place. Because that
-is how the business actually runs; Stripe fits DGN's card-on-file auto-charge model, not
-Clean's pay-after-service model, and inventing an online payment flow before Paul wants one
-would be a mockup.
+Surface-scoped. Legacy Ocala full-grooming (served from doggoneclean.us until its own
+rebuild) bills in person at the appointment: cash and card via Square (reader plus
+invoices), no checks. Stripe is not used on this surface. The Hurricane Bath v2.0 surface
+(hurricanebath.com) is the exception and is governed by `card_on_file_at_signup` +
+`auto_charge_at_24h` (Stripe SetupIntent at booking, charged at the 24-hour mark). Because
+the two surfaces have different operating models: legacy is pay-after-service for known
+clients on a held route, while Hurricane Bath sells a subscription-default product to new
+clients where a card on file is what makes the 24-hour commitment loop work; one payment
+rule cannot serve both without breaking one of them.
 
 `if_payments_added_handle_money_safely` (money):
 If online payment is ever added, store all money in cents (convert to dollars only at the
@@ -376,14 +636,16 @@ a long full groom, and this economics is the engine under Clean's bath-forward r
 not a separate idea. Pairs with `no_doodles`.
 
 `accepted_payment_methods` (money):
-State the accepted-payment list consistently everywhere it appears: cash, Visa, Mastercard,
-American Express, Discover, Apple Pay, Google Pay, and Samsung Pay, all run through Square (the
-in-person processor). No checks. PayPal and Cash App can be taken if a client insists, but are
-deliberately not advertised, because they are an extra hassle and usually a fumble at the trailer.
-The Apple, Google, and Samsung wallets are methods clients pay with and do not conflict with
-`device_profile`, which governs Paul's own tools, not what clients use. Because a clear list stops
-clients wondering whether they need cash or an ATM stop, and naming the wallets removes a friction
-point at the trailer.
+Legacy surface only (doggoneclean.us). State the accepted-payment list consistently
+everywhere it appears on the legacy surface: cash, Visa, Mastercard, American Express,
+Discover, Apple Pay, Google Pay, and Samsung Pay, all run through Square (the in-person
+processor). No checks. PayPal and Cash App can be taken if a client insists, but are
+deliberately not advertised, because they are an extra hassle and usually a fumble at the
+trailer. The Apple, Google, and Samsung wallets are methods clients pay with and do not
+conflict with `device_profile`, which governs Paul's own tools, not what clients use. The
+Hurricane Bath v2.0 surface does not use this list; it is card-on-file Stripe per
+`card_on_file_at_signup`. Because a clear list stops clients wondering whether they need
+cash or an ATM stop, and naming the wallets removes a friction point at the trailer.
 
 `house_shampoo` (service):
 Clean washes everyone with one gentle, well-tolerated house shampoo; a client who wants a

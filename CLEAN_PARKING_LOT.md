@@ -38,21 +38,9 @@ Kernels for the site copy, captured so they are not lost. Not approved and not f
 
 ## Portal and subscription ideas (parked, not ready to use)
 
-- **Two-tap cancellation (kill signup friction).** Paul's idea, 2026-05-25. Rationale: remove
-  any friction or anxiety a prospect feels at signup by making cancellation obviously and
-  visibly easy; counterintuitively, the easier it is to leave, the more willing people are to
-  join. (Paul's analogy: a visible confidence move, like the WWII practice he cites of painting
-  aircraft-carrier decks a bold color.)
-  - **Checkout rule:** a clear "Two Taps to Cancel" guarantee right next to the credit card
-    input, to kill buying anxiety before they sign up.
-  - **Portal UI:** a giant, bright red stop-sign button labeled "Cancel My Subscription" inside
-    the client portal, immediately visible, never hidden.
-  - **Tap one (the warning):** "Are you sure? Canceling instantly forfeits your locked-in rate
-    and your spot on our route."
-  - **Tap two (the exit):** a second tap immediately stops the billing and releases their slot,
-    with zero friction.
-  - Build note: this is subscription cancellation (stop billing, free the route slot), separate
-    from the per-appointment `cancellation_24h` fee; keep the two distinct.
+- **Two-tap cancellation.** LOCKED 2026-05-26 as `stop_sign_two_taps` (see Oracle). The parked
+  idea from 2026-05-25 became the rule the same week; kept here only as a pointer so future
+  sessions do not re-park it.
 
 ## Service eligibility ideas (parked, needs work before use)
 
@@ -97,24 +85,71 @@ are not routed until converted. Verify against the real sheet at conversion time
 
 ## Bigger questions for Paul (decide before the build needs them)
 
-- **Business architecture (RESOLVED 2026-05-24, refined 2026-05-25).** Two businesses, not
-  three: DGN (Dog Gone Nails, new, nails only in the Villages, fully separate) and Clean (this
-  repo, one evolving business, a fork of the DGN platform). Clean's arc: legacy full grooming
-  continues for legacy Ocala clients, while Clean makes a hard pivot to bath only (no-haircut
-  dogs, because haircuts are the cycle-time drag and bath is higher revenue per hour), starting
-  in Ocala where Paul already works and migrating to the Villages as the legacy book winds down.
-  Destination: bath only in the Villages. The separate reinvented bath business folds into Clean
-  by evolving into it. Full decision in the Scroll decisions log. Still parked as forward-looking,
-  not decided: a possible "Dog Gone" brand family named by service (Clean, Walking, Sitting,
-  Training) built as forks of the same platform, each its own instance; and whether Paul
-  ultimately runs a portfolio he keeps or builds units to sell.
-- **Online payment:** DECIDED 2026-05-24. In person via Square; online deferred until it
-  earns its place. The DGN payment/skip/reschedule/card layer is not ported now.
+- **Business architecture (RESOLVED 2026-05-24, refined 2026-05-25 and 2026-05-26).** Two
+  businesses in Paul's portfolio: DGN (Dog Gone Nails, new, nails only in the Villages, fully
+  separate) and Clean (this repo, one evolving business, a fork of the DGN platform). Clean
+  has TWO URL surfaces during the transition. **Legacy** (doggoneclean.us) keeps serving
+  legacy Ocala full-grooming clients on Squarespace + Square + Acuity until its own rebuild.
+  **Hurricane Bath v2.0** (hurricanebath.com) is Clean's new bath-only, subscription-default
+  surface: launches in The Villages with Stripe card-on-file at signup, the locked v2.0 rule
+  pack (founders rate, breed tiers, three-dog cap, free-skip allowance, no-show pause,
+  reschedule step-up, two-tap cancel, etc.). Destination: bath only in the Villages by
+  morphing the same business; the surfaces eventually converge. Still parked as
+  forward-looking, not decided: a possible "Dog Gone" brand family named by service (Clean,
+  Walking, Sitting, Training) built as forks of the same platform, each its own instance; and
+  whether Paul ultimately runs a portfolio he keeps or builds units to sell.
+- **Online payment:** DECIDED 2026-05-24 (legacy only), UPDATED 2026-05-26 (Hurricane Bath
+  is online). Surface-scoped: legacy doggoneclean.us continues in person via Square (see
+  `bills_in_person_today` + `accepted_payment_methods`). Hurricane Bath launches with Stripe
+  card-on-file at signup plus auto-charge at the 24-hour mark, per the new Oracle rules
+  `card_on_file_at_signup` and `auto_charge_at_24h`. DGN's payment/skip/reschedule/card
+  layer IS ported to the Hurricane Bath surface (see the 2026-05-26 decisions log in the
+  Scroll for the 24 captured rules); it is NOT ported to the legacy surface.
 - **Field/operator app:** DECIDED 2026-05-24. Yes, operator app plus pizza tracker in Clean
   v1, forked from DGN. (Pizza-tracker details to come from Paul.)
 - **Paul's FL/GA travel:** still open. Does the biweekly Florida/Georgia travel that shapes
   DGN's Villages schedule also constrain the Clean route, or is it DGN-only? Clean data today
   only has client seasonality (Mary Jane away Jun-Nov), not Paul's own travel.
+
+## Hurricane Bath open decisions (parked from the 2026-05-26 plan)
+
+These do not gate the build but should be resolved as Phase 4 progresses.
+
+- **Cycle time per appointment.** 1 hour placeholder including drive + work; Paul
+  measures real cycle times in The Villages once routes start running. Capacity
+  planning gut estimate also parked: 65% one-dog, 30% two-dog, 5% three-dog.
+  Updates `breed_tier_pricing` and operator-app capacity math.
+- **Tier slug names.** Recommended `smoothcoat` and `doublecoat` per the plan;
+  Paul may rename (candidates considered: `tier_1` / `tier_2`, `quick` /
+  `extended`, `standard` / `extended`, `express` / `full`). Descriptive beats
+  hierarchical because the categories are coat-type differences, not levels.
+- **Breed list refinement.** First attempt at `src/data/breeds.json` lives in
+  Appendix A of the approved plan, with smoothcoat (~52 breeds), doublecoat
+  (~11 breeds, small after Paul's mat/impact exclusion), and a long
+  not_accepted list including all poodles/crosses, Goldens/Aussies/Border
+  Collies (per Paul's call-outs), feathered retrievers/setters, spaniels, toy
+  grooming breeds, long-coat herders, wirehairs, corded/heavy-coat, and the
+  excluded Nordic/spitz/heavy-undercoat group. Mixed-breed dogs route through
+  an eligibility questionnaire. Paul iterates.
+
+## Paul-actions deferred from 2026-05-26 rule capture
+
+Mechanical work that the session could not complete itself.
+
+- **Push the `pre-hurricane-snapshot` git tag** to origin. The tag was created
+  locally on commit `f65a096` but the harness proxy returns HTTP 403 on tag
+  pushes. Local `git push --tags origin` from Paul's machine should
+  propagate it.
+- **Create the private archive repo `doggoneclean-legacy-data`.** The harness
+  scope cannot reach repos outside `doggoneclean-site` and `doggonenails-site`.
+  Until it exists, the `data/` directory is held in `legacy/data/` in this
+  repo (move executed 2026-05-26). When the archive repo exists, move the
+  files there and strip from `main`.
+- **Hurricane Bath Supabase project** (`dgc-prod`): create separate from
+  `dgn-prod`, hand over URL + service-role key.
+- **New Stripe account for Dog Gone Clean.** Separate from DGN's account.
+- **Domain-locked Maps + OAuth keys** for hurricanebath.com (own Google Cloud
+  project per `own_infrastructure`).
 
 ## Saleability (keep the door open)
 
