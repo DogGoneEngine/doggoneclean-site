@@ -99,4 +99,9 @@ PRECOMMIT
 fi
 
 echo ""
+echo "--- done means done ---"
+echo "  UI/frontend task: 'npm run verify' MUST return green before reporting done."
+echo "  Doc/config task:  'python3 scripts/check.py' MUST return AUDIT PASS."
+echo "  See CLAUDE.md 'Stack and commands' for the rule. CI enforces both."
+echo ""
 echo "=== orient complete. read CLAUDE.md, then the Scroll, then CLEAN_ORACLE.md. ==="

@@ -193,8 +193,18 @@ the working stack is Markdown + JSON + git + `python3`, with the Drive MCP tools
 upstream reader and the Supabase MCP tools for the database. `legacy/data/clients.json` stays the
 authoritative client file until the app writes back to Supabase.
 
-- Validate + lint locally: `python3 scripts/check.py` (validates `legacy/data/clients.json`
-  structure and scans tracked docs for em dashes). Run before committing.
+- Validate + lint locally: `python3 scripts/check.py` (full structural audit: data,
+  copy, Oracle/index sync, conflict markers, stale paths, workflows). Pre-commit hook
+  runs this automatically; SessionStart hook installs the pre-commit hook on every
+  session start.
+- Verify a UI change: `npm run verify` (builds, boots preview server, drives the site
+  in headless Chromium at desktop + Pixel-8-Pro widths, fails on any console error, JS
+  exception, failed request, or non-200 page; saves screenshots to `artifacts/`).
+  **A UI or frontend task is not done until `npm run verify` returns green AND you have
+  looked at the screenshots.** Reporting "done" without verify is forbidden. The same
+  script runs in CI; a PR with a red verify is blocked from merging. Browser install
+  needs `npx playwright install chromium` from a network that can reach Playwright's
+  CDN (the harness blocks it, so this runs in CI or on Paul's local machine).
 - Regenerate the DB seed from the source of truth: `python3 scripts/gen_seed_sql.py`
   (writes `supabase/seed.sql` from `legacy/data/clients.json`).
 - Read contact sheets: Drive MCP tools (search_files, get_file_metadata, read_file_content,

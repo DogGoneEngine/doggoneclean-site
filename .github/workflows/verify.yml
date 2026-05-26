@@ -1,0 +1,33 @@
+name: Verify
+
+# Builds the Astro site, boots a local preview server, drives it in headless Chromium,
+# fails on any console error, JS exception, failed network request, or non-200 page.
+# Same script Paul runs locally via `npm run verify`. If this fails on a PR, the PR
+# is blocked from merging.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - run: npm run verify
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-screenshots
+          path: artifacts/
+          if-no-files-found: ignore
