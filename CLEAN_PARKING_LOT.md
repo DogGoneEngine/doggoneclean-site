@@ -23,6 +23,18 @@ approved the visuals) with the master logo (`public/logo.png`) and real content 
   brush wording: the Hurricane Bath and high-velocity dryer do that work, Paul owns no brush.
 - **Logo check.** Confirm the logo renders cleanly on the light page (may need a
   transparent-background version).
+- **Small live-site bugs found 2026-05-26 (none blocking, fix on next site touch):**
+  - **`/portal/` links 404.** The homepage header "Client sign in" link and the hero
+    "Book a visit" primary CTA both point to `/portal/`, which does not exist yet. Real
+    visitors hit a 404. Fix when the portal route lands, or stub with a "coming soon"
+    anchor or a phone-call CTA in the meantime.
+  - **Dead `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var in `deploy.yml`** (line 31), left
+    from the 2026-05-26 verify-gate salvage. Playwright is gone from the project; this is
+    zombie code. Removing it changes nothing functional, just removes one source of
+    confusion for a future reader.
+  - **Unused CSS classes in `src/pages/index.astro`.** The `<style>` block defines
+    `.chips`, `.chips li`, and `.services` rules but no element uses them; leftover from
+    earlier homepage versions. Harmless cruft.
 
 ## Marketing copy ideas (parked, not ready to use)
 

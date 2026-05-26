@@ -119,6 +119,44 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-05-26 (recovery from compounded bad sessions)
+
+Paul came in after losing a night of sleep to compounded bad sessions: one had hallucinated
+and committed nothing, the next had built a Playwright verify-gate that broke the deploy,
+the next had thrashed trying to fix it, and the last had cleaned up the salvage. The
+symptom in front of Paul: "Claude says it made the change, but I don't see it on the live
+site." This recovery session listened first (no theory before Paul's account), then
+verified ground truth from disk and the live site rather than from the prior sessions'
+commit messages, and diagnosed: the live homepage was stale by 8 commits (last published
+was `f3ed2be` at 6:30 AM Eastern; current `main` was `e408d71`). The verify-gate damage
+was already gone from the code, but the GitHub Actions deploy was returning HTTP 403 on
+`git clone` for every push after `f3ed2be`, and the Audit workflow was failing the same
+way. All repo Actions settings checked out as correct. The cause was a transient GitHub
+auth glitch (likely tripped by the morning's commit-storm rate limit on the account); it
+cleared instantly when Paul re-ran the latest failed deploy from the Actions UI, and the
+queue caught up.
+
+Then bumped `actions/checkout@v4` -> `@v5` and `actions/setup-node@v4` -> `@v5` ahead of
+the GitHub Node 20 deprecation (forced upgrade 2026-06-02, removal 2026-09-16); both v5
+versions run on Node 24, deprecation warning is cleared, deploy and audit both verified
+green on the new versions. Sanity-tested the full pipeline with a homepage section swap
+(Hurricane Bath section now precedes "Why Paul built it"), Paul confirmed it landed live.
+
+Two new Oracle rules captured from this recovery: `recovery_from_a_bad_session` (process
+for the next session walking into a compounded bad situation: listen first, verify from
+disk not from prior-session claims, treat prior-session commit messages as an unreliable
+witness, stop on "loop" as Paul's hard-stop word) and `transient_ci_rerun_first`
+(engineering: re-run a failing CI workflow once before pushing a fix-commit; pushing onto
+a jammed pipeline compounds; the 403 today would have stayed broken for another night if
+the response had been another commit instead of a re-run). Both indexed in
+CLEAN_BUSINESS_RULES.md. CLAUDE.md updated: the stale "awaiting `DROPLET_SSH_KEY`" build-gate
+paragraph replaced with current reality (deploy publishes, `audit.yml` runs `check.py` on
+every push); new bullets in "How Paul works" (the loop-stopword recovery protocol) and
+"Stack and commands" (the re-run-first rule). Three small live-site bugs found during the
+audit and parked in CLEAN_PARKING_LOT.md for the next site-touching session: `/portal/`
+links 404 on the homepage CTAs, dead `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var in
+`deploy.yml`, unused CSS classes in `index.astro`.
+
 ### 2026-05-26 (workflow-cap follow-up)
 
 A sibling session on `doggonenails-site`, after cleaning up the verify gate, swept the
@@ -629,12 +667,36 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - Breed list refinement (first attempt seeded for Phase 4; Paul iterates).
 
 ### Paul-actions deferred from these sessions
-- Flip the GitHub default branch to `main` (Settings > Branches) if it is not already.
 - Grant this environment access to the `doggonenails-site` repo so a future session can
   fork the DGN structure.
 - Create the new Dog Gone Clean Stripe account and hand over the publishable + secret keys.
 - Twilio account, number, and A2P registration (SMS + phone login).
 - Already done (do NOT re-do): `dgc-prod` Supabase project exists; Google Maps key
-  domain-locked to hurricanebath.com and the Clean domains; Google sign-in enabled.
-- Repo housekeeping (delete stale `claude/*` branches) is parked as very low priority
-  in CLEAN_PARKING_LOT.md; safe to defer indefinitely.
+  domain-locked to hurricanebath.com and the Clean domains; Google sign-in enabled; GitHub
+  default branch is `main`; stale `claude/*` branches deleted; CI/deploy on Node 24
+  action versions ahead of the 2026-09-16 Node 20 removal.
+
+### Recovery from compounded bad sessions (afternoon)
+- **The "Claude says it changed, I don't see it" symptom traced to a transient GitHub 403
+  on `git clone`.** Cause was outside the code (all repo Actions settings correct, all
+  prior workflow file changes correct), resolved by a single Re-run of the latest failed
+  deploy from the Actions UI. Eight commits caught up at once when the queue cleared.
+- **Two new Oracle rules locked:** `recovery_from_a_bad_session` (process: the next
+  session walking into prior-session damage listens first, verifies from disk not from
+  prior-session claims, treats prior commit messages as unreliable witness, stops on
+  Paul's "loop" stopword) and `transient_ci_rerun_first` (engineering: re-run a failing
+  pipeline once before pushing a fix-commit; pushing compounds). Both indexed.
+- **Node 20 action deprecation cleared.** `actions/checkout@v4` -> `@v5` and
+  `actions/setup-node@v4` -> `@v5` in `deploy.yml` and `audit.yml`; both v5 versions run
+  on Node 24. Verified green end-to-end on the new versions. Cleared well ahead of the
+  2026-06-02 forced upgrade and the 2026-09-16 removal.
+- **Pipeline sanity-tested with a homepage section swap.** Hurricane Bath section now
+  precedes "Why Paul built it" instead of following it. Edit -> commit -> deploy -> live
+  loop confirmed working.
+- **CLAUDE.md updated** to fix the stale "awaiting `DROPLET_SSH_KEY`" build-gate paragraph
+  (deploy publishes; `audit.yml` runs `check.py` in CI) and to reference the two new rules
+  in "How Paul works" and "Stack and commands".
+- **Three small live-site bugs parked** for the next site-touching session: `/portal/`
+  links 404 on the homepage CTAs (Client sign in + Book a visit); dead
+  `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var in `deploy.yml`; unused CSS classes
+  (`.chips`, `.chips li`, `.services`) in `index.astro`.

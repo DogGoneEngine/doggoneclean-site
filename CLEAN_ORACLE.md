@@ -159,6 +159,20 @@ and saying "done" on unverified work compounds (errors aren't caught until later
 in past sessions' "done" claims is destroyed, which is what blew up the afternoon of
 2026-05-26).
 
+`recovery_from_a_bad_session` (process):
+When a prior session has hallucinated, gaslit, or looped and Paul is bringing the wreckage
+into a fresh session, the new session does five things, in order: (1) listen first and let
+Paul describe what is wrong before forming any theory; (2) verify ground truth from the
+file system, live systems, and Paul's account, never from prior-session commit messages or
+Scroll claims; (3) name disagreements between Paul's account and the docs out loud, because
+reality wins (`reality_wins`); (4) propose one verified change at a time, each with a clear
+reversal path; (5) if Paul says "loop" mid-conversation, stop immediately, re-ground from
+disk, and do not defend the prior turn's claims. Because a prior session's commit messages
+and Scroll entries are CLAIMS by an unreliable witness, not ground truth; treating them as
+fact lets the next session re-confirm the hallucination. The cost of pausing to verify is
+low; the cost of compounding a bad session's errors is what Paul walked into on 2026-05-26
+after losing a night of sleep to it.
+
 `ci_workflows_capped_and_validated` (engineering):
 Every GitHub Actions job in `.github/workflows/` must declare `timeout-minutes:` on the
 job, and any new workflow must have been run end-to-end successfully at least once before
@@ -167,6 +181,20 @@ before GitHub kills it, accumulating runs that jam the Actions queue and block a
 deploys (this is exactly what `verify.yml` did on 2026-05-26), and a workflow shipped
 without ever running is shipping a guess. No exceptions for "low-risk" workflows: the cap
 costs one line, the failure mode costs a day.
+
+`transient_ci_rerun_first` (engineering):
+When a GitHub Actions workflow fails with a transient-looking signal (HTTP 403 or 429 from
+GitHub itself, a network timeout, "unable to access" during checkout on a public repo, an
+intermittent service error), the first response is to re-run the workflow once from the
+Actions UI, not to push a fix-commit. Only push when the diagnosis points at the code, the
+workflow file, or repo state that the runner actually sees. Because pushing commits onto a
+failing pipeline compounds the mess: each new commit fires another run that fails the same
+way, and the queue of failed runs jams the deploy chain so even after the transient cause
+clears, queued commits sit unpublished. On 2026-05-26 a transient GitHub 403 on `git
+clone` looked persistent across eight homepage commits, blocked the live site for hours,
+and resolved instantly on a single Re-run of the latest deploy from the Actions UI. A
+one-tap re-run is the cheapest possible diagnostic for "transient versus persistent" and
+costs nothing when the cause turns out to be real.
 
 `no_merge_across_repos` (process):
 Never share, symlink, or merge these docs or infrastructure between the DGN and DGC repos.

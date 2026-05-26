@@ -108,6 +108,13 @@ See `lock_it_in_capture` in the Oracle.
   Pay, or Apple Sign In. Default mobile test target is Pixel + Chrome.
 - **No em dashes** in any copy, code, comments, or docs.
 - **No corporate jargon:** no "reach out," "circle back," "bandwidth," "free up."
+- **When a prior session went bad** (hallucinating, gaslighting, looping) and Paul is bringing
+  the wreckage into this session: listen first before forming any theory; verify ground truth
+  from the file system, live systems, and Paul's account, NOT from prior-session commit
+  messages or Scroll claims (those can be the same unreliable witness that caused the mess);
+  name disagreements out loud (reality wins); propose one verified change at a time. If Paul
+  says "**loop**" mid-conversation, stop immediately, re-ground from disk, do not defend the
+  prior turn's claims. See `recovery_from_a_bad_session` in the Oracle.
 
 - **`main` is the single trunk.** Every session branches FROM `main` and merges BACK INTO
   `main` to count as shipped. Work left on a per-session `claude/*` branch is NOT shipped, no
@@ -214,6 +221,12 @@ authoritative client file until the app writes back to Supabase.
   is proxied), and the Drive, Supabase, and GitHub MCP tools work normally. DogGoneClean.us
   also 403s automated fetches, so to reference the live site ask Paul for screenshots rather
   than reporting that it cannot be seen.
+- **Transient CI failure: re-run before pushing.** When a GitHub Actions job fails with a
+  transient-looking signal (HTTP 403 or 429 from GitHub itself, network timeout, "unable to
+  access" on a public repo), re-run the workflow once from the Actions UI before pushing a
+  fix-commit. Pushing onto a failing pipeline compounds the mess: each new commit fires
+  another run that fails the same way, and the queue jams. See `transient_ci_rerun_first` in
+  the Oracle.
 
 **Planned stack (mirrors DGN; Clean gets its OWN instances, never DGN's).** Astro 5 + React
 18 islands, Node 20, npm. Supabase backend. Deploy: push to main -> GitHub Actions builds
@@ -229,10 +242,18 @@ adding its OWN Caddy site block (hurricanebath.com for staging, doggoneclean.us 
 and its own served directory, reusing the existing Dockerized Caddy rather than installing a
 second web server. The site is NOT Squarespace; do not assume so again.
 
-**Build gate (planned, not built yet).** `npm run build` runs a business-rules lint, then the
-Astro build, then a smoke test, and any step's failure fails the build. The GitHub Actions
-deploy workflow now exists (`.github/workflows/deploy.yml`, awaiting the `DROPLET_SSH_KEY`
-secret to publish); the business-rules lint and smoke test do not exist yet.
+**Build gate (partial; structural lint live in CI, local build-chain not built yet).** The
+structural lint runs in three places off one script: `scripts/check.py` runs on every
+SessionStart, on every local commit via the pre-commit hook the SessionStart installs, and on
+every push and PR via `.github/workflows/audit.yml`. The deploy workflow
+(`.github/workflows/deploy.yml`) publishes on push to `main`: builds Astro, rsyncs `dist/`
+to the droplet over SSH; verified working end-to-end 2026-05-26 after the verify-gate
+disaster was unwound. The not-yet-built part is a single local `npm run build` that chains
+structural lint -> Astro build -> smoke test so a bad copy edit cannot reach staging. The
+verify-gate attempt on 2026-05-26 tried this with Playwright and broke the deploy chain for
+hours; the salvage was `verify_the_change_before_done` (the session verifies the actual
+change, not a tool) plus `ci_workflows_capped_and_validated` (every workflow capped) plus
+`transient_ci_rerun_first` (re-run a failing pipeline once before pushing).
 
 ## Hard constraints
 
