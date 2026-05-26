@@ -73,8 +73,8 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   Twilio account, number, and A2P registration (SMS + phone login). DONE: `dgc-prod` keys
   + DB password; Google Cloud Maps key + Google sign-in; the deploy publishes to
   hurricanebath.com (confirmed live). Also supplies only Paul can give: real photos/video
-  for the showcases, and starting the review-gathering. Repo housekeeping (delete stale
-  `claude/*` branches on GitHub) is parked as very low priority in CLEAN_PARKING_LOT.md.
+  for the showcases, and starting the review-gathering. Repo housekeeping is DONE: GitHub
+  default branch is `main`, all stale `claude/*` branches deleted (2026-05-26).
 - **Moat backlog (parked, do now, not website-gated):** gather Google reviews from
   grateful long-time clients, build an owned before/after photo and video library, start a
   per-appointment data log, keep feeding the Oracle and field manual, and protect the
@@ -197,7 +197,7 @@ hard-separation line per `own_infrastructure` (only `dgn-prod` existed before; n
 Clean's touches it). Wrote the v1 schema (`public.clients` + `public.dogs`) as a migration
 in `supabase/migrations/`, RLS-locked with no policy so only the service role reaches the
 data until portal auth is built (the records carry gate codes and door codes). Added
-`scripts/gen_seed_sql.py`, which turns `data/clients.json` into a reproducible
+`scripts/gen_seed_sql.py`, which turns `legacy/data/clients.json` (then `data/clients.json`, moved 2026-05-26) into a reproducible
 `supabase/seed.sql`, and seeded the project: 47 clients (33 standing, 11 one-off, 2 at-will,
 1 banned) and 61 dogs, prices stored in cents, verified with zero orphans and zero standing
 records missing required fields. Saved the generated TypeScript types to
@@ -249,7 +249,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **Sourcing:** resolve each client to the newest populated contact-sheet doc; never a blank
   template, an old spreadsheet, or the handoff index.
 - **Client corrections (Paul's review):** the full corrected records live in
-  `data/clients.json`. Headline fixes: Kevin Cummings is a 7-dog full-groom account at 6wk
+  `legacy/data/clients.json` (was `data/clients.json` at the time, moved 2026-05-26). Headline fixes: Kevin Cummings is a 7-dog full-groom account at 6wk
   (not a 2-dog nails stop); Mary Beth's Onyx died 6/2025 and Theo is the second dog; Donna
   DiPasqua's dog is Fledge ($100, Monthly); Linda Giza is 3 months; Bradley has one dog;
   Chester lost Windsor; Chloe is Louie only (Boykin Spaniel); Erich is Koby only; Steve and
@@ -290,7 +290,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   business-architecture entry.)
 - **Clean is a fork of the DGN platform.** v1 replaces the current stack feature-for-feature:
   Squarespace -> Astro site; Acuity + confirmations -> portal + String of Pearls + automated
-  notifications; Drive client Docs -> Supabase client book (seeded from `data/clients.json`);
+  notifications; Drive client Docs -> Supabase client book (seeded from `legacy/data/clients.json`);
   Google Voice texting -> SMS; manual location text -> pizza tracker; manual photos ->
   operator-app photo capture and share.
 - **String of Pearls from day one** (not deferred for low density); the one adaptation is
