@@ -241,6 +241,13 @@ require haircuts and have low mat risk. Because cycle time depends on no mat
 surprise, and the premium-inclusive promise breaks if the operator has to charge
 for unexpected work or skip a booked dog at the door.
 
+`villages_only_at_launch` (product):
+Hurricane Bath's service area at launch is The Villages, FL, with the address
+polygon enforced at booking step 1. The schema keeps the zone abstraction so
+later cities can be added without rework. Because launching one zone densely
+beats spreading thin across Florida, and a Villages-shaped route is the operator
+load model the pricing is calibrated against.
+
 ---
 
 ## Money
