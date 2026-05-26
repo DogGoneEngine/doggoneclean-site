@@ -12,7 +12,8 @@ marketing toward higher-profit bath work to attract new clients, and it can expa
 Villages with bath service. There is no separate "new Clean"; the existing book and the new
 direction are the same business being morphed (sending the legacy business to the gym). Clean
 is built as a fork of the proven Dog Gone Nails (DGN) platform, with its own instances and
-infrastructure, never merged with DGN. The authoritative client records in `data/` seed it.
+infrastructure, never merged with DGN. The authoritative legacy client records in `legacy/data/`
+seed the legacy doggoneclean.us rebuild when it happens.
 Treat this as a construction site for the building that is coming.
 
 There are two businesses total: DGN (the flagship, fully separate) and Clean (this repo).
@@ -96,13 +97,18 @@ vocabulary (where "groomer" is banned for "specialist" and "grind/trim" is banne
   doc-ID index pointed at stale/blank duplicates and produced wrong records. Resolve a
   client by listing the folder, taking the most recently modified real file for that name,
   and reading that. Never trust a blank template or an old spreadsheet.
-- **`data/clients.json`** is the authoritative record set: 33 standing + 11 one-off + 2
-  at-will + 1 banned. Fields per client: name, aka/account, status, service type, cadence
-  (value + confidence), dogs, location, access, availability (hard/soft/not-days/seasonal),
-  hardness tag, flags, relationships, explicit `data_gaps`.
-- **`data/route_template.md`** - the recurring zone-day route template for standing clients.
-- **`data/sources.md`** - source priority and the corrected contact-sheet doc-ID index.
-- **`data/README.md`** - provenance, resolved conflicts, open gaps.
+- **`legacy/data/clients.json`** is the authoritative legacy record set: 33 standing + 11
+  one-off + 2 at-will + 1 banned. Fields per client: name, aka/account, status, service
+  type, cadence (value + confidence), dogs, location, access, availability
+  (hard/soft/not-days/seasonal), hardness tag, flags, relationships, explicit `data_gaps`.
+  Moved from `data/` to `legacy/data/` on 2026-05-26 because these records belong to the
+  legacy doggoneclean.us surface, not Hurricane Bath; the legacy site uses them when it is
+  eventually rebuilt.
+- **`legacy/data/route_template.md`** - the recurring zone-day route template for legacy
+  standing clients.
+- **`legacy/data/sources.md`** - source priority and the corrected contact-sheet doc-ID
+  index.
+- **`legacy/data/README.md`** - provenance, resolved conflicts, open gaps.
 - The calendar extract (`dgc_active_enriched`) is rough and unreliable, especially dog info
   and some cadences. Cross-check only, never a record source.
 - The active roster was determined in a prior session by referencing Paul's calendar (past

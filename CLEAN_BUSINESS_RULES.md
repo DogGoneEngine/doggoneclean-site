@@ -24,13 +24,13 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | own_infrastructure | Build | CLAUDE.md "Hard constraints" | infra config |
 | reuse_dgn_stack | Build | CLAUDE.md "Stack"; Oracle | `package.json`, deploy workflow |
 | build_gate | Build | Oracle (planned) | `npm run build` (lint + smoke) |
-| classify_by_frequency | Roster | `clients.json` `status`; `data/README.md` | `business_rules` row |
+| classify_by_frequency | Roster | `clients.json` `status`; `legacy/data/README.md` | `business_rules` row |
 | active_set | Roster | `clients.json` scope; `check.py` (count=33) | `business_rules` row |
 | banned_excluded | Roster | `clients.json` `exclude_from_everything`; **`check.py`** (record flag + absent from route) | `business_rules` row |
 | one_off_not_routed | Roster | `clients.json` `routed:false`; `route_template.md`; **`check.py`** (absent from route) | route-generation code |
 | real_data_only | Data | `clients.json` `data_gaps[]`; convention | n/a |
-| sheets_are_truth | Data | `data/sources.md`; CLAUDE.md | n/a |
-| newest_doc | Data | `data/sources.md` (corrected IDs + caveat); CLAUDE.md | sheet-resolver code |
+| sheets_are_truth | Data | `legacy/data/sources.md`; CLAUDE.md | n/a |
+| newest_doc | Data | `legacy/data/sources.md` (corrected IDs + caveat); CLAUDE.md | sheet-resolver code |
 | reality_wins | Data | Scroll header mandate; convention | n/a |
 | service_type_required | Data | `clients.json` `service_type`; **`check.py`** | DB not-null; `src/business/` |
 | data_gap_explicit | Data | `clients.json` `data_gaps[]`; **`check.py`** | n/a |

@@ -18,8 +18,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-CLIENTS = REPO / "data" / "clients.json"
-ROUTE = REPO / "data" / "route_template.md"
+CLIENTS = REPO / "legacy" / "data" / "clients.json"
+ROUTE = REPO / "legacy" / "data" / "route_template.md"
 
 ALLOWED_SERVICE = {
     "full_groom",
