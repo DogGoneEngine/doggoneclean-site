@@ -405,6 +405,16 @@ stability requires the cost of late changes to be visible at the decision
 moment; calculating from the original date (not today) is what makes the
 curve a real incentive rather than a way to game the picker.
 
+`reschedule_two_paths_for_recurring` (reschedule):
+Recurring clients see two reschedule buttons. "Just this visit" reschedules
+the one appointment, leaves the subscription cadence unchanged, and applies
+the step-up to this visit only. "Change my regular schedule" reschedules this
+appointment AND updates the subscription cadence going forward, applying the
+step-up to this visit and pricing future appointments at the new cadence's
+rate. Because clients reschedule for two different reasons (one-off conflict
+versus an ongoing rhythm change) and conflating them either over-charges
+casual reschedulers or under-charges true cadence changes.
+
 ---
 
 ## Money
