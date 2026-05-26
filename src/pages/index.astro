@@ -29,6 +29,25 @@ const bathPoints = [
   },
 ];
 
+const faqs = [
+  {
+    q: "Is it gentle?",
+    a: "Yes. The pressure dials down to a soft trickle, so faces, eyes, and small or nervous dogs get a soft bath.",
+  },
+  {
+    q: "Is my dog washed in clean water?",
+    a: "The wash recirculates and gets your dog clean the way a dishwasher does. An extra-dirty dog is flushed and washed again with fresh water, and every dog finishes on a clean-water rinse from a separate tank.",
+  },
+  {
+    q: "What shampoo do you use?",
+    a: "A gentle shampoo and conditioner that suits nearly every dog. If your dog needs something specific, medicated, or for a particular condition, bring it and we will use it.",
+  },
+  {
+    q: "How dirty is too dirty?",
+    a: "Just about nothing. Mud from nose to tail is a normal day.",
+  },
+];
+
 ---
 
 <!doctype html>
@@ -54,7 +73,7 @@ const bathPoints = [
     <main>
       <section class="hero">
         <p class="eyebrow">Mobile dog baths in Ocala</p>
-        <h1>A serious bath,<br /><span class="grad">at your door.</span></h1>
+        <h1>Built, <span class="grad">not bought.</span></h1>
         <p class="lede">
           The Hurricane Bath gets your dog genuinely clean, fast, right in your
           driveway. Twenty years of steady hands and one familiar face, with the
@@ -65,6 +84,17 @@ const bathPoints = [
           <a class="button ghost" href="#bath">Meet the Hurricane Bath</a>
         </div>
         <p class="trio">Structured. Reliable. Personal.</p>
+      </section>
+
+      <section class="why">
+        <p class="eyebrow">Why Paul built it</p>
+        <h2>None of the systems he could buy did everything he wanted in one machine.</h2>
+        <p>
+          So he built the one that does. Years of working with the professional
+          systems showed him what to keep and what was missing, and he put all of
+          it into a single machine tuned exactly the way he wants to wash a dog.
+          There is nothing else quite like it, and he is still refining it.
+        </p>
       </section>
 
       <section id="services" class="services">
@@ -83,7 +113,7 @@ const bathPoints = [
 
       <section id="bath" class="bath">
         <p class="eyebrow light">The Hurricane Bath</p>
-        <h2>Built, <span class="grad">not bought.</span></h2>
+        <h2>A serious bath, <span class="grad">at your door.</span></h2>
         <p class="lede">
           The Hurricane Bath moves up to about ten gallons a minute, the kind of
           flow you get from city water, and dials all the way down to a soft
@@ -96,6 +126,21 @@ const bathPoints = [
               <article class="card dark">
                 <h3>{p.head}</h3>
                 <p>{p.body}</p>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="faq">
+        <p class="eyebrow">Questions, answered</p>
+        <h2>Honest answers about the Hurricane Bath.</h2>
+        <div class="qa-list">
+          {
+            faqs.map((f) => (
+              <article class="qa">
+                <h3>{f.q}</h3>
+                <p>{f.a}</p>
               </article>
             ))
           }
@@ -299,8 +344,44 @@ const bathPoints = [
       .power,
       .doorstep,
       .area,
-      .about {
+      .about,
+      .why,
+      .faq {
         padding: 1.8rem 0 2.6rem;
+      }
+      .why h2 {
+        max-width: 40rem;
+        line-height: 1.18;
+      }
+      .why p {
+        font-size: 1.08rem;
+        color: #41506a;
+        max-width: 44rem;
+        margin: 0;
+      }
+      .faq h2 {
+        max-width: 40rem;
+      }
+      .qa-list {
+        display: grid;
+        gap: 0.9rem;
+        max-width: 46rem;
+      }
+      .qa {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 1.1rem 1.3rem;
+        box-shadow: 0 4px 14px rgba(13, 30, 70, 0.04);
+      }
+      .qa h3 {
+        margin: 0 0 0.35rem;
+        font-size: 1.05rem;
+        color: var(--accent);
+      }
+      .qa p {
+        margin: 0;
+        color: #41506a;
       }
       .grid {
         display: grid;
