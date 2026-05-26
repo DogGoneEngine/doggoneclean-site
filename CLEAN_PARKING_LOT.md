@@ -132,24 +132,29 @@ These do not gate the build but should be resolved as Phase 4 progresses.
   excluded Nordic/spitz/heavy-undercoat group. Mixed-breed dogs route through
   an eligibility questionnaire. Paul iterates.
 
-## Paul-actions deferred from 2026-05-26 rule capture
+## Paul-actions still open
 
-Mechanical work that the session could not complete itself.
+Mechanical work the container cannot do itself.
 
-- **Push the `pre-hurricane-snapshot` git tag** to origin. The tag was created
-  locally on commit `f65a096` but the harness proxy returns HTTP 403 on tag
-  pushes. Local `git push --tags origin` from Paul's machine should
-  propagate it.
-- **Create the private archive repo `doggoneclean-legacy-data`.** The harness
-  scope cannot reach repos outside `doggoneclean-site` and `doggonenails-site`.
-  Until it exists, the `data/` directory is held in `legacy/data/` in this
-  repo (move executed 2026-05-26). When the archive repo exists, move the
-  files there and strip from `main`.
-- **Hurricane Bath Supabase project** (`dgc-prod`): create separate from
-  `dgn-prod`, hand over URL + service-role key.
-- **New Stripe account for Dog Gone Clean.** Separate from DGN's account.
-- **Domain-locked Maps + OAuth keys** for hurricanebath.com (own Google Cloud
-  project per `own_infrastructure`).
+- **New Stripe account for Dog Gone Clean.** Separate from DGN's account and Paul's
+  personal account per `own_infrastructure`. Hand over publishable + secret keys for the
+  Hurricane Bath v2.0 surface (gates `card_on_file_at_signup`).
+- **Twilio account, number, and A2P registration.** For SMS notifications and phone-login
+  fallback. Clean's own account, not DGN's.
+- **Grant the remote environment access to `doggonenails-site`** so a future session can
+  read its multi-page structure and fork it into Clean.
+- **Create the private archive repo `doggoneclean-legacy-data` (eventually, not urgent).**
+  The harness scope is limited to `doggoneclean-site` and `doggonenails-site`. For now the
+  records live under `legacy/data/` in this repo, which is fine; move them out only if and
+  when the legacy book moves into Supabase and the static files become true archive.
+
+## Repo housekeeping (very low priority)
+
+- **Delete the stale `claude/*` remote branches** on github.com (Settings > Branches or
+  the branch list). They are leftover session snapshots from before the reconciliation;
+  their content is all in `main`, they cannot deploy (the workflow only fires on `main`),
+  and they conflict with nothing. Only cost is visual clutter in the branch list. Safe to
+  defer indefinitely; do it whenever the list bothers you.
 
 ## Saleability (keep the door open)
 
