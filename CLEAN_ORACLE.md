@@ -426,6 +426,23 @@ stop-sign promise of frictionless exit and turns a routine action into a
 small negotiation. The data that matters (when, what, gap) is already on the
 row.
 
+`stop_sign_two_taps` (ux):
+The cancel-subscription control in the portal is two taps from portal home,
+with a clear consequence preview between them: tap "Stop my subscription",
+see a screen that lists what cascades (future not-within-24h appointments
+removed; any appointment inside the 24-hour window still charges per
+`within_24h_non_refundable`), tap "Confirm cancel". The two-tap promise is
+marketed on four surfaces: the homepage block, booking step 2 cadence-picker
+tagline, booking step 4 card-entry reassurance, and the portal control
+itself. Homepage copy: "Cancel in two taps. No phone calls, no scripts, no
+guilt." Booking step 2 tagline: "Try it. If it is not for you, cancel in two
+taps." Booking step 4 reassurance: "Cancel anytime in two taps from your
+portal. No questions asked." The portal cancel screen carries no reason
+field per `no_reason_field_ever`. Because frictionless exit is a marketing
+feature that drives signups, and the visible cancel commitment is what makes
+a card-on-file subscription emotionally signable; hard-to-cancel is what
+gives subscriptions their bad name.
+
 ---
 
 ## Money
