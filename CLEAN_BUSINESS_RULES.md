@@ -24,33 +24,36 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | no_merge_across_repos | Process | CLAUDE.md "Repo separation" | n/a |
 | persistent_status_update | Process | Oracle; convention | `business_rules` row |
 | dates_use_local_eastern | Process | Oracle; Scroll header mandate; CLAUDE.md | `business_rules` row |
+| lock_it_in_capture | Process | CLAUDE.md; Scroll header mandate; Oracle | `business_rules` row |
+| clean_stays_saleable | Build | CLAUDE.md "Hard constraints"; Oracle | n/a (guardrail, not feature) |
 | no_database_until_rules_agreed | Build | CLAUDE.md "Hard constraints"; Oracle | lifts once rules agreed |
 | own_infrastructure | Build | CLAUDE.md "Hard constraints" | infra config |
 | reuse_dgn_stack | Build | CLAUDE.md "Stack"; Oracle | `package.json`, deploy workflow |
 | build_gate | Build | Oracle (planned) | `npm run build` (lint + smoke) |
-| classify_by_frequency | Roster | `clients.json` `status`; `data/README.md` | `business_rules` row |
-| active_set | Roster | `clients.json` scope; `check.py` (count=33) | `business_rules` row |
-| banned_excluded | Roster | `clients.json` `exclude_from_everything`; **`check.py`** (record flag + absent from route) | `business_rules` row |
-| one_off_not_routed | Roster | `clients.json` `routed:false`; `route_template.md`; **`check.py`** (absent from route) | route-generation code |
+| classify_by_frequency | Roster | `legacy/data/clients.json` `status`; `legacy/data/README.md` | `business_rules` row |
+| active_set | Roster | `legacy/data/clients.json` scope; `check.py` (count=33) | `business_rules` row |
+| banned_excluded | Roster | `legacy/data/clients.json` `exclude_from_everything`; **`check.py`** (record flag + absent from route) | `business_rules` row |
+| one_off_not_routed | Roster | `legacy/data/clients.json` `routed:false`; `legacy/data/route_template.md`; **`check.py`** (absent from route) | route-generation code |
 | no_doodles | Roster | Oracle; convention | intake/booking gate; `business_rules` row |
-| real_data_only | Data | `clients.json` `data_gaps[]`; convention | n/a |
-| sheets_are_truth | Data | `data/sources.md`; CLAUDE.md | n/a |
-| newest_doc | Data | `data/sources.md` (corrected IDs + caveat); CLAUDE.md | sheet-resolver code |
+| real_data_only | Data | `legacy/data/clients.json` `data_gaps[]`; convention | n/a |
+| sheets_are_truth | Data | `legacy/data/sources.md`; CLAUDE.md | n/a |
+| newest_doc | Data | `legacy/data/sources.md` (corrected IDs + caveat); CLAUDE.md | sheet-resolver code |
 | reality_wins | Data | Scroll header mandate; convention | n/a |
-| service_type_required | Data | `clients.json` `service_type`; **`check.py`** | DB not-null; `src/business/` |
-| data_gap_explicit | Data | `clients.json` `data_gaps[]`; **`check.py`** | n/a |
-| cadence_conflict_leans_sheet | Scheduling | `clients.json` `cadence_confidence`/`cadence_note`; **`check.py`** (valid confidence) | `business_rules` row |
-| hardness_respected | Scheduling | `clients.json` `hardness`/`availability`; `route_template.md`; **`check.py`** (valid tag) | scheduling engine |
-| time_is_the_constraint | Scheduling | `route_template.md` design note | scheduling engine |
-| base_is_home_sw | Routing | `clients.json` `_meta`; `route_template.md` | drive-time code |
-| realistic_daily_load | Routing | `route_template.md` capacity notes | scheduling engine |
-| the_slot_is_the_clients | Scheduling | Oracle; `route_template.md` | booking engine |
+| service_type_required | Data | `legacy/data/clients.json` `service_type`; **`check.py`** | DB not-null; `src/business/` |
+| data_gap_explicit | Data | `legacy/data/clients.json` `data_gaps[]`; **`check.py`** | n/a |
+| cadence_conflict_leans_sheet | Scheduling | `legacy/data/clients.json` `cadence_confidence`/`cadence_note`; **`check.py`** (valid confidence) | `business_rules` row |
+| hardness_respected | Scheduling | `legacy/data/clients.json` `hardness`/`availability`; `legacy/data/route_template.md`; **`check.py`** (valid tag) | scheduling engine |
+| time_is_the_constraint | Scheduling | `legacy/data/route_template.md` design note | scheduling engine |
+| use_the_smart_scheduler_from_day_one | Scheduling | Oracle | scheduling engine (String of Pearls fork); v2.0 booking surface |
+| base_is_home_sw | Routing | `legacy/data/clients.json` `_meta`; `legacy/data/route_template.md` | drive-time code |
+| realistic_daily_load | Routing | `legacy/data/route_template.md` capacity notes | scheduling engine |
+| the_slot_is_the_clients | Scheduling | Oracle; `legacy/data/route_template.md` | booking engine |
 | protect_the_operator | Scheduling | Oracle | scheduling engine constants |
 | income_target_caps_the_day | Scheduling | Oracle | scheduling engine constants |
 | heads_up_on_the_way | Scheduling | Oracle | pizza tracker; notifications code |
 | lock_in_timing | Scheduling | Oracle | scheduling engine; notifications code |
-| gated_community_hours | Routing | Oracle; `clients.json` access notes | scheduling engine |
-| bills_in_person_today | Money | Oracle; `clients.json` (per-dog prices) | n/a |
+| gated_community_hours | Routing | Oracle; `legacy/data/clients.json` access notes | scheduling engine |
+| bills_in_person_today | Money | Oracle; `legacy/data/clients.json` (per-dog prices) | n/a |
 | if_payments_added_handle_money_safely | Money | Oracle (deferred) | pricing code; webhook fn |
 | grooming_vocab | Copy | CLAUDE.md; **`check.py`** (dog-qualified, over `src/`) | lint allowlist |
 | cancellation_24h | Money | Oracle | booking engine; site copy |
@@ -60,7 +63,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | online_only_comms | Process | Oracle; convention | site copy; intake; `business_rules` row |
 | friendly_dogs_only | Safety | Oracle; convention | site copy; intake gate |
 | core_is_no_haircut_dogs | Roster | Oracle; convention | site copy; intake |
-| service_area_ocala | Routing | Oracle; `data/` | scheduling engine; intake address check |
+| service_area_ocala | Routing | Oracle; `legacy/data/` | scheduling engine; intake address check |
 | no_dgn_import | Copy | CLAUDE.md; "Repo separation" | lint pattern |
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |
 | no_jargon | Copy | CLAUDE.md; convention | lint pattern |
@@ -79,11 +82,35 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | overlay_opacity_pairs_pointer_events | Engineering | Oracle (carried) | component CSS |
 | smoke_test_on_every_build | Engineering | Oracle (carried) | `scripts/smoke-build.mjs` |
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
+| bath_only_no_mats | Hurricane Bath: product | Oracle | `src/data/breeds.json`; booking-flow gating; lint pattern for accepted-breed list |
+| villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check; `villages` zone config |
+| three_dog_cap | Hurricane Bath: product | Oracle | booking flow dog-count limit; `src/business/pricing.js`; DB constraint on `appointments.dog_count` |
+| premium_inclusive_no_addons | Hurricane Bath: product | Oracle | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy |
+| breed_tier_pricing | Hurricane Bath: pricing | Oracle; `src/data/breeds.json` (Phase 4) | `src/business/pricing.js`; DB `subscriptions.base_price_cents` + `additional_dog_cents`; `business_rules` row |
+| cadence_4wk_or_2wk_same_price | Hurricane Bath: pricing | Oracle | booking step 2 cadence picker; `src/business/pricing.js` quoter |
+| single_oneoff_higher | Hurricane Bath: pricing | Oracle | `src/business/pricing.js` Reset rate = Maintenance + $20 first dog |
+| tiered_founders_rate | Hurricane Bath: pricing | Oracle | `?founders=1` URL handling; `subscriptions.founders_locked_until`; `src/business/pricing.js` |
+| card_on_file_at_signup | Hurricane Bath: money | Oracle | `create-setup-intent` edge function; booking step 4 Stripe Elements; DB `subscriptions.stripe_payment_method_id` not-null |
+| auto_charge_at_24h | Hurricane Bath: money | Oracle | `charge-appointment` edge function (hourly cron); query ceiling `scheduled_start <= NOW() + 24h`; lint pattern banning earlier charge windows |
+| card_expiry_60_30_7 | Hurricane Bath: money | Oracle | `card-expiry-alert` cron; portal banner component; `stripe-webhook` `payment_method.updated` handler |
+| within_24h_non_refundable | Hurricane Bath: money | Oracle | portal cancel/skip button visibility; `portal_cancel_subscription` + `portal_skip_appointment` RPC guards; payment row preserved on cancel |
+| no_show_pause_at_two | Hurricane Bath: money | Oracle | `subscriptions.consecutive_no_shows` counter; auto-pause trigger; portal reactivation flow |
+| one_free_skip_per_52w | Hurricane Bath: skip | Oracle | `subscriptions.last_skip_at`; `portal_skip_appointment` RPC; skip counter in portal |
+| free_skip_keeps_maintenance_rate | Hurricane Bath: skip | Oracle | `portal_skip_appointment` next-appointment pricing branch; portal copy "This is your free skip" |
+| paid_skip_resets_next_visit_to_single_rate | Hurricane Bath: skip | Oracle | `portal_skip_appointment` paid branch; `subscriptions.last_skip_priced_at`; next-appointment `amount_cents` set to Reset rate |
+| five_week_grace_returns_to_maintenance | Hurricane Bath: skip | Oracle | pricing function gap check (skipped -> next visit <= 35d => Maintenance); never surfaced in client copy |
+| reschedule_step_up_weekly | Hurricane Bath: reschedule | Oracle | `src/business/pricing.js` reschedule quoter (curve keyed on days from original); `portal_reschedule_appointment` RPC; calendar price preview |
+| reschedule_two_paths_for_recurring | Hurricane Bath: reschedule | Oracle | portal reschedule UI two-button choice; `portal_reschedule_appointment` `change_cadence` param; subscription cadence update branch |
+| no_reason_field_ever | Hurricane Bath: ux | Oracle | absence of reason textbox/dropdown in skip + reschedule + cancel flows; lint pattern banning `cancel_reason` / `skip_reason` form fields in portal code |
+| stop_sign_two_taps | Hurricane Bath: ux | Oracle | portal cancel flow (2-tap with cascade preview); 4 marketing copy surfaces (homepage, booking step 2, booking step 4, portal); lint pattern asserting copy presence |
+| octane_selector_cadence_picker | Hurricane Bath: ux | Oracle | booking step 2 React component (3 buttons + arrow); locked copy "Want your dog fresher?"; smoke test asserts component renders all 3 options |
+| calendar_shows_price_per_date | Hurricane Bath: ux | Oracle | portal reschedule + skip-pick calendar component (per-date price label); `src/business/pricing.js` quote-per-date helper |
+| string_of_pearls_is_a_service | Hurricane Bath: engineering | Oracle | `get-available-slots` / `create-booking` / `reschedule-appointment` / `skip-appointment` / `stop-subscription` CORS-locked edge functions; `/schedule-widget` iframe route; service-type query param |
 
 ## How to add a row
 
 1. Add the entry to `CLEAN_ORACLE.md` with a real because.
-2. Add what enforcement exists today (a `clients.json` field, a `scripts/check.py` check, or
+2. Add what enforcement exists today (a `legacy/data/clients.json` field, a `scripts/check.py` check, or
    convention) to the "Enforced today" column.
 3. DB rows are deferred until the rules are agreed and a database exists
    (`no_database_until_rules_agreed`). Do not add a `business_rules` migration yet.

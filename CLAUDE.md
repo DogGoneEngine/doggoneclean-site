@@ -16,7 +16,8 @@ migrates from Ocala to the Villages as the legacy full-grooming clients wind dow
 destination is bath only in the Villages, reached by morphing the same business, not by
 standing up a separate "new Clean". Clean
 is built as a fork of the proven Dog Gone Nails (DGN) platform, with its own instances and
-infrastructure, never merged with DGN. The authoritative client records in `data/` seed it.
+infrastructure, never merged with DGN. The authoritative legacy client records in `legacy/data/`
+seed the legacy doggoneclean.us rebuild when it happens.
 Treat this as a construction site for the building that is coming.
 
 There are two businesses total: DGN (Dog Gone Nails, the new nails-only business in the
@@ -127,10 +128,12 @@ See `lock_it_in_capture` in the Oracle.
   on a PR is worth watching. Just ship and report what shipped.
 - **State today:** `main` is the trunk, and the deploy workflow (`.github/workflows/deploy.yml`)
   fires on push to `main`, builds the Astro site, and publishes it to the droplet at
-  hurricanebath.com (staging), which is live and serving the rebuilt homepage. doggoneclean.us
-  still serves the old Squarespace site; flip it to production at launch. A planned build gate
-  (run `scripts/check.py` before deploy) is not wired yet, so a lint-failing push can still
-  reach staging; stand it up so bad copy cannot publish.
+  hurricanebath.com, which is live serving a single-page placeholder. hurricanebath.com is the
+  Dog Gone Clean v2.0 surface (bath-only, subscription-default, The Villages); doggoneclean.us
+  keeps serving the legacy Squarespace site for full-grooming clients indefinitely, until its
+  own separate rebuild. A planned build gate (run `scripts/check.py` before deploy) is not
+  wired yet, so a lint-failing push can still reach staging; stand it up so bad copy cannot
+  publish.
 
 ## Terminology
 
@@ -163,13 +166,18 @@ existing DogGoneClean.us content into this look; do not reinvent the copy. See
   doc-ID index pointed at stale/blank duplicates and produced wrong records. Resolve a
   client by listing the folder, taking the most recently modified real file for that name,
   and reading that. Never trust a blank template or an old spreadsheet.
-- **`data/clients.json`** is the authoritative record set: 33 standing + 11 one-off + 2
-  at-will + 1 banned. Fields per client: name, aka/account, status, service type, cadence
-  (value + confidence), dogs, location, access, availability (hard/soft/not-days/seasonal),
-  hardness tag, flags, relationships, explicit `data_gaps`.
-- **`data/route_template.md`** - the recurring zone-day route template for standing clients.
-- **`data/sources.md`** - source priority and the corrected contact-sheet doc-ID index.
-- **`data/README.md`** - provenance, resolved conflicts, open gaps.
+- **`legacy/data/clients.json`** is the authoritative legacy record set: 33 standing + 11
+  one-off + 2 at-will + 1 banned. Fields per client: name, aka/account, status, service
+  type, cadence (value + confidence), dogs, location, access, availability
+  (hard/soft/not-days/seasonal), hardness tag, flags, relationships, explicit `data_gaps`.
+  Moved from `data/` to `legacy/data/` on 2026-05-26 because these records belong to the
+  legacy doggoneclean.us surface, not Hurricane Bath; the legacy site uses them when it is
+  eventually rebuilt.
+- **`legacy/data/route_template.md`** - the recurring zone-day route template for legacy
+  standing clients.
+- **`legacy/data/sources.md`** - source priority and the corrected contact-sheet doc-ID
+  index.
+- **`legacy/data/README.md`** - provenance, resolved conflicts, open gaps.
 - The calendar extract (`dgc_active_enriched`) is rough and unreliable, especially dog info
   and some cadences. Cross-check only, never a record source.
 - The active roster was determined in a prior session by referencing Paul's calendar (past
@@ -180,15 +188,15 @@ existing DogGoneClean.us content into this look; do not reinvent the copy. See
 **Current state.** A minimal Astro site is scaffolded (a homepage that builds) and the
 database layer exists. Clean's own Supabase project `dgc-prod` (ref `urebdrosrxejhubpbxsa`,
 us-east-1, in the shared "Mount Olympus" org) holds the client book: `public.clients` + `public.dogs`, seeded from
-`data/clients.json`, RLS-locked. Schema-as-code lives in `supabase/migrations/`. The rest of
+`legacy/data/clients.json`, RLS-locked. Schema-as-code lives in `supabase/migrations/`. The rest of
 the working stack is Markdown + JSON + git + `python3`, with the Drive MCP tools as the
-upstream reader and the Supabase MCP tools for the database. `data/clients.json` stays the
+upstream reader and the Supabase MCP tools for the database. `legacy/data/clients.json` stays the
 authoritative client file until the app writes back to Supabase.
 
-- Validate + lint locally: `python3 scripts/check.py` (validates `clients.json` structure
-  and scans tracked docs for em dashes). Run before committing.
+- Validate + lint locally: `python3 scripts/check.py` (validates `legacy/data/clients.json`
+  structure and scans tracked docs for em dashes). Run before committing.
 - Regenerate the DB seed from the source of truth: `python3 scripts/gen_seed_sql.py`
-  (writes `supabase/seed.sql` from `data/clients.json`).
+  (writes `supabase/seed.sql` from `legacy/data/clients.json`).
 - Read contact sheets: Drive MCP tools (search_files, get_file_metadata, read_file_content,
   download_file_content).
 - Reading external web pages: WebFetch is blocked in this remote/web environment (returns 403
@@ -235,9 +243,13 @@ secret to publish); the business-rules lint and smoke test do not exist yet.
   a static site and a Supabase project both move to their own home with low effort before any
   sale. Keep each set of API keys its own (a separate Google Cloud project for Maps and
   OAuth, domain-locked).
-- **Clean is paid in person.** Square for in-person card, cash, and the major wallets (Apple Pay,
-  Google Pay, Samsung Pay); no checks; not Stripe. PayPal and Cash App exist but are not
-  advertised. Online payment is deferred until it earns its place. See `accepted_payment_methods`.
+- **Payment is surface-scoped.** Legacy doggoneclean.us bills in person via Square: card,
+  cash, and the major wallets (Apple Pay, Google Pay, Samsung Pay); no checks; not Stripe.
+  PayPal and Cash App exist but are not advertised. See `bills_in_person_today` +
+  `accepted_payment_methods`. The Hurricane Bath v2.0 surface (hurricanebath.com) is the
+  exception: Stripe card-on-file at signup with auto-charge at the 24-hour mark
+  (`card_on_file_at_signup`, `auto_charge_at_24h`). New Dog Gone Clean Stripe account, not
+  DGN's and not Paul's personal.
 - Real data only. Unknown fields are data gaps, never invented values.
 - No em dashes, anywhere.
 - Grooming terminology is correct here; never import DGN's bans.
