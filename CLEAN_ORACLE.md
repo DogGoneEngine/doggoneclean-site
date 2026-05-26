@@ -284,6 +284,12 @@ freshness upgrade (more visits per year at the recurring rate), not a savings
 play; pricing the higher-frequency option lower would invite gaming and the
 goal is to make freshness, not discount, the upgrade reason.
 
+`single_oneoff_higher` (pricing):
+A single one-off (non-recurring) appointment is priced $20 above the recurring
+first-dog rate per tier. Because a one-off loses the recurring efficiency and
+the slot's annuity value, and the spread is what keeps the recurring offer the
+obvious better deal at the moment of choice.
+
 ---
 
 ## Money
