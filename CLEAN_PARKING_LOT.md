@@ -36,6 +36,24 @@ Kernels for the site copy, captured so they are not lost. Not approved and not f
   Angle: sells the recurring two-week bath cadence as shedding control. Ties straight to the
   bath-forward pivot and to recurring standing visits. Hold until the copy pass.
 
+## Portal and subscription ideas (parked, not ready to use)
+
+- **Two-tap cancellation (kill signup friction).** Paul's idea, 2026-05-25. Rationale: remove
+  any friction or anxiety a prospect feels at signup by making cancellation obviously and
+  visibly easy; counterintuitively, the easier it is to leave, the more willing people are to
+  join. (Paul's analogy: a visible confidence move, like the WWII practice he cites of painting
+  aircraft-carrier decks a bold color.)
+  - **Checkout rule:** a clear "Two Taps to Cancel" guarantee right next to the credit card
+    input, to kill buying anxiety before they sign up.
+  - **Portal UI:** a giant, bright red stop-sign button labeled "Cancel My Subscription" inside
+    the client portal, immediately visible, never hidden.
+  - **Tap one (the warning):** "Are you sure? Canceling instantly forfeits your locked-in rate
+    and your spot on our route."
+  - **Tap two (the exit):** a second tap immediately stops the billing and releases their slot,
+    with zero friction.
+  - Build note: this is subscription cancellation (stop billing, free the route slot), separate
+    from the per-appointment `cancellation_24h` fee; keep the two distinct.
+
 ## Conversion candidates (one-off -> standing)
 
 Leave the one-off list as-is and treat it as people to try to convert to standing where
