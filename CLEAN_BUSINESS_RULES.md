@@ -69,6 +69,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | within_24h_non_refundable | Hurricane Bath: money | Oracle | portal cancel/skip button visibility; `portal_cancel_subscription` + `portal_skip_appointment` RPC guards; payment row preserved on cancel |
 | no_show_pause_at_two | Hurricane Bath: money | Oracle | `subscriptions.consecutive_no_shows` counter; auto-pause trigger; portal reactivation flow |
 | one_free_skip_per_52w | Hurricane Bath: skip | Oracle | `subscriptions.last_skip_at`; `portal_skip_appointment` RPC; skip counter in portal |
+| free_skip_keeps_maintenance_rate | Hurricane Bath: skip | Oracle | `portal_skip_appointment` next-appointment pricing branch; portal copy "This is your free skip" |
 
 ## How to add a row
 

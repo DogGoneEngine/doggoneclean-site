@@ -360,6 +360,14 @@ need a release valve to keep a subscription emotionally easy to keep, but
 unlimited skips destroy route stability and the operator's working-capital
 model.
 
+`free_skip_keeps_maintenance_rate` (skip):
+When a free skip is available and used, the next appointment after the skip
+is charged at the normal recurring (Maintenance) rate. No change, no penalty.
+Portal copy on skip: "This is your free skip. Your next appointment will be
+at your regular rate." Because the free skip is a quiet trust-builder, not a
+fee event; charging extra on the next visit would convert a goodwill
+mechanism into a hidden surcharge clients would resent on discovery.
+
 ---
 
 ## Money
