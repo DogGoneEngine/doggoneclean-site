@@ -22,17 +22,25 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Current focus / next action
 
-- **Direction:** Clean is ONE evolving business and a fork of the DGN platform. Two
-  businesses total: DGN (flagship, fully separate) and Clean (this repo). Clean keeps its
-  existing full-grooming clients while the marketing leans into higher-profit bath work, one
-  portal serves both, and it can expand to the Villages with bath.
+- **Direction:** Clean is ONE evolving business with TWO URL surfaces during the
+  transition. Hurricane Bath at hurricanebath.com is Dog Gone Clean v2.0: a
+  subscription-only, bath-only operation in The Villages with online card-on-file
+  payment. Legacy doggoneclean.us continues serving Ocala full-grooming clients
+  on Squarespace + Square + Acuity until its own rebuild. Both surfaces carry
+  the Dog Gone Clean brand; eventually they converge. Two businesses total in
+  Paul's portfolio: DGN (flagship, fully separate) and Clean (this repo).
 - **State:** client records clean (33 standing, seed-ready); route template drafted; doc and
   handoff system built; strategy, infrastructure, and workflow decisions locked;
   `scripts/check.py` enforces what can be enforced today. Clean is greenlit to build.
-- **Next chapter (best done in a fresh thread):** scaffold the Clean Astro app + bath-forward
-  marketing skeleton (needs no credentials), then the schema as migration files + seed from
-  `data/clients.json`, then the portal shell. Recommended first move: scaffold the Astro app
-  plus marketing skeleton.
+  Hurricane Bath rule set captured into the Oracle on 2026-05-26 (24 new rules,
+  one commit each, all pushed). `pre-hurricane-snapshot` git tag created locally
+  on commit `f65a096`; push to remote blocked by the harness proxy and is a
+  Paul-action.
+- **Next chapter:** Build step 2 of the approved 2026-05-26 plan: scaffold the
+  Astro app plus the bath-forward marketing skeleton. Plan file at
+  `/root/.claude/plans/in-a-different-thread-vivid-spindle.md`. Per
+  `string_of_pearls_is_a_service`, the scheduler is pulled forward of the
+  legacy site rebuild so Acuity can be dropped early.
 - **Needs Paul to unblock the live pieces:** create Clean's own Supabase project and hand
   over URL + keys; create a Google Cloud project with a domain-locked Maps key and OAuth
   client; point hurricanebath.com at the droplet for staging. (If a literal fork of the DGN
@@ -51,17 +59,40 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   the last cadence lock and a rebalance against corrected stop sizes.
 - **Phase 3 - Doc / handoff system.** DONE. CLAUDE.md + this Scroll + CLEAN_ORACLE.md +
   CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + `scripts/check.py`.
-- **Phase 4 - Clean website + ops app (fork of the DGN platform).** GREENLIT, starting.
-  Astro marketing site (bath-forward) + client portal (existing + new clients) + String of
-  Pearls scheduling + operator app with photos + pizza tracker + SMS notifications, on
-  Clean's own Supabase project, seeded from `data/clients.json`. In-person payment (Square).
-  Preview on hurricanebath.com until doggoneclean.us flips at launch.
+- **Phase 4 - Clean website + ops app (fork of the DGN platform).** STARTED 2026-05-26.
+  Rule capture complete (24 Hurricane Bath rules committed to the Oracle, one
+  per commit). Next: Astro scaffold + bath-forward marketing skeleton. Build
+  per the approved 2026-05-26 plan: Hurricane Bath at hurricanebath.com is the
+  subscription bath-only surface with online card-on-file payment, premium-
+  inclusive pricing, and the String of Pearls scheduler exposed as a service
+  consumable from the legacy doggoneclean.us Squarespace site so Acuity can be
+  dropped before the legacy rebuild. Operator app + pizza tracker + SMS
+  notifications + Resend email all forked from DGN. Clean's own Supabase
+  project (`dgc-prod`); new Stripe account for Dog Gone Clean. Legacy
+  doggoneclean.us continues on Squarespace + Square + Acuity (with the
+  scheduler swapped out) until its own rebuild later.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 
 ---
 
 ## Session history
+
+### 2026-05-26 (Hurricane Bath rule capture + plan reconciliation)
+
+A prior 2026-05-26 thread did extensive planning for Hurricane Bath (Dog Gone
+Clean v2.0) but admitted late that it had hallucinated and committed nothing.
+The session's ExitPlanMode body survived in Claude Code's side panel and was
+re-pasted into the recovery session. The pasted plan was reconciled against
+DGN's canonical skip/reschedule policy (per Paul's "use the dgn policy"
+instruction) and against Paul's in-chat correction to the breed list
+("exclude any breed that can mat or impact"). The final plan was approved
+and the locked rule set was captured into the Oracle one rule per commit,
+24 commits, all pushed. The `pre-hurricane-snapshot` git tag was created
+locally at `f65a096`; pushing it to the remote was blocked by the harness
+proxy with HTTP 403 and is a Paul-action. Forensic record of the two failed
+sessions and recovery procedure was produced inline for Paul to save outside
+the container.
 
 ### 2026-05-24 (one long session)
 
@@ -162,3 +193,71 @@ sessions add their own dated section below.
 ### Facts for the record
 - **Domain:** the live site is www.DogGoneClean.us. Paul does NOT own DogGoneClean.com.
   Staging/preview on hurricanebath.com (a domain Paul owns).
+
+---
+
+## Decisions log (2026-05-26)
+
+### Hurricane Bath plan reconciliation (RESOLVED)
+- **One business, two URL surfaces.** Dog Gone Clean is the business. Hurricane
+  Bath (hurricanebath.com) is the new subscription bath-only surface. Legacy
+  doggoneclean.us is the existing Squarespace surface for full-grooming clients,
+  sunsetting eventually. They converge later; for now they coexist with the
+  String of Pearls scheduler shared between them as a service. This supersedes
+  the 2026-05-24 "preview on hurricanebath.com until doggoneclean.us flips at
+  launch" framing, per `reality_wins`.
+- **Online payment for Hurricane Bath only.** The 2026-05-24 decision "online
+  deferred until it earns its place" still applies to legacy doggoneclean.us,
+  which stays on Square. Hurricane Bath launches with Stripe card-on-file plus
+  auto-charge at the 24-hour mark, per the new `card_on_file_at_signup` and
+  `auto_charge_at_24h` rules. `bills_in_person_today` is explicitly scoped to
+  the legacy surface only by the new rules' becauses; it is not deleted.
+- **DGN's skip and reschedule policy is ported verbatim** for Hurricane Bath
+  per Paul's "use the dgn policy" instruction. Source: DGN
+  `SCROLL_OF_HEPHAESTUS.md` sections 6.2 to 6.8 and DGN `ORACLE.md`. Skip and
+  reschedule are distinct curves: a paid skip jumps in one step to the
+  single-visit rate, while a reschedule beyond grace steps up weekly.
+  Reverses the 2026-05-24 parking-lot line "The DGN payment/skip/reschedule/
+  card layer is not ported now" for the Hurricane Bath surface only.
+
+### Rules captured into the Oracle (24, one commit each)
+- Product scope: `bath_only_no_mats`, `villages_only_at_launch`, `three_dog_cap`,
+  `premium_inclusive_no_addons`.
+- Pricing: `breed_tier_pricing`, `cadence_4wk_or_2wk_same_price`,
+  `single_oneoff_higher`, `tiered_founders_rate`.
+- Money flow: `card_on_file_at_signup`, `auto_charge_at_24h`,
+  `card_expiry_60_30_7`, `within_24h_non_refundable`, `no_show_pause_at_two`.
+- Skip and reschedule (ported from DGN canon): `one_free_skip_per_52w`,
+  `free_skip_keeps_maintenance_rate`,
+  `paid_skip_resets_next_visit_to_single_rate`,
+  `five_week_grace_returns_to_maintenance`, `reschedule_step_up_weekly`,
+  `reschedule_two_paths_for_recurring`.
+- UX: `no_reason_field_ever`, `stop_sign_two_taps`,
+  `octane_selector_cadence_picker`, `calendar_shows_price_per_date`.
+- Engineering: `string_of_pearls_is_a_service`.
+
+### Meta-Rule on every-decision-survives-a-redesign
+The four defense layers are: Oracle (rationale, locked today) ->
+`business_rules` DB row (deferred until DB lands per
+`no_database_until_rules_agreed`) -> code mirror in `src/business/`
+(deferred until Phase 4 scaffold) -> lint pattern in
+`scripts/lint-business-rules.mjs` (deferred until scaffold). Every new
+Hurricane Bath rule lands in the Oracle today and in the right-hand columns
+as Phase 4 scaffolds; CLEAN_BUSINESS_RULES.md tracks the migration.
+
+### Open decisions (captured in CLEAN_PARKING_LOT.md)
+- Cycle time per appointment (1hr placeholder; Paul measures in Villages).
+- Tier slug names (smoothcoat / doublecoat recommended; Paul may rename).
+- Breed list refinement (first attempt seeded for Phase 4; Paul iterates).
+
+### Paul-actions deferred from this session
+- Push the `pre-hurricane-snapshot` git tag (the harness proxy returns 403 on
+  tag pushes; the tag exists locally at `f65a096`).
+- Create the private archive repo `doggoneclean-legacy-data` (the harness
+  scope is limited to the existing repos). The plan calls for moving the
+  current `data/` contents there eventually; for now they are held under
+  `legacy/data/` in this repo.
+- Create the Hurricane Bath Supabase project (`dgc-prod`) and hand over URL +
+  keys.
+- Create the new Stripe account for Dog Gone Clean.
+- Domain-lock the Google Maps and OAuth keys for hurricanebath.com.
