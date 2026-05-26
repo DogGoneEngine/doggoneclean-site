@@ -78,6 +78,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | stop_sign_two_taps | Hurricane Bath: ux | Oracle | portal cancel flow (2-tap with cascade preview); 4 marketing copy surfaces (homepage, booking step 2, booking step 4, portal); lint pattern asserting copy presence |
 | octane_selector_cadence_picker | Hurricane Bath: ux | Oracle | booking step 2 React component (3 buttons + arrow); locked copy "Want your dog fresher?"; smoke test asserts component renders all 3 options |
 | calendar_shows_price_per_date | Hurricane Bath: ux | Oracle | portal reschedule + skip-pick calendar component (per-date price label); `src/business/pricing.js` quote-per-date helper |
+| string_of_pearls_is_a_service | Hurricane Bath: engineering | Oracle | `get-available-slots` / `create-booking` / `reschedule-appointment` / `skip-appointment` / `stop-subscription` CORS-locked edge functions; `/schedule-widget` iframe route; service-type query param |
 
 ## How to add a row
 

@@ -464,6 +464,20 @@ enforcement at the moment of choice; surfacing the price on each candidate
 date is what makes the curve a real decision input rather than a surprise on
 the next invoice.
 
+### Engineering
+
+`string_of_pearls_is_a_service` (engineering):
+The String of Pearls scheduler is built as a backend service from day one,
+callable both from the Hurricane Bath Astro app (direct Supabase RPC) and
+from the legacy doggoneclean.us Squarespace site (CORS-locked Supabase edge
+functions plus an embeddable `/schedule-widget` iframe route). Edge functions
+are service-type aware: `?service=bath` carries Hurricane Bath durations and
+rules, `?service=full-groom` carries the legacy variable durations. Keys are
+domain-locked per `own_infrastructure`. Because the doggoneclean.us rebuild
+is sequenced after Hurricane Bath, but dropping Acuity should not wait that
+long; building the scheduler as a service from day one lets the legacy site
+adopt it via embed while the new site uses it natively.
+
 ---
 
 ## Money
