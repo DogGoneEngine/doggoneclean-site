@@ -443,6 +443,18 @@ feature that drives signups, and the visible cancel commitment is what makes
 a card-on-file subscription emotionally signable; hard-to-cancel is what
 gives subscriptions their bad name.
 
+`octane_selector_cadence_picker` (ux):
+Booking step 2 presents three cadence options as three buttons laid out left
+to right: "Every 4 weeks" (default, highlighted), "Every 2 weeks", and
+"One-off". Above the buttons sits a horizontal arrow pointing left to right
+with the copy: "Want your dog fresher?" The visual metaphor is a racetrack
+octane selector: same product, increasing freshness as you move up the row.
+The upgrade path is freshness, not savings, per
+`cadence_4wk_or_2wk_same_price`. Because the visual metaphor makes the
+freshness-to-cadence mapping legible at the decision moment, and a clearly
+defaulted 4-week with an obvious "more freshness" path positions the 2-week
+option as upgrade rather than penalty.
+
 ---
 
 ## Money
