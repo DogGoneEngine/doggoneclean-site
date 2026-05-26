@@ -100,8 +100,9 @@ fi
 
 echo ""
 echo "--- done means done ---"
-echo "  UI/frontend task: 'npm run verify' MUST return green before reporting done."
-echo "  Doc/config task:  'python3 scripts/check.py' MUST return AUDIT PASS."
-echo "  See CLAUDE.md 'Stack and commands' for the rule. CI enforces both."
+echo "  Before reporting done, verify the specific change you made does what was asked."
+echo "  Targeted on the change, not a generic 'nothing broken' sweep: load the affected"
+echo "  page, re-read the affected record, run the affected rule. A clean build is not"
+echo "  verification. See 'verify_the_change_before_done' in the Oracle."
 echo ""
 echo "=== orient complete. read CLAUDE.md, then the Scroll, then CLEAN_ORACLE.md. ==="

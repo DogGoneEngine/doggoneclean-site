@@ -197,14 +197,14 @@ authoritative client file until the app writes back to Supabase.
   copy, Oracle/index sync, conflict markers, stale paths, workflows). Pre-commit hook
   runs this automatically; SessionStart hook installs the pre-commit hook on every
   session start.
-- Verify a UI change: `npm run verify` (builds, boots preview server, drives the site
-  in headless Chromium at desktop + Pixel-8-Pro widths, fails on any console error, JS
-  exception, failed request, or non-200 page; saves screenshots to `artifacts/`).
-  **A UI or frontend task is not done until `npm run verify` returns green AND you have
-  looked at the screenshots.** Reporting "done" without verify is forbidden. The same
-  script runs in CI; a PR with a red verify is blocked from merging. Browser install
-  needs `npx playwright install chromium` from a network that can reach Playwright's
-  CDN (the harness blocks it, so this runs in CI or on Paul's local machine).
+- **Verify the change before reporting done.** Before saying a task is finished, verify
+  that the specific change you just made does what was asked. Targeted on the change, not
+  a generic regression sweep: for a UI change, load the affected page in a real browser
+  and confirm the thing you changed renders the way you intended; for a data or config
+  change, re-read the record and confirm the value; for a rule change, run
+  `python3 scripts/check.py` and confirm the rule is in force. A clean `npm run build`
+  is necessary but not sufficient: the build can pass and the change can still not do
+  what was asked. See `verify_the_change_before_done` in the Oracle.
 - Regenerate the DB seed from the source of truth: `python3 scripts/gen_seed_sql.py`
   (writes `supabase/seed.sql` from `legacy/data/clients.json`).
 - Read contact sheets: Drive MCP tools (search_files, get_file_metadata, read_file_content,

@@ -148,6 +148,17 @@ the pipeline exists.)
 Do not offer to subscribe to PR activity or watch the deploy. Because there are no separate
 reviewers and no PR-level CI, so nothing on a PR is worth watching in this solo-dev setup.
 
+`verify_the_change_before_done` (process):
+Before reporting a task as done, verify that the specific change just made does what was
+asked. Targeted on the change, not a generic "nothing broken" sweep: for a UI change, load
+the affected page and confirm the thing you changed renders the way you intended; for a
+data or config change, re-read the affected record and confirm the value; for a rule
+change, run `python3 scripts/check.py` and confirm the rule is in force. Because a clean
+build is not verification: a build can pass and the change can still not do what was asked,
+and saying "done" on unverified work compounds (errors aren't caught until later, and trust
+in past sessions' "done" claims is destroyed, which is what blew up the afternoon of
+2026-05-26).
+
 `no_merge_across_repos` (process):
 Never share, symlink, or merge these docs or infrastructure between the DGN and DGC repos.
 Because merged history and shared infrastructure mis-apply rules across products.

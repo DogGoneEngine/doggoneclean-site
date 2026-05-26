@@ -119,6 +119,38 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-05-26 (verify-gate salvage)
+
+The prior 2026-05-26 session shipped a Playwright-based `verify.yml` CI workflow without a
+`timeout-minutes` cap and without ever running it end-to-end successfully. Every run hung;
+six accumulated and jammed the Actions queue, blocking deploys for the last several
+homepage commits. The session flailed through five commits trying to cancel the hung runs
+via concurrency groups (which cannot retroactively cancel in-progress runs) and ended with
+`verify.yml` deleted but `scripts/verify.mjs` and the npm `verify` script and `playwright`
+devDep left in place, and `CLAUDE.md` still pointing future sessions at `npm run verify`
+as the required "done means done" gate. Three lessons recorded inline below; salvage in
+this session was scoped to what Paul authorized as an outcome: "rules a session reads at
+orient match reality."
+
+Removed: `scripts/verify.mjs`, the `verify` npm script, and the `playwright` devDep.
+Rewrote the `CLAUDE.md` Stack-and-commands entry and the session-start orient footer to
+state the outcome ("verify the specific change you made does what was asked"), not the
+broken mechanism. Added Oracle rule `verify_the_change_before_done` (process), indexed in
+`CLEAN_BUSINESS_RULES.md`. Did NOT touch: the audit pipeline (`scripts/check.py`,
+`audit.yml`, pre-commit hook, SessionStart hook orient logic) which is sound and proven
+green every session; `deploy.yml` which has a working `timeout-minutes: 5` cap and the
+right `--omit=dev` for Astro. The hung Verify runs in the Actions tab are waiting on
+GitHub's ~6h timeout to clear; they cannot be cancelled by tools available to a session.
+The next deploy will pick up the latest `main` (homepage commit `72a1f10` plus this
+cleanup) once the queue unjams.
+
+Lessons (encoded in the new Oracle rule):
+- Reporting "done" on unverified work compounds. A clean build is not verification.
+- A CI workflow shipped without being run end-to-end is shipping a guess. Job-level
+  `timeout-minutes` is non-negotiable.
+- When a remedy is not working, stop adding commits. Flailing leaves more debris than the
+  original mistake.
+
 ### 2026-05-26 (root-cause fix: GitHub default branch)
 
 Found the actual root cause of the "every session starts on a stale branch" failure

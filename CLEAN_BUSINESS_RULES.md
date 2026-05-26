@@ -21,6 +21,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | dig_the_moat | Process | CLAUDE.md "How Paul works"; Oracle | `business_rules` row |
 | ship_to_completion | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | no_pr_activity_subscription_nudge | Process | CLAUDE.md "Shipping" | `business_rules` row |
+| verify_the_change_before_done | Process | CLAUDE.md "Stack and commands"; session-start orient footer; convention | `business_rules` row |
 | no_merge_across_repos | Process | CLAUDE.md "Repo separation" | n/a |
 | persistent_status_update | Process | Oracle; convention | `business_rules` row |
 | dates_use_local_eastern | Process | Oracle; Scroll header mandate; CLAUDE.md | `business_rules` row |
