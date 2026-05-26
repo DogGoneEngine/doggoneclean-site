@@ -66,17 +66,15 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   pages, then a real copy pass on the placeholder hero. Then the portal shell with auth
   (first RLS policies land with auth), scheduling tables forked from DGN's String of
   Pearls, and the `business_rules` table mirroring the Oracle.
-- **Needs Paul to unblock the remaining pieces:** (1) flip the GitHub default branch to
-  `main` (Settings > Branches) and delete the stale `claude/*` branches (branch delete is
-  blocked from this environment, so it is Paul's click); (2) push the local
-  `pre-hurricane-snapshot` tag at `f65a096` (harness proxy 403s tag push); (3) grant this
-  environment access to the `doggonenails-site` repo so the next session can fork the DGN
-  structure; (4) create the Dog Gone Clean Stripe account (separate from any DGN/personal
-  account per `own_infrastructure`) and hand over the publishable + secret keys; (5)
-  Clean's own Twilio account, number, and A2P registration (SMS + phone login). DONE:
-  `dgc-prod` keys + DB password; Google Cloud Maps key + Google sign-in; the deploy
-  publishes to hurricanebath.com (confirmed live). Also supplies only Paul can give: real
-  photos/video for the showcases, and starting the review-gathering.
+- **Needs Paul to unblock the remaining pieces:** (1) grant this environment access to
+  the `doggonenails-site` repo so the next session can fork the DGN structure; (2) create
+  the Dog Gone Clean Stripe account (separate from any DGN/personal account per
+  `own_infrastructure`) and hand over the publishable + secret keys; (3) Clean's own
+  Twilio account, number, and A2P registration (SMS + phone login). DONE: `dgc-prod` keys
+  + DB password; Google Cloud Maps key + Google sign-in; the deploy publishes to
+  hurricanebath.com (confirmed live). Also supplies only Paul can give: real photos/video
+  for the showcases, and starting the review-gathering. Repo housekeeping (delete stale
+  `claude/*` branches on GitHub) is parked as very low priority in CLEAN_PARKING_LOT.md.
 - **Moat backlog (parked, do now, not website-gated):** gather Google reviews from
   grateful long-time clients, build an owned before/after photo and video library, start a
   per-appointment data log, keep feeding the Oracle and field manual, and protect the
@@ -152,11 +150,8 @@ DGN's canonical skip/reschedule policy (per Paul's "use the dgn policy"
 instruction) and against Paul's in-chat correction to the breed list
 ("exclude any breed that can mat or impact"). The final plan was approved
 and the locked rule set was captured into the Oracle one rule per commit,
-24 commits, all pushed. The `pre-hurricane-snapshot` git tag was created
-locally at `f65a096`; pushing it to the remote was blocked by the harness
-proxy with HTTP 403 and is a Paul-action. Forensic record of the two failed
-sessions and recovery procedure was produced inline for Paul to save outside
-the container. (This session was performed on the stale `f65a096` base, not
+24 commits, all pushed. Forensic record of the two failed sessions and
+recovery procedure was produced inline for Paul to save outside the container. (This session was performed on the stale `f65a096` base, not
 on `main`; that branch divergence was reconciled in the 2026-05-26 scroll
 reconciliation entry above.)
 
@@ -579,13 +574,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - Breed list refinement (first attempt seeded for Phase 4; Paul iterates).
 
 ### Paul-actions deferred from these sessions
-- Flip the GitHub default branch to `main` (Settings > Branches) and delete the stale
-  `claude/*` remote branches (branch delete is blocked from this environment).
-- Push the `pre-hurricane-snapshot` git tag at `f65a096` (the harness proxy returns 403 on
-  tag pushes; the tag exists locally).
+- Flip the GitHub default branch to `main` (Settings > Branches) if it is not already.
 - Grant this environment access to the `doggonenails-site` repo so a future session can
   fork the DGN structure.
 - Create the new Dog Gone Clean Stripe account and hand over the publishable + secret keys.
 - Twilio account, number, and A2P registration (SMS + phone login).
 - Already done (do NOT re-do): `dgc-prod` Supabase project exists; Google Maps key
   domain-locked to hurricanebath.com and the Clean domains; Google sign-in enabled.
+- Repo housekeeping (delete stale `claude/*` branches) is parked as very low priority
+  in CLEAN_PARKING_LOT.md; safe to defer indefinitely.
