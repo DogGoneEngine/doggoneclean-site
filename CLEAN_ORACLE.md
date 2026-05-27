@@ -280,21 +280,42 @@ Banned clients (Bonnie DiGraziano) are excluded everywhere: records, routes, sum
 Because a client Paul has fired must never resurface in a plan.
 
 `toes_over_the_precipice` (roster):
-A client who treats the operator as a suspect ends as a client. The trigger is
-a no-cause accusation against the operator (or anyone present at the appointment)
-of harming a dog, or a demand for supervised-only or restricted-presence
-conditions inside the trailer. Do not try to win them back, and do not accept
-the conditions, because both legitimize an accusation that should simply end
-the relationship. The trust required to be alone with someone's dog cannot be
-partially restored. Once that suspicion is held it never leaves: every future
-off-day for the dog becomes the operator's fault with no possible defense,
-because you cannot disprove something that never happened. Profitability and
-tenure do not cancel this calculus; revenue hides the risk, it does not cancel
-it. A client standing with their toes over the edge of that precipice is a
-liability on every visit no matter how much they pay. Recorded from the
-2026-04-24 incident with a 5-year client; the full text exchange is preserved
-in the 2026-05-27 decisions log entry in CLEAN_SCROLL_OF_HEPHAESTUS.md. Pairs
-with `banned_excluded` (which is the data-side rule once a relationship has
+A client who treats the operator as a suspect ends as a client. The
+trigger is not the request the client makes; it is the accusation
+underneath it. A client asking to sit in the trailer because their dog
+is anxious, asking the operator to call before arrival, asking for a
+shorter trim, asking the operator to use their own shampoo, asking to
+reschedule, asking to skip the ears because they are sore: these are
+normal customer-service requests and are not this rule. The precipice
+is a no-cause accusation against the operator (or anyone present at the
+appointment) of harming a dog, or a demand for supervised-only or
+restricted-presence conditions inside the trailer that flows from such
+an accusation. The distinguishing test: is the client treating the
+operator as a service provider with a request (fine, accommodate
+within reason), or as a suspect with a condition (this rule fires).
+Do not try to win them back, and do not accept the conditions, because
+both legitimize an accusation that should simply end the relationship.
+The trust required to be alone with someone's dog cannot be partially
+restored. Once the suspicion is held it never leaves: every future
+off-day for the dog becomes the operator's fault with no possible
+defense, because you cannot disprove something that never happened.
+And the discipline this rule asks for is exactly because the client
+was profitable. A first-time, troublesome, or unprofitable client
+making the same accusation is easy to cut loose; a five-year, very
+profitable client making it is the actual test of this rule. The
+comfort of established revenue creates the urge to negotiate, to
+accept the conditions, to keep the income flowing. That urge is the
+booby trap. A long-time profitable client who has crossed the trust
+boundary is not a profitable client anymore; they are a future
+scenario in which a real or imagined off-day becomes a legal or
+reputational incident, and the revenue does not begin to cover that
+downside risk. The harder the choice feels, the more this rule is
+exactly the rule that should make it. A client standing with their
+toes over the edge of that precipice is a liability on every visit no
+matter how much they pay. Recorded from the 2026-04-24 incident with a
+5-year client; the full text exchange is preserved in the 2026-05-27
+decisions log entry in CLEAN_SCROLL_OF_HEPHAESTUS.md. Pairs with
+`banned_excluded` (which is the data-side rule once a relationship has
 been ended; this rule is the strategic rule for when to end it).
 
 `one_off_not_routed` (roster):
