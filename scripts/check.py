@@ -578,6 +578,129 @@ def check_rule_survival():
         "'we do not bath' (the eligibility no header)",
     )
 
+    # ── no_dgn_import ─────────────────────────────────────────────────────
+    # DGN's nail vocabulary must not appear on Clean's bath surface.
+    # Scoped to customer-facing pages and components; the Field Manual
+    # and other internal docs can mention these terms internally.
+    dgn_nail_vocab = [
+        (r"rotary tool", "rotary tool"),
+        (r"sculpt nails", "sculpt nails"),
+        (r"grind nails", "grind nails"),
+    ]
+    customer_pages = [home, villages, process_page, book, portal, terms,
+                      PAGES / "privacy.astro", PAGES / "sms.astro"]
+    for page in customer_pages:
+        for pat, label in dgn_nail_vocab:
+            require_absent(
+                page, pat, "no_dgn_import",
+                f"DGN nail vocab '{label}' (Clean is bath only, not nails)",
+            )
+
+    # ── no_jargon ─────────────────────────────────────────────────────────
+    # Corporate jargon must not appear in customer-facing copy. "free up"
+    # is scoped to its banned context "free up the slot" to avoid
+    # tripping on legitimate sentences like "free up your weekend."
+    jargon = [
+        (r"\breach out\b", "'reach out'"),
+        (r"\bcircle back\b", "'circle back'"),
+        (r"\bbandwidth\b", "'bandwidth' as a corporate noun"),
+        (r"free up the slot", "'free up the slot'"),
+    ]
+    for page in customer_pages:
+        for pat, label in jargon:
+            require_absent(page, pat, "no_jargon", label)
+
+    # ── reminder_voice ────────────────────────────────────────────────────
+    # The banned-phrase list from `reminder_voice`. "Arrival window" is
+    # already covered by `appointment_block_not_window` so it is not
+    # duplicated here.
+    reminder_banned = [
+        (r"friendly reminder", "'friendly reminder'"),
+        (r"just a reminder", "'just a reminder'"),
+        (r"reaching out", "'reaching out'"),
+        (r"please be advised", "'please be advised'"),
+        (r"\blast chance\b", "'last chance'"),
+        (r"make changes now", "'make changes now'"),
+    ]
+    for page in customer_pages:
+        for pat, label in reminder_banned:
+            require_absent(page, pat, "reminder_voice", label)
+
+    # ── founders_spots_remaining_counter ──────────────────────────────────
+    # The counter element must exist on /the-villages even though its
+    # display is gated until remaining drops below the threshold. A
+    # redesign that drops the element means the counter never lights up
+    # when sign-ups roll in.
+    require_present(
+        villages,
+        r'id="launch-spot-count"',
+        "founders_spots_remaining_counter",
+        "'id=\"launch-spot-count\"' element (the counter target)",
+        flags=0,
+    )
+
+    # ── supabase_rpc_not_raw_fetch ────────────────────────────────────────
+    # Forbid `fetch(...SUPABASE_URL...)` in portal code: this is the raw
+    # REST call pattern that causes auth-lock conflicts. Edge function
+    # calls via `callPortalEdge()` go through the supabase client's
+    # `.functions.invoke()` or a separate session-token path and do not
+    # match this pattern, so legitimate calls are not flagged.
+    portal_dir = COMPONENTS / "portal"
+    if portal_dir.exists():
+        for path in sorted(portal_dir.rglob("*.js*")):
+            if not path.is_file():
+                continue
+            text = _read(path)
+            if text is None:
+                continue
+            normalized = re.sub(r"\s+", " ", text)
+            if re.search(r"fetch\([^)]*SUPABASE_URL", normalized):
+                failures.append(
+                    f"{path.relative_to(REPO)}: forbidden pattern for rule "
+                    f"'supabase_rpc_not_raw_fetch': raw fetch() against "
+                    f"SUPABASE_URL (use sb().rpc() / sb().from() instead; "
+                    f"raw fetch causes auth-lock conflicts)"
+                )
+
+    # ── auth_listener_sets_state_only ─────────────────────────────────────
+    # The onAuthStateChange callback must set state only. Network calls
+    # (.from(...), await fetch(...)) inside the callback recurse into
+    # the same auth-lock conflict. Scan portal code for these patterns
+    # inside an onAuthStateChange( ... ) block.
+    if portal_dir.exists():
+        for path in sorted(portal_dir.rglob("*.js*")):
+            if not path.is_file():
+                continue
+            text = _read(path)
+            if text is None:
+                continue
+            # Locate each onAuthStateChange( ... ) block by paren-matching.
+            for m in re.finditer(r"onAuthStateChange\s*\(", text):
+                depth = 1
+                i = m.end()
+                while i < len(text) and depth > 0:
+                    if text[i] == "(":
+                        depth += 1
+                    elif text[i] == ")":
+                        depth -= 1
+                    i += 1
+                block = text[m.end() : i]
+                forbidden_in_block = [
+                    (r"\.from\(", ".from() database call"),
+                    (r"\.rpc\(", ".rpc() database call"),
+                    (r"\bawait\s+fetch\b", "await fetch() network call"),
+                    (r"loadPortalData\(", "loadPortalData() network call"),
+                ]
+                for pat, label in forbidden_in_block:
+                    if re.search(pat, block):
+                        line = text.count("\n", 0, m.start()) + 1
+                        failures.append(
+                            f"{path.relative_to(REPO)}:{line}: forbidden pattern for "
+                            f"rule 'auth_listener_sets_state_only': {label} inside "
+                            f"onAuthStateChange callback (set state only; do network "
+                            f"calls in a separate useEffect that watches auth state)"
+                        )
+
 
 def main():
     check_clients()

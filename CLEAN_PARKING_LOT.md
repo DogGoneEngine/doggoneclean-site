@@ -58,11 +58,13 @@ small slice once the table is being written to).
   the `cities` table and the next build picks it up.
 - ~~Customer-facing rules survive a major website redesign only because
   the only thing standing between a redesigner and dropping them was my
-  copy~~ FIXED 2026-05-27. 19 rules now have `scripts/check.py` patterns
-  that fail the build if their customer-facing expression goes missing.
-  Going-forward expectation hardened in the Oracle's "How to add a
-  rule" section: lint enforcement lands the same commit as the rule
-  by default.
+  copy~~ FIXED 2026-05-27. 25 rules (every Clean rule with a site-or-portal
+  expression) now have `scripts/check.py` patterns that fail the build
+  if their expression goes missing. The one rule still deferred is
+  `cancellation_24h`, whose exact wording applies to the legacy
+  doggoneclean.us surface that has not been rebuilt. Going-forward
+  expectation hardened in the Oracle's "How to add a rule" section:
+  lint enforcement lands the same commit as the rule by default.
 
 **Still open for Paul (mechanical, container cannot do):**
 - **Copy pass (real work still needed in some places).** The eight-page site uses

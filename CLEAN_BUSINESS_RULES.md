@@ -70,20 +70,20 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | friendly_dogs_only | Safety | Oracle; site copy; **`check.py`** asserts "friendly dogs" + "aggression" present on `index.astro` and `the-villages.astro` | intake gate |
 | core_is_no_haircut_dogs | Roster | Oracle; site copy; **`check.py`** asserts "bath only" present on `the-villages.astro` and `process.astro` | intake gate |
 | service_area_ocala | Routing | Oracle; `legacy/data/` | scheduling engine; intake address check |
-| no_dgn_import | Copy | CLAUDE.md; "Repo separation" | lint pattern |
+| no_dgn_import | Copy | CLAUDE.md; "Repo separation"; **`check.py`** forbids "rotary tool" / "sculpt nails" / "grind nails" on customer-facing pages | n/a |
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |
-| no_jargon | Copy | CLAUDE.md; convention | lint pattern |
+| no_jargon | Copy | CLAUDE.md; **`check.py`** forbids "reach out", "circle back", "bandwidth", "free up the slot" on customer-facing pages | n/a |
 | device_profile | Copy | CLAUDE.md "How Paul works" | n/a |
 | neural_expressive_design | Design | CLAUDE.md "Design language"; Oracle; design tokens in `src/styles/global.css`; **`check.py`** asserts `--accent`, `--accent2`, `--ink`, `--bg` tokens present in `global.css` | restyle lint that asserts token *values* unchanged (the present lint only asserts presence) |
 | website_is_ground_zero | Copy | Oracle; convention | build copy check |
-| reminder_voice | Copy | Oracle; convention | lint pattern (banned phrases) |
+| reminder_voice | Copy | Oracle; **`check.py`** forbids "friendly reminder", "just a reminder", "reaching out", "please be advised", "last chance", "make changes now" on customer-facing pages (arrival window already covered by appointment_block_not_window) | n/a |
 | dont_knock_competitors | Copy | Oracle; convention | lint pattern |
 | appointment_block_not_window | Copy | Oracle; **`check.py`** forbids "arrival window" anywhere in `src/pages/index.astro`, `the-villages.astro`, `process.astro` | n/a |
 | language_bank | Copy | Oracle; site copy; **`check.py`** asserts "belongs to the process" present on `process.astro` | additional banked-line presence checks as the bank grows |
 | no_trailer_graphics | Copy | Oracle | n/a (real-world) |
 | maps_js_api_only | Engineering | Oracle (carried) | code + lint when site exists |
-| supabase_rpc_not_raw_fetch | Engineering | Oracle (carried) | code + `raw_fetch` lint |
-| auth_listener_sets_state_only | Engineering | Oracle (carried) | portal code |
+| supabase_rpc_not_raw_fetch | Engineering | Oracle (carried); **`check.py`** forbids `fetch(...SUPABASE_URL...)` pattern in `src/components/portal/` (catches raw REST without flagging legitimate edge-function calls) | n/a |
+| auth_listener_sets_state_only | Engineering | Oracle (carried); **`check.py`** scans `onAuthStateChange((...))` blocks in `src/components/portal/` and forbids `.from(`, `.rpc(`, `await fetch(`, `loadPortalData(` inside them | n/a |
 | nav_no_backdrop_filter | Engineering | Oracle (carried); **`check.py`** forbids "backdrop-filter" anywhere in `src/components/Nav.astro` | n/a |
 | overlay_opacity_pairs_pointer_events | Engineering | Oracle (carried) | component CSS |
 | smoke_test_on_every_build | Engineering | Oracle (carried) | `scripts/smoke-build.mjs` |
@@ -112,7 +112,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | stop_sign_two_taps | Hurricane Bath: ux | Oracle; **`check.py`** asserts "two taps" present on `index.astro`, `the-villages.astro`, `book.astro`, `terms.astro`, and `src/components/portal/PortalApp.jsx` (the four-surfaces requirement from the Oracle) | portal cancel flow (2-tap with cascade preview) when the cancel RPC lands |
 | octane_selector_cadence_picker | Hurricane Bath: ux | Oracle | booking step 2 React component (3 buttons + arrow); locked copy "Want your dog fresher?"; smoke test asserts component renders all 3 options |
 | calendar_shows_price_per_date | Hurricane Bath: ux | Oracle | portal reschedule + skip-pick calendar component (per-date price label); `src/business/pricing.js` quote-per-date helper |
-| founders_spots_remaining_counter | Hurricane Bath: ux | Oracle | `/the-villages` page `#launch-spot-count` element (hidden above threshold, fed by public read on counted subscriptions); threshold constant in `src/business/pricing.js` |
+| founders_spots_remaining_counter | Hurricane Bath: ux | Oracle; `/the-villages` page `#launch-spot-count` element (hidden above threshold, fed by public read on counted subscriptions); **`check.py`** asserts `id="launch-spot-count"` present on `the-villages.astro` | threshold constant in `src/business/pricing.js`; counter JS wires up when `bath_subscriptions` is being written to |
 | founders_cap_statement_always_visible | Hurricane Bath: ux | Oracle; `/the-villages` launch card eyebrow + headline + subhead + terms-grid tile (cap stated four places, always visible, independent of the counter element); **`check.py`** asserts "households" appears 2+ times in customer-facing copy on `the-villages.astro` | n/a |
 | single_visit_as_own_path | Hurricane Bath: ux | Oracle; `/the-villages` "Other ways in" section (single-visit card with its own CTA `/book?plan=single`, alongside standard recurring); **`check.py`** asserts `/book?plan=single` CTA href present on `the-villages.astro` | booking-flow plan picker (top-level choice before card entry) |
 | string_of_pearls_is_a_service | Hurricane Bath: engineering | Oracle | `get-available-slots` / `create-booking` / `reschedule-appointment` / `skip-appointment` / `stop-subscription` CORS-locked edge functions; `/schedule-widget` iframe route; service-type query param |

@@ -155,6 +155,40 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-05-27 (redesign-survival closure)
+
+Closed the remaining six gaps so the rulebook fully survives a major
+website redesign. Added six narrowly-scoped lint patterns to
+`scripts/check.py`:
+
+- `no_dgn_import`: forbids DGN nail vocab ("rotary tool", "sculpt nails",
+  "grind nails") on customer-facing pages.
+- `no_jargon`: forbids "reach out", "circle back", "bandwidth", and
+  "free up the slot" (the slot-context phrasing, not "free up"
+  generally, to avoid tripping on legitimate sentences).
+- `reminder_voice`: forbids the banned-phrase list ("friendly
+  reminder", "just a reminder", "reaching out", "please be advised",
+  "last chance", "make changes now").
+- `founders_spots_remaining_counter`: asserts `id="launch-spot-count"`
+  present on `/the-villages` (the counter element).
+- `supabase_rpc_not_raw_fetch`: forbids `fetch(...SUPABASE_URL...)` in
+  `src/components/portal/` (the raw-REST-call pattern). Legitimate
+  edge-function calls via the client's `.functions.invoke()` and the
+  separate-session-token path do not match this regex.
+- `auth_listener_sets_state_only`: paren-matches each
+  `onAuthStateChange((...))` block and forbids `.from(`, `.rpc(`,
+  `await fetch(`, `loadPortalData(` inside it. The current portal
+  separates these (the listener sets state, a useEffect watches auth
+  state and calls `loadPortalData()`), so the lint passes.
+
+All 25 customer-facing and engineering rules with site-or-portal
+expressions are now build-time enforced. The lint caught zero
+false-positives on its first run, confirming the patterns are scoped
+narrowly enough not to risk normal operations. `cancellation_24h`
+remains the one rule with its lint deferred (its exact-wording
+requirement applies to the legacy doggoneclean.us surface that has
+not been rebuilt yet).
+
 ### 2026-05-27 (redesign-survival hardening)
 
 Paul asked the audit question: if a future session does a major website
