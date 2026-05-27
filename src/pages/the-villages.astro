@@ -2,18 +2,33 @@
 // src/pages/the-villages.astro
 // Hurricane Bath city page for The Villages. The conversion surface.
 //
+// Pricing and the founders cap are hydrated at build time from the
+// `cities` row in dgc-prod (single source of truth, `if_payments_added_
+// handle_money_safely`). Hardcoded literals removed 2026-05-27 to close
+// the drift risk where a price change in the DB would not propagate to
+// the page.
+//
 // Honors the locked Hurricane Bath v2.0 rules:
 //  - breed_tier_pricing: smoothcoat / doublecoat tiers
 //  - three_dog_cap: max 3 dogs, $20 decrement
 //  - tiered_founders_rate: $55 smooth / $80 double, 12 months, ?founders=1
 //  - founders_spots_remaining_counter: counter element ships here; JS that
 //    queries bath_subscriptions lands in the chapter that creates the table
+//  - founders_cap_statement_always_visible: cap stated in eyebrow,
+//    headline, subhead, and a tile in the terms-grid
+//  - single_visit_as_own_path: "Other ways in" section has its own card
+//    + CTA for the single-visit option, not a row inside a recurring card
 //  - cadence_4wk_or_2wk_same_price: 4wk default, 2wk freshness upgrade
 //  - premium_inclusive_no_addons: one price per tier, no upsells
 //  - specialist_named_not_promised: Paul named with photo placeholder
 //  - villages_only_in_copy: this page is Villages-only, no other cities
 
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCityBySlug, cityTiers } from '../lib/cities.js';
+
+const city = await getCityBySlug('the-villages');
+const tiers = cityTiers(city);
+const FOUNDERS_CAP = city.hb_founders_cap;
 
 const apptSteps = [
   'We park in your driveway and set up the trailer.',
@@ -28,25 +43,6 @@ const reminders = [
   'Reminder one day before',
   'Reminder the morning of',
   'Heads up text when we are on the way, with a live tracker',
-];
-
-const tiers = [
-  {
-    key: 'smooth',
-    label: 'Smoothcoat',
-    sub: 'Single coat, short hair. Labs, Boxers, Pointers, and friends.',
-    recurring: 75,
-    single: 95,
-    founders: 55,
-  },
-  {
-    key: 'double',
-    label: 'Doublecoat',
-    sub: 'Short or medium double coat that sheds without matting.',
-    recurring: 100,
-    single: 120,
-    founders: 80,
-  },
 ];
 ---
 
@@ -86,12 +82,12 @@ const tiers = [
       <div class="launch-card">
         <div class="launch-card__eyebrow">
           <span class="launch-card__dot" aria-hidden="true"></span>
-          Founders rate &middot; First 25 households
+          Founders rate &middot; First {FOUNDERS_CAP} households
         </div>
 
-        <h2 class="launch-card__headline">Be one of the first 25 households on the route.</h2>
+        <h2 class="launch-card__headline">Be one of the first {FOUNDERS_CAP} households on the route.</h2>
         <p class="launch-card__sub">
-          The founders rate is reserved for the first 25 households in
+          The founders rate is reserved for the first {FOUNDERS_CAP} households in
           The Villages to sign up. Your rate locks for 12 months from
           the day you start. When the tier fills, the price moves up
           and does not come back.
@@ -118,7 +114,7 @@ const tiers = [
 
         <div class="launch-card__terms-grid">
           <div class="launch-card__term">
-            <strong>25 households.</strong>
+            <strong>{FOUNDERS_CAP} households.</strong>
             The cap is real. The route is sized around it.
           </div>
           <div class="launch-card__term">
