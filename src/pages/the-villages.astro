@@ -86,14 +86,15 @@ const tiers = [
       <div class="launch-card">
         <div class="launch-card__eyebrow">
           <span class="launch-card__dot" aria-hidden="true"></span>
-          The Villages launch pricing
+          Founders rate &middot; First 25 households
         </div>
 
-        <h2 class="launch-card__headline">Founders rate, locked for 12 months.</h2>
+        <h2 class="launch-card__headline">Be one of the first 25 households on the route.</h2>
         <p class="launch-card__sub">
-          You are early. This rate is reserved for the first households on
-          the route. After 12 months, your rate moves to the then current
-          recurring price.
+          The founders rate is reserved for the first 25 households in
+          The Villages to sign up. Your rate locks for 12 months from
+          the day you start. When the tier fills, the price moves up
+          and does not come back.
         </p>
 
         <div class="launch-card__tiers">
@@ -104,21 +105,35 @@ const tiers = [
                 <span class="launch-tier__dollar">$</span>
                 <span class="launch-tier__num">{t.founders}</span>
               </div>
-              <div class="launch-tier__per">per visit, founders rate</div>
+              <div class="launch-tier__per">per visit, every 4 weeks (or 2)</div>
+              <div class="launch-tier__compare">Saves ${t.recurring - t.founders} per visit vs standard recurring</div>
             </div>
           ))}
         </div>
 
-        <!-- founders_spots_remaining_counter: hidden until the JS that reads
-             from bath_subscriptions lands (same chapter that creates the table). -->
+        <!-- Counter: hidden until remaining drops below 10 per
+             `founders_spots_remaining_counter`. The cap statement above
+             is always visible; the live count appears when scarcity is real. -->
         <div id="launch-spot-count" class="launch-card__spots" hidden></div>
 
-        <hr class="launch-card__divider" />
-
-        <p class="launch-card__terms">
-          One price per tier. No add ons. No surprise charges. Card on file
-          at signup. Cancel any time, in two taps from your portal.
-        </p>
+        <div class="launch-card__terms-grid">
+          <div class="launch-card__term">
+            <strong>25 households.</strong>
+            The cap is real. The route is sized around it.
+          </div>
+          <div class="launch-card__term">
+            <strong>12 months locked.</strong>
+            Your rate cannot move during your first year.
+          </div>
+          <div class="launch-card__term">
+            <strong>No add ons.</strong>
+            One price per visit, charged the day before.
+          </div>
+          <div class="launch-card__term">
+            <strong>Two-tap cancel.</strong>
+            Anytime, from your portal. No phone calls.
+          </div>
+        </div>
 
         <a href="/book?founders=1" class="launch-card__cta">
           Claim my founders rate
@@ -128,43 +143,68 @@ const tiers = [
     </div>
   </section>
 
-  <!-- REGULAR PRICING -->
-  <section class="section pricing-section" id="pricing">
+  <!-- OTHER WAYS TO BOOK -->
+  <section class="section other-ways-section" id="pricing">
     <div class="container">
       <div class="text-center">
-        <p class="section-label">Standard pricing</p>
-        <h2 class="section-title">Simple, two tiers, one price each.</h2>
+        <p class="section-label">Other ways in</p>
+        <h2 class="section-title">Not ready for founders? Two more ways.</h2>
         <p class="section-subtitle section-subtitle--center">
-          Cycle time depends on coat type, so the price does too. Beyond
-          that, no add ons, no upsells. The price you see is the price
-          you pay.
+          Either option uses the same Hurricane Bath, the same booking
+          flow, and the same two-tap cancel. The price is the only
+          thing that moves.
         </p>
       </div>
 
-      <div class="pricing-grid">
-        {tiers.map(t => (
-          <article class="pricing-card">
-            <div class="pricing-card__type">{t.label}</div>
-            <p class="pricing-card__sub">{t.sub}</p>
-            <div class="pricing-card__rows">
-              <div class="pricing-row">
-                <div class="pricing-row__label">Recurring (every 4 or 2 weeks)</div>
-                <div class="pricing-row__price">${t.recurring}</div>
+      <div class="other-ways-grid">
+        <article class="other-way">
+          <div class="other-way__eyebrow">Try us once</div>
+          <h3>Single visit</h3>
+          <p class="other-way__desc">
+            Book one bath. No subscription. If you love it (you will),
+            move to recurring whenever you are ready.
+          </p>
+          <div class="other-way__rows">
+            {tiers.map(t => (
+              <div class="other-way__row">
+                <span class="other-way__row-label">{t.label}</span>
+                <span class="other-way__row-price">${t.single}</span>
               </div>
-              <div class="pricing-row">
-                <div class="pricing-row__label">Single visit</div>
-                <div class="pricing-row__price">${t.single}</div>
+            ))}
+          </div>
+          <a class="button button--ghost button--block" href="/book?plan=single">
+            Book a single visit
+          </a>
+        </article>
+
+        <article class="other-way">
+          <div class="other-way__eyebrow">After founders fills</div>
+          <h3>Standard recurring</h3>
+          <p class="other-way__desc">
+            When the founders cohort fills, this is the rate. Recurring
+            every four weeks (or every two, same price). Cancel any
+            time in two taps.
+          </p>
+          <div class="other-way__rows">
+            {tiers.map(t => (
+              <div class="other-way__row">
+                <span class="other-way__row-label">{t.label}</span>
+                <span class="other-way__row-price">${t.recurring}</span>
               </div>
-            </div>
-          </article>
-        ))}
+            ))}
+          </div>
+          <a class="button button--ghost button--block" href="/book">
+            Start recurring
+          </a>
+        </article>
       </div>
 
       <p class="pricing-fineprint">
-        Up to three dogs per visit. Each additional dog is $20 less than
-        the prior dog in the same tier. Mixed breeds route through a quick
-        eligibility check at booking. Inside the 24 hour mark before your
-        visit, the card on file is charged and the appointment is locked.
+        Up to three dogs per visit. Each additional dog is $20 less
+        than the prior dog in the same tier. Mixed breeds route through
+        a quick eligibility check at booking. Once a visit enters the
+        24 hour window, the card on file is charged and the appointment
+        is locked.
       </p>
     </div>
   </section>
@@ -439,9 +479,17 @@ const tiers = [
     font-size: var(--text-xs);
     color: var(--muted);
   }
+  .launch-tier__compare {
+    margin-top: var(--space-xs);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.02em;
+  }
   .launch-card__spots {
-    background: rgba(37, 99, 235, 0.08);
+    background: linear-gradient(100deg, rgba(37, 99, 235, 0.12), rgba(6, 182, 212, 0.12));
     color: var(--accent);
+    border: 1px solid rgba(37, 99, 235, 0.2);
     border-radius: var(--radius-md);
     padding: var(--space-md);
     text-align: center;
@@ -449,15 +497,28 @@ const tiers = [
     font-weight: 700;
     margin-bottom: var(--space-lg);
   }
-  .launch-card__divider {
-    border: none;
-    border-top: 1px solid var(--line);
-    margin: 0 0 var(--space-lg);
+  .launch-card__terms-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
   }
-  .launch-card__terms {
+  @media (max-width: 540px) {
+    .launch-card__terms-grid { grid-template-columns: 1fr; }
+  }
+  .launch-card__term {
+    background: var(--surface-alt);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
     font-size: var(--text-sm);
     color: var(--soft);
-    margin-bottom: var(--space-xl);
+    line-height: 1.5;
+  }
+  .launch-card__term strong {
+    display: block;
+    color: var(--ink);
+    margin-bottom: 2px;
   }
   .launch-card__cta {
     display: flex;
@@ -482,29 +543,31 @@ const tiers = [
   }
   .launch-card__arrow { font-size: 1.2em; line-height: 1; }
 
-  /* PRICING */
-  .pricing-section {
+  /* OTHER WAYS TO BOOK */
+  .other-ways-section {
     background: var(--surface-alt);
     border-block: 1px solid var(--line);
   }
-  .pricing-grid {
+  .other-ways-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-lg);
-    max-width: 760px;
+    max-width: 820px;
     margin: var(--space-2xl) auto 0;
   }
   @media (max-width: 700px) {
-    .pricing-grid { grid-template-columns: 1fr; }
+    .other-ways-grid { grid-template-columns: 1fr; }
   }
-  .pricing-card {
+  .other-way {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
   }
-  .pricing-card__type {
+  .other-way__eyebrow {
     font-size: var(--text-xs);
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -512,32 +575,47 @@ const tiers = [
     color: var(--accent2);
     margin-bottom: var(--space-sm);
   }
-  .pricing-card__sub {
-    font-size: var(--text-sm);
+  .other-way h3 {
+    color: var(--accent);
+    margin: 0 0 var(--space-sm);
+    font-size: var(--text-2xl);
+  }
+  .other-way__desc {
     color: var(--soft);
     margin: 0 0 var(--space-lg);
+    font-size: var(--text-sm);
+    line-height: 1.6;
   }
-  .pricing-card__rows {
+  .other-way__rows {
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
   }
-  .pricing-row {
+  .other-way__row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     border-top: 1px solid var(--line);
     padding-top: var(--space-md);
   }
-  .pricing-row__label {
+  .other-way__row:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+  .other-way__row-label {
     font-size: var(--text-sm);
     color: var(--ink);
+    font-weight: 600;
   }
-  .pricing-row__price {
+  .other-way__row-price {
     font-family: var(--font-display);
     font-size: var(--text-2xl);
     font-weight: 800;
     color: var(--accent);
+  }
+  .other-way .button {
+    margin-top: auto;
   }
   .pricing-fineprint {
     max-width: 720px;
