@@ -1,0 +1,362 @@
+---
+// src/pages/process.astro
+// How a Hurricane Bath visit unfolds, start to finish. Same editorial
+// treatment as DGN's Process page: intro, the beats, the standard
+// belongs to the process. The detail lives here so the home page can
+// stay punchy.
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const beats = [
+  {
+    name: 'Set up',
+    desc: 'We pull into your driveway, level the trailer, and bring the climate controlled interior up to working condition. Air conditioning, dehumidifier, and high velocity dryers are ready before your dog steps in.',
+  },
+  {
+    name: 'Soak',
+    desc: 'A dry double coat shrugs full pressure right off. So we start soft, dialing the nozzle down to wet the dog through and lift the worst of what is on the surface before the real wash starts.',
+  },
+  {
+    name: 'Drive water to the skin',
+    desc: 'With the dog wet, pressure dials up and the recirculating system pushes water and shampoo through the coat down to the skin, where a real clean actually happens. The lever stays in our hand the whole time. Faces, eyes, and sensitive spots get the soft setting; the rest of the dog gets what its coat needs.',
+  },
+  {
+    name: 'Flush if filthy',
+    desc: 'When a dog is genuinely caked, the wash water turns to a mud puddle. We flush the whole system, refill with clean water, and wash again. As many times as it takes. The system is fast enough that a second or third pass is no trouble. The dog washes up the way an already clean dog does.',
+  },
+  {
+    name: 'Clean tank finish',
+    desc: 'Every dog finishes the same way: a fresh water rinse from a separate tank. The recirculation gets the work done; the clean tank ends it.',
+  },
+  {
+    name: 'Dry in the trailer',
+    desc: 'Drying is a one two punch. The dehumidifier pulls moisture out of the air so it lifts off the coat. The high velocity dryer pushes the rest off. Inside a trailer held around 30 percent humidity, drying time falls by more than half. Your dog walks out dry, not damp.',
+  },
+];
+---
+
+<BaseLayout
+  title="The Process | Dog Gone Clean Hurricane Bath"
+  description="How a Hurricane Bath unfolds, start to finish. Six steps. Same sequence, every dog. Built around the bath the way the bath was built around the dog."
+>
+
+  <!-- HERO -->
+  <section class="process-hero">
+    <div class="glow glow-a"></div>
+    <div class="container">
+      <p class="eyebrow">How we work</p>
+      <h1>The Process</h1>
+      <p class="process-hero__sub">
+        Your dog needs a bath. That is the job. Here is what happens
+        while we are doing it.
+      </p>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="section process-intro">
+    <div class="container">
+      <div class="process-intro__grid">
+        <div>
+          <h2>None of the systems Paul could buy did everything he wanted in one machine.</h2>
+          <p>
+            So he built the one that does. Years working with the
+            commercial wash systems taught him what to keep and what was
+            missing, and he put all of it into a single rig tuned exactly
+            the way he wants to bath a dog.
+          </p>
+          <p>
+            The Hurricane Bath is the result, and it is still being
+            refined. The bath itself is built to do one thing very well:
+            get a dog genuinely clean, calmly, without leaving home.
+          </p>
+          <p>
+            We are incapable of doing this halfway. The bath is broken
+            into the steps below, in the same order, every time. Not
+            because that makes it interesting. Because the result is
+            measurably better when the work is repeatable.
+          </p>
+        </div>
+        <div class="process-intro__stats">
+          <div class="process-stat">
+            <div class="process-stat__num">6</div>
+            <p class="process-stat__label">Defined steps.<br />Same sequence, every dog.</p>
+          </div>
+          <div class="process-stat">
+            <div class="process-stat__num process-stat__num--word">~10 GPM</div>
+            <p class="process-stat__label">Peak flow. About what you get from city water, in a mobile rig.</p>
+          </div>
+          <div class="process-stat">
+            <div class="process-stat__num process-stat__num--word">~5 gal</div>
+            <p class="process-stat__label">Typical wash and rinse. The power is in how water moves, not how much.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEATS -->
+  <section class="section beats-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">The protocol</p>
+        <h2 class="section-title">Six steps. Every dog.</h2>
+        <p class="section-subtitle section-subtitle--center">
+          Each step addresses a specific thing about getting a dog
+          actually clean. Skip one and it shows up in the next.
+        </p>
+      </div>
+
+      <ol class="beats-list">
+        {beats.map((beat, i) => (
+          <li class="beat">
+            <div class="beat__num">{i + 1}</div>
+            <div class="beat__content">
+              <h3>{beat.name}</h3>
+              <p>{beat.desc}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- STANDARD -->
+  <section class="section standard-section">
+    <div class="container">
+      <div class="standard__grid">
+        <div>
+          <p class="section-label">The standard</p>
+          <h2>The standard does not belong to a person.<br /><span class="grad">It belongs to the process.</span></h2>
+          <p>
+            Every Hurricane Bath follows the same six steps. Water
+            dialed to the coat. The system flushed when it has to be.
+            The finish on the clean tank. Drying in the climate
+            controlled trailer.
+          </p>
+          <p>
+            That is the point of writing it down: a bath that holds the
+            same standard whether Paul or anyone trained on the system
+            is the one running it. Today, Paul runs the Villages route.
+            As the route grows, every operator who joins is trained to
+            the same protocol, and you will know by name and face who
+            is coming to your driveway.
+          </p>
+          <a class="button button--primary" href="/the-villages">See the offer in The Villages</a>
+        </div>
+        <div class="standard__why">
+          <h3>Why a process</h3>
+          <p>
+            A bath looks simple from outside the trailer. Inside, doing
+            it well is a sequence of small judgments about pressure,
+            water, coat type, and time, made on every dog.
+          </p>
+          <p>
+            Writing the sequence down does two things: it makes every
+            bath repeatable across operators, and it makes the bath
+            holdable to a standard that does not depend on whose hands
+            are on the nozzle.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section process-cta">
+    <div class="container">
+      <h2>Your dog. <span class="grad">Genuinely clean.</span></h2>
+      <p>The Hurricane Bath, in your driveway. Lock in the founders rate while spots last.</p>
+      <a class="button button--ghost button--lg" href="/the-villages">Book in The Villages</a>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .process-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-4xl) var(--space-2xl);
+    text-align: center;
+  }
+  .process-hero .glow-a {
+    top: -120px;
+    right: 50%;
+    margin-right: -180px;
+    width: 360px;
+    height: 360px;
+  }
+  .process-hero .eyebrow {
+    color: var(--accent2);
+  }
+  .process-hero h1 {
+    font-size: clamp(2.8rem, 7vw, 4.4rem);
+    color: var(--ink);
+    margin: 0 0 var(--space-lg);
+  }
+  .process-hero__sub {
+    font-size: var(--text-lg);
+    color: var(--soft);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* INTRO */
+  .process-intro__grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-3xl);
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .process-intro__grid { grid-template-columns: 1fr; }
+  }
+  .process-intro h2 {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    margin-bottom: var(--space-lg);
+  }
+  .process-intro__stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .process-stat {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg) var(--space-xl);
+    box-shadow: var(--shadow-sm);
+  }
+  .process-stat__num {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(100deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1;
+    margin-bottom: var(--space-sm);
+  }
+  .process-stat__num--word {
+    font-size: 1.6rem;
+    line-height: 1.2;
+    padding-top: 0.25rem;
+  }
+  .process-stat__label {
+    font-size: var(--text-sm);
+    color: var(--soft);
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  /* BEATS */
+  .beats-section {
+    background: var(--surface-alt);
+    border-block: 1px solid var(--line);
+  }
+  .beats-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-2xl) auto 0;
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .beat {
+    display: flex;
+    gap: var(--space-lg);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+  .beat:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-md);
+  }
+  .beat__num {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border-radius: var(--radius-full);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+  .beat__content { flex: 1; }
+  .beat__content h3 {
+    color: var(--accent);
+    margin: 0 0 var(--space-sm);
+    font-size: var(--text-xl);
+  }
+  .beat__content p {
+    color: var(--soft);
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  /* STANDARD */
+  .standard__grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-3xl);
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .standard__grid { grid-template-columns: 1fr; }
+  }
+  .standard__grid h2 {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    margin-bottom: var(--space-md);
+  }
+  .standard__grid p {
+    margin-bottom: var(--space-md);
+  }
+  .standard__why {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+  }
+  .standard__why h3 {
+    color: var(--accent);
+    margin: 0 0 var(--space-md);
+  }
+
+  /* CTA */
+  .process-cta {
+    background: linear-gradient(135deg, var(--ink), #15233f 60%, #0e2a3a);
+    color: #fff;
+    text-align: center;
+  }
+  .process-cta h2 {
+    color: #fff;
+    margin-bottom: var(--space-md);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+  }
+  .process-cta p {
+    color: rgba(255, 255, 255, 0.78);
+    margin: 0 auto var(--space-xl);
+    max-width: 480px;
+  }
+  .process-cta .button--ghost {
+    background: #fff;
+    color: var(--ink);
+  }
+  .process-cta .button--ghost:hover {
+    background: var(--bg);
+    color: var(--ink);
+    border-color: transparent;
+  }
+</style>
