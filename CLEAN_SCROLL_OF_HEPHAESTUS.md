@@ -189,6 +189,64 @@ remains the one rule with its lint deferred (its exact-wording
 requirement applies to the legacy doggoneclean.us surface that has
 not been rebuilt yet).
 
+### 2026-05-27 (`toes_over_the_precipice` captured)
+
+A client-side rule, captured today, prompted by reflection during the
+strategy discussion. The incident itself happened 2026-04-24. Rule lives
+in the Oracle as `toes_over_the_precipice` (roster).
+
+**The incident.** A 5-year, very profitable client claimed her
+"intuitive" dog was distraught for hours after Paul's son was present at
+the appointment. Paul did the grooming as he always does; his son never
+touched the dog, just stood nearby. No incident, no injury, no rough
+handling. The client decided the dog was traumatized by the son's
+"energy" and demanded Paul come alone and be supervised in the trailer
+going forward.
+
+**Why it ends the relationship.** Stripped of the spiritual framing, the
+demand is a plain accusation: the client believes Paul (or anyone
+present with him) is a danger to her dog. Mobile dog grooming runs
+entirely on being trusted alone with the animal. Once a client holds
+that suspicion it never leaves. Every future off-day for the dog
+becomes Paul's fault, with no possible defense, because you cannot
+disprove something that never happened. Profitability and five-year
+tenure do not change this. Revenue hides the risk; it does not cancel
+it.
+
+**The rule action.** Do not try to win them back, and do not accept the
+supervised-only conditions. Both legitimize the accusation. End the
+relationship cleanly.
+
+**The text exchange (primary source, 2026-04-24).**
+
+Client's message:
+> Spoke with Scott this morning
+> Bitty is a very intuitive dog
+> She's was absolutely distraught for hours after your son was here. We
+> would feel much more comfortable if these requests work to for you?
+> You are only to come alone please.
+> One of us will always be in the trailer with you.
+> Trim only for Bitty
+> Full wash for smudge
+> Let me know if that is ok?
+> Also please delay next wash by two weeks please
+> Thank you
+
+Paul's reply:
+> Hi Lynne, I understand what you're asking about Bitty, the next
+> appointment, and who comes with me.
+> You and Scott have been wonderful clients for a long time. You've
+> never felt like just another stop on my route, and taking care of
+> Bitty and Smudge has always been a bright spot in my day.
+> Before we sort through the details, I think we should first make sure
+> Dog Gone Clean is still the right service for you going forward.
+> I would be sad to lose you, but I would fully understand if you feel
+> another plan would be better for them.
+
+The reply is the textbook execution: warm, no defense (because
+defending against a no-cause accusation legitimizes it), no negotiation
+of the conditions, the exit framed as the client's choice.
+
 ### 2026-05-27 (redesign-survival hardening)
 
 Paul asked the audit question: if a future session does a major website

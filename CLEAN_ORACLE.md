@@ -279,6 +279,24 @@ already made, and the archive holds years of inactive clients who would pollute 
 Banned clients (Bonnie DiGraziano) are excluded everywhere: records, routes, summaries.
 Because a client Paul has fired must never resurface in a plan.
 
+`toes_over_the_precipice` (roster):
+A client who treats the operator as a suspect ends as a client. The trigger is
+a no-cause accusation against the operator (or anyone present at the appointment)
+of harming a dog, or a demand for supervised-only or restricted-presence
+conditions inside the trailer. Do not try to win them back, and do not accept
+the conditions, because both legitimize an accusation that should simply end
+the relationship. The trust required to be alone with someone's dog cannot be
+partially restored. Once that suspicion is held it never leaves: every future
+off-day for the dog becomes the operator's fault with no possible defense,
+because you cannot disprove something that never happened. Profitability and
+tenure do not cancel this calculus; revenue hides the risk, it does not cancel
+it. A client standing with their toes over the edge of that precipice is a
+liability on every visit no matter how much they pay. Recorded from the
+2026-04-24 incident with a 5-year client; the full text exchange is preserved
+in the 2026-05-27 decisions log entry in CLEAN_SCROLL_OF_HEPHAESTUS.md. Pairs
+with `banned_excluded` (which is the data-side rule once a relationship has
+been ended; this rule is the strategic rule for when to end it).
+
 `one_off_not_routed` (roster):
 One-off and at-will clients are served on request and are not placed in the recurring route.
 Because the route template is the standing backbone; on-request work fills gaps around it.
