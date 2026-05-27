@@ -123,6 +123,63 @@ const beats = [
     </div>
   </section>
 
+  <!-- SEE IT WORK -->
+  <section class="section see-it">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">See it work</p>
+        <h2 class="section-title">Pressure that adapts. <span class="grad">Suds that get all the way down.</span></h2>
+        <p class="section-subtitle section-subtitle--center">
+          The bath in motion. The sound is part of the proof; tap the speaker on either clip if you want to hear it.
+        </p>
+      </div>
+
+      <div class="video-grid">
+        <figure class="video-card">
+          <div class="video-card__wrap">
+            <video
+              class="video-card__media"
+              src="/videos/water-pressure.mp4"
+              poster="/videos/water-pressure.jpg"
+              muted
+              autoplay
+              loop
+              playsinline
+              preload="metadata"
+              aria-label="Water pressure ramping from a trickle to full flow, then back down"
+            ></video>
+            <button class="video-card__sound" type="button" aria-label="Toggle sound" data-state="muted">
+              <span class="video-card__icon" aria-hidden="true">&#x1F50A;</span>
+              <span class="video-card__sound-label">Tap for sound</span>
+            </button>
+          </div>
+          <figcaption>The lever dials from a trickle to full flow and back, in one hand, without leaving the dog.</figcaption>
+        </figure>
+
+        <figure class="video-card">
+          <div class="video-card__wrap">
+            <video
+              class="video-card__media"
+              src="/videos/bath-in-action.mp4"
+              poster="/videos/bath-in-action.jpg"
+              muted
+              autoplay
+              loop
+              playsinline
+              preload="metadata"
+              aria-label="The Hurricane Bath in action: recirculated water and shampoo working through a wet coat"
+            ></video>
+            <button class="video-card__sound" type="button" aria-label="Toggle sound" data-state="muted">
+              <span class="video-card__icon" aria-hidden="true">&#x1F50A;</span>
+              <span class="video-card__sound-label">Tap for sound</span>
+            </button>
+          </div>
+          <figcaption>Recirculation drives shampoo through the coat to the skin. The proof is the suds.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
   <!-- STANDARD -->
   <section class="section standard-section">
     <div class="container">
@@ -336,6 +393,75 @@ const beats = [
     margin: 0 0 var(--space-md);
   }
 
+  /* SEE IT WORK */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2xl);
+    max-width: 760px;
+    margin: var(--space-2xl) auto 0;
+  }
+  @media (max-width: 720px) {
+    .video-grid {
+      grid-template-columns: 1fr;
+      max-width: 380px;
+      gap: var(--space-xl);
+    }
+  }
+  .video-card {
+    margin: 0;
+  }
+  .video-card__wrap {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    background: var(--ink);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .video-card__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .video-card__sound {
+    position: absolute;
+    right: var(--space-md);
+    bottom: var(--space-md);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    background: rgba(12, 19, 34, 0.72);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    font: inherit;
+    font-size: var(--text-sm);
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--transition-base), transform var(--transition-base);
+  }
+  .video-card__sound:hover {
+    background: rgba(12, 19, 34, 0.88);
+    transform: translateY(-1px);
+  }
+  .video-card__sound[data-state="on"] {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent;
+  }
+  .video-card__icon {
+    font-size: 1rem;
+  }
+  .video-card figcaption {
+    margin-top: var(--space-md);
+    color: var(--soft);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+    text-align: center;
+  }
+
   /* CTA */
   .process-cta {
     background: linear-gradient(135deg, var(--ink), #15233f 60%, #0e2a3a);
@@ -362,3 +488,34 @@ const beats = [
     border-color: transparent;
   }
 </style>
+
+<script is:inline>
+  // Sound toggle for the See It Work video cards. Only one video plays
+  // audio at a time; tapping a second card mutes the first.
+  document.querySelectorAll('.video-card__sound').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.video-card');
+      const video = card.querySelector('video');
+      if (video.muted) {
+        document.querySelectorAll('.video-card video').forEach((v) => {
+          if (v !== video && !v.muted) {
+            v.muted = true;
+            const otherBtn = v.closest('.video-card').querySelector('.video-card__sound');
+            otherBtn.dataset.state = 'muted';
+            otherBtn.querySelector('.video-card__sound-label').textContent = 'Tap for sound';
+            otherBtn.querySelector('.video-card__icon').textContent = '\u{1F50A}';
+          }
+        });
+        video.muted = false;
+        btn.dataset.state = 'on';
+        btn.querySelector('.video-card__sound-label').textContent = 'Sound on';
+        btn.querySelector('.video-card__icon').textContent = '\u{1F509}';
+      } else {
+        video.muted = true;
+        btn.dataset.state = 'muted';
+        btn.querySelector('.video-card__sound-label').textContent = 'Tap for sound';
+        btn.querySelector('.video-card__icon').textContent = '\u{1F50A}';
+      }
+    });
+  });
+</script>
