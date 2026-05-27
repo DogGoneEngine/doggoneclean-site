@@ -419,6 +419,18 @@ later cities can be added without rework. Because launching one zone densely
 beats spreading thin across Florida, and a Villages-shaped route is the operator
 load model the pricing is calibrated against.
 
+`villages_only_in_copy` (Hurricane Bath: copy):
+The Hurricane Bath surface mentions only The Villages in customer-facing copy:
+no other cities, no reference to the legacy Ocala full-grooming book (which
+keeps its own surface at doggoneclean.us until its own rebuild), no speculative
+future locations, no "coming soon" placeholders. Because the bath surface stays
+focused on one product in one place (`favor_high_hourly_work`,
+`core_is_no_haircut_dogs`), and any mention of other surfaces invites support
+questions you would have to say no to ("do you also do Ocala?" "not for baths").
+Pairs with `villages_only_at_launch`, which gates the booking polygon; this
+rule gates the marketing copy. When Hurricane Bath expands to a second zone,
+update this rule and the copy together, not the copy alone.
+
 `three_dog_cap` (product):
 Maximum 3 dogs per appointment and per household. The per-dog price decrement
 is $20 (each additional dog priced at the prior dog's rate minus $20), within

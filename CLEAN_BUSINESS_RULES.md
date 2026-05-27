@@ -88,6 +88,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
 | bath_only_no_mats | Hurricane Bath: product | Oracle | `src/data/breeds.json`; booking-flow gating; lint pattern for accepted-breed list |
 | villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check; `villages` zone config |
+| villages_only_in_copy | Hurricane Bath: copy | Oracle | site copy (`src/pages/`); lint pattern banning second-city / Ocala-legacy / coming-soon mentions on the Hurricane Bath surface |
 | three_dog_cap | Hurricane Bath: product | Oracle | booking flow dog-count limit; `src/business/pricing.js`; DB constraint on `appointments.dog_count` |
 | premium_inclusive_no_addons | Hurricane Bath: product | Oracle | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy |
 | breed_tier_pricing | Hurricane Bath: pricing | Oracle; `src/data/breeds.json` (Phase 4) | `src/business/pricing.js`; DB `subscriptions.base_price_cents` + `additional_dog_cents`; `business_rules` row |
