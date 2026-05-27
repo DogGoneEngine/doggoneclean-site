@@ -155,6 +155,75 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-05-27 (redesign-survival hardening)
+
+Paul asked the audit question: if a future session does a major website
+redesign, what survives and what gets silently wiped out? The honest
+answer was that around 19 customer-facing rules had their only live
+enforcement in copy on a page I had written, with no lint to catch a
+rewrite that dropped them. Eight were "high risk" (no DB backstop) and
+eleven were "medium" (DB backstops the rule itself, but the customer
+expression on the site relies on copy alone). Three commits to close
+this:
+
+1. **Price hydration** (commit `857952c`). `/the-villages` was carrying
+   the tier prices and the founders cap as hardcoded literals in a
+   `tiers` array at the top of the page, duplicating the values in the
+   `cities` row. A price change in the DB would not have propagated.
+   New `src/lib/cities.js` does a build-time fetch of the city row;
+   the page hydrates `tiers` and `FOUNDERS_CAP` from there. Copy was
+   updated to template the cap (`{FOUNDERS_CAP}`) in the eyebrow,
+   headline, subhead, and terms-tile. Trade-off: deploys now depend
+   on dgc-prod being reachable at build time. Acceptable — the live
+   site keeps serving on a build failure, and the same dependency
+   exists for the portal already. Live customer behavior unchanged.
+   `if_payments_added_handle_money_safely` was the rule the fix
+   served (fail loud on missing pricing columns, single source of
+   truth for money).
+
+2. **Rule-survival lint, first 8** (commit `e412c18`). Added
+   `check_rule_survival()` to `scripts/check.py` covering:
+   `villages_only_in_copy`, `founders_cap_statement_always_visible`,
+   `single_visit_as_own_path`, `specialist_named_not_promised`,
+   `appointment_block_not_window`, `language_bank`,
+   `neural_expressive_design` (brand color tokens), and
+   `nav_no_backdrop_filter`. Each rule names the file it lives in and
+   the pattern that has to stay there. The lint caught two
+   false-positives on its first run (my own copy used "arrival
+   window" in a negating sentence and a Nav comment mentioned
+   "backdrop-filter"); both fixed in the same commit. Verification by
+   real-world catch, not synthetic test.
+
+3. **Rule-survival lint, additional 11 + Oracle sharpened**
+   (this commit). Added patterns for: `stop_sign_two_taps` (four
+   surfaces: home, city, book stub, terms, portal island),
+   `auto_charge_at_24h` ("the day before" customer promise),
+   `within_24h_non_refundable` ("24 hour" + "non-refundable" on terms),
+   `three_dog_cap` ("three dogs" on city + book), `friendly_dogs_only`
+   ("friendly dogs" + "aggression" on home + city), `premium_inclusive_
+   no_addons` ("no add ons" on city), `cadence_4wk_or_2wk_same_price`
+   ("same price" on home), `card_on_file_at_signup` ("card on file" on
+   three pages), `core_is_no_haircut_dogs` ("bath only" on city +
+   process), `bath_only_no_mats` (tier names + eligibility headers on
+   city). The `require_present` helper now defaults to case-insensitive
+   matching and normalizes whitespace so multi-word patterns survive
+   line wraps in Astro source. Caught three real copy gaps in my own
+   pages (terms missed "the day before" framing, process page missed
+   "bath only" statement, portal copy was on the React island not the
+   route file). All fixed in the same commit. The Oracle's "How to
+   add a rule" section was sharpened: lint enforcement lands the same
+   commit as the rule by default, not as a later step. The previous
+   practice of "land the rule now, defer the lint" repeatedly produced
+   rules-in-name-only.
+
+Net: 19 rules now have build-time enforcement that asserts their
+customer-facing or structural expression on the page that carries it.
+A redesign that drops any of them fails the audit in three places
+(SessionStart hook, pre-commit hook, GitHub Actions audit workflow).
+`cancellation_24h`'s lint is parked for the legacy doggoneclean.us
+rebuild (the rule's exact wording applies to the legacy surface, not
+the bath surface where `within_24h_non_refundable` governs).
+
 ### 2026-05-27 (schema + portal Phase 1 shipped)
 
 After the pricing redesign locked, Paul greenlit starting the portal in the

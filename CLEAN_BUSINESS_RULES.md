@@ -67,8 +67,8 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |
 | house_shampoo | Service | Oracle; convention | site copy; intake form |
 | online_only_comms | Process | Oracle; convention | site copy; intake; `business_rules` row |
-| friendly_dogs_only | Safety | Oracle; convention | site copy; intake gate |
-| core_is_no_haircut_dogs | Roster | Oracle; convention | site copy; intake |
+| friendly_dogs_only | Safety | Oracle; site copy; **`check.py`** asserts "friendly dogs" + "aggression" present on `index.astro` and `the-villages.astro` | intake gate |
+| core_is_no_haircut_dogs | Roster | Oracle; site copy; **`check.py`** asserts "bath only" present on `the-villages.astro` and `process.astro` | intake gate |
 | service_area_ocala | Routing | Oracle; `legacy/data/` | scheduling engine; intake address check |
 | no_dgn_import | Copy | CLAUDE.md; "Repo separation" | lint pattern |
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |
@@ -88,19 +88,19 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | overlay_opacity_pairs_pointer_events | Engineering | Oracle (carried) | component CSS |
 | smoke_test_on_every_build | Engineering | Oracle (carried) | `scripts/smoke-build.mjs` |
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
-| bath_only_no_mats | Hurricane Bath: product | Oracle | `src/data/breeds.json`; booking-flow gating; lint pattern for accepted-breed list |
+| bath_only_no_mats | Hurricane Bath: product | Oracle; DB `bath_dogs.coat_tier` CHECK; **`check.py`** asserts "Smoothcoat" + "Doublecoat" tier names + "we bath" / "we do not bath" eligibility headers present on `the-villages.astro` | `src/data/breeds.json` (mixed-breed eligibility); booking-flow gating |
 | villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check; `villages` zone config |
 | villages_only_in_copy | Hurricane Bath: copy | Oracle; **`check.py`** forbids "Ocala", "Fernandina", "St. Simons", "Saint Simons" in customer-facing markup on `index.astro`, `the-villages.astro`, `process.astro` (frontmatter + HTML comments stripped before check) | n/a |
-| three_dog_cap | Hurricane Bath: product | Oracle | booking flow dog-count limit; `src/business/pricing.js`; DB constraint on `appointments.dog_count` |
-| premium_inclusive_no_addons | Hurricane Bath: product | Oracle | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy |
+| three_dog_cap | Hurricane Bath: product | Oracle; DB `bath_appointments.dog_count` CHECK (1-3); **`check.py`** asserts "three dogs" present on `the-villages.astro` and `book.astro` | booking flow dog-count limit; `src/business/pricing.js` |
+| premium_inclusive_no_addons | Hurricane Bath: product | Oracle; **`check.py`** asserts "no add ons" present on `the-villages.astro` | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy in booking |
 | breed_tier_pricing | Hurricane Bath: pricing | Oracle; `src/data/breeds.json` (Phase 4) | `src/business/pricing.js`; DB `subscriptions.base_price_cents` + `additional_dog_cents`; `business_rules` row |
-| cadence_4wk_or_2wk_same_price | Hurricane Bath: pricing | Oracle | booking step 2 cadence picker; `src/business/pricing.js` quoter |
+| cadence_4wk_or_2wk_same_price | Hurricane Bath: pricing | Oracle; **`check.py`** asserts "same price" present on `index.astro` (the 2-week cadence is freshness, not a different rate) | booking step 2 cadence picker; `src/business/pricing.js` quoter |
 | single_oneoff_higher | Hurricane Bath: pricing | Oracle | `src/business/pricing.js` Reset rate = Maintenance + $20 first dog |
 | tiered_founders_rate | Hurricane Bath: pricing | Oracle | `?founders=1` URL handling; `subscriptions.founders_locked_until`; `src/business/pricing.js` |
-| card_on_file_at_signup | Hurricane Bath: money | Oracle | `create-setup-intent` edge function; booking step 4 Stripe Elements; DB `subscriptions.stripe_payment_method_id` not-null |
-| auto_charge_at_24h | Hurricane Bath: money | Oracle | `charge-appointment` edge function (hourly cron); query ceiling `scheduled_start <= NOW() + 24h`; lint pattern banning earlier charge windows |
+| card_on_file_at_signup | Hurricane Bath: money | Oracle; DB `bath_subscriptions.stripe_payment_method_id`; **`check.py`** asserts "card on file" present on `the-villages.astro`, `book.astro`, `terms.astro` | `create-setup-intent` edge function; booking step 4 Stripe Elements |
+| auto_charge_at_24h | Hurricane Bath: money | Oracle; **`check.py`** asserts "the day before" customer-facing promise present on `the-villages.astro`, `book.astro`, `terms.astro` | `charge-appointment` edge function (hourly cron); query ceiling `scheduled_start <= NOW() + 24h`; lint pattern banning earlier charge windows in cron query |
 | card_expiry_60_30_7 | Hurricane Bath: money | Oracle | `card-expiry-alert` cron; portal banner component; `stripe-webhook` `payment_method.updated` handler |
-| within_24h_non_refundable | Hurricane Bath: money | Oracle | portal cancel/skip button visibility; `portal_cancel_subscription` + `portal_skip_appointment` RPC guards; payment row preserved on cancel |
+| within_24h_non_refundable | Hurricane Bath: money | Oracle; **`check.py`** asserts "24 hour" present on `the-villages.astro` + `terms.astro`, and "non-refundable" present on `terms.astro` | portal cancel/skip button visibility; `portal_cancel_subscription` + `portal_skip_appointment` RPC guards; payment row preserved on cancel |
 | no_show_pause_at_two | Hurricane Bath: money | Oracle | `subscriptions.consecutive_no_shows` counter; auto-pause trigger; portal reactivation flow |
 | one_free_skip_per_52w | Hurricane Bath: skip | Oracle | `subscriptions.last_skip_at`; `portal_skip_appointment` RPC; skip counter in portal |
 | free_skip_keeps_maintenance_rate | Hurricane Bath: skip | Oracle | `portal_skip_appointment` next-appointment pricing branch; portal copy "This is your free skip" |
@@ -109,7 +109,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | reschedule_step_up_weekly | Hurricane Bath: reschedule | Oracle | `src/business/pricing.js` reschedule quoter (curve keyed on days from original); `portal_reschedule_appointment` RPC; calendar price preview |
 | reschedule_two_paths_for_recurring | Hurricane Bath: reschedule | Oracle | portal reschedule UI two-button choice; `portal_reschedule_appointment` `change_cadence` param; subscription cadence update branch |
 | no_reason_field_ever | Hurricane Bath: ux | Oracle | absence of reason textbox/dropdown in skip + reschedule + cancel flows; lint pattern banning `cancel_reason` / `skip_reason` form fields in portal code |
-| stop_sign_two_taps | Hurricane Bath: ux | Oracle | portal cancel flow (2-tap with cascade preview); 4 marketing copy surfaces (homepage, booking step 2, booking step 4, portal); lint pattern asserting copy presence |
+| stop_sign_two_taps | Hurricane Bath: ux | Oracle; **`check.py`** asserts "two taps" present on `index.astro`, `the-villages.astro`, `book.astro`, `terms.astro`, and `src/components/portal/PortalApp.jsx` (the four-surfaces requirement from the Oracle) | portal cancel flow (2-tap with cascade preview) when the cancel RPC lands |
 | octane_selector_cadence_picker | Hurricane Bath: ux | Oracle | booking step 2 React component (3 buttons + arrow); locked copy "Want your dog fresher?"; smoke test asserts component renders all 3 options |
 | calendar_shows_price_per_date | Hurricane Bath: ux | Oracle | portal reschedule + skip-pick calendar component (per-date price label); `src/business/pricing.js` quote-per-date helper |
 | founders_spots_remaining_counter | Hurricane Bath: ux | Oracle | `/the-villages` page `#launch-spot-count` element (hidden above threshold, fed by public read on counted subscriptions); threshold constant in `src/business/pricing.js` |

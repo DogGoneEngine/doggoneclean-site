@@ -983,11 +983,25 @@ tests in a no-signal trailer.
 ## How to add a rule
 
 1. Write the entry here with a real because.
-2. (Deferred until the database exists and the rules are agreed: add a `business_rules`
-   row in a migration. Do not do this yet per `no_database_until_rules_agreed`.)
-3. If it can be enforced in code, add the constant/function (today: `scripts/check.py`;
-   later: `src/business/`).
-4. If it can be enforced as a forbidden pattern, add it to the lint and update
-   `CLEAN_BUSINESS_RULES.md`.
+2. **In the same commit (or at most the next one), add its enforcement
+   layer.** If the rule expresses itself in customer-facing copy or in
+   structural markup, add a `scripts/check.py` pattern that fails the
+   build if the expression is dropped. If the rule lives in code, add
+   the constant/function (today: `scripts/check.py`; later:
+   `src/business/`). The previous practice of "land the rule now,
+   defer the lint to later" repeatedly produced rules-in-name-only:
+   the Oracle said one thing and the only thing standing between a
+   redesigner and dropping it was a comment. A rule that can be
+   silently dropped at the next refactor is not a rule.
+3. Update `CLEAN_BUSINESS_RULES.md`: the "Enforced today" column names
+   the live layer (Oracle + check.py + DB + ...), the deferred column
+   names what else this rule will gain when a downstream piece lands.
+4. (Deferred until the rules are agreed and a business_rules table
+   exists: add a row in a migration. Not built yet per
+   `no_database_until_rules_agreed`.)
 
-A rule that lives in only one place is a rule waiting to be lost.
+A rule that lives in only one place is a rule waiting to be lost. The
+target is the four-layer pattern in `CLEAN_BUSINESS_RULES.md`: Oracle
+(rationale), `business_rules` DB row (data), code mirror (`src/`),
+lint pattern (`scripts/check.py`). New rules close as many of those
+layers as they can the day they land.

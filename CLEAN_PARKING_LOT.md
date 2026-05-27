@@ -52,6 +52,17 @@ small slice once the table is being written to).
   unreachable host), this is the cause every time. Configuration lives
   in the dashboard, not the Supabase MCP, so a future session cannot
   diagnose-and-fix in one move; surface to Paul.
+- ~~Tier prices and founders cap hardcoded as literals on `/the-villages`~~
+  FIXED 2026-05-27. New `src/lib/cities.js` does a build-time fetch of
+  the city row; the page hydrates from there. Change a price column in
+  the `cities` table and the next build picks it up.
+- ~~Customer-facing rules survive a major website redesign only because
+  the only thing standing between a redesigner and dropping them was my
+  copy~~ FIXED 2026-05-27. 19 rules now have `scripts/check.py` patterns
+  that fail the build if their customer-facing expression goes missing.
+  Going-forward expectation hardened in the Oracle's "How to add a
+  rule" section: lint enforcement lands the same commit as the rule
+  by default.
 
 **Still open for Paul (mechanical, container cannot do):**
 - **Copy pass (real work still needed in some places).** The eight-page site uses

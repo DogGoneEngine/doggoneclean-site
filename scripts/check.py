@@ -302,15 +302,28 @@ def check_rule_survival():
     home = PAGES / "index.astro"
     villages = PAGES / "the-villages.astro"
     process_page = PAGES / "process.astro"
+    book = PAGES / "book.astro"
+    portal = PAGES / "portal.astro"
+    terms = PAGES / "terms.astro"
     nav = COMPONENTS / "Nav.astro"
     global_css = STYLES / "global.css"
+    # The portal copy lives in the React island once Phase 1 ships, not
+    # in the page shell. Point the portal-control checks at the island.
+    portal_app = COMPONENTS / "portal" / "PortalApp.jsx"
 
-    def require_present(path, pattern, rule_key, label, flags=0):
+    def _normalize_ws(text):
+        # Collapse all runs of whitespace to a single space so multi-word
+        # patterns ("the day before", "two taps") survive line wraps in
+        # the source file. Required because Astro pages format prose
+        # across multiple lines for readability.
+        return re.sub(r"\s+", " ", text)
+
+    def require_present(path, pattern, rule_key, label, flags=re.IGNORECASE):
         text = _read(path)
         if text is None:
             failures.append(f"{path.relative_to(REPO)}: file missing (rule '{rule_key}')")
             return
-        if not re.search(pattern, text, flags):
+        if not re.search(pattern, _normalize_ws(text), flags):
             failures.append(
                 f"{path.relative_to(REPO)}: missing required pattern for rule "
                 f"'{rule_key}': {label}"
@@ -320,7 +333,7 @@ def check_rule_survival():
         text = _read(path)
         if text is None:
             return
-        if re.search(pattern, text, flags):
+        if re.search(pattern, _normalize_ws(text), flags):
             failures.append(
                 f"{path.relative_to(REPO)}: forbidden pattern for rule "
                 f"'{rule_key}': {label}"
@@ -424,6 +437,145 @@ def check_rule_survival():
         r"backdrop-filter",
         "nav_no_backdrop_filter",
         "'backdrop-filter' (causes dashed-line artifact on Android/Chrome; use solid rgba background)",
+    )
+
+    # ── stop_sign_two_taps ────────────────────────────────────────────────
+    # Oracle: marketed on four surfaces (homepage, booking step 2,
+    # booking step 4, portal control). On the current site set, the
+    # home page, the city page, the booking entry, the terms page,
+    # and the portal React island each carry "two taps".
+    for page in (home, villages, book, terms, portal_app):
+        require_present(
+            page,
+            r"two taps",
+            "stop_sign_two_taps",
+            "'two taps' (Oracle: stop-sign cancel marketed on four surfaces)",
+        )
+
+    # ── auto_charge_at_24h ────────────────────────────────────────────────
+    # The customer-facing promise is "charged the day before, never sooner."
+    # Required wherever the bath surface discusses billing.
+    for page in (villages, book, terms):
+        require_present(
+            page,
+            r"the day before",
+            "auto_charge_at_24h",
+            "'the day before' (the customer-facing 24-hour charge promise)",
+        )
+
+    # ── within_24h_non_refundable ─────────────────────────────────────────
+    # The customer-facing terms must say what happens once the visit enters
+    # the 24-hour window: card charged, appointment locked, non-refundable.
+    for page in (villages, terms):
+        require_present(
+            page,
+            r"24[ -]hour",
+            "within_24h_non_refundable",
+            "'24 hour' (the locked-and-charged window must be stated)",
+        )
+    require_present(
+        terms,
+        r"non[- ]refundable",
+        "within_24h_non_refundable",
+        "'non-refundable' (the within-24h payment status must be stated in terms)",
+    )
+
+    # ── three_dog_cap ─────────────────────────────────────────────────────
+    # Customer must know the per-visit cap before they book. The DB CHECK
+    # enforces dog_count <= 3 but the customer learns the limit here.
+    for page in (villages, book):
+        require_present(
+            page,
+            r"three dogs",
+            "three_dog_cap",
+            "'three dogs' (per-visit cap must be visible before booking)",
+        )
+
+    # ── friendly_dogs_only ────────────────────────────────────────────────
+    # Safety boundary must be visible on the customer-facing site, not
+    # only buried in intake. Home page carries the safety section; the
+    # city page carries it in eligibility.
+    for page in (home, villages):
+        require_present(
+            page,
+            r"friendly dogs",
+            "friendly_dogs_only",
+            "'friendly dogs' (the safety boundary)",
+        )
+        require_present(
+            page,
+            r"aggression",
+            "friendly_dogs_only",
+            "'aggression' (the negation half of the safety boundary)",
+        )
+
+    # ── premium_inclusive_no_addons ───────────────────────────────────────
+    # One price per tier, no upsells. The page must say it.
+    require_present(
+        villages,
+        r"no add ons",
+        "premium_inclusive_no_addons",
+        "'no add ons' (premium-inclusive pricing must be stated)",
+    )
+
+    # ── cadence_4wk_or_2wk_same_price ─────────────────────────────────────
+    # 4wk default, 2wk freshness upgrade at the same price. The "same
+    # price" framing is the rule's point and must be communicated.
+    require_present(
+        home,
+        r"same price",
+        "cadence_4wk_or_2wk_same_price",
+        "'same price' (the 2-week cadence is freshness, not a different rate)",
+    )
+
+    # ── card_on_file_at_signup ────────────────────────────────────────────
+    # Card-on-file at booking is the model. Customers learn about it
+    # before they enter the flow.
+    for page in (villages, book, terms):
+        require_present(
+            page,
+            r"card on file",
+            "card_on_file_at_signup",
+            "'card on file' (signup requires it; customer should expect it)",
+        )
+
+    # ── core_is_no_haircut_dogs ───────────────────────────────────────────
+    # Bath only. The page must say so where eligibility is discussed.
+    for page in (villages, process_page):
+        require_present(
+            page,
+            r"bath only",
+            "core_is_no_haircut_dogs",
+            "'bath only' (we do not do haircuts)",
+        )
+
+    # ── bath_only_no_mats ─────────────────────────────────────────────────
+    # Customer-facing eligibility: the tier names must be present (they
+    # are the eligibility lens), and a yes/no eligibility distinction
+    # must be visible.
+    require_present(
+        villages,
+        r"Smoothcoat",
+        "bath_only_no_mats",
+        "'Smoothcoat' tier name (eligibility classifier)",
+    )
+    require_present(
+        villages,
+        r"Doublecoat",
+        "bath_only_no_mats",
+        "'Doublecoat' tier name (eligibility classifier)",
+    )
+    require_present(
+        villages,
+        r"[Ww]e bath",
+        "bath_only_no_mats",
+        "'we bath' (the eligibility yes header)",
+    )
+    require_present(
+        villages,
+        r"[Ww]e do not bath",
+        "bath_only_no_mats",
+        "'we do not bath' (the eligibility no header)",
     )
 
 
