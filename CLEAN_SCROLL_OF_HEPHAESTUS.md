@@ -62,23 +62,45 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   across all of them, zero DGN aesthetic imported. Shipped in six thin slices, all
   merged to `main`. See the 2026-05-27 session entry below for the slice list and
   what each one contained.
-- **Next chapter:** Hurricane Bath v2.0 booking surface, built against the locked
-  24-rule pack. The booking flow replaces the `/book` stub: address polygon check
-  (`villages_only_at_launch`), coat eligibility check (`bath_only_no_mats`), octane
+- **Hurricane Bath v2.0 schema: DONE 2026-05-27.** Five new tables on `dgc-prod`
+  (`cities`, `bath_subscribers`, `bath_dogs`, `bath_subscriptions`,
+  `bath_appointments`) with RLS policies, indexes, and updated_at triggers. The
+  Villages seeded as the launch city with tiered pricing and the 25-household
+  founders cap. Migration: `supabase/migrations/0002_hurricane_bath_v2_schema.sql`.
+  Legacy `clients` + `dogs` left untouched; v2.0 tables are prefixed `bath_` so
+  a future operator UI cannot confuse a Hurricane Bath subscriber with a legacy
+  Ocala client.
+- **Portal Phase 1: DONE 2026-05-27.** Real sign-in (Google OAuth + phone OTP +
+  email magic link) plus an honest authenticated empty state replacing the
+  `/portal` stub. A signed-in user with no `bath_subscribers` row sees "Book
+  your first visit to get started"; a subscriber row triggers a placeholder
+  dashboard that points at the views landing in Phase 2/3. The booking flow
+  chapter creates the first real subscriber rows.
+- **Next chapter (Phase 2: data views):** port the read-only portions of DGN's
+  `PortalViews.jsx` to Clean. Dashboard (next appointment, card-expiry banners
+  per `card_expiry_60_30_7`, status chips), Appointments list and detail, Pack
+  view (subscriber's dogs with the smoothcoat/doublecoat tier on each). All
+  read-side, no mutations yet; mutations land in Phase 3. The dashboard's
+  "your specialist" element uses the `specialist_assigned_per_route` pattern
+  once routes/operators exist (deferred to the operator-app chapter).
+- **Phase 3 (mutating views):** Stripe card-on-file management (`PaymentSection`),
+  Plan section with the two-tap stop sign (`stop_sign_two_taps`), Reschedule
+  with `calendar_shows_price_per_date` and the step-up curve, Skip flow
+  (`one_free_skip_per_52w` + `paid_skip_resets_next_visit_to_single_rate`),
+  Notifications preferences. Each one is its own SECURITY DEFINER RPC plus the
+  portal UI that calls it.
+- **Hurricane Bath v2.0 booking surface:** still ahead, builds against the
+  schema that now exists. Replaces the `/book` stub. Stripe SetupIntent at
+  completion (`card_on_file_at_signup`), address polygon check
+  (`villages_only_at_launch`), coat eligibility (`bath_only_no_mats`), octane
   cadence picker (`octane_selector_cadence_picker`), three-dog cap selector
   (`three_dog_cap`), breed-tier-priced first dog (`breed_tier_pricing`,
-  `tiered_founders_rate`), Stripe SetupIntent at completion
-  (`card_on_file_at_signup`). Then the portal replaces the `/portal` stub: Google
-  sign in with phone/email access-code fallback, two-tap stop sign
-  (`stop_sign_two_taps`), reschedule with `calendar_shows_price_per_date`, skip
-  flow with the free-skip allowance (`one_free_skip_per_52w`), card-on-file
-  management. Both surfaces query the `bath_subscriptions` table that gets created
-  in this same chapter (and which the `founders_spots_remaining_counter` on
-  `/the-villages` will start showing once rows exist). The String of Pearls
-  scheduler (`string_of_pearls_is_a_service`) lands as edge functions callable from
-  both the Astro app and the legacy doggoneclean.us site (CORS-locked). Then the
-  operator app + pizza tracker, then the `business_rules` table mirroring the
-  Oracle, then auth-bound RLS policies on every subscriber-data table.
+  `tiered_founders_rate`). Creates the first `bath_subscriptions` rows, at
+  which point the founders counter on `/the-villages` starts having
+  something real to count.
+- **String of Pearls scheduler service** (`string_of_pearls_is_a_service`),
+  operator app + pizza tracker, then the `business_rules` table mirroring
+  the Oracle. All downstream of the booking surface.
 - **Needs Paul to unblock the remaining pieces:** (1) create the Dog Gone Clean Stripe
   account (separate from any DGN/personal account per `own_infrastructure`) and hand
   over the publishable + secret keys (gates the Hurricane Bath booking flow, the chapter
@@ -132,6 +154,60 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 ---
 
 ## Session history
+
+### 2026-05-27 (schema + portal Phase 1 shipped)
+
+After the pricing redesign locked, Paul greenlit starting the portal in the
+same session rather than punting to a fresh one. Two slices landed in order:
+
+1. **Schema** (`supabase/migrations/0002_hurricane_bath_v2_schema.sql`,
+   commit `a728529`). Five tables on `dgc-prod`: `cities`, `bath_subscribers`,
+   `bath_dogs`, `bath_subscriptions`, `bath_appointments`. RLS on every
+   table, policies scoped to `auth.uid()` chained through the subscriber
+   row, anon read on `cities` only (public site needs polygon + pricing).
+   Indexes including the hot one for the charge-appointment cron
+   (`bath_appointments_charge_candidates_idx` on `scheduled_start` where
+   status is requested/confirmed and payment_status is pending). Shared
+   `set_updated_at()` trigger on all five tables. The Villages seeded as
+   the launch city with the locked founders + tier pricing ($55/$80
+   founders, $75/$100 standard, $95/$120 single, 25-household cap).
+   TypeScript types regenerated to `supabase/database.types.ts`. The
+   legacy `clients` + `dogs` tables sit alongside untouched: every v2.0
+   table is prefixed `bath_` so a future operator UI cannot confuse a
+   Hurricane Bath subscriber with a legacy Ocala client. Advisors clean
+   (only the pre-existing intentional INFO on `clients`/`dogs` which are
+   service-role-only by design).
+
+2. **Portal Phase 1** (commit `b364a4d`). React integration added to
+   Astro; `@supabase/supabase-js` installed. New island at
+   `src/components/portal/`: `supabase.js` (Clean's project, persistSession
+   true, sendOtp/verifyOtp/signInWithGoogle/getPortalData helpers),
+   `AuthScreen.jsx` (Google primary, phone-or-email fallback, ported
+   from DGN and rewritten in Clean voice), `PortalApp.jsx` (auth state
+   orchestrator with three render branches: anonymous, authenticated
+   with no subscriber row, authenticated with subscriber), `portal.css`
+   (Neural Expressive idiom: blue gradient buttons, soft glow on the
+   auth card, system sans, no Google Fonts). `src/pages/portal.astro`
+   replaced from stub to a real island mount. The honest empty-state
+   landing for a signed-in user with no subscriber row points at
+   `/the-villages` to book; the placeholder dashboard for a subscriber
+   acknowledges that the data views (Dashboard, Pack, Plan, Reschedule,
+   Skip, Cancel) ship in subsequent slices.
+
+What Phase 1 will NOT do today: there is no `bath_subscribers` row for
+anyone yet (no booking flow). A real sign-in lands every user in the
+empty state. That is correct: Paul can test sign-in end-to-end (Google
+should work; phone OTP needs Twilio which is still on his plate; email
+magic link works via Supabase's default mailer). When the booking flow
+chapter creates the first subscriber rows, the placeholder dashboard
+becomes the surface that Phase 2 fills in.
+
+The founders counter on `/the-villages` still ships hidden per
+`founders_spots_remaining_counter` (the table exists but with 0 rows
+and a 10-spot threshold, the rule's correct behavior is hidden). The
+counter wiring (a SECURITY DEFINER read function for anon, or an
+anon-readable view) lands in the slice that opens the founders cohort
+for sign-ups.
 
 ### 2026-05-27 (pricing redesign on /the-villages)
 

@@ -12,13 +12,23 @@ live (`/`, `/the-villages`, `/process`, `/book`, `/portal`, `/privacy`, `/terms`
 `/sms`), Neural Expressive look consistent across all of them, zero DGN aesthetic
 imported. See the 2026-05-27 "fork shipped" entry in the Scroll for the slice list.
 
-**Active next step (the next chapter): the Hurricane Bath v2.0 booking flow.** It
-replaces the `/book` stub with the real signup, against the locked 24-rule pack
-(Stripe SetupIntent, octane cadence picker, three-dog cap selector,
-breed-tier-priced single bath, two-tap stop sign, calendar-shows-price-per-date).
-Creates the `bath_subscriptions` table; once subscriber rows exist, the
-`founders_spots_remaining_counter` element already on `/the-villages` starts
-showing the live count. The portal at `/portal` follows.
+**Active next step:** Portal Phase 2 (data views). With the schema in place
+and the auth shell live, the read-side views from DGN's `PortalViews.jsx`
+port next: Dashboard (next-appointment card, card-expiry banners),
+Appointments list + detail, Pack view. Honest empty states until the
+booking flow lands and creates the first real rows.
+
+**Phase 3 (mutating views):** Stripe card management, Plan section with
+the two-tap stop sign, Reschedule with per-date pricing, Skip flow,
+Notifications. Each requires its own SECURITY DEFINER RPC plus the UI.
+
+**Booking flow chapter:** still ahead. Replaces the `/book` stub with the
+real signup against the locked 24-rule pack (Stripe SetupIntent, octane
+cadence picker, three-dog cap selector, breed-tier-priced single bath).
+Creates the first `bath_subscriptions` rows. Once the founders cohort
+starts filling, the `founders_spots_remaining_counter` element already on
+`/the-villages` starts showing the live count (counter wiring is its own
+small slice once the table is being written to).
 
 **Resolved 2026-05-27 (kept for history):**
 - ~~Fork the DGN site structure into Clean (multi-page)~~ DONE. Shipped in six
