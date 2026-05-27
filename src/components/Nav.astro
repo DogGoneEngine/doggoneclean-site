@@ -7,7 +7,8 @@
 // scoped-CSS-plus-media-query approach has bitten DGN before
 // (`nav_no_backdrop_filter` and the Android-Chrome repaint artifact).
 //
-// Background uses solid rgba (not backdrop-filter) per `nav_no_backdrop_filter`.
+// Background uses solid rgba per the `nav_no_backdrop_filter` rule (the
+// other approach causes a dashed-line artifact on Android/Chrome).
 //
 // Simpler than DGN's nav: Clean serves only The Villages today
 // (`villages_only_in_copy`), so there is no city dropdown.

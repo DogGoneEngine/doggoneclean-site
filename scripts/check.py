@@ -261,6 +261,172 @@ def check_workflows_no_deleted_branches():
                 )
 
 
+PAGES = REPO / "src" / "pages"
+COMPONENTS = REPO / "src" / "components"
+STYLES = REPO / "src" / "styles"
+
+
+def _read(path):
+    try:
+        return path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return None
+
+
+def _strip_frontmatter_and_comments(text):
+    """Astro frontmatter and HTML comments are not customer-facing copy."""
+    if text is None:
+        return ""
+    body = text
+    if body.startswith("---"):
+        end = body.find("---", 3)
+        if end > 0:
+            body = body[end + 3 :]
+    body = re.sub(r"<!--.*?-->", "", body, flags=re.DOTALL)
+    return body
+
+
+def check_rule_survival():
+    """Lint patterns asserting that each high-risk rule still has its load-bearing
+    copy or element on the page that carries it. A redesign that rewrites a page
+    must keep these markers (or replace them with equivalents that the patterns
+    here recognize). The patterns are deliberately loose: structural markers and
+    key phrases, not pixel-level copy. The point is to catch silent rule drops,
+    not to freeze wording.
+
+    Each failure names its rule key so a redesigner can look up the source-of-
+    truth requirement in CLEAN_ORACLE.md.
+
+    Adding a rule? Add its survival check here at the same commit, per the going-
+    forward rule: every new rule lands with its enforcement layer."""
+    home = PAGES / "index.astro"
+    villages = PAGES / "the-villages.astro"
+    process_page = PAGES / "process.astro"
+    nav = COMPONENTS / "Nav.astro"
+    global_css = STYLES / "global.css"
+
+    def require_present(path, pattern, rule_key, label, flags=0):
+        text = _read(path)
+        if text is None:
+            failures.append(f"{path.relative_to(REPO)}: file missing (rule '{rule_key}')")
+            return
+        if not re.search(pattern, text, flags):
+            failures.append(
+                f"{path.relative_to(REPO)}: missing required pattern for rule "
+                f"'{rule_key}': {label}"
+            )
+
+    def require_absent(path, pattern, rule_key, label, flags=re.IGNORECASE):
+        text = _read(path)
+        if text is None:
+            return
+        if re.search(pattern, text, flags):
+            failures.append(
+                f"{path.relative_to(REPO)}: forbidden pattern for rule "
+                f"'{rule_key}': {label}"
+            )
+
+    # ── villages_only_in_copy ──────────────────────────────────────────────
+    # Marketing pages on the Hurricane Bath surface must not name other Florida
+    # cities. Ocala is the legacy doggoneclean.us surface; mentioning it here
+    # invites questions we cannot answer.
+    for page in (home, villages, process_page):
+        body = _strip_frontmatter_and_comments(_read(page))
+        for forbidden in ("Ocala", "Fernandina", "St. Simons", "Saint Simons"):
+            if forbidden in body:
+                failures.append(
+                    f"{page.relative_to(REPO)}: customer-facing copy mentions "
+                    f"'{forbidden}' (rule 'villages_only_in_copy')"
+                )
+
+    # ── founders_cap_statement_always_visible ─────────────────────────────
+    # The cap must appear in always-visible copy on the city page (not only in
+    # the counter element, which is hidden until remaining drops below the
+    # threshold). Word 'households' must appear in 2+ places (eyebrow + body).
+    body = _strip_frontmatter_and_comments(_read(villages))
+    if len(re.findall(r"\bhouseholds\b", body)) < 2:
+        failures.append(
+            f"src/pages/the-villages.astro: 'households' appears < 2 times in "
+            f"customer-facing copy (rule 'founders_cap_statement_always_visible'); "
+            f"the founders cap must be in always-visible copy, not only in the "
+            f"hidden counter element"
+        )
+
+    # ── single_visit_as_own_path ──────────────────────────────────────────
+    # The city page must offer a single-visit CTA at its own URL, not as a row
+    # buried inside a recurring pricing card.
+    require_present(
+        villages,
+        r"/book\?plan=single",
+        "single_visit_as_own_path",
+        "single-visit CTA href '/book?plan=single'",
+    )
+
+    # ── specialist_named_not_promised ─────────────────────────────────────
+    # The page must include a specialist section (a name + a place for a photo)
+    # AND must not over-promise that any one operator will always be the one.
+    require_present(
+        villages,
+        r'class="specialist-card"',
+        "specialist_named_not_promised",
+        "specialist section (class='specialist-card')",
+    )
+    for forbidden in ("always Paul", "always be Paul", "will be Paul", "only Paul", "you will always see Paul"):
+        require_absent(
+            villages,
+            forbidden,
+            "specialist_named_not_promised",
+            f"over-promising phrase '{forbidden}' (the rule forbids locking in any one operator)",
+        )
+
+    # ── appointment_block_not_window ──────────────────────────────────────
+    # Cable-company "arrival window" language must not appear on the marketing
+    # pages. The page uses "block" instead.
+    for page in (home, villages, process_page):
+        require_absent(
+            page,
+            r"arrival window",
+            "appointment_block_not_window",
+            "'arrival window' (use 'block' instead)",
+        )
+
+    # ── language_bank ─────────────────────────────────────────────────────
+    # The 'standard belongs to the process' line is a locked language-bank
+    # entry. The Process page is its most central expression.
+    require_present(
+        process_page,
+        r"belongs to the process",
+        "language_bank",
+        "the 'belongs to the process' line",
+    )
+
+    # ── neural_expressive_design ──────────────────────────────────────────
+    # The brand color tokens must be defined in global.css. A redesign that
+    # replaces global.css with a new system cannot drop these tokens silently.
+    css = _read(global_css)
+    if css is None:
+        failures.append(
+            "src/styles/global.css: missing (rule 'neural_expressive_design')"
+        )
+    else:
+        for token in ("--accent", "--accent2", "--ink", "--bg"):
+            if token not in css:
+                failures.append(
+                    f"src/styles/global.css: missing brand token '{token}' "
+                    f"(rule 'neural_expressive_design')"
+                )
+
+    # ── nav_no_backdrop_filter ────────────────────────────────────────────
+    # Never use backdrop-filter on the scrolled nav. Causes a dashed-line
+    # rendering artifact on Android/Chrome. Use solid rgba background.
+    require_absent(
+        nav,
+        r"backdrop-filter",
+        "nav_no_backdrop_filter",
+        "'backdrop-filter' (causes dashed-line artifact on Android/Chrome; use solid rgba background)",
+    )
+
+
 def main():
     check_clients()
     check_dashes()
@@ -270,12 +436,13 @@ def main():
     check_oracle_index_consistency()
     check_no_stale_data_paths()
     check_workflows_no_deleted_branches()
+    check_rule_survival()
     if failures:
         print(f"AUDIT FAIL ({len(failures)} issue(s)):")
         for f in failures:
             print(f"  - {f}")
         sys.exit(1)
-    print("AUDIT PASS: clients.json valid, no dashes, Oracle/index in sync, no conflict markers, no stale paths, workflows clean.")
+    print("AUDIT PASS: clients.json valid, no dashes, Oracle/index in sync, no conflict markers, no stale paths, workflows clean, rule-survival lint green.")
     sys.exit(0)
 
 

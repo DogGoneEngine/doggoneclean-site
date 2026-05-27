@@ -60,7 +60,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | bills_in_person_today | Money | Oracle; `legacy/data/clients.json` (per-dog prices) | n/a |
 | if_payments_added_handle_money_safely | Money | Oracle (deferred) | pricing code; webhook fn |
 | grooming_vocab | Copy | CLAUDE.md; **`check.py`** (dog-qualified, over `src/`) | lint allowlist |
-| specialist_named_not_promised | Copy | Oracle | site copy (city page "your specialist" section); lint pattern banning "always", "every time" predicates near specialist mentions |
+| specialist_named_not_promised | Copy | Oracle; **`check.py`** asserts `class="specialist-card"` present + forbids "always Paul" / "will be Paul" / "only Paul" on the city page | additional lint patterns when more operators join (per-name) |
 | specialist_assigned_per_route | Scheduling | Oracle | `routes.operator_id`; booking step 1 polygon-check response includes `route_operator` (name + photo URL); portal "your specialist" section reads the same join |
 | cancellation_24h | Money | Oracle | booking engine; site copy |
 | favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |
@@ -74,23 +74,23 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |
 | no_jargon | Copy | CLAUDE.md; convention | lint pattern |
 | device_profile | Copy | CLAUDE.md "How Paul works" | n/a |
-| neural_expressive_design | Design | CLAUDE.md "Design language"; Oracle | design tokens in `src/`; restyle lint when the site is rebuilt |
+| neural_expressive_design | Design | CLAUDE.md "Design language"; Oracle; design tokens in `src/styles/global.css`; **`check.py`** asserts `--accent`, `--accent2`, `--ink`, `--bg` tokens present in `global.css` | restyle lint that asserts token *values* unchanged (the present lint only asserts presence) |
 | website_is_ground_zero | Copy | Oracle; convention | build copy check |
 | reminder_voice | Copy | Oracle; convention | lint pattern (banned phrases) |
 | dont_knock_competitors | Copy | Oracle; convention | lint pattern |
-| appointment_block_not_window | Copy | Oracle; convention | lint pattern |
-| language_bank | Copy | Oracle | site copy |
+| appointment_block_not_window | Copy | Oracle; **`check.py`** forbids "arrival window" anywhere in `src/pages/index.astro`, `the-villages.astro`, `process.astro` | n/a |
+| language_bank | Copy | Oracle; site copy; **`check.py`** asserts "belongs to the process" present on `process.astro` | additional banked-line presence checks as the bank grows |
 | no_trailer_graphics | Copy | Oracle | n/a (real-world) |
 | maps_js_api_only | Engineering | Oracle (carried) | code + lint when site exists |
 | supabase_rpc_not_raw_fetch | Engineering | Oracle (carried) | code + `raw_fetch` lint |
 | auth_listener_sets_state_only | Engineering | Oracle (carried) | portal code |
-| nav_no_backdrop_filter | Engineering | Oracle (carried) | `backdrop_filter_on_nav` lint |
+| nav_no_backdrop_filter | Engineering | Oracle (carried); **`check.py`** forbids "backdrop-filter" anywhere in `src/components/Nav.astro` | n/a |
 | overlay_opacity_pairs_pointer_events | Engineering | Oracle (carried) | component CSS |
 | smoke_test_on_every_build | Engineering | Oracle (carried) | `scripts/smoke-build.mjs` |
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
 | bath_only_no_mats | Hurricane Bath: product | Oracle | `src/data/breeds.json`; booking-flow gating; lint pattern for accepted-breed list |
 | villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check; `villages` zone config |
-| villages_only_in_copy | Hurricane Bath: copy | Oracle | site copy (`src/pages/`); lint pattern banning second-city / Ocala-legacy / coming-soon mentions on the Hurricane Bath surface |
+| villages_only_in_copy | Hurricane Bath: copy | Oracle; **`check.py`** forbids "Ocala", "Fernandina", "St. Simons", "Saint Simons" in customer-facing markup on `index.astro`, `the-villages.astro`, `process.astro` (frontmatter + HTML comments stripped before check) | n/a |
 | three_dog_cap | Hurricane Bath: product | Oracle | booking flow dog-count limit; `src/business/pricing.js`; DB constraint on `appointments.dog_count` |
 | premium_inclusive_no_addons | Hurricane Bath: product | Oracle | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy |
 | breed_tier_pricing | Hurricane Bath: pricing | Oracle; `src/data/breeds.json` (Phase 4) | `src/business/pricing.js`; DB `subscriptions.base_price_cents` + `additional_dog_cents`; `business_rules` row |
@@ -113,8 +113,8 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | octane_selector_cadence_picker | Hurricane Bath: ux | Oracle | booking step 2 React component (3 buttons + arrow); locked copy "Want your dog fresher?"; smoke test asserts component renders all 3 options |
 | calendar_shows_price_per_date | Hurricane Bath: ux | Oracle | portal reschedule + skip-pick calendar component (per-date price label); `src/business/pricing.js` quote-per-date helper |
 | founders_spots_remaining_counter | Hurricane Bath: ux | Oracle | `/the-villages` page `#launch-spot-count` element (hidden above threshold, fed by public read on counted subscriptions); threshold constant in `src/business/pricing.js` |
-| founders_cap_statement_always_visible | Hurricane Bath: ux | Oracle; `/the-villages` launch card eyebrow + headline + subhead + terms-grid tile (cap stated four places, always visible, independent of the counter element) | lint pattern asserting cap-statement copy presence on the city page |
-| single_visit_as_own_path | Hurricane Bath: ux | Oracle; `/the-villages` "Other ways in" section (single-visit card with its own CTA `/book?plan=single`, alongside standard recurring) | booking-flow plan picker (top-level choice before card entry); lint pattern asserting single-visit CTA presence on the city page |
+| founders_cap_statement_always_visible | Hurricane Bath: ux | Oracle; `/the-villages` launch card eyebrow + headline + subhead + terms-grid tile (cap stated four places, always visible, independent of the counter element); **`check.py`** asserts "households" appears 2+ times in customer-facing copy on `the-villages.astro` | n/a |
+| single_visit_as_own_path | Hurricane Bath: ux | Oracle; `/the-villages` "Other ways in" section (single-visit card with its own CTA `/book?plan=single`, alongside standard recurring); **`check.py`** asserts `/book?plan=single` CTA href present on `the-villages.astro` | booking-flow plan picker (top-level choice before card entry) |
 | string_of_pearls_is_a_service | Hurricane Bath: engineering | Oracle | `get-available-slots` / `create-booking` / `reschedule-appointment` / `skip-appointment` / `stop-subscription` CORS-locked edge functions; `/schedule-widget` iframe route; service-type query param |
 
 ## How to add a row
