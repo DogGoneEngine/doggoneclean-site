@@ -1,481 +1,567 @@
 ---
-const bathPoints = [
+// src/pages/index.astro
+// Home page. Funnel for the Hurricane Bath: introduce, justify, point
+// people at /the-villages (the city page where the offer lives) and
+// /process (the work explained). The deep detail does not live here.
+//
+// Service area copy stays The Villages only per `villages_only_in_copy`.
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const valueProps = [
   {
-    head: "Power, dialed to the dog",
-    body: "A lever at the nozzle sets the water from a soft trickle to full force. Full force drives water through a thick double coat to the skin. Soft is right for a face, eyes, and nervous dogs. Powerful does not have to mean rough.",
+    title: 'The Hurricane Bath',
+    body: 'A wash system Paul built himself. Powerful when it needs to be, gentle when it has to be. Strong flow drives water through a thick coat to the skin. A soft trickle for faces, eyes, and nervous dogs. No fire hosing where it does not belong.',
   },
   {
-    head: "Finishes on clean water",
-    body: "The wash recirculates and gets your dog clean the way a dishwasher does. Every dog finishes with a fresh water rinse from a separate tank.",
+    title: 'Built around the dog',
+    body: 'We bath one household at a time in a climate controlled trailer. No cages, no assembly line, no crowded lobby. Your dog gets focused care and the trailer rolls on.',
   },
   {
-    head: "No dog too dirty",
-    body: "Mud from nose to tail is a normal day. When the wash water turns to a puddle, we flush, refill, and wash again until your dog washes up clean.",
-  },
-  {
-    head: "Easy on water",
-    body: "Most dogs are washed and rinsed with under five gallons. The power comes from how the system moves water, not from wasting it.",
+    title: 'We come to you',
+    body: 'The trailer parks in your driveway. The bath happens. Your dog walks back inside clean. You stay home. Your day stays yours.',
   },
 ];
 
-const faqs = [
-  {
-    q: "Is it gentle?",
-    a: "Yes. The pressure dials down to a soft trickle, so faces, eyes, and small or nervous dogs get a soft bath.",
-  },
-  {
-    q: "Is my dog washed in clean water?",
-    a: "The wash recirculates and gets your dog clean the way a dishwasher does. An extra-dirty dog is flushed and washed again with fresh water, and every dog finishes on a clean-water rinse from a separate tank.",
-  },
-  {
-    q: "What shampoo do you use?",
-    a: "A gentle shampoo and conditioner that suits nearly every dog. If your dog needs something specific, medicated, or for a particular condition, bring it and we will use it.",
-  },
-  {
-    q: "How dirty is too dirty?",
-    a: "Just about nothing. Mud from nose to tail is a normal day.",
-  },
+const loopSteps = [
+  'You notice the shedding piling up on the rug and the couch.',
+  'You think about giving the bath yourself. The hose is cold, the dog hates it, the mess is enormous.',
+  'You think about loading the dog up and driving somewhere. The wait. The pickup. Half a day gone.',
+  'So you put it off. The shedding gets worse. So does the smell.',
+  'The cycle repeats. You think about it again next week.',
 ];
 
+const recurringSteps = [
+  'Book your first visit',
+  'Try the Hurricane Bath',
+  'We come back on a schedule you keep',
+  'Cancel in two taps, anytime',
+];
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dog Gone Clean | Mobile dog baths in The Villages, Florida</title>
-    <meta
-      name="description"
-      content="Dog Gone Clean is a mobile dog bath service in The Villages, Florida, powered by the Hurricane Bath. A genuinely clean dog in your driveway, on a schedule you keep."
-    />
-  </head>
-  <body>
+<BaseLayout
+  title="Dog Gone Clean | Mobile dog baths in The Villages, Florida"
+  description="A genuinely clean dog in your driveway, powered by the Hurricane Bath. Recurring or one off, in The Villages, Florida."
+>
+
+  <!-- HERO -->
+  <section class="hero">
     <div class="glow glow-a"></div>
     <div class="glow glow-b"></div>
-
-    <header class="site">
-      <img class="brand-logo" src="/logo.png" alt="Dog Gone Clean" />
-      <a class="portal" href="/portal/">Client sign in</a>
-    </header>
-
-    <main>
-      <section class="hero">
+    <div class="container">
+      <div class="hero__inner">
         <p class="eyebrow">Mobile dog baths in The Villages, Florida</p>
-        <h1>A bath your dog<br /><span class="grad">actually likes.</span></h1>
-        <p class="lede">
+        <h1 class="hero__title">A bath your dog<br /><span class="grad">actually likes.</span></h1>
+        <p class="hero__lede">
           Powered by the Hurricane Bath, in your driveway. A genuinely clean
           dog, calmly handled, without the trip.
         </p>
-        <div class="cta">
-          <a class="button primary" href="/portal/">Book a visit</a>
-          <a class="button ghost" href="#bath">Meet the Hurricane Bath</a>
+        <div class="hero__cta">
+          <a class="button button--primary button--lg" href="/the-villages">Book a visit</a>
+          <a class="button button--ghost button--lg" href="/process">Meet the Hurricane Bath</a>
         </div>
-        <p class="trio">Structured. Reliable. Personal.</p>
-      </section>
+        <p class="hero__trio">Structured. Reliable. Personal.</p>
+      </div>
+    </div>
+  </section>
 
-      <section id="bath" class="bath">
-        <p class="eyebrow light">The Hurricane Bath</p>
-        <h2>A serious bath, <span class="grad">at your door.</span></h2>
-        <p class="lede">
-          The Hurricane Bath moves up to about ten gallons a minute, the kind of
-          flow you get from city water, and dials all the way down to a soft
-          trickle for a dog's face and eyes. Paul built it himself, and it gets a
-          dog genuinely clean, fast.
+  <!-- FAST LANE -->
+  <section class="fast-lane">
+    <div class="container">
+      <div class="fast-lane__inner">
+        <a href="/the-villages" class="fast-lane-card fast-lane-card--new">
+          <div class="fast-lane-card__icon" aria-hidden="true">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </div>
+          <div>
+            <div class="fast-lane-card__label">New here</div>
+            <div class="fast-lane-card__desc">See the offer in The Villages</div>
+          </div>
+        </a>
+        <a href="/portal" class="fast-lane-card fast-lane-card--existing">
+          <div class="fast-lane-card__icon" aria-hidden="true">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 14l-4-4 4-4"/>
+              <path d="M5 10h11a4 4 0 010 8h-1"/>
+            </svg>
+          </div>
+          <div>
+            <div class="fast-lane-card__label">Existing client</div>
+            <div class="fast-lane-card__desc">Manage your recurring care</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUE PROPS -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">What makes this different</p>
+        <h2 class="section-title">A clean dog is the real job here.</h2>
+        <p class="section-subtitle section-subtitle--center">
+          Dog Gone Clean does one thing: bath dogs, in their driveway, with
+          a system Paul designed to do it well. No salon theater, no
+          add ons, no upsells. One clean dog at a time.
         </p>
-        <div class="grid">
-          {
-            bathPoints.map((p) => (
-              <article class="card dark">
-                <h3>{p.head}</h3>
-                <p>{p.body}</p>
-              </article>
-            ))
-          }
+      </div>
+      <div class="value-grid">
+        {valueProps.map(v => (
+          <article class="value-card">
+            <h3>{v.title}</h3>
+            <p>{v.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- THE LOOP -->
+  <section class="section loop-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">The problem we solve</p>
+        <h2 class="section-title">You know it needs to get done.</h2>
+        <p class="section-subtitle section-subtitle--center">
+          Bathing the dog is one of those tasks that keeps getting pushed
+          to next week. Here is how the cycle usually plays out.
+        </p>
+      </div>
+      <div class="loop-grid">
+        <ol class="loop-list">
+          {loopSteps.map((step, i) => (
+            <li>
+              <span class="loop-marker">{i + 1}</span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+        <div class="loop-solution">
+          <h3>Break the loop.</h3>
+          <p>
+            Dog Gone Clean takes the bath off your plate. We show up at
+            your home on a schedule you set, run the Hurricane Bath, and
+            roll on. You stop thinking about it. You stop putting it off.
+            It just gets done.
+          </p>
+          <a class="button button--primary" href="/the-villages">See the offer</a>
         </div>
-      </section>
+      </div>
+    </div>
+  </section>
 
-      <section class="why">
-        <p class="eyebrow">Why Paul built it</p>
-        <h2>None of the systems he could buy did everything he wanted in one machine.</h2>
-        <p>
-          So he built the one that does. Years of working with the professional
-          systems showed him what to keep and what was missing, and he put all of
-          it into a single machine tuned exactly the way he wants to wash a dog.
-          There is nothing else quite like it, and he is still refining it.
+  <!-- RECURRING MODEL -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">How it works</p>
+        <h2 class="section-title">Set it. Forget it. <span class="grad">Stay ahead of the shed.</span></h2>
+        <p class="section-subtitle section-subtitle--center">
+          Most clients pick recurring every four weeks. Heavy shedders go
+          every two. Same price either way. Book once and the rest runs
+          on a standing schedule.
         </p>
-      </section>
-
-      <section class="standard">
-        <p class="eyebrow">The standard</p>
-        <h2>The standard does not belong to a person. <span class="grad">It belongs to the process.</span></h2>
-        <p>
-          Every bath follows the same process. Water dialed to the coat. The
-          system flushed when it has to be. The finish on the clean tank.
-          Drying in the climate-controlled trailer. That is the point of
-          writing it down: a bath that holds the same standard whether Paul
-          or anyone trained on the system is the one running it.
-        </p>
-      </section>
-
-      <section class="faq">
-        <p class="eyebrow">Questions, answered</p>
-        <h2>Honest answers about the Hurricane Bath.</h2>
-        <div class="qa-list">
-          {
-            faqs.map((f) => (
-              <article class="qa">
-                <h3>{f.q}</h3>
-                <p>{f.a}</p>
-              </article>
-            ))
-          }
+      </div>
+      <div class="recurring">
+        <div class="recurring__copy">
+          <h3>Recurring, your way</h3>
+          <p>
+            Your bath runs on the same rhythm every cycle. The Hurricane
+            Bath stays ahead of the shedding, the smell, and the dander
+            you would rather not vacuum. No reminding yourself. No
+            rebooking. No hassle.
+          </p>
+          <p>
+            You can also book a single visit first and move to recurring
+            when you are ready.
+          </p>
         </div>
-      </section>
+        <ol class="recurring__steps">
+          {recurringSteps.map((step, i) => (
+            <li>
+              <span class="recurring__num">{i + 1}</span>
+              <span class="recurring__text">{step}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
 
-      <section class="power">
-        <h2>Serious power, <span class="grad">quiet by choice.</span></h2>
-        <p>
-          Ten thousand watts of generator capacity roll up to your driveway,
-          about what it takes to run a small house. The two units are inverter
-          models, chosen to run at the volume of a normal conversation. Paul
-          paid more for them so your visit stays peaceful.
+  <!-- SERVICE AREA -->
+  <section class="section city-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">Service area</p>
+        <h2 class="section-title">We are in The Villages.</h2>
+        <p class="section-subtitle section-subtitle--center">
+          Hurricane Bath service launches in The Villages, Florida.
+          Check your address and lock in the founders rate.
         </p>
-        <p>
-          That power runs the air conditioning, the dehumidifier, and the
-          high-velocity dryers, so your dog is comfortable the whole time and
-          dry quickly.
-        </p>
-      </section>
+      </div>
+      <div class="city-grid">
+        <a href="/the-villages" class="city-card">
+          <div class="city-card__state">Florida</div>
+          <h3>The Villages</h3>
+          <p>Mobile dog baths in The Villages. Recurring or one off, on a schedule you keep.</p>
+          <div class="city-card__cta">
+            See the offer
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
 
-      <section class="arrival">
-        <p class="eyebrow">Now in The Villages, Florida</p>
-        <h2>The trailer parks in your driveway.<br />The bath happens.<br /><span class="grad">Your dog walks back inside, clean.</span></h2>
-        <p>
-          That is the whole visit. You stay home. Your dog gets focused care.
-          The trailer carries its own water, power, and climate control, so
-          nothing about your day has to change. Just your dog, the Hurricane
-          Bath, and the same process every visit.
-        </p>
-      </section>
+  <!-- FRIENDLY DOGS -->
+  <section class="section friendly-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">Safety standard</p>
+        <h2 class="section-title">Friendly dogs only</h2>
+      </div>
+      <div class="friendly__card">
+        <p>A mobile dog bath runs on the trust between the dog and the operator.</p>
+        <p>A dog that shows aggression toward people is not eligible for this service.</p>
+        <p><strong>Normal wiggling is fine. Aggression is not.</strong></p>
+      </div>
+    </div>
+  </section>
 
-      <section class="about">
-        <h2>Meet Paul Nickerson</h2>
-        <p>
-          Paul did not fall into this business by accident. He chose dogs. He
-          wanted to build his life around working with them, so he trained at the
-          Florida Institute of Animal Arts and built Dog Gone Clean from the
-          ground up in Ocala, Florida.
-        </p>
-        <p>
-          What started as one trailer and one decision became a focused mobile
-          dog grooming service built on calm handling and full attention. The
-          system came later. The dogs came first.
-        </p>
-        <p class="sign">Paul Nickerson, Owner, Dog Gone Clean</p>
-      </section>
-    </main>
+</BaseLayout>
 
-    <footer class="site-footer">
-      <span>Dog Gone Clean</span>
-      <span>Mobile dog baths, The Villages FL</span>
-    </footer>
+<style>
+  /* HERO */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-4xl) var(--space-3xl);
+  }
+  .hero .glow-a {
+    top: -120px;
+    right: -80px;
+    width: 420px;
+    height: 420px;
+  }
+  .hero .glow-b {
+    top: 320px;
+    left: -120px;
+    width: 380px;
+    height: 380px;
+  }
+  .hero__inner {
+    max-width: 760px;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 var(--space-md);
+  }
+  .hero__title {
+    font-size: clamp(2.6rem, 8vw, 4.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--space-lg);
+  }
+  .hero__lede {
+    font-size: var(--text-xl);
+    color: var(--soft);
+    line-height: 1.5;
+    margin: 0 auto var(--space-xl);
+    max-width: 38rem;
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    justify-content: center;
+  }
+  .hero__trio {
+    margin: var(--space-xl) 0 0;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--soft);
+  }
 
-    <style>
-      :root {
-        --ink: #0c1322;
-        --muted: #5a6b7d;
-        --bg: #f7f9ff;
-        --card: #ffffff;
-        --accent: #2563eb;
-        --accent2: #06b6d4;
-        --line: #e3e8f4;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      html {
-        scroll-behavior: smooth;
-      }
-      body {
-        margin: 0;
-        position: relative;
-        overflow-x: hidden;
-        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-        color: var(--ink);
-        background: var(--bg);
-        line-height: 1.55;
-      }
-      .glow {
-        position: absolute;
-        z-index: 0;
-        border-radius: 50%;
-        filter: blur(90px);
-        opacity: 0.5;
-        pointer-events: none;
-      }
-      .glow-a {
-        top: -120px;
-        right: -80px;
-        width: 420px;
-        height: 420px;
-        background: radial-gradient(circle, #3b82f6, transparent 70%);
-      }
-      .glow-b {
-        top: 600px;
-        left: -120px;
-        width: 380px;
-        height: 380px;
-        background: radial-gradient(circle, #22d3ee, transparent 70%);
-      }
-      .site,
-      main,
-      .site-footer {
-        position: relative;
-        z-index: 1;
-      }
-      .site {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1.1rem 1.4rem;
-        max-width: 980px;
-        margin: 0 auto;
-      }
-      .brand-logo {
-        height: 108px;
-        width: auto;
-        display: block;
-      }
-      @media (max-width: 480px) {
-        .brand-logo {
-          height: 80px;
-        }
-      }
-      .portal {
-        color: var(--accent);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.95rem;
-      }
-      main {
-        max-width: 980px;
-        margin: 0 auto;
-        padding: 0 1.4rem;
-      }
-      .eyebrow {
-        text-transform: uppercase;
-        letter-spacing: 0.09em;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: var(--accent);
-        margin: 0 0 0.7rem;
-      }
-      .eyebrow.light {
-        color: var(--accent2);
-      }
-      .hero {
-        padding: 3rem 0 3.5rem;
-      }
-      h1 {
-        font-size: clamp(2.6rem, 9vw, 4.6rem);
-        line-height: 1.02;
-        letter-spacing: -0.02em;
-        margin: 0 0 1.2rem;
-        font-weight: 800;
-      }
-      .grad {
-        background: linear-gradient(100deg, var(--accent), var(--accent2));
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-      .lede {
-        font-size: 1.18rem;
-        color: #41506a;
-        max-width: 36rem;
-        margin: 0 0 1.7rem;
-      }
-      .cta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-      }
-      .button {
-        display: inline-block;
-        padding: 0.85rem 1.4rem;
-        border-radius: 999px;
-        text-decoration: none;
-        font-weight: 700;
-      }
-      .primary {
-        background: linear-gradient(100deg, var(--accent), var(--accent2));
-        color: #fff;
-        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35);
-      }
-      .ghost {
-        background: #fff;
-        color: var(--ink);
-        border: 1px solid var(--line);
-      }
-      .trio {
-        margin: 1.8rem 0 0;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        color: #41506a;
-      }
-      section h2 {
-        font-size: clamp(1.6rem, 4vw, 2.2rem);
-        letter-spacing: -0.01em;
-        margin: 0 0 1.2rem;
-        font-weight: 800;
-      }
-      .services,
-      .power,
-      .arrival,
-      .about,
-      .why,
-      .faq,
-      .standard {
-        padding: 1.8rem 0 2.6rem;
-      }
-      .standard h2 {
-        max-width: 40rem;
-        line-height: 1.18;
-      }
-      .standard p {
-        font-size: 1.08rem;
-        color: #41506a;
-        max-width: 44rem;
-        margin: 0;
-      }
-      .arrival h2 {
-        line-height: 1.15;
-        max-width: 30rem;
-      }
-      .arrival p {
-        font-size: 1.08rem;
-        color: #41506a;
-        max-width: 40rem;
-      }
-      .why h2 {
-        max-width: 40rem;
-        line-height: 1.18;
-      }
-      .why p {
-        font-size: 1.08rem;
-        color: #41506a;
-        max-width: 44rem;
-        margin: 0;
-      }
-      .faq h2 {
-        max-width: 40rem;
-      }
-      .qa-list {
-        display: grid;
-        gap: 0.9rem;
-        max-width: 46rem;
-      }
-      .qa {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 1.1rem 1.3rem;
-        box-shadow: 0 4px 14px rgba(13, 30, 70, 0.04);
-      }
-      .qa h3 {
-        margin: 0 0 0.35rem;
-        font-size: 1.05rem;
-        color: var(--accent);
-      }
-      .qa p {
-        margin: 0;
-        color: #41506a;
-      }
-      .grid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      }
-      .card {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 1.4rem;
-        box-shadow: 0 6px 20px rgba(13, 30, 70, 0.05);
-      }
-      .card h3 {
-        margin: 0 0 0.5rem;
-        color: var(--accent);
-      }
-      .card p {
-        margin: 0;
-        color: #41506a;
-      }
-      .bath {
-        position: relative;
-        margin: 1rem -1.4rem;
-        padding: 3rem 1.4rem;
-        color: #eaf2ff;
-        background: linear-gradient(160deg, #0c1322, #15233f 60%, #0e2a3a);
-        border-radius: 24px;
-      }
-      .bath h2 {
-        color: #fff;
-      }
-      .bath .lede {
-        color: #b9cae8;
-      }
-      .card.dark {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: none;
-      }
-      .card.dark h3 {
-        color: #67e8f9;
-      }
-      .card.dark p {
-        color: #b9cae8;
-      }
-      .power p,
-      .about p {
-        font-size: 1.08rem;
-        color: #41506a;
-        max-width: 44rem;
-        margin: 0 0 1rem;
-      }
-      .chips {
-        list-style: none;
-        padding: 0;
-        margin: 1rem 0 0;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.6rem;
-      }
-      .chips li {
-        background: #fff;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        padding: 0.45rem 1rem;
-        font-size: 0.95rem;
-        font-weight: 600;
-      }
-      .about .sign {
-        font-weight: 700;
-        color: var(--ink);
-      }
-      .site-footer {
-        max-width: 980px;
-        margin: 0 auto;
-        padding: 2.5rem 1.4rem 3.5rem;
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        color: #5a6b7d;
-        font-size: 0.9rem;
-        border-top: 1px solid var(--line);
-      }
-    </style>
-  </body>
-</html>
+  /* FAST LANE */
+  .fast-lane {
+    margin-top: calc(-1 * var(--space-lg));
+    position: relative;
+    z-index: 2;
+  }
+  .fast-lane__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .fast-lane-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-xl);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--ink);
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  }
+  .fast-lane-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+  .fast-lane-card__icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    display: grid;
+    place-items: center;
+  }
+  .fast-lane-card--new .fast-lane-card__icon {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
+  }
+  .fast-lane-card--existing .fast-lane-card__icon {
+    background: rgba(6, 182, 212, 0.12);
+    color: var(--accent2);
+  }
+  .fast-lane-card__label {
+    font-size: var(--text-lg);
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .fast-lane-card__desc {
+    font-size: var(--text-sm);
+    color: var(--soft);
+    margin-top: 2px;
+  }
+  @media (max-width: 600px) {
+    .fast-lane { margin-top: var(--space-md); }
+    .fast-lane__inner { grid-template-columns: 1fr; }
+  }
+
+  /* VALUE PROPS */
+  .value-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+    margin-top: var(--space-3xl);
+  }
+  @media (max-width: 900px) {
+    .value-grid { grid-template-columns: 1fr; }
+  }
+  .value-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+  .value-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  .value-card h3 {
+    font-size: var(--text-xl);
+    margin: 0 0 var(--space-sm);
+    color: var(--accent);
+  }
+  .value-card p {
+    color: var(--soft);
+    margin: 0;
+  }
+
+  /* THE LOOP */
+  .loop-section {
+    background: var(--surface-alt);
+    border-block: 1px solid var(--line);
+  }
+  .loop-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--space-3xl);
+    align-items: start;
+    margin-top: var(--space-2xl);
+  }
+  @media (max-width: 900px) {
+    .loop-grid { grid-template-columns: 1fr; gap: var(--space-xl); }
+  }
+  .loop-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  .loop-list li {
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+    color: var(--soft);
+  }
+  .loop-marker {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--radius-full);
+    font-weight: 800;
+  }
+  .loop-solution {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+  }
+  .loop-solution h3 {
+    color: var(--accent);
+    margin: 0 0 var(--space-md);
+  }
+  .loop-solution p {
+    margin-bottom: var(--space-lg);
+  }
+
+  /* RECURRING */
+  .recurring {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+    margin-top: var(--space-2xl);
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .recurring { grid-template-columns: 1fr; }
+  }
+  .recurring__copy h3 {
+    color: var(--accent);
+    margin: 0 0 var(--space-md);
+    font-size: var(--text-2xl);
+  }
+  .recurring__steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .recurring__steps li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: var(--space-md) var(--space-lg);
+  }
+  .recurring__num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border-radius: var(--radius-full);
+    font-weight: 800;
+  }
+  .recurring__text {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* CITY */
+  .city-section {
+    background: var(--surface-alt);
+    border-block: 1px solid var(--line);
+    scroll-margin-top: var(--nav-height);
+  }
+  .city-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 480px);
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-top: var(--space-2xl);
+  }
+  .city-card {
+    display: block;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+    text-align: left;
+  }
+  .city-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent);
+    color: inherit;
+  }
+  .city-card__state {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: var(--space-xs);
+  }
+  .city-card h3 {
+    font-size: var(--text-2xl);
+    color: var(--accent);
+    margin: 0 0 var(--space-sm);
+  }
+  .city-card p {
+    color: var(--soft);
+    margin: 0 0 var(--space-lg);
+  }
+  .city-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: var(--text-sm);
+  }
+
+  /* FRIENDLY */
+  .friendly-section { }
+  .friendly__card {
+    max-width: 640px;
+    margin: var(--space-2xl) auto 0;
+    padding: var(--space-2xl);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .friendly__card p {
+    margin-bottom: var(--space-md);
+    font-size: var(--text-lg);
+  }
+  .friendly__card p:last-child { margin-bottom: 0; }
+</style>
