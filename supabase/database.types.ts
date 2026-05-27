@@ -7,13 +7,351 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
+      bath_appointments: {
+        Row: {
+          amount_cents: number
+          charged_at: string | null
+          created_at: string
+          dog_count: number
+          id: string
+          notes: string | null
+          original_scheduled_start: string | null
+          payment_status: string
+          scheduled_end: string | null
+          scheduled_start: string
+          status: string
+          stripe_payment_intent_id: string | null
+          subscriber_id: string
+          subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          charged_at?: string | null
+          created_at?: string
+          dog_count?: number
+          id?: string
+          notes?: string | null
+          original_scheduled_start?: string | null
+          payment_status?: string
+          scheduled_end?: string | null
+          scheduled_start: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          subscriber_id: string
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          charged_at?: string | null
+          created_at?: string
+          dog_count?: number
+          id?: string
+          notes?: string | null
+          original_scheduled_start?: string | null
+          payment_status?: string
+          scheduled_end?: string | null
+          scheduled_start?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          subscriber_id?: string
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bath_appointments_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "bath_subscribers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bath_appointments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "bath_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bath_dogs: {
+        Row: {
+          active: boolean
+          behavior_notes: string | null
+          birth_date: string | null
+          breed: string | null
+          coat_tier: string | null
+          created_at: string
+          dob_approximate: boolean
+          id: string
+          name: string
+          subscriber_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          behavior_notes?: string | null
+          birth_date?: string | null
+          breed?: string | null
+          coat_tier?: string | null
+          created_at?: string
+          dob_approximate?: boolean
+          id?: string
+          name: string
+          subscriber_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          behavior_notes?: string | null
+          birth_date?: string | null
+          breed?: string | null
+          coat_tier?: string | null
+          created_at?: string
+          dob_approximate?: boolean
+          id?: string
+          name?: string
+          subscriber_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bath_dogs_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "bath_subscribers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bath_subscribers: {
+        Row: {
+          address_city: string | null
+          address_line_1: string | null
+          address_state: string | null
+          address_zip: string | null
+          auth_user_id: string | null
+          city_id: string | null
+          created_at: string
+          email: string | null
+          email_opt_in: boolean
+          first_name: string | null
+          id: string
+          is_test: boolean
+          last_name: string | null
+          last_profile_confirmed_at: string | null
+          phone_e164: string | null
+          service_lat: number | null
+          service_lng: number | null
+          sms_opt_in: boolean
+          stripe_customer_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          address_city?: string | null
+          address_line_1?: string | null
+          address_state?: string | null
+          address_zip?: string | null
+          auth_user_id?: string | null
+          city_id?: string | null
+          created_at?: string
+          email?: string | null
+          email_opt_in?: boolean
+          first_name?: string | null
+          id?: string
+          is_test?: boolean
+          last_name?: string | null
+          last_profile_confirmed_at?: string | null
+          phone_e164?: string | null
+          service_lat?: number | null
+          service_lng?: number | null
+          sms_opt_in?: boolean
+          stripe_customer_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address_city?: string | null
+          address_line_1?: string | null
+          address_state?: string | null
+          address_zip?: string | null
+          auth_user_id?: string | null
+          city_id?: string | null
+          created_at?: string
+          email?: string | null
+          email_opt_in?: boolean
+          first_name?: string | null
+          id?: string
+          is_test?: boolean
+          last_name?: string | null
+          last_profile_confirmed_at?: string | null
+          phone_e164?: string | null
+          service_lat?: number | null
+          service_lng?: number | null
+          sms_opt_in?: boolean
+          stripe_customer_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bath_subscribers_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bath_subscriptions: {
+        Row: {
+          additional_dog_decrement_cents: number
+          base_price_cents: number
+          cadence: string
+          cancelled_at: string | null
+          city_id: string
+          consecutive_no_shows: number
+          created_at: string
+          founders_locked_until: string | null
+          id: string
+          is_founders: boolean
+          last_skip_at: string | null
+          last_skip_priced_at: string | null
+          paused_at: string | null
+          paused_reason: string | null
+          started_at: string
+          status: string
+          stripe_payment_method_id: string | null
+          subscriber_id: string
+          updated_at: string
+        }
+        Insert: {
+          additional_dog_decrement_cents?: number
+          base_price_cents: number
+          cadence: string
+          cancelled_at?: string | null
+          city_id: string
+          consecutive_no_shows?: number
+          created_at?: string
+          founders_locked_until?: string | null
+          id?: string
+          is_founders?: boolean
+          last_skip_at?: string | null
+          last_skip_priced_at?: string | null
+          paused_at?: string | null
+          paused_reason?: string | null
+          started_at?: string
+          status?: string
+          stripe_payment_method_id?: string | null
+          subscriber_id: string
+          updated_at?: string
+        }
+        Update: {
+          additional_dog_decrement_cents?: number
+          base_price_cents?: number
+          cadence?: string
+          cancelled_at?: string | null
+          city_id?: string
+          consecutive_no_shows?: number
+          created_at?: string
+          founders_locked_until?: string | null
+          id?: string
+          is_founders?: boolean
+          last_skip_at?: string | null
+          last_skip_priced_at?: string | null
+          paused_at?: string | null
+          paused_reason?: string | null
+          started_at?: string
+          status?: string
+          stripe_payment_method_id?: string | null
+          subscriber_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bath_subscriptions_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bath_subscriptions_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "bath_subscribers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cities: {
+        Row: {
+          center_lat: number | null
+          center_lng: number | null
+          created_at: string
+          hb_active: boolean
+          hb_addon_decrement_cents: number
+          hb_doublecoat_recurring_cents: number | null
+          hb_doublecoat_single_cents: number | null
+          hb_founders_cap: number
+          hb_founders_doublecoat_cents: number | null
+          hb_founders_smoothcoat_cents: number | null
+          hb_smoothcoat_recurring_cents: number | null
+          hb_smoothcoat_single_cents: number | null
+          id: string
+          name: string
+          polygon: Json
+          slug: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          center_lat?: number | null
+          center_lng?: number | null
+          created_at?: string
+          hb_active?: boolean
+          hb_addon_decrement_cents?: number
+          hb_doublecoat_recurring_cents?: number | null
+          hb_doublecoat_single_cents?: number | null
+          hb_founders_cap?: number
+          hb_founders_doublecoat_cents?: number | null
+          hb_founders_smoothcoat_cents?: number | null
+          hb_smoothcoat_recurring_cents?: number | null
+          hb_smoothcoat_single_cents?: number | null
+          id?: string
+          name: string
+          polygon?: Json
+          slug: string
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          center_lat?: number | null
+          center_lng?: number | null
+          created_at?: string
+          hb_active?: boolean
+          hb_addon_decrement_cents?: number
+          hb_doublecoat_recurring_cents?: number | null
+          hb_doublecoat_single_cents?: number | null
+          hb_founders_cap?: number
+          hb_founders_doublecoat_cents?: number | null
+          hb_founders_smoothcoat_cents?: number | null
+          hb_smoothcoat_recurring_cents?: number | null
+          hb_smoothcoat_single_cents?: number | null
+          id?: string
+          name?: string
+          polygon?: Json
+          slug?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           access: Json
@@ -149,140 +487,9 @@ export type Database = {
         ]
       }
     }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    Views: { [_ in never]: never }
+    Functions: { [_ in never]: never }
+    Enums: { [_ in never]: never }
+    CompositeTypes: { [_ in never]: never }
   }
 }
-
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
-
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
-
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
-
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
-
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
-
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const
