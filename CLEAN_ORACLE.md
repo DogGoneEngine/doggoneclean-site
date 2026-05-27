@@ -677,7 +677,24 @@ next month, the auto-update pattern adds zero ongoing work for Paul, and
 hiding the count above the threshold avoids the "97 spots left" anti-signal
 that tells visitors the offer has no real urgency. Pairs with
 `tiered_founders_rate` (which defines the rate and cap the counter draws
-from).
+from) and `founders_cap_statement_always_visible` (which carries the
+scarcity framing when the counter itself is hidden).
+
+`founders_cap_statement_always_visible` (ux):
+The founders rate page must state the founders cap (e.g., "first 25
+households") prominently in always-visible copy, separate from the
+counter element that surfaces only when remaining drops below the
+visibility threshold. The cap belongs in the launch card eyebrow,
+headline, or subhead, and is reinforced in a terms tile so it cannot
+be missed by a scanning reader. Because scarcity expressed only through
+a counter-when-low produces a page that does not read like a special
+offer when the counter is hidden (the failure mode caught on
+2026-05-27, where the first cut of `/the-villages` buried the cap and
+read as just another price). The cap is the always-true fact that
+makes the offer feel time-limited even before the count is meaningful;
+the counter is the urgency signal that fires when supply runs low. Two
+distinct surfaces, both required. Pairs with
+`founders_spots_remaining_counter` and `tiered_founders_rate`.
 
 ### Engineering
 
