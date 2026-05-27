@@ -174,7 +174,7 @@ this:
    the page hydrates `tiers` and `FOUNDERS_CAP` from there. Copy was
    updated to template the cap (`{FOUNDERS_CAP}`) in the eyebrow,
    headline, subhead, and terms-tile. Trade-off: deploys now depend
-   on dgc-prod being reachable at build time. Acceptable — the live
+   on dgc-prod being reachable at build time. Acceptable: the live
    site keeps serving on a build failure, and the same dependency
    exists for the portal already. Live customer behavior unchanged.
    `if_payments_added_handle_money_safely` was the rule the fix
