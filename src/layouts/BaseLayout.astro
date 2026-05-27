@@ -1,0 +1,63 @@
+---
+// src/layouts/BaseLayout.astro
+//
+// Marketing layout for Dog Gone Clean / Hurricane Bath pages: home,
+// /the-villages, /process, and the /book + /portal stubs.
+// Legal pages use src/layouts/Legal.astro instead. Both share global.css.
+
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import FloatBookButton from '../components/FloatBookButton.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  noIndex?: boolean;
+}
+
+const {
+  title = 'Dog Gone Clean | Mobile dog baths in The Villages, Florida',
+  description = 'Dog Gone Clean is a mobile dog bath service in The Villages, Florida, powered by the Hurricane Bath. A genuinely clean dog in your driveway, on a schedule you keep.',
+  ogImage = '/logo.png',
+  noIndex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+    <title>{title}</title>
+
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+
+    <link rel="icon" type="image/png" href="/logo.png" />
+  </head>
+
+  <body>
+    <Nav />
+    <main>
+      <slot />
+    </main>
+    <FloatBookButton />
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>

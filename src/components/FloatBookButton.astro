@@ -1,0 +1,135 @@
+---
+// src/components/FloatBookButton.astro
+//
+// Page-aware floating Book a visit button. Mounted globally via BaseLayout.
+// Reads window.location at runtime to decide visibility and copy.
+//
+// Hidden on /book, /portal, and the legal pages.
+// On the home page and /process: opens /book.
+// On /the-villages: leads with the founders offer.
+---
+
+<a href="/book" id="float-btn" class="float-btn" data-float-btn aria-hidden="true" tabindex="-1">
+  <span class="float-btn__label">Book a visit</span>
+</a>
+
+<style>
+  .float-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 150;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 26px;
+    background: linear-gradient(100deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    border: none;
+    border-radius: var(--radius-full);
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.42);
+    cursor: pointer;
+    text-decoration: none;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(16px);
+    transition: opacity 0.35s ease, transform 0.35s ease, box-shadow var(--transition-fast);
+    pointer-events: none;
+  }
+
+  .float-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 28%,
+      rgba(255, 255, 255, 0.32) 46%,
+      rgba(255, 255, 255, 0.18) 52%,
+      transparent 66%
+    );
+    transform: translateX(-130%);
+    transition: transform 0.65s ease;
+    pointer-events: none;
+  }
+
+  .float-btn:hover::after,
+  .float-btn:active::after {
+    transform: translateX(130%);
+  }
+
+  .float-btn.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .float-btn:hover {
+    box-shadow: 0 14px 36px rgba(37, 99, 235, 0.5);
+    color: #fff;
+  }
+
+  .float-btn__label {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    .float-btn {
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%) translateY(16px);
+      bottom: 20px;
+      padding: 13px 28px;
+      white-space: nowrap;
+    }
+    .float-btn.is-visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    .float-btn:hover {
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+</style>
+
+<script>
+  const btn = document.querySelector('[data-float-btn]') as HTMLAnchorElement | null;
+  if (btn) {
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    const HIDDEN = ['/book', '/portal', '/privacy', '/terms', '/sms'];
+    const isHidden = HIDDEN.some(p => path === p || path.startsWith(p + '/'));
+
+    if (isHidden) {
+      btn.remove();
+    } else {
+      const labelEl = btn.querySelector('.float-btn__label') as HTMLElement | null;
+
+      if (path === '/the-villages') {
+        if (labelEl) labelEl.textContent = 'Lock in the founders rate';
+        btn.href = '/book?founders=1';
+      } else {
+        if (labelEl) labelEl.textContent = 'Book a visit';
+        btn.href = '/book';
+      }
+
+      const REVEAL_AT = 480;
+      let visible = false;
+
+      function syncVisibility() {
+        const shouldShow = window.scrollY > REVEAL_AT;
+        if (shouldShow !== visible) {
+          visible = shouldShow;
+          btn!.classList.toggle('is-visible', visible);
+          btn!.setAttribute('aria-hidden', String(!visible));
+          btn!.tabIndex = visible ? 0 : -1;
+        }
+      }
+      window.addEventListener('scroll', syncVisibility, { passive: true });
+      syncVisibility();
+    }
+  }
+</script>

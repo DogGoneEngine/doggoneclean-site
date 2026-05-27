@@ -1,0 +1,133 @@
+---
+// src/layouts/Legal.astro
+//
+// Layout for /privacy, /terms, /sms. Uses global.css. Includes Nav and a
+// simple footer link strip but skips the FloatBookButton (legal pages are
+// not the place to push a CTA).
+
+import Nav from '../components/Nav.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  updatedAt?: string;
+}
+
+const {
+  title,
+  description = 'Dog Gone Clean legal information.',
+  updatedAt,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title} | Dog Gone Clean</title>
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/png" href="/logo.png" />
+  </head>
+
+  <body>
+    <Nav />
+    <main class="legal">
+      <article class="legal__inner">
+        <h1 class="legal__title">{title}</h1>
+        {updatedAt && <p class="legal__updated">Last updated {updatedAt}</p>}
+        <div class="legal__body">
+          <slot />
+        </div>
+      </article>
+    </main>
+
+    <footer class="legal-footer">
+      <div class="legal-footer__inner">
+        <span>&copy; {year} Dog Gone Clean</span>
+        <span class="legal-footer__links">
+          <a href="/">Home</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/sms">SMS Terms</a>
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+
+  .legal {
+    padding-block: var(--space-3xl) var(--space-4xl);
+  }
+
+  .legal__inner {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-inline: var(--space-xl);
+  }
+
+  .legal__title {
+    font-size: clamp(var(--text-3xl), 5vw, var(--text-4xl));
+    margin-bottom: var(--space-sm);
+  }
+
+  .legal__updated {
+    color: var(--muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .legal__body p {
+    margin-bottom: var(--space-md);
+    color: var(--soft);
+  }
+
+  .legal__body h2 {
+    font-size: var(--text-xl);
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-sm);
+  }
+
+  .legal__body a {
+    color: var(--accent);
+  }
+
+  .legal-footer {
+    border-top: 1px solid var(--line);
+    padding: var(--space-xl) 0;
+    background: var(--card);
+  }
+
+  .legal-footer__inner {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-inline: var(--space-xl);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    font-size: var(--text-xs);
+    color: var(--muted);
+  }
+
+  .legal-footer__links {
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  .legal-footer__links a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .legal-footer__links a:hover {
+    color: var(--accent);
+  }
+</style>

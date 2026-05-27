@@ -1,0 +1,238 @@
+---
+// src/components/Nav.astro
+//
+// Brutalist build: every visual property is set inline so the nav cannot
+// be hidden by a missing or cached stylesheet. Responsiveness is driven by
+// matchMedia + inline script, not by @media in scoped CSS, because the
+// scoped-CSS-plus-media-query approach has bitten DGN before
+// (`nav_no_backdrop_filter` and the Android-Chrome repaint artifact).
+//
+// Background uses solid rgba (not backdrop-filter) per `nav_no_backdrop_filter`.
+//
+// Simpler than DGN's nav: Clean serves only The Villages today
+// (`villages_only_in_copy`), so there is no city dropdown.
+---
+
+<header
+  id="site-nav"
+  style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 72px;
+    background: rgba(247, 249, 255, 0.96);
+    border-bottom: 1px solid rgba(13, 30, 70, 0.08);
+  "
+>
+  <div
+    style="
+      display: flex;
+      align-items: center;
+      max-width: 1080px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 20px;
+    "
+  >
+    <!-- Logo -->
+    <a
+      href="/"
+      aria-label="Dog Gone Clean home"
+      style="
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        flex-shrink: 0;
+      "
+    >
+      <img
+        src="/logo.png"
+        alt="Dog Gone Clean"
+        style="
+          height: 48px;
+          width: auto;
+          display: block;
+        "
+      />
+    </a>
+
+    <!-- Desktop nav -->
+    <nav
+      id="nav-desktop"
+      aria-label="Main navigation"
+      style="
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        margin-left: auto;
+      "
+    >
+      <a
+        href="/process"
+        style="
+          font-size: 15px;
+          font-weight: 600;
+          color: #41506a;
+          text-decoration: none;
+          font-family: system-ui, -apple-system, sans-serif;
+        "
+      >The Process</a>
+
+      <a
+        href="/the-villages"
+        style="
+          font-size: 15px;
+          font-weight: 600;
+          color: #41506a;
+          text-decoration: none;
+          font-family: system-ui, -apple-system, sans-serif;
+        "
+      >The Villages</a>
+
+      <span aria-hidden="true" style="display:block; width:1px; height:20px; background:#cbd5e8;"></span>
+
+      <a
+        href="/portal"
+        style="
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 14px;
+          font-weight: 600;
+          color: #5a6b7d;
+          text-decoration: none;
+          font-family: system-ui, -apple-system, sans-serif;
+        "
+      >
+        Client sign in
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </nav>
+
+    <!-- Mobile hamburger -->
+    <button
+      id="navHamburger"
+      aria-label="Open menu"
+      aria-expanded="false"
+      style="
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        margin-left: auto;
+        padding: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
+      "
+    >
+      <span style="display:block; width:22px; height:2px; background:#0c1322; border-radius:2px;"></span>
+      <span style="display:block; width:22px; height:2px; background:#0c1322; border-radius:2px;"></span>
+      <span style="display:block; width:22px; height:2px; background:#0c1322; border-radius:2px;"></span>
+    </button>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div
+    id="navMobile"
+    aria-hidden="true"
+    style="
+      display: none;
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #f7f9ff;
+      padding: 24px;
+      overflow-y: auto;
+      z-index: 99;
+      flex-direction: column;
+    "
+  >
+    <div style="flex: 1;">
+      <a href="/process" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; font-size:18px; font-weight:700; color:#0c1322; text-decoration:none; border-bottom:1px solid #e3e8f4;">
+        The Process
+      </a>
+      <a href="/the-villages" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; font-size:18px; font-weight:700; color:#0c1322; text-decoration:none; border-bottom:1px solid #e3e8f4;">
+        The Villages
+      </a>
+    </div>
+
+    <div style="border-top: 1px solid #e3e8f4; margin-top: 24px; padding-top: 16px;">
+      <a href="/portal" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; font-size:18px; font-weight:600; color:#5a6b7d; text-decoration:none;">
+        Client sign in
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14M13 5l7 7-7 7" stroke="#5a6b7d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Spacer so page content starts below the fixed nav -->
+<div style="height: 72px;" aria-hidden="true"></div>
+
+<!-- Scroll progress line -->
+<div
+  id="scrollProgress"
+  aria-hidden="true"
+  style="
+    position: fixed;
+    top: 72px;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, #2563eb, #06b6d4);
+    z-index: 99;
+    transition: width 80ms linear;
+    pointer-events: none;
+  "
+></div>
+
+<script is:inline>
+  (function () {
+    var hamb = document.getElementById('navHamburger');
+    var desk = document.getElementById('nav-desktop');
+    var mob  = document.getElementById('navMobile');
+    var prog = document.getElementById('scrollProgress');
+
+    function applyLayout() {
+      var isMobile = window.matchMedia('(max-width: 768px)').matches;
+      if (isMobile) {
+        desk.style.display = 'none';
+        hamb.style.display = 'flex';
+      } else {
+        desk.style.display = 'flex';
+        hamb.style.display = 'none';
+        mob.style.display = 'none';
+        hamb.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+    }
+    applyLayout();
+    window.addEventListener('resize', applyLayout);
+
+    function updateProgress() {
+      var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0;
+      prog.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+
+    hamb.addEventListener('click', function () {
+      var isOpen = mob.style.display === 'flex';
+      mob.style.display = isOpen ? 'none' : 'flex';
+      hamb.setAttribute('aria-expanded', String(!isOpen));
+      mob.setAttribute('aria-hidden', String(isOpen));
+      document.body.style.overflow = isOpen ? '' : 'hidden';
+    });
+  })();
+</script>

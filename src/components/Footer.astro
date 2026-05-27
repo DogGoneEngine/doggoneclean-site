@@ -1,0 +1,160 @@
+---
+// src/components/Footer.astro
+//
+// Marketing-pages footer. Sits at the bottom of every BaseLayout page.
+// Single-city site (`villages_only_in_copy`), so no Cities column.
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+
+      <!-- Brand column -->
+      <div class="footer__brand">
+        <a href="/" class="footer__logo">Dog Gone Clean</a>
+        <p class="footer__tagline">
+          Mobile dog baths, powered by the Hurricane Bath. A genuinely clean
+          dog, in your driveway, on a schedule you keep.
+        </p>
+        <p class="footer__location">The Villages, Florida</p>
+      </div>
+
+      <!-- About -->
+      <div class="footer__col">
+        <p class="footer__col-label">About</p>
+        <ul>
+          <li><a href="/process" class="footer__link">The Process</a></li>
+          <li><a href="/the-villages" class="footer__link">The Villages</a></li>
+        </ul>
+      </div>
+
+      <!-- Account -->
+      <div class="footer__col">
+        <p class="footer__col-label">Account</p>
+        <ul>
+          <li><a href="/portal" class="footer__link">Client sign in</a></li>
+          <li><a href="/book" class="footer__link">Book a visit</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div class="footer__col">
+        <p class="footer__col-label">Legal</p>
+        <ul>
+          <li><a href="/privacy" class="footer__link">Privacy Policy</a></li>
+          <li><a href="/terms" class="footer__link">Terms of Service</a></li>
+          <li><a href="/sms" class="footer__link">SMS Terms</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer__bottom">
+      <p class="footer__copy">&copy; {year} Dog Gone Clean. All rights reserved.</p>
+      <p class="footer__sms-note">Text STOP to opt out of SMS notifications.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--ink);
+    color: var(--ink-inverse);
+    padding-top: var(--space-4xl);
+    padding-bottom: var(--space-2xl);
+    margin-top: var(--space-5xl);
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--space-3xl);
+    padding-bottom: var(--space-3xl);
+    border-bottom: 1px solid rgba(234, 242, 255, 0.12);
+    margin-bottom: var(--space-xl);
+  }
+
+  @media (max-width: 900px) {
+    .footer__grid { grid-template-columns: 1fr 1fr; gap: var(--space-2xl); }
+    .footer__brand { grid-column: 1 / -1; }
+  }
+
+  @media (max-width: 480px) {
+    .footer__grid { grid-template-columns: 1fr; }
+  }
+
+  .footer__logo {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--ink-inverse);
+    text-decoration: none;
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.01em;
+  }
+
+  .footer__tagline {
+    font-size: var(--text-sm);
+    color: rgba(234, 242, 255, 0.72);
+    line-height: 1.65;
+    max-width: 320px;
+    margin-bottom: var(--space-md);
+  }
+
+  .footer__location {
+    font-size: var(--text-xs);
+    color: rgba(234, 242, 255, 0.5);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .footer__col-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(234, 242, 255, 0.5);
+    margin-bottom: var(--space-lg);
+  }
+
+  .footer__col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .footer__link {
+    font-size: var(--text-sm);
+    color: rgba(234, 242, 255, 0.78);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .footer__link:hover {
+    color: var(--accent2-light);
+  }
+
+  .footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+  }
+
+  .footer__copy,
+  .footer__sms-note {
+    font-size: var(--text-xs);
+    color: rgba(234, 242, 255, 0.45);
+    margin: 0;
+  }
+</style>

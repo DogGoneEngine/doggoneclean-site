@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "check": "python3 scripts/check.py",
+    "build": "python3 scripts/check.py && astro build",
     "preview": "astro preview"
   },
   "dependencies": {
