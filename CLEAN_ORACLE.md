@@ -664,6 +664,21 @@ enforcement at the moment of choice; surfacing the price on each candidate
 date is what makes the curve a real decision input rather than a surprise on
 the next invoice.
 
+`founders_spots_remaining_counter` (ux):
+The launch/pricing area on the Hurricane Bath surface shows a live
+"spots remaining at this rate" counter under the founders pricing, hidden
+until remaining drops below a visibility threshold (10 by default), updating
+automatically from the active subscription count (no manual maintenance).
+Port of DGN's Villages-page pattern: see `doggonenails-site/src/pages/
+the-villages.astro`, the `#launch-spot-count` element fed by a public
+read on a counted Supabase resource. Because real scarcity is the
+conversion tool that gets indecisive visitors to decide today instead of
+next month, the auto-update pattern adds zero ongoing work for Paul, and
+hiding the count above the threshold avoids the "97 spots left" anti-signal
+that tells visitors the offer has no real urgency. Pairs with
+`tiered_founders_rate` (which defines the rate and cap the counter draws
+from).
+
 ### Engineering
 
 `string_of_pearls_is_a_service` (engineering):
