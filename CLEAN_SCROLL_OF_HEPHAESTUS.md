@@ -133,6 +133,45 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-05-27 (pricing redesign on /the-villages)
+
+Right after the fork shipped, Paul caught two issues on the city page pricing
+area: the founders rate did not visually pop as a scarcity offer, and the
+single-visit option was buried inside the recurring pricing card as a row
+instead of being its own path. Two adjustments shipped (commit `fac3894`):
+
+1. **Founders launch card states the 25-household cap up front.** The cap is
+   now stated four places in always-visible copy: the eyebrow ("Founders rate
+   · First 25 households"), the headline ("Be one of the first 25 households
+   on the route."), the subhead body, and a "25 households" tile in the
+   terms-grid. Each tier price now shows a "Saves $20 per visit vs standard
+   recurring" line in cyan so the value of being early sits right next to the
+   number. The terms paragraph was replaced with a 2x2 grid of bolded
+   mini-statements (25 households / 12 months locked / No add ons / Two-tap
+   cancel) so a scanning reader cannot miss any of them. The counter element
+   still hides until remaining drops below 10 per
+   `founders_spots_remaining_counter`; the cap statement is what carries the
+   scarcity until the counter becomes meaningful.
+
+2. **New "Other ways in" section** between founders and eligibility, with two
+   side-by-side cards: "Try us once / Single visit" ($95 smoothcoat / $120
+   doublecoat) with its own CTA `/book?plan=single`, and "After founders
+   fills / Standard recurring" ($75 / $100) with `/book`. The single-visit is
+   now a top-level path on the page, not a row.
+
+Two new Oracle rules captured from the correction, each in its own commit
+(`b049d86`, `269bcc9`):
+`founders_cap_statement_always_visible` (cap and counter are distinct things;
+the cap is always visible, the counter is the urgency layer that fires when
+supply runs low) and `single_visit_as_own_path` (the trial path is the main
+feeder of the recurring funnel; burying it starves recurring of its on-ramp).
+Both indexed in `CLEAN_BUSINESS_RULES.md`.
+
+Lesson encoded: when the implementation of a rule produces an outcome the
+rule did not intend, the missing constraint is itself a rule worth capturing.
+A future session reading just `founders_spots_remaining_counter` and not the
+pair rule could rebuild the buried-cap failure verbatim.
+
 ### 2026-05-27 (fork shipped)
 
 The DGN multi-page site structure was forked into Clean over six thin
