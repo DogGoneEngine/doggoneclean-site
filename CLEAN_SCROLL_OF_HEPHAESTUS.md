@@ -155,6 +155,64 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-05-27 (`post_appointment_show_someone_nudge` captured)
+
+Locked the standard post-appointment SMS nudge for both businesses
+(Dog Gone Clean and Dog Gone Nails). Rule lives in CLEAN_ORACLE.md as
+`post_appointment_show_someone_nudge` (copy domain) and is mirrored
+verbatim into DGN's ORACLE.md (notifications domain) so neither repo
+loses it.
+
+**The format.** Every post-appointment client text is two lines, with
+photos attached as MMS:
+
+```
+[Dog's name] before and after.
+Show someone.
+```
+
+"Show someone." is the literal second line, two words. The nudge is
+deliberately bare: no brand handle, no @-mention, no "tag us" line,
+no platform-specific share call, no pre-filled social caption.
+
+**The constraint.** The rule's hard line, identical across DGC and DGN,
+is that the message never contains a pre-filled brand handle, an
+embedded "@doggoneclean" / "@doggonenails" caption, or a "tag us"
+appendage. A future companion share page using the Web Share API is
+allowed once each business's Supabase booking pipeline writes
+per-appointment photo records, but the share page stays under the
+same hard line: no pre-filled brand handles, no embedded captions, no
+"tag us" prompt. The helper only removes the steps of saving to
+camera roll and opening another app.
+
+**The principle.** The nudge's strategic value lives entirely in
+being unprompted. Pre-filling brand handles or appending "tag us"
+copy converts organic enthusiasm into a recognizable marketing
+channel, which simultaneously destroys the unprompted-word-of-mouth
+dynamic and crosses the line from making sharing easy into using the
+client as a promotion channel. The honest position is that we want
+clients to share these photos and we want to make that easy, and if
+it sometimes comes back to the business that is fine because it
+arrived without an ask; embedding the ask in the message itself
+converts kindness into an ask and collapses the value.
+
+**Phasing.** Effective immediately on Paul's existing post-appointment
+send (Google Voice MMS today, Twilio MMS once A2P 10DLC clears). The
+share page is parked in CLEAN_PARKING_LOT.md (and PARKING_LOT.md in
+the DGN repo) until the photo pipeline lands; the bare two-line MMS
+needs none of that and is shipping today.
+
+**Filed in:**
+- `CLEAN_ORACLE.md`: new rule `post_appointment_show_someone_nudge` in
+  the Copy and terminology section.
+- `CLEAN_PARKING_LOT.md`: forward entry under "Portal and subscription
+  ideas" for the future share page.
+- `CLEAN_BUSINESS_RULES.md`: new index row.
+- `doggonenails-site/ORACLE.md`: parallel rule in the Notifications
+  section.
+- `doggonenails-site/PARKING_LOT.md`: forward entry for the share page.
+- `doggonenails-site/BUSINESS_RULES.md`: parallel index row.
+
 ### 2026-05-27 (redesign-survival closure)
 
 Closed the remaining six gaps so the rulebook fully survives a major

@@ -918,6 +918,42 @@ banned-phrase list: "friendly reminder," "just a reminder," "reaching out," "ple
 advised," "arrival window," "last chance," "make changes now." Because these messages are
 part of the brand, not admin exhaust, and a long-time client may receive them a hundred times.
 
+`post_appointment_show_someone_nudge` (copy):
+Every post-appointment client text follows this exact two-line format, identical at Dog Gone
+Clean and Dog Gone Nails:
+
+```
+[Dog's name] before and after.
+Show someone.
+```
+
+Photos are attached as MMS. "Show someone." is the literal second line, two words, no variations.
+The nudge is deliberately bare: no brand handle, no @-mention, no "tag us" line, no
+platform-specific share call, no pre-filled social caption. The client is treated as already
+proud of the photo, and the nudge only removes friction if they decide to share. Anything that
+flows back to the business is downstream of the client's choice and carries the weight of
+being unprompted.
+
+Hard line that does not move: the text never contains a pre-filled brand handle, an embedded
+"@doggoneclean" caption, or a "tag us" appendage. A later companion share page on
+doggoneclean.us (or hurricanebath.com on the v2.0 surface) is allowed once Clean's Supabase
+booking pipeline writes per-appointment photo records: it uses the Web Share API to one-tap
+the photos into the client's native share sheet, presents an optional generic caption, and
+stays under the same constraint (no pre-filled brand handles, no embedded "@doggoneclean"
+caption, no "tag us" prompt). Platform choice, caption, and tagging always stay with the
+client; the helper only removes the steps of saving to camera roll and opening another app.
+The share page is parked in CLEAN_PARKING_LOT.md until the photo pipeline lands.
+
+Because the nudge's strategic value lives entirely in being unprompted. Pre-filling brand
+handles or appending "tag us" copy converts organic enthusiasm into a recognizable marketing
+channel, which simultaneously destroys the unprompted-word-of-mouth dynamic and crosses the
+line from making sharing easy into using the client as a promotion channel. The honest
+position is that we want clients to share these photos and we want to make that easy, and
+if it sometimes comes back to the business that is fine because it arrived without an ask;
+embedding the ask in the message itself converts kindness into an ask and collapses the
+value. Effective immediately on Paul's existing post-appointment send (Google Voice today,
+Twilio MMS once A2P 10DLC clears).
+
 `dont_knock_competitors` (copy):
 Never disparage other systems, products, or groomers in client-facing copy; make the case for
 why ours is great on its own merits. Because putting others down makes the brand look insecure

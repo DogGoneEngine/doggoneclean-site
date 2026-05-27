@@ -78,6 +78,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | neural_expressive_design | Design | CLAUDE.md "Design language"; Oracle; design tokens in `src/styles/global.css`; **`check.py`** asserts `--accent`, `--accent2`, `--ink`, `--bg` tokens present in `global.css` | restyle lint that asserts token *values* unchanged (the present lint only asserts presence) |
 | website_is_ground_zero | Copy | Oracle; convention | build copy check |
 | reminder_voice | Copy | Oracle; **`check.py`** forbids "friendly reminder", "just a reminder", "reaching out", "please be advised", "last chance", "make changes now" on customer-facing pages (arrival window already covered by appointment_block_not_window) | n/a |
+| post_appointment_show_someone_nudge | Copy | Oracle; convention (Paul's manual MMS send today off Google Voice) | post-appointment notification template when Twilio MMS lands; `/share/[token]` share page when photo pipeline lands (parked in CLEAN_PARKING_LOT.md); `check.py` lint forbidding "@doggoneclean" / "tag us" / "tag @" in post-appointment template + share-page copy once those surfaces exist |
 | dont_knock_competitors | Copy | Oracle; convention | lint pattern |
 | appointment_block_not_window | Copy | Oracle; **`check.py`** forbids "arrival window" anywhere in `src/pages/index.astro`, `the-villages.astro`, `process.astro` | n/a |
 | language_bank | Copy | Oracle; site copy; **`check.py`** asserts "belongs to the process" present on `process.astro` | additional banked-line presence checks as the bank grows |

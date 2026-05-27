@@ -96,6 +96,24 @@ Kernels for the site copy, captured so they are not lost. Not approved and not f
   idea from 2026-05-25 became the rule the same week; kept here only as a pointer so future
   sessions do not re-park it.
 
+- **"Show someone." share page (Web Share API).** Companion to the post-appointment SMS
+  nudge locked in the Oracle as `post_appointment_show_someone_nudge`. The bare two-line
+  MMS ("[Dog's name] before and after. / Show someone.") with photos attached is effective
+  immediately on Paul's existing send. This entry is the next phase: a small share page on
+  doggoneclean.us (or hurricanebath.com on the v2.0 surface) at a per-appointment URL that
+  lets the client one-tap the photos into their native share sheet via `navigator.share()`,
+  with an optional generic caption (e.g. "fresh paws") they can edit or delete. Hard
+  constraints carried from the rule do NOT relax: no pre-filled brand handles, no embedded
+  "@doggoneclean" caption, no "tag us" prompt, no platform-specific deep-link. Platform
+  choice and tagging stay with the client; the page only removes the steps of saving to
+  camera roll and opening another app. Falls back to a download link plus
+  copy-to-clipboard on browsers without `share()`. Parked because it needs per-appointment
+  photo records in Clean's Supabase with stable signed URLs plus a tokenized fetch path
+  that does not require auth (an SMS recipient is not necessarily logged into the portal).
+  The booking pipeline plus operator-app photo storage have to be solid first. Sizing:
+  ~2 to 3 units once photo records exist (one Astro route, one React island, one edge
+  function for the tokenized photo fetch).
+
 ## Service eligibility ideas (parked, needs work before use)
 
 - **The Breed Firewall classification (draft).** Paul's idea, 2026-05-25. A coat-type rule for
