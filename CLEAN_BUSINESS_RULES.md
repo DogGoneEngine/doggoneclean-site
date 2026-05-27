@@ -60,6 +60,8 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | bills_in_person_today | Money | Oracle; `legacy/data/clients.json` (per-dog prices) | n/a |
 | if_payments_added_handle_money_safely | Money | Oracle (deferred) | pricing code; webhook fn |
 | grooming_vocab | Copy | CLAUDE.md; **`check.py`** (dog-qualified, over `src/`) | lint allowlist |
+| specialist_named_not_promised | Copy | Oracle | site copy (city page "your specialist" section); lint pattern banning "always", "every time" predicates near specialist mentions |
+| specialist_assigned_per_route | Scheduling | Oracle | `routes.operator_id`; booking step 1 polygon-check response includes `route_operator` (name + photo URL); portal "your specialist" section reads the same join |
 | cancellation_24h | Money | Oracle | booking engine; site copy |
 | favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |
 | accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |

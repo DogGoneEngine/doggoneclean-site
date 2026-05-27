@@ -347,6 +347,23 @@ than new work, and the route-optimization part simply scales as density grows. T
 adaptation Clean needs is variable grooming service durations, not DGN's fixed nail-time
 buckets.
 
+`specialist_assigned_per_route` (scheduling):
+Each service address belongs to a route, and each route is staffed by one named
+operator. At booking step 1, when a visitor enters their address and it passes
+the polygon check, the response shows "you are on [Operator Name]'s route" with
+the operator's name and photo, so the visitor knows who is physically coming
+before they put a card on file. The assignment lives on the route (not on the
+individual appointment), so handing a route to a new operator updates every
+client on that route at once with no per-appointment edit. Because visitors
+deserve to know who is coming to their driveway as part of the decision to
+sign up (`stop_sign_two_taps` plus card-on-file is a trust commitment, and
+the operator is a real part of what they are committing to), and the
+route-as-the-unit model is how the operator layer scales when Paul hires
+(`runs without Paul` from the prime directive) without the system needing a
+per-appointment human in the loop. Pairs with `specialist_named_not_promised`
+on the marketing side and `use_the_smart_scheduler_from_day_one` on the
+engine side.
+
 `base_is_home_sw` (routing):
 Use Paul's home (3885 SW 114th Court 34481) for drive-time math; treat the SW / On Top of
 the World cluster as the launch/return zone; no separate fictional anchor. Because home sits
@@ -762,6 +779,22 @@ unqualified terms read as the predatory sense of the word and undercut trust on 
 "a full groom" as a noun are fine; it is the bare "grooming"/"groomer" that is banned. Because
 the brand voice has to read unambiguously as pet care. Enforced by `scripts/check.py` over
 `src/` (the website copy).
+
+`specialist_named_not_promised` (copy):
+The current operator of a Hurricane Bath route is named and photographed in the
+marketing copy (today: Paul). The copy never promises "you will always see Paul"
+and never implies an interchangeable Tom-or-Dick-or-Harry. It pairs with the
+existing "the standard does not belong to a person, it belongs to the process"
+language, so a new operator joining the team does not break a promise made to
+existing clients. Each operator who joins the team gets their own name and
+photo in the copy when they start, in the same section, on equal footing.
+Because Paul is the trailblazer today but the business is being built so it can
+add operators later (the prime directive's "runs without Paul" and "a unicorn
+job" tests), and copy that locks in "always Paul" makes every future hire read
+as a downgrade, while copy that hides the operator entirely makes the brand
+feel faceless. Named-but-not-promised is the version that serves both the
+"clients grateful it exists" test (you know who is coming) and the
+runs-without-Paul test (the brand survives a hire) at the same time.
 
 `no_dgn_import` (copy):
 Never import DGN's nail vocabulary or bans into Clean. Because the two businesses describe
