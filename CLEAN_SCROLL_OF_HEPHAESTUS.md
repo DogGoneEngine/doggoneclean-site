@@ -57,22 +57,28 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   copy). The live site's old "Grooming. No Chaos." hero is recorded there but was rejected.
   Waiting on Paul's real photos and video. Build details stay in CLEAN_FIELD_MANUAL.md, off
   the public page.
-- **Next chapter:** fork the DGN multi-page site structure into Clean (active task,
-  greenlit 2026-05-27 after a full read pass of both repos). Clean keeps its Neural
-  Expressive style, its Hurricane Bath product, and its own data; only the page set,
-  layout pattern, and component shape come from DGN. Site shape: home + `/the-villages`
-  city page (Hurricane Bath hero, founders launch card with the live spots counter from
-  `founders_spots_remaining_counter`, breed-tier pricing, three-dog cap, named specialist
-  per `specialist_named_not_promised`) + dedicated `/process` page + honest stub pages at
-  `/book` and `/portal` (fixes the 2026-05-26 parked 404s) + legal stubs, plus reusable
-  Nav / Footer / FloatBookButton in the Neural Expressive idiom, plus the build pipeline
-  extended to chain `python3 scripts/check.py` ahead of `astro build`. Site copy stays
-  The Villages only (`villages_only_in_copy`); zero DGN aesthetic imported. After the
-  fork lands: the Hurricane Bath v2.0 booking surface against the locked 24-rule pack
-  (Stripe SetupIntent, octane cadence picker, three-dog cap selector, breed-tier-priced
-  single bath, two-tap stop sign in the portal, calendar-shows-price-per-date). Then the
-  portal shell with auth (first RLS policies land with auth), scheduling tables forked
-  from DGN's String of Pearls, and the `business_rules` table mirroring the Oracle.
+- **Site fork: DONE 2026-05-27.** Eight routes live (`/`, `/the-villages`, `/process`,
+  `/book`, `/portal`, `/privacy`, `/terms`, `/sms`), Neural Expressive look consistent
+  across all of them, zero DGN aesthetic imported. Shipped in six thin slices, all
+  merged to `main`. See the 2026-05-27 session entry below for the slice list and
+  what each one contained.
+- **Next chapter:** Hurricane Bath v2.0 booking surface, built against the locked
+  24-rule pack. The booking flow replaces the `/book` stub: address polygon check
+  (`villages_only_at_launch`), coat eligibility check (`bath_only_no_mats`), octane
+  cadence picker (`octane_selector_cadence_picker`), three-dog cap selector
+  (`three_dog_cap`), breed-tier-priced first dog (`breed_tier_pricing`,
+  `tiered_founders_rate`), Stripe SetupIntent at completion
+  (`card_on_file_at_signup`). Then the portal replaces the `/portal` stub: Google
+  sign in with phone/email access-code fallback, two-tap stop sign
+  (`stop_sign_two_taps`), reschedule with `calendar_shows_price_per_date`, skip
+  flow with the free-skip allowance (`one_free_skip_per_52w`), card-on-file
+  management. Both surfaces query the `bath_subscriptions` table that gets created
+  in this same chapter (and which the `founders_spots_remaining_counter` on
+  `/the-villages` will start showing once rows exist). The String of Pearls
+  scheduler (`string_of_pearls_is_a_service`) lands as edge functions callable from
+  both the Astro app and the legacy doggoneclean.us site (CORS-locked). Then the
+  operator app + pizza tracker, then the `business_rules` table mirroring the
+  Oracle, then auth-bound RLS policies on every subscriber-data table.
 - **Needs Paul to unblock the remaining pieces:** (1) create the Dog Gone Clean Stripe
   account (separate from any DGN/personal account per `own_infrastructure`) and hand
   over the publishable + secret keys (gates the Hurricane Bath booking flow, the chapter
@@ -126,6 +132,56 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 ---
 
 ## Session history
+
+### 2026-05-27 (fork shipped)
+
+The DGN multi-page site structure was forked into Clean over six thin
+slices that each merged to `main` and deployed to hurricanebath.com:
+
+1. **Foundation:** design tokens in `src/styles/global.css`, BaseLayout +
+   Legal layout in `src/layouts/`, Nav + Footer + FloatBookButton in
+   `src/components/`. Build chain extended: `npm run build` now runs
+   `python3 scripts/check.py` then `astro build`. `astro.config.mjs`
+   updated: `site: 'https://hurricanebath.com'` and
+   `build.format: 'directory'` for clean URLs. No visible site change
+   (the new files were not yet imported by any page).
+2. **Home page:** rewritten as a multi-page funnel (hero, fast lane,
+   value props, the loop, recurring model, single Villages tile,
+   friendly dogs only). Bath-forward copy; no nail vocab; no
+   `grooming_vocab` violations.
+3. **/the-villages:** hero, founders launch card with the
+   `founders_spots_remaining_counter` element in place (JS wiring lands
+   with the booking flow when `bath_subscriptions` exists), tiered
+   pricing card (smoothcoat / doublecoat), eligibility (we bath / we do
+   not), how-the-visit-unfolds, specialist section naming Paul with a
+   placeholder avatar per `specialist_named_not_promised`, reminders,
+   final CTA.
+4. **/process:** six-step Hurricane Bath protocol (Set up, Soak, Drive
+   water to the skin, Flush if filthy, Clean tank finish, Dry in the
+   trailer), intro stats, the-standard-belongs-to-the-process section.
+5. **Stubs:** /book and /portal honest "coming soon" pages so the
+   homepage CTAs no longer 404. Same commit dropped the dead
+   `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var from `deploy.yml`.
+6. **Legal stubs:** privacy, terms, SMS (each with a "draft, real
+   before launch" notice up top), using the new Legal layout.
+
+Zero DGN aesthetic imported. Clean's blue gradient and soft glow idiom
+runs through every page. The Neural Expressive look is consistent
+across the eight routes. Per `villages_only_in_copy`, no other cities
+are mentioned anywhere. Per `grooming_vocab`, the bare word
+"grooming" never appears (the bath surface avoids the word entirely;
+the rule is enforced by `scripts/check.py`).
+
+All eight routes (`/`, `/the-villages`, `/process`, `/book`, `/portal`,
+`/privacy`, `/terms`, `/sms`) build clean; `scripts/check.py` green;
+the unused-CSS-classes cleanup parked 2026-05-26 was auto-resolved
+because the rewritten homepage dropped those classes.
+
+What still needs Paul (unchanged from the earlier focus block, refined):
+photo of Paul for the city page specialist section (placeholder "P"
+avatar in place); Stripe account + keys (gates the booking flow);
+Twilio + A2P (gates SMS); attorney review of the legal pages before
+launch.
 
 ### 2026-05-27 (strategy thread + four decisions captured)
 

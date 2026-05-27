@@ -4,44 +4,46 @@ Deferred work and forward-looking ideas, parked so they survive a context reset.
 here is committed work; it is the backlog. Move an item into CLEAN_SCROLL_OF_HEPHAESTUS.md's focus block
 when it becomes active.
 
-## Website build (active next step)
+## Website build
 
 The site is live at hurricanebath.com (staging), built and deployed from `main` via
-`.github/workflows/deploy.yml`. The homepage is rebuilt in the Neural Expressive look (Paul
-approved the visuals) with the master logo (`public/logo.png`) and real content from
-`marketing/`. Next steps, decided 2026-05-25:
+`.github/workflows/deploy.yml`. The multi-page fork DONE 2026-05-27: eight routes
+live (`/`, `/the-villages`, `/process`, `/book`, `/portal`, `/privacy`, `/terms`,
+`/sms`), Neural Expressive look consistent across all of them, zero DGN aesthetic
+imported. See the 2026-05-27 "fork shipped" entry in the Scroll for the slice list.
 
-- **Fork the DGN site structure into Clean (multi-page).** Clean's site is currently a single
-  page; it should be a multi-page site modeled on the proven Dog Gone Nails site (Clean is a
-  fork of the DGN platform; the separation line is data/accounts/docs, never the site shape).
-  Paul granted environment access to the DGN repo 2026-05-27; the fork is unblocked.
-  Reuse DGN's page set and layout pattern; keep Clean's own content, Neural Expressive
-  style, logo, and data. Do NOT merge DGN's docs or data. Build-time decisions locked
-  2026-05-27 from the strategy thread: service area copy is Villages-only
-  (`villages_only_in_copy`), the city page specialist section names the current operator
-  with a photo (`specialist_named_not_promised` + `specialist_assigned_per_route`),
-  founders pricing has the live spots-remaining counter (`founders_spots_remaining_counter`),
-  the Hurricane Bath process gets its own `/process` page (mirrors DGN's), and the
-  `/portal/` + `/book/` 404 bugs get fixed with honest stub pages rather than CTA removal
-  (the CTAs are part of the money-machine pattern).
-- **Copy pass (the live copy needs real work).** The hero "A cleaner dog, without leaving
-  home." is a provisional placeholder ("Dog grooming. No chaos." was rejected). Service area is
-  Ocala ONLY (no surrounding towns; one-off exceptions are not advertised). No "brush out" or
-  brush wording: the Hurricane Bath and high-velocity dryer do that work, Paul owns no brush.
+**Active next step (the next chapter): the Hurricane Bath v2.0 booking flow.** It
+replaces the `/book` stub with the real signup, against the locked 24-rule pack
+(Stripe SetupIntent, octane cadence picker, three-dog cap selector,
+breed-tier-priced single bath, two-tap stop sign, calendar-shows-price-per-date).
+Creates the `bath_subscriptions` table; once subscriber rows exist, the
+`founders_spots_remaining_counter` element already on `/the-villages` starts
+showing the live count. The portal at `/portal` follows.
+
+**Resolved 2026-05-27 (kept for history):**
+- ~~Fork the DGN site structure into Clean (multi-page)~~ DONE. Shipped in six
+  thin slices, all merged to `main`. Build-time decisions locked the same day:
+  `villages_only_in_copy`, `specialist_named_not_promised` +
+  `specialist_assigned_per_route`, `founders_spots_remaining_counter`, dedicated
+  `/process` page, honest stubs at `/book` and `/portal`.
+- ~~`/portal/` and `/book/` links 404~~ FIXED 2026-05-27. Both routes now serve
+  honest "coming soon" stub pages.
+- ~~Dead `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var in `deploy.yml`~~ REMOVED
+  2026-05-27.
+- ~~Unused CSS classes `.chips`, `.chips li`, `.services` in `src/pages/index.astro`~~
+  AUTO-RESOLVED 2026-05-27: the rewritten homepage dropped those classes.
+
+**Still open for Paul (mechanical, container cannot do):**
+- **Copy pass (real work still needed in some places).** The eight-page site uses
+  bath-forward copy throughout, but a final copy review by Paul will sharpen
+  voice and catch anything that does not sound like the business. Service area
+  is Villages-only (`villages_only_in_copy`). No "brush out" or brush wording:
+  the Hurricane Bath and high-velocity dryer do that work, Paul owns no brush.
+- **Photo of Paul for the city page specialist section.** The `/the-villages`
+  page currently uses a placeholder "P" gradient avatar; drop a real photo in
+  `public/` and update the `<img src="...">` in `the-villages.astro`.
 - **Logo check.** Confirm the logo renders cleanly on the light page (may need a
   transparent-background version).
-- **Small live-site bugs found 2026-05-26 (none blocking, fix on next site touch):**
-  - **`/portal/` links 404.** The homepage header "Client sign in" link and the hero
-    "Book a visit" primary CTA both point to `/portal/`, which does not exist yet. Real
-    visitors hit a 404. Fix when the portal route lands, or stub with a "coming soon"
-    anchor or a phone-call CTA in the meantime.
-  - **Dead `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var in `deploy.yml`** (line 31), left
-    from the 2026-05-26 verify-gate salvage. Playwright is gone from the project; this is
-    zombie code. Removing it changes nothing functional, just removes one source of
-    confusion for a future reader.
-  - **Unused CSS classes in `src/pages/index.astro`.** The `<style>` block defines
-    `.chips`, `.chips li`, and `.services` rules but no element uses them; leftover from
-    earlier homepage versions. Harmless cruft.
 
 ## Marketing copy ideas (parked, not ready to use)
 
