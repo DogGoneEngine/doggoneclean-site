@@ -197,10 +197,29 @@ same session rather than punting to a fresh one. Two slices landed in order:
 What Phase 1 will NOT do today: there is no `bath_subscribers` row for
 anyone yet (no booking flow). A real sign-in lands every user in the
 empty state. That is correct: Paul can test sign-in end-to-end (Google
-should work; phone OTP needs Twilio which is still on his plate; email
-magic link works via Supabase's default mailer). When the booking flow
-chapter creates the first subscriber rows, the placeholder dashboard
-becomes the surface that Phase 2 fills in.
+verified working below; phone OTP needs Twilio which is still on his
+plate; email magic link works via Supabase's default mailer). When the
+booking flow chapter creates the first subscriber rows, the placeholder
+dashboard becomes the surface that Phase 2 fills in.
+
+**Verified end-to-end same day.** Paul tested Google sign-in from his
+Pixel and confirmed the round-trip lands on the portal's empty state.
+One config fix was needed before it worked: Supabase Auth's Site URL on
+dgc-prod still defaulted to `http://localhost:3000`, so the OAuth
+callback landed there after Google succeeded. Paul fixed it in the
+Supabase dashboard (Authentication > URL Configuration):
+
+- Site URL: `https://hurricanebath.com`
+- Additional Redirect URLs:
+  - `https://hurricanebath.com/portal/`
+  - `https://hurricanebath.com/portal/**`
+  - `http://localhost:4321/portal/` (for local `npm run dev`)
+  - `http://localhost:4321/portal/**`
+
+This category of configuration (Supabase Auth URL settings) lives in
+the dashboard and is not exposed by the Supabase MCP, so a future
+session diagnosing a similar "Google sign-in lands on localhost"
+symptom should look here first rather than at the code.
 
 The founders counter on `/the-villages` still ships hidden per
 `founders_spots_remaining_counter` (the table exists but with 0 rows

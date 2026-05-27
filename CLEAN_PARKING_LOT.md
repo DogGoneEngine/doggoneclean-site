@@ -42,6 +42,16 @@ small slice once the table is being written to).
   2026-05-27.
 - ~~Unused CSS classes `.chips`, `.chips li`, `.services` in `src/pages/index.astro`~~
   AUTO-RESOLVED 2026-05-27: the rewritten homepage dropped those classes.
+- ~~Supabase Auth Site URL on dgc-prod defaulted to `http://localhost:3000`~~
+  FIXED 2026-05-27 by Paul in the Supabase dashboard (Authentication >
+  URL Configuration). Site URL is now `https://hurricanebath.com`;
+  Additional Redirect URLs include `https://hurricanebath.com/portal/`
+  + `**` wildcard, plus `http://localhost:4321/portal/` + `**` for
+  local dev. Diagnostic: if Google sign-in lands a Pixel on
+  `localhost:3000/#access_token=...` (the OAuth callback hash with an
+  unreachable host), this is the cause every time. Configuration lives
+  in the dashboard, not the Supabase MCP, so a future session cannot
+  diagnose-and-fix in one move; surface to Paul.
 
 **Still open for Paul (mechanical, container cannot do):**
 - **Copy pass (real work still needed in some places).** The eight-page site uses
