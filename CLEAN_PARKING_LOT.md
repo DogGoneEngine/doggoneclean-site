@@ -14,9 +14,16 @@ approved the visuals) with the master logo (`public/logo.png`) and real content 
 - **Fork the DGN site structure into Clean (multi-page).** Clean's site is currently a single
   page; it should be a multi-page site modeled on the proven Dog Gone Nails site (Clean is a
   fork of the DGN platform; the separation line is data/accounts/docs, never the site shape).
-  Paul is granting this environment access to the DGN repo so a future session can read its
-  structure and fork it directly. Reuse DGN's page set and layout; keep Clean's own content,
-  Neural Expressive style, logo, and data. Do NOT merge DGN's docs or data.
+  Paul granted environment access to the DGN repo 2026-05-27; the fork is unblocked.
+  Reuse DGN's page set and layout pattern; keep Clean's own content, Neural Expressive
+  style, logo, and data. Do NOT merge DGN's docs or data. Build-time decisions locked
+  2026-05-27 from the strategy thread: service area copy is Villages-only
+  (`villages_only_in_copy`), the city page specialist section names the current operator
+  with a photo (`specialist_named_not_promised` + `specialist_assigned_per_route`),
+  founders pricing has the live spots-remaining counter (`founders_spots_remaining_counter`),
+  the Hurricane Bath process gets its own `/process` page (mirrors DGN's), and the
+  `/portal/` + `/book/` 404 bugs get fixed with honest stub pages rather than CTA removal
+  (the CTAs are part of the money-machine pattern).
 - **Copy pass (the live copy needs real work).** The hero "A cleaner dog, without leaving
   home." is a provisional placeholder ("Dog grooming. No chaos." was rejected). Service area is
   Ocala ONLY (no surrounding towns; one-off exceptions are not advertised). No "brush out" or

@@ -57,24 +57,32 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   copy). The live site's old "Grooming. No Chaos." hero is recorded there but was rejected.
   Waiting on Paul's real photos and video. Build details stay in CLEAN_FIELD_MANUAL.md, off
   the public page.
-- **Next chapter:** build the Hurricane Bath v2.0 booking surface against the locked rule
-  pack. That means: a real signup flow (Stripe SetupIntent at booking per
-  `card_on_file_at_signup`), the octane cadence picker, three-dog cap selector,
-  breed-tier-priced single bath, the two-tap stop sign in the portal, the calendar that
-  shows price per date. Parallel track: fork the DGN site structure
-  (`doggonenails-site`) into a multi-page shell that holds both surfaces and the marketing
-  pages, then a real copy pass on the placeholder hero. Then the portal shell with auth
-  (first RLS policies land with auth), scheduling tables forked from DGN's String of
-  Pearls, and the `business_rules` table mirroring the Oracle.
-- **Needs Paul to unblock the remaining pieces:** (1) grant this environment access to
-  the `doggonenails-site` repo so the next session can fork the DGN structure; (2) create
-  the Dog Gone Clean Stripe account (separate from any DGN/personal account per
-  `own_infrastructure`) and hand over the publishable + secret keys; (3) Clean's own
-  Twilio account, number, and A2P registration (SMS + phone login). DONE: `dgc-prod` keys
-  + DB password; Google Cloud Maps key + Google sign-in; the deploy publishes to
-  hurricanebath.com (confirmed live). Also supplies only Paul can give: real photos/video
-  for the showcases, and starting the review-gathering. Repo housekeeping is DONE: GitHub
-  default branch is `main`, all stale `claude/*` branches deleted (2026-05-26).
+- **Next chapter:** fork the DGN multi-page site structure into Clean (active task,
+  greenlit 2026-05-27 after a full read pass of both repos). Clean keeps its Neural
+  Expressive style, its Hurricane Bath product, and its own data; only the page set,
+  layout pattern, and component shape come from DGN. Site shape: home + `/the-villages`
+  city page (Hurricane Bath hero, founders launch card with the live spots counter from
+  `founders_spots_remaining_counter`, breed-tier pricing, three-dog cap, named specialist
+  per `specialist_named_not_promised`) + dedicated `/process` page + honest stub pages at
+  `/book` and `/portal` (fixes the 2026-05-26 parked 404s) + legal stubs, plus reusable
+  Nav / Footer / FloatBookButton in the Neural Expressive idiom, plus the build pipeline
+  extended to chain `python3 scripts/check.py` ahead of `astro build`. Site copy stays
+  The Villages only (`villages_only_in_copy`); zero DGN aesthetic imported. After the
+  fork lands: the Hurricane Bath v2.0 booking surface against the locked 24-rule pack
+  (Stripe SetupIntent, octane cadence picker, three-dog cap selector, breed-tier-priced
+  single bath, two-tap stop sign in the portal, calendar-shows-price-per-date). Then the
+  portal shell with auth (first RLS policies land with auth), scheduling tables forked
+  from DGN's String of Pearls, and the `business_rules` table mirroring the Oracle.
+- **Needs Paul to unblock the remaining pieces:** (1) create the Dog Gone Clean Stripe
+  account (separate from any DGN/personal account per `own_infrastructure`) and hand
+  over the publishable + secret keys (gates the Hurricane Bath booking flow, the chapter
+  after the site fork); (2) Clean's own Twilio account, number, and A2P registration
+  (SMS + phone login). DONE: `dgc-prod` keys + DB password; Google Cloud Maps key +
+  Google sign-in; the deploy publishes to hurricanebath.com (confirmed live); DGN repo
+  access granted 2026-05-27 (the fork is unblocked). Also supplies only Paul can give:
+  real photos/video for the showcases, a photo of Paul for the city page specialist
+  section, and starting the review-gathering. Repo housekeeping is DONE: GitHub default
+  branch is `main`, all stale `claude/*` branches deleted (2026-05-26).
 - **Moat backlog (parked, do now, not website-gated):** gather Google reviews from
   grateful long-time clients, build an owned before/after photo and video library, start a
   per-appointment data log, keep feeding the Oracle and field manual, and protect the
@@ -118,6 +126,50 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 ---
 
 ## Session history
+
+### 2026-05-27 (strategy thread + four decisions captured)
+
+A long strategy thread reviewing the project end-to-end before starting the
+fork of the DGN multi-page site structure. Paul granted the environment
+access to `doggonenails-site` (was blocking the fork; now unblocked) and
+directed a thorough read pass of both repos before any code touched disk.
+Four decisions came out of the thread and landed in the Oracle as new rules,
+one logical commit each:
+
+- `villages_only_in_copy` (Hurricane Bath: copy): the v2.0 surface mentions
+  only The Villages in customer-facing copy, no legacy Ocala / no future
+  cities / no coming-soon placeholders. Pairs with `villages_only_at_launch`
+  (which gates the booking polygon); this rule gates the copy.
+- `specialist_named_not_promised` (copy) + `specialist_assigned_per_route`
+  (scheduling), paired: name and photo the current operator (today: Paul),
+  never lock in "always Paul" and never imply an interchangeable team,
+  surface "you are on [Name]'s route" at booking step 1 from the route's
+  operator. Pairs with the existing standard-belongs-to-the-process
+  language so adding a hire does not break a promise to existing clients.
+- `founders_spots_remaining_counter` (ux): port DGN's Villages-page live
+  spots counter to the Hurricane Bath launch page, hidden above a
+  visibility threshold, auto-updated from the subscription count.
+
+One site-build decision (not a business rule, scoped to this build): the
+Hurricane Bath process gets its own dedicated `/process` page mirroring
+DGN's, not folded into the homepage. The `/portal/` and `/book/` link
+404s parked 2026-05-26 get fixed by adding honest stub pages during the
+fork, not by removing the CTAs (the CTAs are part of the money-machine
+pattern).
+
+Did NOT touch this session: the existing 24-rule Hurricane Bath pack
+(sound), the Field Manual (sound), the `marketing/` showcases (sound),
+`legacy/data/` (out of scope for the v2.0 surface), the deploy workflow,
+the database, or any code. Active fork build starts next.
+
+Near-miss noted for future-session-Claude: this session almost proposed
+inventing a new `BUILD_NOTES.md` and `BRAND_BRIEF.md` before reading the
+existing six-doc set. `read_before_redesign` already prevents this in
+principle; the concrete example is recorded so the lesson is grounded.
+Every "I should make a doc for this" instinct in this repo must first
+check whether CLAUDE.md / Scroll / Oracle / Business Rules / Parking Lot
+/ Field Manual already has the home for it. The doc set is intentionally
+exhaustive; new top-level docs are almost never the right answer.
 
 ### 2026-05-26 (recovery from compounded bad sessions)
 
