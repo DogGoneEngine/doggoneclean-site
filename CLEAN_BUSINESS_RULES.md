@@ -114,6 +114,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | calendar_shows_price_per_date | Hurricane Bath: ux | Oracle | portal reschedule + skip-pick calendar component (per-date price label); `src/business/pricing.js` quote-per-date helper |
 | founders_spots_remaining_counter | Hurricane Bath: ux | Oracle | `/the-villages` page `#launch-spot-count` element (hidden above threshold, fed by public read on counted subscriptions); threshold constant in `src/business/pricing.js` |
 | founders_cap_statement_always_visible | Hurricane Bath: ux | Oracle; `/the-villages` launch card eyebrow + headline + subhead + terms-grid tile (cap stated four places, always visible, independent of the counter element) | lint pattern asserting cap-statement copy presence on the city page |
+| single_visit_as_own_path | Hurricane Bath: ux | Oracle; `/the-villages` "Other ways in" section (single-visit card with its own CTA `/book?plan=single`, alongside standard recurring) | booking-flow plan picker (top-level choice before card entry); lint pattern asserting single-visit CTA presence on the city page |
 | string_of_pearls_is_a_service | Hurricane Bath: engineering | Oracle | `get-available-slots` / `create-booking` / `reschedule-appointment` / `skip-appointment` / `stop-subscription` CORS-locked edge functions; `/schedule-widget` iframe route; service-type query param |
 
 ## How to add a row

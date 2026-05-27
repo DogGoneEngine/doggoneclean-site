@@ -696,6 +696,24 @@ the counter is the urgency signal that fires when supply runs low. Two
 distinct surfaces, both required. Pairs with
 `founders_spots_remaining_counter` and `tiered_founders_rate`.
 
+`single_visit_as_own_path` (ux):
+On the city page and in the booking flow, the single-visit option is
+presented as its own findable path with its own price block and CTA,
+not as a secondary row inside a recurring pricing card. On the city
+page that means a dedicated section or card sitting alongside the
+recurring options, not a "single visit" line buried under a "recurring"
+header. In the booking flow that means a top-level plan choice the
+visitor sees before card entry, not an option discovered late. Because
+the single-visit price is the on-ramp many new customers need before
+committing to a recurring subscription, and most "try us once"
+customers convert to recurring after the first visit; burying the
+trial path makes it read as an afterthought and starves the recurring
+funnel of its main feeder. The failure mode this rule prevents was
+caught on 2026-05-27, where the first cut of `/the-villages` showed
+the single-visit price only as a row inside the tier pricing card,
+which Paul correctly read as "you can't actually try us once." Pairs
+with `single_oneoff_higher` (which defines the price spread).
+
 ### Engineering
 
 `string_of_pearls_is_a_service` (engineering):
