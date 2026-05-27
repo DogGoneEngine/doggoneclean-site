@@ -1,0 +1,118 @@
+---
+// src/pages/book.astro
+// Honest stub for the booking flow. The real signup (Stripe SetupIntent,
+// octane cadence picker, three-dog cap selector, breed tier check) lands
+// in the chapter that follows this fork, against the locked 24-rule
+// Hurricane Bath v2.0 pack. Until then, this page exists so the homepage
+// CTA does not 404.
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Booking | Dog Gone Clean Hurricane Bath"
+  description="Hurricane Bath online booking opens soon. Lock in the founders rate in The Villages, Florida."
+  noIndex={true}
+>
+  <section class="stub">
+    <div class="glow glow-a"></div>
+    <div class="container">
+      <div class="stub__inner">
+        <p class="eyebrow">Booking</p>
+        <h1>Almost ready.</h1>
+        <p class="stub__lede">
+          We are putting the finishing touches on the Hurricane Bath
+          signup. When it opens, the flow takes a couple of minutes:
+          check your address, pick a cadence, enter your card on file,
+          done. The founders rate locks for a year from the day you sign
+          up.
+        </p>
+
+        <div class="stub__what">
+          <h2>What signup will include</h2>
+          <ul>
+            <li>Address check (Villages, Florida service area)</li>
+            <li>Quick coat eligibility check (smoothcoat or doublecoat)</li>
+            <li>Pick your cadence: every four weeks (default) or every two (same price, more freshness)</li>
+            <li>Up to three dogs per visit</li>
+            <li>Card on file, charged the day before each visit (never sooner)</li>
+            <li>Cancel any time in two taps from your portal</li>
+          </ul>
+        </div>
+
+        <div class="stub__cta">
+          <a class="button button--primary button--lg" href="/the-villages">See the founders offer</a>
+          <a class="button button--ghost button--lg" href="/process">How a bath works</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .stub {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-4xl);
+  }
+  .stub .glow-a {
+    top: -100px;
+    right: -40px;
+    width: 360px;
+    height: 360px;
+  }
+  .stub__inner {
+    max-width: 640px;
+    margin-inline: auto;
+  }
+  .stub h1 {
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    margin: 0 0 var(--space-lg);
+  }
+  .stub__lede {
+    font-size: var(--text-lg);
+    color: var(--soft);
+    margin: 0 0 var(--space-2xl);
+  }
+  .stub__what {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-2xl);
+  }
+  .stub__what h2 {
+    font-size: var(--text-xl);
+    color: var(--accent);
+    margin: 0 0 var(--space-md);
+  }
+  .stub__what ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .stub__what li {
+    color: var(--soft);
+    padding-left: 1.5rem;
+    position: relative;
+  }
+  .stub__what li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 8px;
+    height: 8px;
+    background: var(--accent2);
+    border-radius: 50%;
+  }
+  .stub__cta {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+</style>

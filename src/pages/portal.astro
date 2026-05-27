@@ -1,0 +1,114 @@
+---
+// src/pages/portal.astro
+// Honest stub for the client portal. The real portal (Google sign in,
+// subscription view, two-tap stop sign, reschedule with price-per-date
+// calendar, skip allowance) lands after the booking flow. Until then,
+// this page exists so the homepage CTA does not 404.
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Client portal | Dog Gone Clean Hurricane Bath"
+  description="The Dog Gone Clean client portal opens once the Hurricane Bath service launches in The Villages, Florida."
+  noIndex={true}
+>
+  <section class="stub">
+    <div class="glow glow-b"></div>
+    <div class="container">
+      <div class="stub__inner">
+        <p class="eyebrow">Client portal</p>
+        <h1>Opens with the service.</h1>
+        <p class="stub__lede">
+          Once Hurricane Bath service is running in The Villages, this is
+          where you will manage your recurring care. We are wiring it up
+          now and will email you a sign in link the day it opens.
+        </p>
+
+        <div class="stub__what">
+          <h2>What the portal will do</h2>
+          <ul>
+            <li>See your next visit and the schedule going forward</li>
+            <li>Reschedule a visit with the price shown per candidate date</li>
+            <li>Skip a visit (one free skip per year, never advertised, just there)</li>
+            <li>Update the card on file</li>
+            <li>Stop your subscription in two taps, no phone calls, no scripts, no guilt</li>
+          </ul>
+        </div>
+
+        <div class="stub__cta">
+          <a class="button button--primary button--lg" href="/the-villages">See the founders offer</a>
+          <a class="button button--ghost button--lg" href="/">Back to home</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .stub {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-4xl);
+  }
+  .stub .glow-b {
+    top: -100px;
+    left: -40px;
+    width: 360px;
+    height: 360px;
+  }
+  .stub__inner {
+    max-width: 640px;
+    margin-inline: auto;
+  }
+  .stub h1 {
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    margin: 0 0 var(--space-lg);
+  }
+  .stub__lede {
+    font-size: var(--text-lg);
+    color: var(--soft);
+    margin: 0 0 var(--space-2xl);
+  }
+  .stub__what {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-2xl);
+  }
+  .stub__what h2 {
+    font-size: var(--text-xl);
+    color: var(--accent);
+    margin: 0 0 var(--space-md);
+  }
+  .stub__what ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .stub__what li {
+    color: var(--soft);
+    padding-left: 1.5rem;
+    position: relative;
+  }
+  .stub__what li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 8px;
+    height: 8px;
+    background: var(--accent2);
+    border-radius: 50%;
+  }
+  .stub__cta {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+</style>

@@ -27,8 +27,6 @@ jobs:
           cache: npm
 
       - run: npm ci --omit=dev
-        env:
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
 
       - run: npm run build
 
