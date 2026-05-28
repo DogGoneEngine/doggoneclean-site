@@ -536,7 +536,7 @@ avatar in place); Stripe account + keys (gates the booking flow);
 Twilio + A2P (gates SMS); attorney review of the legal pages before
 launch.
 
-### 2026-05-28 (process-page videos moved up, show-don't-tell locked)
+### 2026-05-28 (process-page video placement + sound, logo crop, favicon, nav size)
 
 Paul added two clips to the `/process` page (water-pressure, bath-in-action)
 and felt they sat too low. They did: fourth section, below the hero, the
@@ -557,6 +557,39 @@ conclusion is believed where a direct claim about calm invites the opposite.
 A footage shot list (before/after, mud-puddle flush, drying, the calm/peaceful
 clip, setup time-lapse, suds-at-skin, the rig) is parked in CLEAN_PARKING_LOT.md
 for Paul to capture on the route.
+
+Then Paul asked for the clip audio to behave. Added an `IntersectionObserver`
+that mutes a clip once it scrolls mostly out of view and a `visibilitychange`
+handler that mutes both clips when the tab is hidden, so sound never plays from
+something the visitor cannot see (the classic "where is that noise coming from"
+annoyance). Captured as a second new Oracle rule, `video_audio_only_when_visible`
+(ux): site video autoplays muted and looping, audio turns on only by a deliberate
+tap, one clip at a time, and cuts on scroll-away or tab-hide. The clips keep
+playing muted; only audio toggles, and returning never auto-unmutes.
+
+Logo work, same session. The supplied `logo.png` was the artwork (878x313)
+floating in a 960x540 canvas with ~112px of dead space top and bottom, so at the
+nav's fixed height the mark rendered tiny. Cropped to the artwork with a small
+even margin (now 910x345). When Paul reported it still looked uncropped, the
+cause was browser cache on the unchanged `/logo.png` URL, fixed by versioning the
+nav src to `?v=2`. Added a dedicated square favicon (`public/favicon.png`,
+128x128) built from just the dog mark and pointed the favicon links at it; before
+this the favicon was the wide lockup squished into a square, an unreadable smear.
+Bumped the nav logo render height 48px -> 60px (the bar is 72px) once the real
+cropped version was visible and still read small.
+
+Transparency dead-end (recorded so no future session re-attempts it). Paul asked
+for a transparent-background logo to park for later. It is not achievable from the
+current raster: the dog's body is pure white and open at the bottom where it meets
+the ground, so its interior is the same connected region as the background and any
+background removal hollows the dog (verified by compositing on dark). The dark
+wordmark also vanishes on dark backgrounds. A true drop-anywhere logo needs proper
+variants from the source art (a filled-shape dog on transparent, plus a light
+wordmark for dark backgrounds), which is a design task, not a raster edit. Parked
+the finding in CLEAN_PARKING_LOT.md; Paul said drop transparency for now.
+
+All of the above built clean (`scripts/check.py` plus `astro build`) and shipped
+to `main` in logical commits across the session.
 
 ### 2026-05-27 (strategy thread + four decisions captured)
 

@@ -735,6 +735,20 @@ the counter is the urgency signal that fires when supply runs low. Two
 distinct surfaces, both required. Pairs with
 `founders_spots_remaining_counter` and `tiered_founders_rate`.
 
+`video_audio_only_when_visible` (ux):
+Site video autoplays muted and looping; audio turns on only by a deliberate tap,
+only one clip at a time, and cuts automatically when the clip scrolls mostly out
+of view or the browser tab is hidden. Clips keep playing muted (only the audio
+toggles), and returning to the tab or scrolling back never auto-unmutes. First
+applied to the `/process` "See it work" clips (muted-autoplay markup plus an
+IntersectionObserver and a visibilitychange handler). Because autoplaying sound a
+visitor did not ask for is hostile, and sound from a clip that has scrolled off or
+a tab that is hidden is the classic "where is that noise coming from" annoyance,
+while a muted loop still carries the proof; audio should be a choice the visitor
+makes on purpose and should never outlive the moment they can see what is making
+it. Pairs with `show_dont_tell` (the clips are the proof shown before it is
+explained) and `neural_expressive_design` (gentle, controlled motion).
+
 `single_visit_as_own_path` (ux):
 On the city page and in the booking flow, the single-visit option is
 presented as its own findable path with its own price block and CTA,

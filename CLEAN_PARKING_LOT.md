@@ -75,8 +75,19 @@ small slice once the table is being written to).
 - **Photo of Paul for the city page specialist section.** The `/the-villages`
   page currently uses a placeholder "P" gradient avatar; drop a real photo in
   `public/` and update the `<img src="...">` in `the-villages.astro`.
-- **Logo check.** Confirm the logo renders cleanly on the light page (may need a
-  transparent-background version).
+- ~~**Logo check.** Confirm the logo renders cleanly on the light page (may need a
+  transparent-background version).~~ DONE 2026-05-28. The supplied `logo.png` had
+  ~112px of dead space top and bottom; cropped to the artwork (960x540 -> 910x345),
+  nav render height raised 48px -> 60px, and a dedicated square favicon
+  (`public/favicon.png`, from the dog mark) replaced the squished wide lockup in
+  the browser tab. **Transparent-background version is NOT feasible from the current
+  raster** and should not be re-attempted: the dog's body is pure white and open at
+  the bottom, so its interior is the same region as the background, and removing the
+  background hollows the dog (verified on a dark composite); the dark wordmark also
+  vanishes on dark backgrounds. A drop-anywhere logo needs proper variants from the
+  source art (filled-shape dog on transparent + a light wordmark for dark
+  backgrounds), a design task for whenever the original vector/layered file is
+  available. Paul dropped transparency for now (2026-05-28).
 
 ## Video / footage to capture (Paul, mechanical)
 
