@@ -983,6 +983,23 @@ hagglers at gas stations and in traffic and attracts the wrong sort of inquiry, 
 is a few missed casual leads for far less noise. Revisit only if a gated community requires a
 marked service vehicle for entry, as some once did.
 
+`show_dont_tell` (copy):
+Show the proof and let the visitor reach the conclusion; do not assert the feeling in words.
+Two applications are locked. First, the strongest proof (video of the bath working) sits high
+on the page, above the explanation, so a visitor sees the bath in motion before reading why it
+works: the `/process` page leads with the "See it work" clips directly under the hero, the
+same pattern as the homepage where the Hurricane Bath section precedes "why Paul built it."
+Second, the trailer's calm is shown, never claimed: footage of an unbothered dog, steady
+hands, and the quiet of the climate-controlled interior carries "this is a peaceful place"
+without the page ever saying so. Because a conclusion a viewer reaches on their own is
+believed, while a direct claim about calm invites the opposite reaction (a nervous owner reads
+reassurance as papering over stress), and proof shown before it is described persuades harder
+than the same point made in prose. Paul's own words, 2026-05-28: the trailer is his happy
+place, and it may make more sense to show that and let people come to that conclusion by
+themselves than to say it out loud. Pairs with `language_bank` (the spoken and text
+reassurance lines) and `neural_expressive_design` (key message and proof big at the top,
+detail below).
+
 ---
 
 ## Design

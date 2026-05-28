@@ -78,6 +78,34 @@ small slice once the table is being written to).
 - **Logo check.** Confirm the logo renders cleanly on the light page (may need a
   transparent-background version).
 
+## Video / footage to capture (Paul, mechanical)
+
+The `/process` page now leads with two clips (water-pressure, bath-in-action) directly under
+the hero per `show_dont_tell` (Oracle). Footage is the page's strongest proof, so a small shot
+list is parked here for Paul to capture on the route. Ranked by persuasive punch:
+
+1. **Before / after the same dog.** Dirty or matted, then clean and fluffy. The single most
+   persuasive clip a pet owner can see.
+2. **The "flush if filthy" mud puddle.** Wash water going brown, the system flushing and
+   refilling clean, then washing again. Proves a capability words cannot ("the wash water turns
+   to a mud puddle").
+3. **Drying in the trailer.** High-velocity dryer with the coat blowing dry, ideally a shot of
+   the humidity gauge near 30 percent. Proves "walks out dry, not damp" and sells the
+   climate-controlled trailer.
+4. **A calm dog mid-bath (the peaceful trailer).** Relaxed dog, loose tail, steady hands, the
+   quiet of the interior. This is the `show_dont_tell` calm clip: show the happy place, never
+   say it. Answers the unspoken "will my dog hate this?"
+5. **Setup / pulling into the driveway** (short time-lapse). Leveling the trailer, AC and lights
+   coming up. Sells the mobile "without leaving home" promise the copy only states.
+6. **Coat parted to show suds at the skin.** Close-up proof of "suds that get all the way down."
+7. **The rig itself / recirculation system.** A few seconds of the custom machine Paul built.
+   This is the moat ("none of the systems Paul could buy did everything"); seeing it makes it
+   real.
+
+If only two get shot next: before/after and the mud-puddle flush. Note when shooting the calm
+clip that the trailer reads as peaceful to Paul because he built it; frame it so the calm is
+visible to someone who has never seen inside.
+
 ## Marketing copy ideas (parked, not ready to use)
 
 Kernels for the site copy, captured so they are not lost. Not approved and not for publish yet.

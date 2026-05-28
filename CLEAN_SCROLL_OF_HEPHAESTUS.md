@@ -536,6 +536,28 @@ avatar in place); Stripe account + keys (gates the booking flow);
 Twilio + A2P (gates SMS); attorney review of the legal pages before
 launch.
 
+### 2026-05-28 (process-page videos moved up, show-don't-tell locked)
+
+Paul added two clips to the `/process` page (water-pressure, bath-in-action)
+and felt they sat too low. They did: fourth section, below the hero, the
+intro, the stats, and the six-step list, roughly three mobile scrolls down on
+the Pixel target. Moved the whole "See it work" block to second position,
+directly under the hero, so the bath is shown in motion right after the hero
+promises "here is what happens." Same pattern as the 2026-05-26 homepage swap
+(Hurricane Bath section before "why Paul built it"). Build clean, shipped to
+`main`.
+
+One new Oracle rule captured: `show_dont_tell` (copy). Proof shows before it is
+explained, and feelings are shown not asserted. Seeded by Paul noticing while
+filming the water-pressure clip that the trailer is his happy place, and that
+it may land better to show that calm and let people conclude it themselves than
+to say it out loud. The rule locks both halves (video high on the page; the
+trailer's calm shown, never claimed) with the because that a self-reached
+conclusion is believed where a direct claim about calm invites the opposite.
+A footage shot list (before/after, mud-puddle flush, drying, the calm/peaceful
+clip, setup time-lapse, suds-at-skin, the rig) is parked in CLEAN_PARKING_LOT.md
+for Paul to capture on the route.
+
 ### 2026-05-27 (strategy thread + four decisions captured)
 
 A long strategy thread reviewing the project end-to-end before starting the

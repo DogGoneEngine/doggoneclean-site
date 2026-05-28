@@ -83,6 +83,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | appointment_block_not_window | Copy | Oracle; **`check.py`** forbids "arrival window" anywhere in `src/pages/index.astro`, `the-villages.astro`, `process.astro` | n/a |
 | language_bank | Copy | Oracle; site copy; **`check.py`** asserts "belongs to the process" present on `process.astro` | additional banked-line presence checks as the bank grows |
 | no_trailer_graphics | Copy | Oracle | n/a (real-world) |
+| show_dont_tell | Copy | Oracle; site structure (the "See it work" video block sits above the intro on `process.astro`); convention | footage shot-list parked in CLEAN_PARKING_LOT.md; `check.py` lint asserting the video block precedes the intro on `process.astro` once the layout settles |
 | maps_js_api_only | Engineering | Oracle (carried) | code + lint when site exists |
 | supabase_rpc_not_raw_fetch | Engineering | Oracle (carried); **`check.py`** forbids `fetch(...SUPABASE_URL...)` pattern in `src/components/portal/` (catches raw REST without flagging legitimate edge-function calls) | n/a |
 | auth_listener_sets_state_only | Engineering | Oracle (carried); **`check.py`** scans `onAuthStateChange((...))` blocks in `src/components/portal/` and forbids `.from(`, `.rpc(`, `await fetch(`, `loadPortalData(` inside them | n/a |
