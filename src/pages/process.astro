@@ -490,32 +490,54 @@ const beats = [
 </style>
 
 <script is:inline>
-  // Sound toggle for the See It Work video cards. Only one video plays
-  // audio at a time; tapping a second card mutes the first.
-  document.querySelectorAll('.video-card__sound').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const card = btn.closest('.video-card');
-      const video = card.querySelector('video');
-      if (video.muted) {
-        document.querySelectorAll('.video-card video').forEach((v) => {
-          if (v !== video && !v.muted) {
-            v.muted = true;
-            const otherBtn = v.closest('.video-card').querySelector('.video-card__sound');
-            otherBtn.dataset.state = 'muted';
-            otherBtn.querySelector('.video-card__sound-label').textContent = 'Tap for sound';
-            otherBtn.querySelector('.video-card__icon').textContent = '\u{1F50A}';
-          }
-        });
-        video.muted = false;
-        btn.dataset.state = 'on';
-        btn.querySelector('.video-card__sound-label').textContent = 'Sound on';
-        btn.querySelector('.video-card__icon').textContent = '\u{1F509}';
-      } else {
-        video.muted = true;
-        btn.dataset.state = 'muted';
-        btn.querySelector('.video-card__sound-label').textContent = 'Tap for sound';
-        btn.querySelector('.video-card__icon').textContent = '\u{1F50A}';
-      }
+  // Sound control for the See It Work video cards. Only one clip plays
+  // audio at a time; audio also cuts when a clip scrolls mostly out of
+  // view or the tab loses focus, so sound never plays where it cannot be
+  // seen. The clips keep playing muted; only the audio is toggled.
+  const cards = Array.from(document.querySelectorAll('.video-card'));
+
+  function mute(video) {
+    if (video.muted) return;
+    video.muted = true;
+    const btn = video.closest('.video-card').querySelector('.video-card__sound');
+    btn.dataset.state = 'muted';
+    btn.querySelector('.video-card__sound-label').textContent = 'Tap for sound';
+    btn.querySelector('.video-card__icon').textContent = '\u{1F50A}';
+  }
+
+  function unmute(video) {
+    cards.forEach((c) => {
+      const other = c.querySelector('video');
+      if (other !== video) mute(other);
     });
+    video.muted = false;
+    const btn = video.closest('.video-card').querySelector('.video-card__sound');
+    btn.dataset.state = 'on';
+    btn.querySelector('.video-card__sound-label').textContent = 'Sound on';
+    btn.querySelector('.video-card__icon').textContent = '\u{1F509}';
+  }
+
+  cards.forEach((card) => {
+    const video = card.querySelector('video');
+    const btn = card.querySelector('.video-card__sound');
+    btn.addEventListener('click', () => {
+      if (video.muted) unmute(video);
+      else mute(video);
+    });
+  });
+
+  // Cut audio when a clip scrolls mostly out of view.
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.intersectionRatio < 0.5) mute(entry.target);
+      });
+    }, { threshold: [0, 0.5, 1] });
+    cards.forEach((card) => io.observe(card.querySelector('video')));
+  }
+
+  // Cut audio when the tab is hidden (switching tabs or apps).
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) cards.forEach((card) => mute(card.querySelector('video')));
   });
 </script>
