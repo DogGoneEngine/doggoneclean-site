@@ -183,6 +183,10 @@ export default function BookingApp() {
 
   return (
     <div className="pt-shell">
+      <div className="bk-glows" aria-hidden="true">
+        <span className="glow glow-a" />
+        <span className="glow glow-b" />
+      </div>
       <div className="bk-wrap">
         <div className="bk-progress2">
           <div className="bk-progress2__label">Step {step} of {TOTAL_STEPS}<span className="bk-progress2__city"> · The Villages</span></div>
@@ -322,7 +326,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 
   return (
     <div className="bk-card">
-      <h2 className="bk-step__title">Let's Get Started</h2>
+      <h2 className="bk-step__title">Let's Get <span className="grad">Started</span></h2>
       <p className="bk-step__sub">First, let's make sure we're a good fit for The Villages.</p>
 
       {/* Stage 1: fit check */}
@@ -480,7 +484,7 @@ function Step2({ city, dogs, cadence, setCadence, onAdvance }) {
   const periodLabel = cadence === 'oneoff' ? 'One bath' : (cadence === '2wk' ? 'Every 2 weeks' : 'Every 4 weeks');
   return (
     <div className="bk-card">
-      <h2 className="bk-step__title">Choose your plan</h2>
+      <h2 className="bk-step__title">Choose your <span className="grad">plan</span></h2>
       <p className="bk-step__sub">Every 4 and every 2 weeks are the same price; pick the freshness you want. Cancel any time in two taps.</p>
       <div className="bk-octane">
         <span className="bk-octane__q">Want your dog fresher?</span>
@@ -539,7 +543,7 @@ function Step3({ city, cadence, chosenSlot, setChosenSlot, error, setError, onAd
 
   return (
     <div className="bk-card">
-      <h2 className="bk-step__title">Choose your date &amp; time</h2>
+      <h2 className="bk-step__title">Choose your date &amp; <span className="grad">time</span></h2>
       <p className="bk-step__sub">
         {cadence === 'oneoff' ? 'Pick a day and time that works for you.' : 'This is your first visit. After that we keep you on the same rhythm, same day, same time. Change or cancel in two taps.'}
       </p>
@@ -626,7 +630,7 @@ function Step4({ city, place, dogs, cadence, chosenSlot }) {
   const preview = buildRecurringPreview(chosenSlot, cadence, 4);
   return (
     <div className="bk-card">
-      <h2 className="bk-step__title">Review &amp; confirm</h2>
+      <h2 className="bk-step__title">Review &amp; <span className="grad">confirm</span></h2>
       <p className="bk-step__sub">Everything look right?</p>
       <dl className="bk-review">
         <div><dt>Name</dt><dd>{place.firstName} {place.lastName}</dd></div>
