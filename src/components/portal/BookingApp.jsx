@@ -28,6 +28,7 @@ import {
   sb, getBookingCity, getOpenSlots, getOpenSlotsBetween,
   signInWithGoogle, toE164US,
 } from './supabase.js';
+import { loadGoogleMaps, parsePlace, isInServiceArea } from './maps.js';
 
 const CITY_SLUG = 'the-villages';
 const STORE_KEY = 'dgc_booking_v2';
@@ -107,7 +108,7 @@ const BLANK_DOG = { name: '', breed: '', coat_tier: '', dobMonth: '', dobDay: ''
 const BLANK = {
   step: 1,
   eligibilityAcked: false,
-  place: { firstName: '', lastName: '', email: '', phone: '', addressLine1: '', addressCity: '', addressState: 'FL', addressZip: '', gateCode: '' },
+  place: { firstName: '', lastName: '', email: '', phone: '', addressLine1: '', addressCity: '', addressState: 'FL', addressZip: '', gateCode: '', serviceLat: null, serviceLng: null },
   smsConsent: true,
   dogs: [{ ...BLANK_DOG }],
   cadence: '4wk',
@@ -215,13 +216,46 @@ export default function BookingApp() {
 /* ── Step 1: Let's get started ─────────────────────────────────────── */
 function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, smsConsent, setSmsConsent, dogs, setDogs, error, setError, onAdvance }) {
   const set = (f) => (e) => setPlace((p) => ({ ...p, [f]: e.target.value }));
-  const stage2 = eligibilityAcked;
-  const stage3 = stage2 && place.addressLine1.trim() && place.addressZip.trim() && place.addressCity.trim();
 
   const [authed, setAuthed] = useState(false);
+  const [mapsMode, setMapsMode] = useState('loading'); // loading | auto | manual
+  const [areaStatus, setAreaStatus] = useState(place.serviceLat != null ? 'in' : 'idle'); // idle | in | out
+  const [editingAddr, setEditingAddr] = useState(!place.addressLine1);
+
   useEffect(() => {
     (async () => { const c = sb(); if (!c) return; const { data: { user } } = await c.auth.getUser(); setAuthed(!!user); })();
   }, []);
+
+  // Try Google Places; fall back to manual entry if the script can't load.
+  useEffect(() => {
+    let cancelled = false;
+    loadGoogleMaps().then(() => { if (!cancelled) setMapsMode('auto'); })
+      .catch(() => { if (!cancelled) setMapsMode('manual'); });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Ref so the (once-captured) pick handler always sees the latest city.
+  const cityRef = useRef(city);
+  useEffect(() => { cityRef.current = city; }, [city]);
+
+  function handlePick(parsed) {
+    setEditingAddr(false);
+    setPlace((p) => ({
+      ...p,
+      addressLine1: parsed.line1,
+      addressCity: parsed.city,
+      addressState: parsed.state || 'FL',
+      addressZip: parsed.zip,
+      serviceLat: parsed.lat,
+      serviceLng: parsed.lng,
+    }));
+    setAreaStatus(isInServiceArea(parsed.lat, parsed.lng, cityRef.current) ? 'in' : 'out');
+  }
+
+  const hasManualAddr = place.addressLine1.trim() && place.addressCity.trim() && place.addressZip.trim();
+  const addrOk = mapsMode === 'manual' ? hasManualAddr : areaStatus === 'in';
+  const stage2 = eligibilityAcked;
+  const stage3 = stage2 && addrOk;
 
   function updateDog(i, field, val) { setDogs((ds) => ds.map((d, idx) => (idx === i ? { ...d, [field]: val } : d))); }
   function setDogCount(n) {
@@ -262,19 +296,53 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
         <span>My dog fits these requirements and is friendly toward people.</span>
       </label>
 
-      {/* Stage 2: address */}
+      {/* Stage 2: address (Google Places + in-area check; manual fallback) */}
       {stage2 && (
         <div className="bk-reveal">
           <div className="bk-stage__divider" />
           <div className="bk-stage__heading">Where do we bring the bath?</div>
-          <Field label="Street address"><input className="pt-input" value={place.addressLine1} onChange={set('addressLine1')} autoComplete="address-line1" /></Field>
-          <div className="bk-grid-3">
-            <Field label="City"><input className="pt-input" value={place.addressCity} onChange={set('addressCity')} autoComplete="address-level2" /></Field>
-            <Field label="State"><input className="pt-input" value={place.addressState} onChange={set('addressState')} autoComplete="address-level1" /></Field>
-            <Field label="ZIP"><input className="pt-input" inputMode="numeric" value={place.addressZip} onChange={set('addressZip')} autoComplete="postal-code" /></Field>
-          </div>
-          <Field label="Gate code (if applicable)"><input className="pt-input" value={place.gateCode} onChange={set('gateCode')} maxLength={32} autoComplete="off" /></Field>
-          <p className="bk-fineprint">We confirm your address is on the route before your first visit.</p>
+
+          {mapsMode === 'loading' && (
+            <Field label="Street address"><input className="pt-input" placeholder="Loading address search..." disabled /></Field>
+          )}
+
+          {mapsMode === 'auto' && (
+            <>
+              {editingAddr ? (
+                <Field label="Street address">
+                  <PlacesInput defaultValue={place.addressLine1} onPick={handlePick} />
+                  <p className="bk-fineprint">Start typing and pick your address from the list.</p>
+                </Field>
+              ) : (
+                <div className="bk-addr-confirmed">
+                  <div className="bk-addr-confirmed__text">{place.addressLine1}, {place.addressCity} {place.addressState} {place.addressZip}</div>
+                  <button type="button" className="bk-addr-confirmed__edit" onClick={() => { setEditingAddr(true); setAreaStatus('idle'); }}>Change</button>
+                </div>
+              )}
+              {areaStatus === 'in' && <div className="bk-area bk-area--in">✓ You're in our service area.</div>}
+              {areaStatus === 'out' && (
+                <div className="bk-area bk-area--out">
+                  That address is just outside the route we run today. <a href="/the-villages">Join the waitlist</a> and we'll let you know the moment we reach you.
+                </div>
+              )}
+            </>
+          )}
+
+          {mapsMode === 'manual' && (
+            <>
+              <Field label="Street address"><input className="pt-input" value={place.addressLine1} onChange={set('addressLine1')} autoComplete="address-line1" /></Field>
+              <div className="bk-grid-3">
+                <Field label="City"><input className="pt-input" value={place.addressCity} onChange={set('addressCity')} autoComplete="address-level2" /></Field>
+                <Field label="State"><input className="pt-input" value={place.addressState} onChange={set('addressState')} autoComplete="address-level1" /></Field>
+                <Field label="ZIP"><input className="pt-input" inputMode="numeric" value={place.addressZip} onChange={set('addressZip')} autoComplete="postal-code" /></Field>
+              </div>
+              <p className="bk-fineprint">We confirm your address is on the route before your first visit.</p>
+            </>
+          )}
+
+          {addrOk && (
+            <Field label="Gate code (if applicable)"><input className="pt-input" value={place.gateCode} onChange={set('gateCode')} maxLength={32} autoComplete="off" /></Field>
+          )}
         </div>
       )}
 
@@ -550,6 +618,32 @@ function Step4({ city, place, dogs, cadence, chosenSlot }) {
 }
 
 function Field({ label, children }) { return (<div className="pt-field bk-field"><label>{label}</label>{children}</div>); }
+
+// Google Places Autocomplete bound to a single address input. Only
+// rendered once the Maps script has loaded (mapsMode === 'auto').
+function PlacesInput({ defaultValue, onPick }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const g = window.google;
+    if (!g || !g.maps || !g.maps.places || !ref.current) return undefined;
+    const ac = new g.maps.places.Autocomplete(ref.current, {
+      types: ['address'],
+      componentRestrictions: { country: 'us' },
+      fields: ['address_components', 'geometry', 'formatted_address'],
+    });
+    const listener = ac.addListener('place_changed', () => {
+      const place = ac.getPlace();
+      if (place && place.geometry) onPick(parsePlace(place));
+    });
+    return () => {
+      if (window.google && window.google.maps && window.google.maps.event) {
+        window.google.maps.event.removeListener(listener);
+        window.google.maps.event.clearInstanceListeners(ac);
+      }
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return <input ref={ref} className="pt-input" defaultValue={defaultValue} placeholder="Start typing your address" autoComplete="off" aria-label="Street address" />;
+}
 
 function GoogleMark() {
   return (

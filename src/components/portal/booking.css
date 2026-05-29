@@ -378,3 +378,11 @@
 /* Back + continue buttons */
 .bk-back { display: inline-block; margin-top: var(--space-lg); background: none; border: none; color: var(--soft); font-size: var(--text-sm); cursor: pointer; }
 .bk-continue { width: 100%; margin-top: var(--space-xl); }
+
+/* Address autocomplete: confirmed readback + service-area banners */
+.bk-addr-confirmed { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-md) var(--space-lg); background: var(--bg); }
+.bk-addr-confirmed__text { font-weight: 600; font-size: var(--text-sm); }
+.bk-addr-confirmed__edit { background: none; border: none; color: var(--accent); font-size: var(--text-xs); cursor: pointer; text-decoration: underline; flex-shrink: 0; }
+.bk-area { margin-top: var(--space-md); font-size: var(--text-sm); border-radius: var(--radius-md); padding: var(--space-md) var(--space-lg); line-height: 1.6; }
+.bk-area--in { color: var(--accent); background: var(--bg); border: 1px solid var(--line); font-weight: 600; }
+.bk-area--out { color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--accent2); }
