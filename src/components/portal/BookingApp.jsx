@@ -34,12 +34,13 @@ const CITY_SLUG = 'the-villages';
 const STORE_KEY = 'dgc_booking_v2';
 const TOTAL_STEPS = 4;
 
+// No service-area line here: the address step right below verifies it, and
+// the intro already says The Villages. Stating it as a requirement is noise.
 const ELIGIBILITY = [
   'Bath only, no haircuts. We do not do scissor or clipper work.',
   'Smoothcoat or doublecoat that sheds without matting.',
   'No doodles or heavily matted coats (those need a full groom).',
   'Up to three dogs per visit.',
-  'In The Villages, Florida service area.',
 ];
 
 const MONTHS = [
