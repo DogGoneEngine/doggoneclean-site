@@ -254,3 +254,52 @@
 }
 .bk-footer__price { font-size: var(--text-sm); color: var(--ink); font-weight: 600; display: inline-flex; align-items: center; gap: var(--space-sm); }
 .bk-signout { background: none; border: none; color: var(--soft); font-size: var(--text-xs); cursor: pointer; text-decoration: underline; }
+
+/* Fit check + progressive reveal */
+.bk-fit {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  padding: var(--space-lg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink);
+}
+.bk-fit input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--accent2); }
+.bk-reveal { margin-top: var(--space-xl); }
+
+/* Optional Google prefill */
+.bk-google-prefill {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: #3c4043;
+}
+.bk-google-prefill:hover { border-color: var(--accent2); }
+.bk-google-prefill__note {
+  flex-basis: 100%;
+  font-weight: 400;
+  font-size: var(--text-xs);
+  color: var(--soft);
+}
+.bk-signedin { font-size: var(--text-sm); color: var(--soft); margin: 0 0 var(--space-lg); }
+
+/* Sign-in block in the review step */
+.bk-signin-block { margin-top: var(--space-md); }
+.bk-signin-block .bk-notice { margin-bottom: var(--space-md); }
+.bk-signin-block .pt-center-fill { min-height: 0; }
+.bk-signin-block .pt-auth-card { box-shadow: none; border: 1px solid var(--line); }
