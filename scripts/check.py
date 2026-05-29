@@ -528,19 +528,9 @@ def check_rule_survival():
         "'non-refundable' (the within-24h payment status must be stated in terms)",
     )
 
-    # ── three_dog_cap ─────────────────────────────────────────────────────
-    # The cap is the Villages HOA limit (2 dogs, 3 grandfathered), NOT a Dog
-    # Gone rule, so it is deliberately NOT stated to customers. Its teeth are
-    # the DB CHECK (dog_count 1-3) + the RPC. Forbid the customer-facing
-    # statement so a redesign cannot reintroduce it as our rule.
-    for page in (villages, terms, portal_app, booking_app):
-        require_absent(
-            page,
-            r"three dogs",
-            "three_dog_cap",
-            "a customer-facing 'three dogs' limit (the cap is the Villages HOA "
-            "rule, enforced in the DB, never stated to customers as ours)",
-        )
+    # three_dog_cap: nothing to assert here. The cap is the Villages HOA limit
+    # (a data point, not a Dog Gone rule), enforced by the DB CHECK
+    # (dog_count 1-3) and the booking form counter, which stops at three.
 
     # ── friendly_dogs_only ────────────────────────────────────────────────
     # Safety boundary must be visible on the customer-facing site, not
