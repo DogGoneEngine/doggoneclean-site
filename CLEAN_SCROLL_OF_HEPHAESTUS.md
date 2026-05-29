@@ -635,7 +635,25 @@ the built bundle, NOT by a live click; final confirmation is Paul on the
 deployed page. `maps_js_api_only` refinement updated to say New, not the legacy
 widget.
 
-No new Oracle rules this chapter; one refinement (`maps_js_api_only`, above).
+Sixth pass (correction, Paul's call): removed the manual address path
+entirely. Paul's rule is that there is no manual option: the address
+autocompletes, you tap it, in-polygon passes and out-of-polygon fails, full
+stop. The funnel had a "Can't find your address? Enter it manually" link that
+dropped to a plain text box and passed the gate on any typed text, and the
+server (0008) accepted a coordinate-less signup as `address_verified = false`
+to confirm later. Both are the unverified "we will sort it out" hole Paul does
+not want. Fixed in both layers: `BookingApp.jsx` now offers autocomplete plus
+the in-area check only (when Maps cannot load it shows an honest "booking opens
+shortly" notice and the gate stays closed, no manual box), and migration 0009
+makes the RPC hard-reject any booking with absent or out-of-area coordinates
+before a row is written. Refined `service_area_enforced_server_side` to match,
+updated the index, and added a `check.py` guard that fails the build if
+manual-entry copy returns to the island. The "manual-entry fallback (no dead
+end)" recorded earlier in this chapter was a mistake against this rule;
+reality wins.
+
+No new Oracle rules this chapter; two refinements (`maps_js_api_only` and
+`service_area_enforced_server_side`, above).
 The funnel enforces the existing rule pack. Blocked / handed to Paul: the
 Stripe SetupIntent edge function
 (needs the Dog Gone Clean TEST keys) to activate the card step, and the

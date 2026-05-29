@@ -1097,18 +1097,20 @@ multi-field form (the fallback if Maps fails is one plain text input, not a form
 `service_area_enforced_server_side` (engineering):
 The service-area (in-polygon) check is authoritative in the signup RPC
 (`bath_start_subscription` calling `_bath_point_in_area` over `cities.polygon`), not in the
-browser. Coordinates inside the polygon set `bath_subscribers.address_verified = true`;
-coordinates outside are rejected before any row is written; a signup with no coordinates (manual
-entry, or an autocomplete that is unavailable) is recorded with `address_verified = false` and
-must be confirmed before any charge, never treated as in-area on trust. The Google Places
-autocomplete in the booking island is a convenience for entering an address, not the gate.
-Because the only area check used to live in the browser (`maps.js`) and ran only when autocomplete
-returned coordinates, so a dead autocomplete box, the manual-entry fallback, or any crafted
-request could place an out-of-area signup. A location gate a redesign or a dead widget can bypass
-is not a gate (see `redesign_survival_is_a_ship_gate`). Auto-verifying a typed manual address
-needs the Geocoding API on Clean's server Maps key (Paul's console, per `maps_js_api_only`); until
-then manual addresses are confirmed by the operator before the first visit, and the charge job
-must refuse to charge an appointment whose subscriber `address_verified` is false.
+browser. There is NO manual address path. A booking must carry coordinates that fall inside the
+polygon or it is rejected before any row is written: coordinates absent (autocomplete bypassed or
+unavailable, or a crafted request) is a hard reject; coordinates outside the polygon is a hard
+reject; coordinates inside proceed with `bath_subscribers.address_verified = true` (migration
+0009, which supersedes 0008's accept-as-unverified branch). The Google Places autocomplete in the
+booking island is the only way to enter an address and is a convenience for capturing it, not the
+gate; when it cannot load, the funnel shows an honest "booking opens shortly" notice and the gate
+stays closed. Because the only area check used to live in the browser (`maps.js`) and ran only
+when autocomplete returned coordinates, so a dead autocomplete box, a manual-entry fallback, or
+any crafted request could place an out-of-area signup. A location gate a redesign or a dead widget
+can bypass is not a gate (see `redesign_survival_is_a_ship_gate`), and a manual "confirm it later"
+path is precisely the unverified hole this rule forbids: address either autocompletes and is
+in-area, or it cannot book. The `address_verified` column stays (always true on a successful
+booking now) as a belt-and-suspenders guard the future charge job still honors.
 
 `supabase_rpc_not_raw_fetch` (engineering):
 In a Supabase client app, use the client's `rpc()` for database/auth calls, not raw

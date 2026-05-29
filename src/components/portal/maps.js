@@ -12,8 +12,10 @@
 export const MAPS_BROWSER_KEY = 'AIzaSyA77l7vz6_hr1CtJ8OGAUsy549TEAAclhw';
 
 // Load the Maps JS API (Places library) once. Resolves with google.maps,
-// rejects if the script fails (network / bad key) so the funnel can fall
-// back to plain manual address entry instead of dead-ending.
+// rejects if the script fails (network / bad key). On failure the funnel
+// shows an honest "booking opens shortly" notice and keeps the gate closed:
+// there is no manual address path, because an address we cannot verify is
+// in-area must not be bookable.
 let _mapsPromise = null;
 export function loadGoogleMaps() {
   if (typeof window === 'undefined') return Promise.reject(new Error('no_window'));

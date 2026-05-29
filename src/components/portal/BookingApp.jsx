@@ -229,7 +229,10 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   const [areaStatus, setAreaStatus] = useState(place.serviceLat != null ? 'pass' : null); // null | pass | fail
 
   const stage1 = eligibilityAcked;
-  const stage2done = mapsFailed ? !!place.addressLine1.trim() : areaStatus === 'pass';
+  // No manual path: the ONLY way past this gate is an address chosen from
+  // autocomplete that the in-area polygon check passed. If Maps cannot load,
+  // the gate stays closed (an address we cannot verify must not be bookable).
+  const stage2done = areaStatus === 'pass';
 
   useEffect(() => {
     (async () => { const c = sb(); if (!c) return; const { data: { user } } = await c.auth.getUser(); setAuthed(!!user); })();
@@ -334,15 +337,12 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
               {!mapsReady && <input type="text" className="pt-input" placeholder="Loading address search..." disabled />}
               <div ref={boxRef} className="bk-place-box" />
               {place.verifiedAddress && <p className="bk-fineprint">Selected: {place.verifiedAddress}</p>}
-              <button type="button" className="bk-manual-link" onClick={() => setMapsFailed(true)}>
-                Can't find your address? Enter it manually
-              </button>
+              <p className="bk-fineprint">Start typing and pick your address from the list so we can confirm it is on the route.</p>
             </Field>
           ) : (
-            <Field label="Service address">
-              <input className="pt-input" value={place.addressLine1} onChange={set('addressLine1')} placeholder="Type your full address" autoComplete="off" />
-              <p className="bk-fineprint">We confirm your address is on the route before your first visit.</p>
-            </Field>
+            <div className="bk-notice">
+              Online booking for The Villages is being set up and opens shortly. <a href="/the-villages">Reserve your founders spot</a> and we will let you know the moment it is live.
+            </div>
           )}
 
           {areaStatus === 'pass' && <div className="bk-area bk-area--in"><span className="bk-area__icon">✓</span> You're in our service area.</div>}

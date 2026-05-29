@@ -730,6 +730,18 @@ def check_rule_survival():
     require_present(booking_app, r"aggression", "friendly_dogs_only",
                     "'aggression' on the booking gate")
 
+    # ── service_area_enforced_server_side (no manual address path) ────────
+    # The gate is autocomplete + the in-area polygon ONLY. A manual-entry path
+    # is the unverified hole the rule forbids (an address we cannot verify is
+    # in-area must not be bookable). Fail the build if it creeps back into the
+    # booking island; the server reject (migration 0009) is the durable teeth,
+    # this guard keeps the page from re-opening the hole in a redesign.
+    require_absent(booking_app, r"enter it manually", "service_area_enforced_server_side",
+                   "a manual-address-entry link in the booking flow (autocomplete + polygon only)")
+    require_absent(booking_app, r"confirm your address is on the route before your first visit",
+                   "service_area_enforced_server_side",
+                   "the 'confirm later' manual-address punt copy in the booking flow")
+
     # ── core_is_no_haircut_dogs / bath_only_no_mats (booking eligibility) ──
     # Eligibility copy; the coat-tier teeth are the DB CHECK + the RPC. WARN.
     require_present(booking_app, r"bath only", "core_is_no_haircut_dogs",
