@@ -20,14 +20,28 @@ optimizer (deferred). Slices shipped to `main`:
   `bath_availability_windows` + `bath_availability_exceptions`,
   `bath_open_slots()` (free slots, no PII, anon-callable), and
   `bath_start_subscription()` enforcing the rule pack atomically.
-- ~~Slice 2: the funnel UI~~ DONE. `/book` is now `BookingApp.jsx` (React
-  island): auth gate -> place -> dogs -> plan -> real slot picker ->
-  review. Live city pricing, real open slots. No fake card form.
+- ~~Slice 2: the funnel UI~~ DONE, then restructured for low friction
+  (2026-05-29). `/book` is `BookingApp.jsx`. NO sign-in wall: anonymous
+  funnel (fit check reveals place + contact + dogs) -> plan -> real slot
+  picker -> review, with sign-in DEFERRED to the final confirm ("create
+  your account to save your card"). Optional Google prefill early. Funnel
+  state persists to sessionStorage so a Google OAuth redirect does not
+  lose progress. Multi-dog pricing fixed (each dog its own tier, stacking
+  per-additional-dog discount; migration 0005). Honors ?plan=single.
 - ~~Slice 3: founders counter feed~~ DONE (migration 0004).
   `bath_founders_remaining(slug)` feeds the hidden `#launch-spot-count`
   on `/the-villages` (reveals below the visibility threshold).
 
 **Still ahead on booking (blocked or next):**
+- **Address autocomplete + service-area verification** (DGN-style, ported
+  from `doggonenails-site` `checkServiceArea`): Google Places Autocomplete
+  on the address field -> lat/lng -> point-in-polygon against
+  `cities.polygon` + per-address allow/deny exceptions. Today the funnel
+  takes a typed address with NO verification. Needs from Paul: a Clean
+  Google Maps API key (its own Google Cloud project, domain-locked, per
+  `clean_stays_saleable`) and the real Villages polygon (drawable, or a
+  center+radius to start). DGN's `isInCityPolygon`/`checkServiceArea` in
+  `src/business/cities.js` is the reference.
 - **Slice 4: Stripe SetupIntent edge function** + activate the card step.
   BLOCKED on Paul creating the Dog Gone Clean Stripe account and providing
   TEST keys. The funnel's final "Add card & confirm" button is disabled
