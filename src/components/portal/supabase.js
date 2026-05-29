@@ -196,21 +196,27 @@ export async function getBookingCity(slug = 'the-villages') {
 // future times by the database function. Empty until the operator has
 // posted availability windows (honest empty state in the picker).
 export async function getOpenSlots(cityId, days = 28) {
-  const client = sb();
-  if (!client) return { error: 'no_client', slots: [] };
   const from = new Date();
   const to = new Date(from.getTime() + days * 24 * 60 * 60 * 1000);
+  return getOpenSlotsBetween(cityId, from, to);
+}
+
+// Same, for an explicit [from, to] window (the "specific month" picker).
+export async function getOpenSlotsBetween(cityId, from, to) {
+  const client = sb();
+  if (!client) return { error: 'no_client', slots: [] };
   const { data, error } = await client.rpc('bath_open_slots', {
     p_city_id: cityId,
-    p_from: from.toISOString(),
-    p_to: to.toISOString(),
+    p_from: new Date(from).toISOString(),
+    p_to: new Date(to).toISOString(),
   });
   if (error) return { error: error.message, slots: [] };
   return { slots: data || [] };
 }
 
-// Submit the signup. `payload` carries the profile, dogs, cadence, and
-// chosen slot; the card (stripe_payment_method_id) is null on the
+// Submit the signup. Books anonymously (no auth session): identity is the
+// phone number; the RPC creates the subscriber, dogs, subscription, and
+// first appointment. The card (stripe_payment_method_id) is null on the
 // pre-launch path and becomes required once Stripe is wired. Returns the
 // RPC result object or { error }.
 export async function startSubscription(payload) {
@@ -228,6 +234,8 @@ export async function startSubscription(payload) {
     p_address_zip: payload.addressZip,
     p_service_lat: payload.serviceLat ?? null,
     p_service_lng: payload.serviceLng ?? null,
+    p_gate_code: payload.gateCode ?? null,
+    p_sms_opt_in: payload.smsOptIn ?? true,
     p_dogs: payload.dogs,
     p_cadence: payload.cadence,
     p_slot_start: payload.slotStart,

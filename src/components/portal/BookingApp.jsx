@@ -1,44 +1,59 @@
 // src/components/portal/BookingApp.jsx
 //
-// Hurricane Bath signup funnel (the /book flow). Low-friction shape: NO
-// sign-in wall. The funnel runs anonymously (fit check -> place + dogs ->
-// plan -> real slot picker -> review); the client only signs in at the
-// final step, to save a card on file and confirm. Google sign-in is
-// offered early as an optional name/email prefill.
+// Hurricane Bath signup funnel (the /book flow). Ported faithfully from
+// the proven Dog Gone Nails booking flow, with only the bath-specific
+// differences overlaid (coat-tier pricing per dog, a 2-week cadence
+// option, a three-dog cap, and no add-ons). NO account required to book
+// (matches nails): the funnel runs anonymously and submits through the
+// anonymous bath_start_subscription RPC, keyed on phone. The portal is
+// claimed later.
 //
-// Built against real services from the first commit (no_mockups):
-// Supabase for auth, live city pricing from the city row, genuinely open
-// slots from bath_open_slots, and the bath_start_subscription RPC (which
-// requires auth.uid(), satisfied by the end-of-funnel sign-in).
+// Four steps, nails structure:
+//   1. Let's get started   (eligibility -> address + gate -> contact + dogs)
+//   2. Choose your plan     (cadence cards + live total)
+//   3. Choose your time     (timeframe -> real slots -> card on file)
+//   4. Review & confirm     (summary + recurring preview -> submit)
 //
-// A Google OAuth sign-in redirects the tab, which would wipe in-progress
-// React state, so the funnel persists to sessionStorage and restores on
-// return. The card-on-file step is gated until the Stripe SetupIntent
-// slice lands (no fake card form). Google Places address autocomplete +
-// polygon service-area check is its own slice (needs the Clean Maps key
-// and the real Villages polygon); until then the address is typed plainly.
+// Two pieces are gated on credentials Paul provides and degrade honestly
+// until then (no fake UI): the address field is plain text until the
+// Google Maps key wires live autocomplete + the in-area polygon check,
+// and the card-on-file step is informational until the Stripe SetupIntent
+// slice lands. Funnel state persists to sessionStorage so the optional
+// Google name/email prefill (which redirects) does not lose progress.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import './portal.css';
 import './booking.css';
 import {
-  sb, getBookingCity, getOpenSlots, signInWithGoogle, signOut, toE164US,
+  sb, getBookingCity, getOpenSlots, getOpenSlotsBetween,
+  signInWithGoogle, toE164US,
 } from './supabase.js';
-import AuthScreen from './AuthScreen.jsx';
 
 const CITY_SLUG = 'the-villages';
-const STEPS = ['start', 'dogs', 'plan', 'time', 'review'];
-const STEP_LABELS = { start: 'Start', dogs: 'Dogs', plan: 'Plan', time: 'Time', review: 'Confirm' };
-const STORE_KEY = 'dgc_booking_v1';
+const STORE_KEY = 'dgc_booking_v2';
+const TOTAL_STEPS = 4;
+
+const ELIGIBILITY = [
+  'Bath only, no haircuts. We do not do scissor or clipper work.',
+  'Smoothcoat or doublecoat that sheds without matting.',
+  'No doodles or heavily matted coats (those need a full groom).',
+  'Up to three dogs per visit.',
+  'In The Villages, Florida service area.',
+];
+
+const MONTHS = [
+  ['01', 'January'], ['02', 'February'], ['03', 'March'], ['04', 'April'],
+  ['05', 'May'], ['06', 'June'], ['07', 'July'], ['08', 'August'],
+  ['09', 'September'], ['10', 'October'], ['11', 'November'], ['12', 'December'],
+];
+const rangeDays = () => Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
+const rangeYears = () => Array.from({ length: 27 }, (_, i) => String(new Date().getFullYear() - i));
 
 function dollars(cents) {
   if (cents == null) return null;
   const d = cents / 100;
   return Number.isInteger(d) ? `$${d}` : `$${d.toFixed(2)}`;
 }
-
-// Per-dog price for its OWN coat tier at the chosen cadence. Recurring
-// shows the founders rate; one-off shows the single price.
 function dogTierCents(city, tier, cadence) {
   if (!city || (tier !== 'smoothcoat' && tier !== 'doublecoat')) return null;
   if (cadence === 'oneoff') {
@@ -46,257 +61,234 @@ function dogTierCents(city, tier, cadence) {
   }
   return tier === 'doublecoat' ? city.hb_founders_doublecoat_cents : city.hb_founders_smoothcoat_cents;
 }
-
-// Visit total: every dog at its own tier, most-expensive first, with the
-// per-additional-dog discount stacking down the line (matches the city
-// page and the bath_start_subscription RPC).
+// Each dog at its own tier, most-expensive first, stacking per-additional
+// discount (matches the city page + the RPC).
 function visitPriceCents(city, dogs, cadence) {
   if (!city) return null;
   const prices = dogs.map((d) => dogTierCents(city, d.coat_tier, cadence));
   if (prices.some((p) => p == null)) return null;
-  const decrement = city.hb_addon_decrement_cents || 0;
-  return [...prices].sort((a, b) => b - a).reduce((sum, c, i) => sum + Math.max(0, c - decrement * i), 0);
+  const dec = city.hb_addon_decrement_cents || 0;
+  return [...prices].sort((a, b) => b - a).reduce((sum, c, i) => sum + Math.max(0, c - dec * i), 0);
+}
+function computeDogAge(m, d, y) {
+  if (!m || !d || !y) return null;
+  const born = new Date(Number(y), Number(m) - 1, Number(d));
+  if (Number.isNaN(born.getTime())) return null;
+  const now = new Date();
+  let months = (now.getFullYear() - born.getFullYear()) * 12 + (now.getMonth() - born.getMonth());
+  if (now.getDate() < born.getDate()) months -= 1;
+  if (months < 0) return null;
+  if (months < 12) return `${months} mo`;
+  const yrs = Math.floor(months / 12);
+  const rem = months % 12;
+  return rem ? `${yrs} yr ${rem} mo` : `${yrs} yr`;
 }
 
-const slotFmt = new Intl.DateTimeFormat('en-US', {
+const slotDayFmt = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric',
 });
-const timeFmt = new Intl.DateTimeFormat('en-US', {
+const slotTimeFmt = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit',
 });
 
+function buildRecurringPreview(slotISO, cadence, count) {
+  if (!slotISO || cadence === 'oneoff') return null;
+  const stepDays = cadence === '2wk' ? 14 : 28;
+  const base = new Date(slotISO);
+  const out = [];
+  for (let i = 0; i < count; i += 1) {
+    const dt = new Date(base.getTime() + stepDays * i * 86400000);
+    out.push(`${slotDayFmt.format(dt)} at ${slotTimeFmt.format(dt)}`);
+  }
+  return out;
+}
+
+const BLANK_DOG = { name: '', breed: '', coat_tier: '', dobMonth: '', dobDay: '', dobYear: '', dobApproximate: false };
 const BLANK = {
-  step: 'start',
-  fitOk: false,
-  place: { firstName: '', lastName: '', phone: '', email: '', addressLine1: '', addressCity: '', addressState: 'FL', addressZip: '' },
-  dogs: [{ name: '', breed: '', coat_tier: '' }],
+  step: 1,
+  eligibilityAcked: false,
+  place: { firstName: '', lastName: '', email: '', phone: '', addressLine1: '', addressCity: '', addressState: 'FL', addressZip: '', gateCode: '' },
+  smsConsent: true,
+  dogs: [{ ...BLANK_DOG }],
   cadence: '4wk',
   chosenSlot: null,
 };
 
 function loadStored() {
   if (typeof window === 'undefined') return null;
-  try {
-    const raw = sessionStorage.getItem(STORE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+  try { const raw = sessionStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
 }
 
 export default function BookingApp() {
-  const [authState, setAuthState] = useState('checking');
-  const [authUser, setAuthUser] = useState(null);
-  const [city, setCity] = useState(null);
-  const [cityError, setCityError] = useState(null);
-
-  // Restore an in-progress funnel (survives a Google OAuth redirect).
   const restored = useRef(loadStored());
   const init = restored.current || BLANK;
-  const [step, setStep] = useState(init.step || 'start');
-  const [fitOk, setFitOk] = useState(!!init.fitOk);
+
+  const [city, setCity] = useState(null);
+  const [cityError, setCityError] = useState(null);
+  const [step, setStep] = useState(init.step || 1);
+  const [eligibilityAcked, setEligibilityAcked] = useState(!!init.eligibilityAcked);
   const [place, setPlace] = useState(init.place || BLANK.place);
+  const [smsConsent, setSmsConsent] = useState(init.smsConsent ?? true);
   const [dogs, setDogs] = useState(init.dogs || BLANK.dogs);
   const [cadence, setCadence] = useState(init.cadence || '4wk');
   const [chosenSlot, setChosenSlot] = useState(init.chosenSlot || null);
-
-  const [slots, setSlots] = useState(null);
-  const [slotsLoading, setSlotsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Honor /book?plan=single (the single-visit CTA) on a fresh funnel.
+  // Honor /book?plan=single on a fresh funnel.
   useEffect(() => {
     if (restored.current) return;
     const params = new URLSearchParams(window.location.search);
     if (params.get('plan') === 'single') setCadence('oneoff');
   }, []);
 
-  // Persist the funnel so a sign-in redirect does not lose progress.
+  // Persist so the optional Google prefill redirect does not lose progress.
   useEffect(() => {
-    try {
-      sessionStorage.setItem(STORE_KEY, JSON.stringify({ step, fitOk, place, dogs, cadence, chosenSlot }));
-    } catch { /* sessionStorage unavailable; not fatal */ }
-  }, [step, fitOk, place, dogs, cadence, chosenSlot]);
+    try { sessionStorage.setItem(STORE_KEY, JSON.stringify({ step, eligibilityAcked, place, smsConsent, dogs, cadence, chosenSlot })); } catch { /* noop */ }
+  }, [step, eligibilityAcked, place, smsConsent, dogs, cadence, chosenSlot]);
 
-  // Auth listener: set state only (auth_listener_sets_state_only).
-  useEffect(() => {
-    const client = sb();
-    if (!client) return;
-    const { data: { subscription } } = client.auth.onAuthStateChange((event, session) => {
-      if (event === 'INITIAL_SESSION') setAuthState(session ? 'authenticated' : 'anonymous');
-      else if (event === 'SIGNED_IN') setAuthState('authenticated');
-      else if (event === 'SIGNED_OUT') { setAuthState('anonymous'); setAuthUser(null); }
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // City pricing loads regardless of auth (cities is anon-readable).
+  // City pricing (anon-readable). On a Google-prefill return, fill name/email.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { city: c, error: ce } = await getBookingCity(CITY_SLUG);
       if (cancelled) return;
       if (ce) setCityError(ce); else setCity(c);
+      // If we returned from a Google sign-in, prefill name/email.
+      const client = sb();
+      if (client) {
+        const { data: { user } } = await client.auth.getUser();
+        if (user && !cancelled) {
+          setPlace((p) => ({
+            ...p,
+            firstName: p.firstName || prefillFirst(user),
+            lastName: p.lastName || prefillLast(user),
+            email: p.email || user.email || '',
+          }));
+        }
+      }
     })();
     return () => { cancelled = true; };
   }, []);
 
-  // On sign-in, grab the user and prefill empty name/email fields.
-  useEffect(() => {
-    if (authState !== 'authenticated') return;
-    let cancelled = false;
-    (async () => {
-      const { data: { user } } = await sb().auth.getUser();
-      if (cancelled || !user) return;
-      setAuthUser(user);
-      setPlace((p) => ({
-        ...p,
-        firstName: p.firstName || prefillFirst(user),
-        lastName: p.lastName || prefillLast(user),
-        email: p.email || user.email || '',
-      }));
-    })();
-    return () => { cancelled = true; };
-  }, [authState]);
+  function advance() { window.scrollTo({ top: 0 }); setError(''); setStep((s) => Math.min(s + 1, TOTAL_STEPS)); }
+  function back() { window.scrollTo({ top: 0 }); setError(''); setStep((s) => Math.max(s - 1, 1)); }
 
-  const loadSlots = useCallback(async () => {
-    if (!city) return;
-    setSlotsLoading(true);
-    const { slots: s } = await getOpenSlots(city.id, city.hb_booking_horizon_days || 28);
-    setSlots(s);
-    setSlotsLoading(false);
-  }, [city]);
-
-  useEffect(() => {
-    if (step === 'time' && slots === null && !slotsLoading) loadSlots();
-  }, [step, slots, slotsLoading, loadSlots]);
-
-  function placeValid() {
-    return fitOk && place.firstName.trim() && place.addressLine1.trim() &&
-      place.addressCity.trim() && place.addressZip.trim() && toE164US(place.phone);
+  if (cityError) {
+    return (
+      <div className="pt-shell"><div className="bk-wrap">
+        <div className="bk-card bk-notice">Booking is not open in this area yet. <a href="/the-villages">See where we serve</a>.</div>
+      </div></div>
+    );
   }
-  function dogsValid() {
-    return dogs.length >= 1 && dogs.length <= 3 &&
-      dogs.every((d) => d.name.trim() && (d.coat_tier === 'smoothcoat' || d.coat_tier === 'doublecoat'));
-  }
-
-  function goNext() {
-    setError('');
-    const i = STEPS.indexOf(step);
-    if (step === 'start' && !placeValid()) {
-      setError(fitOk ? 'Please fill in your name, phone, and service address.' : 'Confirm the fit check to continue.');
-      return;
-    }
-    if (step === 'dogs' && !dogsValid()) { setError('Give each dog a name and a coat type (one to three dogs).'); return; }
-    if (step === 'time' && !chosenSlot) { setError('Pick a time for your first visit.'); return; }
-    if (i < STEPS.length - 1) setStep(STEPS[i + 1]);
-  }
-  function goBack() {
-    setError('');
-    const i = STEPS.indexOf(step);
-    if (i > 0) setStep(STEPS[i - 1]);
-  }
-
-  function updateDog(idx, field, val) { setDogs((ds) => ds.map((d, i) => (i === idx ? { ...d, [field]: val } : d))); }
-  function addDog() { if (dogs.length < 3) setDogs((ds) => [...ds, { name: '', breed: '', coat_tier: '' }]); }
-  function removeDog(idx) { setDogs((ds) => ds.filter((_, i) => i !== idx)); }
-
-  if (authState === 'checking' && !restored.current) {
-    return <div className="pt-center-fill"><div className="pt-spinner" /></div>;
-  }
-
-  const price = visitPriceCents(city, dogs, cadence);
-  const authed = authState === 'authenticated' && authUser;
 
   return (
     <div className="pt-shell">
       <div className="bk-wrap">
-        <BookingProgress step={step} />
-
-        {cityError && (
-          <div className="bk-card bk-notice">
-            Booking is not open in this area yet. <a href="/the-villages">See where we serve</a>.
-          </div>
-        )}
-
-        {!cityError && (
-          <div className="bk-card">
-            {step === 'start' && (
-              <StartStep
-                place={place} setPlace={setPlace} fitOk={fitOk} setFitOk={setFitOk}
-                authed={authed} authUser={authUser}
-                onGoogle={() => signInWithGoogle('/book/')}
-              />
-            )}
-            {step === 'dogs' && <DogsStep dogs={dogs} updateDog={updateDog} addDog={addDog} removeDog={removeDog} />}
-            {step === 'plan' && <PlanStep city={city} dogs={dogs} cadence={cadence} setCadence={setCadence} />}
-            {step === 'time' && (
-              <TimeStep slots={slots} loading={slotsLoading} chosen={chosenSlot} setChosen={setChosenSlot} onRefresh={() => setSlots(null)} />
-            )}
-            {step === 'review' && (
-              <ReviewStep place={place} dogs={dogs} cadence={cadence} chosenSlot={chosenSlot} price={price} authed={authed} authUser={authUser} />
-            )}
-
-            {error && <div className="pt-error-msg bk-error">{error}</div>}
-
-            <div className="bk-nav">
-              {step !== 'start' ? <button className="pt-btn pt-btn-ghost" onClick={goBack}>Back</button> : <span />}
-              {step !== 'review'
-                ? <button className="pt-btn pt-btn-primary" onClick={goNext}>Continue</button>
-                : <button className="pt-btn pt-btn-primary" disabled title="Card on file opens with online payment">
-                    Add card &amp; confirm
-                  </button>}
-            </div>
-          </div>
-        )}
-
-        <div className="bk-footer">
-          {price != null && step !== 'start' && (
-            <span className="bk-footer__price">
-              {dollars(price)}{cadence === 'oneoff' ? ' / single visit' : ' / visit'}
-              {cadence !== 'oneoff' && <span className="bk-founders-tag">founders rate</span>}
-            </span>
-          )}
-          {authed && <button className="bk-signout" onClick={() => signOut()}>Not you? Sign out</button>}
+        <div className="bk-progress2">
+          <div className="bk-progress2__label">Step {step} of {TOTAL_STEPS}<span className="bk-progress2__city"> · The Villages</span></div>
+          <div className="bk-progress2__bar"><div className="bk-progress2__fill" style={{ width: `${(step / TOTAL_STEPS) * 100}%` }} /></div>
         </div>
+
+        {step === 1 && (
+          <Step1
+            city={city} eligibilityAcked={eligibilityAcked} setEligibilityAcked={setEligibilityAcked}
+            place={place} setPlace={setPlace} smsConsent={smsConsent} setSmsConsent={setSmsConsent}
+            dogs={dogs} setDogs={setDogs} error={error} setError={setError} onAdvance={advance}
+          />
+        )}
+        {step === 2 && (
+          <Step2 city={city} dogs={dogs} cadence={cadence} setCadence={setCadence} onAdvance={advance} />
+        )}
+        {step === 3 && (
+          <Step3 city={city} cadence={cadence} chosenSlot={chosenSlot} setChosenSlot={setChosenSlot} error={error} setError={setError} onAdvance={advance} />
+        )}
+        {step === 4 && (
+          <Step4 city={city} place={place} dogs={dogs} cadence={cadence} chosenSlot={chosenSlot} />
+        )}
+
+        {step > 1 && <button className="bk-back" type="button" onClick={back}>← Back</button>}
       </div>
     </div>
   );
 }
 
-function BookingProgress({ step }) {
-  const current = STEPS.indexOf(step);
-  return (
-    <ol className="bk-progress">
-      {STEPS.map((s, i) => (
-        <li key={s} className={`bk-progress__item${i === current ? ' is-current' : ''}${i < current ? ' is-done' : ''}`}>
-          <span className="bk-progress__dot">{i < current ? '✓' : i + 1}</span>
-          <span className="bk-progress__label">{STEP_LABELS[s]}</span>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function StartStep({ place, setPlace, fitOk, setFitOk, authed, authUser, onGoogle }) {
+/* ── Step 1: Let's get started ─────────────────────────────────────── */
+function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, smsConsent, setSmsConsent, dogs, setDogs, error, setError, onAdvance }) {
   const set = (f) => (e) => setPlace((p) => ({ ...p, [f]: e.target.value }));
-  return (
-    <div className="bk-step">
-      <h2 className="bk-step__title">Let's get started</h2>
-      <p className="bk-step__sub">A couple of minutes, no obligation. Hurricane Bath comes to your driveway in The Villages, Florida.</p>
+  const stage2 = eligibilityAcked;
+  const stage3 = stage2 && place.addressLine1.trim() && place.addressZip.trim() && place.addressCity.trim();
 
+  const [authed, setAuthed] = useState(false);
+  useEffect(() => {
+    (async () => { const c = sb(); if (!c) return; const { data: { user } } = await c.auth.getUser(); setAuthed(!!user); })();
+  }, []);
+
+  function updateDog(i, field, val) { setDogs((ds) => ds.map((d, idx) => (idx === i ? { ...d, [field]: val } : d))); }
+  function setDogCount(n) {
+    const target = Math.max(1, Math.min(3, n));
+    setDogs((ds) => {
+      const next = [...ds];
+      while (next.length < target) next.push({ ...BLANK_DOG });
+      while (next.length > target) next.pop();
+      return next;
+    });
+  }
+
+  const contactValid = place.firstName.trim() && toE164US(place.phone);
+  const dogsValid = dogs.every((d) => d.name.trim() && (d.coat_tier === 'smoothcoat' || d.coat_tier === 'doublecoat'));
+  const canContinue = stage3 && contactValid && dogsValid;
+
+  async function googlePrefill() {
+    try { await signInWithGoogle('/book/'); } catch { /* user can type manually */ }
+  }
+
+  return (
+    <div className="bk-card">
+      <h2 className="bk-step__title">Let's get started</h2>
+      <p className="bk-step__sub">First, let's make sure the Hurricane Bath is a good fit for your dog in The Villages.</p>
+
+      {/* Stage 1: fit check */}
+      <div className="bk-friendly">
+        <p className="bk-friendly__title">Friendly dogs only</p>
+        <p className="bk-friendly__body">Dogs that show aggression toward people, or are excessively uncooperative, are not eligible. Normal wiggling is fine.</p>
+      </div>
+      <ul className="bk-checklist">
+        {ELIGIBILITY.map((item) => (
+          <li key={item} className="bk-checklist__item"><span className="bk-checklist__bullet">✓</span><span>{item}</span></li>
+        ))}
+      </ul>
       <label className="bk-fit">
-        <input type="checkbox" checked={fitOk} onChange={(e) => setFitOk(e.target.checked)} />
-        <span>My dog is friendly, and I'm in The Villages area. (Bath only: smoothcoat or doublecoat dogs that shed without matting, no haircuts.)</span>
+        <input type="checkbox" checked={eligibilityAcked} onChange={(e) => setEligibilityAcked(e.target.checked)} />
+        <span>My dog fits these requirements and is friendly toward people.</span>
       </label>
 
-      {fitOk && (
+      {/* Stage 2: address */}
+      {stage2 && (
         <div className="bk-reveal">
-          {!authed ? (
-            <button type="button" className="bk-google-prefill" onClick={onGoogle}>
+          <div className="bk-stage__divider" />
+          <div className="bk-stage__heading">Where do we bring the bath?</div>
+          <Field label="Street address"><input className="pt-input" value={place.addressLine1} onChange={set('addressLine1')} autoComplete="address-line1" /></Field>
+          <div className="bk-grid-3">
+            <Field label="City"><input className="pt-input" value={place.addressCity} onChange={set('addressCity')} autoComplete="address-level2" /></Field>
+            <Field label="State"><input className="pt-input" value={place.addressState} onChange={set('addressState')} autoComplete="address-level1" /></Field>
+            <Field label="ZIP"><input className="pt-input" inputMode="numeric" value={place.addressZip} onChange={set('addressZip')} autoComplete="postal-code" /></Field>
+          </div>
+          <Field label="Gate code (if applicable)"><input className="pt-input" value={place.gateCode} onChange={set('gateCode')} maxLength={32} autoComplete="off" /></Field>
+          <p className="bk-fineprint">We confirm your address is on the route before your first visit.</p>
+        </div>
+      )}
+
+      {/* Stage 3: contact + dogs */}
+      {stage3 && (
+        <div className="bk-reveal">
+          <div className="bk-stage__divider" />
+          <div className="bk-stage__heading">Your information</div>
+
+          {!authed && !place.firstName && !place.email && (
+            <button type="button" className="bk-google-prefill" onClick={googlePrefill}>
               <GoogleMark /> Pre-fill with Google
-              <span className="bk-google-prefill__note">Optional. Fills your name and email, and saves your spot for the card step.</span>
+              <span className="bk-google-prefill__note">Optional. Fills your name and email from your Google account.</span>
             </button>
-          ) : (
-            <p className="bk-signedin">Signed in as <strong>{authUser.email || prefillFirst(authUser)}</strong>.</p>
           )}
 
           <div className="bk-grid-2">
@@ -304,166 +296,264 @@ function StartStep({ place, setPlace, fitOk, setFitOk, authed, authUser, onGoogl
             <Field label="Last name"><input className="pt-input" value={place.lastName} onChange={set('lastName')} autoComplete="family-name" /></Field>
           </div>
           <div className="bk-grid-2">
-            <Field label="Mobile phone"><input className="pt-input" type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} autoComplete="tel" /></Field>
-            <Field label="Email (optional)"><input className="pt-input" type="email" value={place.email} onChange={set('email')} autoComplete="email" /></Field>
+            <Field label="Mobile number"><input className="pt-input" type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} autoComplete="tel" /></Field>
+            <Field label="Email (optional)"><input className="pt-input" type="email" value={place.email} onChange={set('email')} autoComplete="email" placeholder="you@example.com" /></Field>
           </div>
-          <Field label="Street address"><input className="pt-input" value={place.addressLine1} onChange={set('addressLine1')} autoComplete="address-line1" /></Field>
-          <div className="bk-grid-3">
-            <Field label="City"><input className="pt-input" value={place.addressCity} onChange={set('addressCity')} autoComplete="address-level2" /></Field>
-            <Field label="State"><input className="pt-input" value={place.addressState} onChange={set('addressState')} autoComplete="address-level1" /></Field>
-            <Field label="ZIP"><input className="pt-input" inputMode="numeric" value={place.addressZip} onChange={set('addressZip')} autoComplete="postal-code" /></Field>
+
+          <label className="bk-fit bk-fit--sms">
+            <input type="checkbox" checked={smsConsent} onChange={(e) => setSmsConsent(e.target.checked)} />
+            <span>Text me appointment reminders and account messages. Msg &amp; data rates may apply. Reply STOP to unsubscribe. <a href="/sms" target="_blank" rel="noopener">SMS Terms</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy</a>.</span>
+          </label>
+
+          <div className="bk-stage__divider" />
+          <div className="bk-stage__heading">How many dogs?</div>
+          <div className="bk-counter">
+            <button type="button" className="bk-counter__btn" onClick={() => setDogCount(dogs.length - 1)} disabled={dogs.length <= 1} aria-label="Fewer">−</button>
+            <div className="bk-counter__num">{dogs.length}</div>
+            <button type="button" className="bk-counter__btn" onClick={() => setDogCount(dogs.length + 1)} disabled={dogs.length >= 3} aria-label="More">+</button>
           </div>
+
+          {dogs.map((d, i) => (
+            <DogCard key={i} idx={i} dog={d} showNumber={dogs.length > 1} onChange={(f, v) => updateDog(i, f, v)} />
+          ))}
         </div>
       )}
+
+      {error && <div className="pt-error-msg bk-error">{error}</div>}
+      <button
+        className="pt-btn pt-btn-primary bk-continue"
+        disabled={!canContinue}
+        onClick={() => { if (!canContinue) { setError('Fill in the fit check, address, your name and phone, and each dog.'); return; } onAdvance(); }}
+      >
+        Choose your plan →
+      </button>
     </div>
   );
 }
 
-function DogsStep({ dogs, updateDog, addDog, removeDog }) {
+function DogCard({ idx, dog, showNumber, onChange }) {
+  const age = computeDogAge(dog.dobMonth, dog.dobDay, dog.dobYear);
   return (
-    <div className="bk-step">
-      <h2 className="bk-step__title">Who is getting a bath?</h2>
-      <p className="bk-step__sub">Up to three dogs per visit. The Hurricane Bath is bath only: smoothcoat or doublecoat dogs that shed without matting.</p>
-      {dogs.map((d, i) => (
-        <div className="bk-dog" key={i}>
-          <div className="bk-dog__head">
-            <span className="bk-dog__n">Dog {i + 1}</span>
-            {dogs.length > 1 && <button className="bk-dog__remove" onClick={() => removeDog(i)}>Remove</button>}
-          </div>
-          <div className="bk-grid-2">
-            <Field label="Name"><input className="pt-input" value={d.name} onChange={(e) => updateDog(i, 'name', e.target.value)} /></Field>
-            <Field label="Breed (optional)"><input className="pt-input" value={d.breed} onChange={(e) => updateDog(i, 'breed', e.target.value)} /></Field>
-          </div>
-          <Field label="Coat type">
-            <div className="bk-tier-row">
-              {[['smoothcoat', 'Smoothcoat', 'Short, single coat'], ['doublecoat', 'Doublecoat', 'Sheds, does not mat']].map(([val, lab, sub]) => (
-                <button key={val} type="button" className={`bk-tier${d.coat_tier === val ? ' is-on' : ''}`} onClick={() => updateDog(i, 'coat_tier', val)}>
-                  <span className="bk-tier__lab">{lab}</span>
-                  <span className="bk-tier__sub">{sub}</span>
-                </button>
-              ))}
-            </div>
-          </Field>
+    <div className="bk-dog">
+      <div className="bk-dog__head">
+        {showNumber && <span className="bk-dog__n">Dog {idx + 1}</span>}
+        <span className="bk-dog__name">Tell us about {dog.name || 'your dog'}</span>
+      </div>
+      <div className="bk-grid-2">
+        <Field label="Name"><input className="pt-input" value={dog.name} onChange={(e) => onChange('name', e.target.value)} /></Field>
+        <Field label="Breed (optional)"><input className="pt-input" value={dog.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="e.g. Labrador, Husky" /></Field>
+      </div>
+      <Field label="Coat type">
+        <div className="bk-tier-row">
+          {[['smoothcoat', 'Smoothcoat', 'Short, single coat'], ['doublecoat', 'Doublecoat', 'Sheds, does not mat']].map(([val, lab, sub]) => (
+            <button key={val} type="button" className={`bk-tier${dog.coat_tier === val ? ' is-on' : ''}`} onClick={() => onChange('coat_tier', val)}>
+              <span className="bk-tier__lab">{lab}</span><span className="bk-tier__sub">{sub}</span>
+            </button>
+          ))}
         </div>
-      ))}
-      {dogs.length < 3 && <button className="bk-add-dog" onClick={addDog}>+ Add another dog</button>}
-      <p className="bk-fineprint">Not sure if your dog qualifies? Doodles and heavily matted coats need a full groom, which the Hurricane Bath does not do. <a href="/the-villages">See coat eligibility</a>.</p>
+      </Field>
+      <Field label="Date of birth (optional)">
+        <div className="bk-dob-row">
+          <select className="pt-input" value={dog.dobMonth} onChange={(e) => onChange('dobMonth', e.target.value)} aria-label="Birth month">
+            <option value="">Month</option>{MONTHS.map(([v, n]) => <option key={v} value={v}>{n}</option>)}
+          </select>
+          <select className="pt-input" value={dog.dobDay} onChange={(e) => onChange('dobDay', e.target.value)} aria-label="Birth day">
+            <option value="">Day</option>{rangeDays().map((dd) => <option key={dd} value={dd}>{Number(dd)}</option>)}
+          </select>
+          <select className="pt-input" value={dog.dobYear} onChange={(e) => onChange('dobYear', e.target.value)} aria-label="Birth year">
+            <option value="">Year</option>{rangeYears().map((y) => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
+      </Field>
+      {age && <div className="bk-age-badge">{age}</div>}
     </div>
   );
 }
 
-function PlanStep({ city, dogs, cadence, setCadence }) {
+/* ── Step 2: plan ──────────────────────────────────────────────────── */
+function Step2({ city, dogs, cadence, setCadence, onAdvance }) {
   const options = [
-    { key: '4wk', label: 'Every 4 weeks', sub: 'The standard cadence. Most dogs, most coats.' },
-    { key: '2wk', label: 'Every 2 weeks', sub: 'Same price, more freshness. Heavy shedders love it.' },
-    { key: 'oneoff', label: 'Single visit', sub: 'One bath, no subscription. Priced higher than recurring.' },
+    { key: '4wk', label: 'Every 4 weeks', hook: 'It just gets done.', sub: 'Book once. We show up every 4 weeks automatically.', badge: 'Founders rate' },
+    { key: '2wk', label: 'Every 2 weeks', hook: 'Extra fresh.', sub: 'Same price as every 4 weeks. Heavy shedders love it.', badge: 'Same price' },
+    { key: 'oneoff', label: 'Single visit', hook: 'Just this once.', sub: 'One bath, one charge. No subscription.', badge: null },
   ];
+  const total = visitPriceCents(city, dogs, cadence);
+  const dogLabel = dogs.length === 1 ? '1 dog' : `${dogs.length} dogs`;
+  const periodLabel = cadence === 'oneoff' ? 'One bath' : (cadence === '2wk' ? 'Every 2 weeks' : 'Every 4 weeks');
   return (
-    <div className="bk-step">
-      <h2 className="bk-step__title">How often?</h2>
+    <div className="bk-card">
+      <h2 className="bk-step__title">Choose your plan</h2>
       <p className="bk-step__sub">Every 4 and every 2 weeks are the same price; pick the freshness you want. Cancel any time in two taps.</p>
       <div className="bk-plans">
         {options.map((o) => {
           const cents = visitPriceCents(city, dogs, o.key);
           return (
             <button key={o.key} type="button" className={`bk-plan${cadence === o.key ? ' is-on' : ''}`} onClick={() => setCadence(o.key)}>
-              <span className="bk-plan__top">
-                <span className="bk-plan__label">{o.label}</span>
-                <span className="bk-plan__price">{dollars(cents) ?? '--'}</span>
-              </span>
+              {o.badge && <span className="bk-plan__badge">{o.badge}</span>}
+              <span className="bk-plan__hook">{o.hook}</span>
+              <span className="bk-plan__top"><span className="bk-plan__label">{o.label}</span><span className="bk-plan__price">{dollars(cents) ?? '--'}</span></span>
               <span className="bk-plan__sub">{o.sub}</span>
-              {o.key !== 'oneoff' && <span className="bk-founders-tag">founders rate, locked 1 year</span>}
+              {o.key !== 'oneoff' && <span className="bk-plan__per">per visit · founders rate locked 1 year</span>}
             </button>
           );
         })}
       </div>
-      {dogs.length > 1 && (
-        <p className="bk-fineprint">Total for all {dogs.length} dogs. Each dog is priced for its own coat; each additional dog is {dollars(city?.hb_addon_decrement_cents)} less than the one before.</p>
+      <div className="bk-livetotal">
+        <div><div className="bk-livetotal__label">{periodLabel}</div><div className="bk-livetotal__sub">{dogLabel}{dogs.length > 1 ? ', each priced for its own coat' : ''}</div></div>
+        <div className="bk-livetotal__amount">{dollars(total) ?? '--'}</div>
+      </div>
+      <button className="pt-btn pt-btn-primary bk-continue" onClick={onAdvance}>Choose your time →</button>
+    </div>
+  );
+}
+
+/* ── Step 3: date & time + card on file (gated) ────────────────────── */
+function Step3({ city, cadence, chosenSlot, setChosenSlot, error, setError, onAdvance }) {
+  const [phase, setPhase] = useState('ask'); // ask | load | cards | empty
+  const [slots, setSlots] = useState([]);
+  const [tf, setTf] = useState('next_available');
+  const [month, setMonth] = useState('');
+  const [year, setYear] = useState('');
+
+  const loadSlots = useCallback(async () => {
+    if (!city) return;
+    setPhase('load');
+    let res;
+    if (tf === 'specific' && month && year) {
+      const from = new Date(Number(year), Number(month) - 1, 1);
+      const to = new Date(Number(year), Number(month), 1);
+      res = await getOpenSlotsBetween(city.id, from, to);
+    } else {
+      res = await getOpenSlots(city.id, city.hb_booking_horizon_days || 28);
+    }
+    const s = res.slots || [];
+    setSlots(s);
+    setPhase(s.length ? 'cards' : 'empty');
+  }, [city, tf, month, year]);
+
+  const byDay = {};
+  for (const s of slots) { const k = slotDayFmt.format(new Date(s.slot_start)); (byDay[k] ||= []).push(s); }
+  const thisYear = new Date().getFullYear();
+
+  return (
+    <div className="bk-card">
+      <h2 className="bk-step__title">Choose your date &amp; time</h2>
+      <p className="bk-step__sub">
+        {cadence === 'oneoff' ? 'Pick a day and time that works for you.' : 'This is your first visit. After that we keep you on the same rhythm, same day, same time. Change or cancel in two taps.'}
+      </p>
+
+      {phase === 'ask' && (
+        <>
+          <div className="bk-stage__heading">When are you looking to start?</div>
+          <div className="bk-radio-group">
+            <label className={`bk-radio${tf === 'next_available' ? ' is-on' : ''}`}>
+              <input type="radio" name="tf" checked={tf === 'next_available'} onChange={() => setTf('next_available')} />
+              <span className="bk-radio__t">Next available</span><span className="bk-radio__d">The soonest opening on the route.</span>
+            </label>
+            <label className={`bk-radio${tf === 'specific' ? ' is-on' : ''}`}>
+              <input type="radio" name="tf" checked={tf === 'specific'} onChange={() => setTf('specific')} />
+              <span className="bk-radio__t">A specific month</span><span className="bk-radio__d">Pick when you'd like to start.</span>
+            </label>
+            {tf === 'specific' && (
+              <div className="bk-grid-2">
+                <select className="pt-input" value={month} onChange={(e) => setMonth(e.target.value)}><option value="">Month</option>{MONTHS.map(([v, n]) => <option key={v} value={v}>{n}</option>)}</select>
+                <select className="pt-input" value={year} onChange={(e) => setYear(e.target.value)}><option value="">Year</option>{[thisYear, thisYear + 1].map((y) => <option key={y} value={y}>{y}</option>)}</select>
+              </div>
+            )}
+          </div>
+          <button className="pt-btn pt-btn-primary bk-continue" disabled={tf === 'specific' && (!month || !year)} onClick={loadSlots}>Find my times →</button>
+        </>
+      )}
+
+      {phase === 'load' && <div className="pt-center-fill" style={{ minHeight: 160 }}><div className="pt-spinner" /></div>}
+
+      {phase === 'empty' && (
+        <div className="bk-empty-slots">
+          <p>No open times in that window yet. We are finalizing the route schedule for The Villages.</p>
+          <p className="bk-fineprint">Try another month, or <a href="/the-villages">reserve your founders spot</a> and we will let you know the moment a slot opens.</p>
+          <button className="pt-btn pt-btn-ghost" onClick={() => setPhase('ask')}>Pick a different timeframe</button>
+        </div>
+      )}
+
+      {phase === 'cards' && (
+        <>
+          <div className="bk-days">
+            {Object.entries(byDay).map(([day, daySlots], gi) => (
+              <div className="bk-day" key={day}>
+                <div className="bk-day__label">{day}</div>
+                <div className="bk-day__slots">
+                  {daySlots.map((s, ti) => (
+                    <button key={s.slot_start} type="button" className={`bk-slot${chosenSlot === s.slot_start ? ' is-on' : ''}`} onClick={() => setChosenSlot(s.slot_start)}>
+                      {gi === 0 && ti === 0 && <span className="bk-slot__badge">Best fit</span>}
+                      {slotTimeFmt.format(new Date(s.slot_start))}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bk-cof">
+            <div className="bk-cof__heading">Card on file</div>
+            <div className="bk-cof__sub">You won't be charged right now.</div>
+            <div className="bk-cof__charge"><strong>Your card is charged the day before each visit, never sooner.</strong></div>
+            <div className="bk-cof__shell">
+              <p>Secure card entry is being finalized. Your card will go straight to Stripe (the platform Amazon and millions of businesses use); we never see your number. This is the last piece before booking goes live.</p>
+            </div>
+            <div className="bk-policy">
+              <strong>{cadence === 'oneoff' ? 'Payment policy.' : 'Recurring care policy.'}</strong>{' '}
+              {cadence === 'oneoff'
+                ? 'Your card is charged the day before your appointment. Once charged, the appointment is confirmed and the payment is non-refundable.'
+                : 'Your card is charged the day before each visit. Stop future visits any time in two taps. Once a visit is charged, it is confirmed and that payment is non-refundable.'}
+            </div>
+          </div>
+
+          {error && <div className="pt-error-msg bk-error">{error}</div>}
+          <button className="pt-btn pt-btn-ghost" style={{ marginRight: 12 }} onClick={() => setPhase('ask')}>Change timeframe</button>
+          <button className="pt-btn pt-btn-primary" disabled={!chosenSlot} onClick={() => { if (!chosenSlot) { setError('Pick a time first.'); return; } onAdvance(); }}>Review &amp; confirm →</button>
+        </>
       )}
     </div>
   );
 }
 
-function TimeStep({ slots, loading, chosen, setChosen, onRefresh }) {
-  if (loading || slots === null) {
-    return <div className="bk-step"><div className="pt-center-fill" style={{ minHeight: 160 }}><div className="pt-spinner" /></div></div>;
-  }
-  if (slots.length === 0) {
-    return (
-      <div className="bk-step">
-        <h2 className="bk-step__title">Pick a time</h2>
-        <div className="bk-empty-slots">
-          <p>No open times are posted yet. We are finalizing the route schedule for The Villages.</p>
-          <p className="bk-fineprint">Check back shortly, or <a href="/the-villages">reserve your founders spot</a> and we will let you know the moment a slot opens.</p>
-          <button className="pt-btn pt-btn-ghost" onClick={onRefresh}>Refresh</button>
-        </div>
-      </div>
-    );
-  }
-  const byDay = {};
-  for (const s of slots) {
-    const key = slotFmt.format(new Date(s.slot_start));
-    (byDay[key] ||= []).push(s);
-  }
-  return (
-    <div className="bk-step">
-      <h2 className="bk-step__title">Pick a time</h2>
-      <p className="bk-step__sub">First visit. After that, we keep you on the same rhythm.</p>
-      <div className="bk-days">
-        {Object.entries(byDay).map(([day, daySlots]) => (
-          <div className="bk-day" key={day}>
-            <div className="bk-day__label">{day}</div>
-            <div className="bk-day__slots">
-              {daySlots.map((s) => (
-                <button key={s.slot_start} type="button" className={`bk-slot${chosen === s.slot_start ? ' is-on' : ''}`} onClick={() => setChosen(s.slot_start)}>
-                  {timeFmt.format(new Date(s.slot_start))}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ReviewStep({ place, dogs, cadence, chosenSlot, price, authed, authUser }) {
+/* ── Step 4: review & confirm ──────────────────────────────────────── */
+function Step4({ city, place, dogs, cadence, chosenSlot }) {
+  const total = visitPriceCents(city, dogs, cadence);
   const cadenceLabel = { '4wk': 'Every 4 weeks', '2wk': 'Every 2 weeks', oneoff: 'Single visit' }[cadence];
+  const preview = buildRecurringPreview(chosenSlot, cadence, 4);
   return (
-    <div className="bk-step">
-      <h2 className="bk-step__title">Review</h2>
+    <div className="bk-card">
+      <h2 className="bk-step__title">Review &amp; confirm</h2>
+      <p className="bk-step__sub">Everything look right?</p>
       <dl className="bk-review">
         <div><dt>Name</dt><dd>{place.firstName} {place.lastName}</dd></div>
         <div><dt>Address</dt><dd>{place.addressLine1}, {place.addressCity} {place.addressState} {place.addressZip}</dd></div>
         <div><dt>Dogs</dt><dd>{dogs.map((d) => `${d.name} (${d.coat_tier})`).join(', ')}</dd></div>
-        <div><dt>Cadence</dt><dd>{cadenceLabel}</dd></div>
-        <div><dt>First visit</dt><dd>{chosenSlot ? `${slotFmt.format(new Date(chosenSlot))}, ${timeFmt.format(new Date(chosenSlot))}` : 'Not selected'}</dd></div>
-        <div><dt>Estimated price</dt><dd>{dollars(price) ?? '--'}{cadence === 'oneoff' ? ' (single visit)' : ' per visit'}</dd></div>
+        <div><dt>Plan</dt><dd>{cadenceLabel}</dd></div>
+        <div><dt>First visit</dt><dd>{chosenSlot ? `${slotDayFmt.format(new Date(chosenSlot))}, ${slotTimeFmt.format(new Date(chosenSlot))}` : '--'}</dd></div>
+        <div className="bk-review__total"><dt>Total per visit</dt><dd>{dollars(total) ?? '--'}</dd></div>
       </dl>
-
-      {!authed ? (
-        <div className="bk-signin-block">
-          <div className="bk-notice bk-notice--soft">
-            <strong>Last step: create your account.</strong> It saves your card on file and gives you the portal to reschedule, skip, or cancel in two taps. We charge the day before each visit, never sooner. Your booking details are saved, so signing in will not lose them.
-          </div>
-          <AuthScreen redirectPath="/book/" />
-        </div>
-      ) : (
-        <div className="bk-notice bk-notice--soft">
-          <strong>Signed in as {authUser.email || prefillFirst(authUser)}. One step left: your card on file.</strong> We charge the day before each visit, never sooner, and you cancel in two taps. Secure online payment is being finalized right now; the card step opens with it, and nothing is booked or charged until then.
+      {preview && (
+        <div className="bk-preview">
+          <div className="bk-preview__label">Your first 4 visits</div>
+          <ul>{preview.map((p) => <li key={p}>{p}</li>)}</ul>
+          <div className="bk-fineprint">And continuing {cadence === '2wk' ? 'every 2 weeks' : 'every 4 weeks'}. This slot is yours.</div>
         </div>
       )}
+      <div className="bk-notice bk-notice--soft">
+        <strong>One step left: your card on file.</strong> Secure online payment is being finalized right now; the card step opens with it, and nothing is booked or charged until then. We charge the day before each visit, never sooner, and you cancel in two taps.
+      </div>
+      <button className="pt-btn pt-btn-primary bk-continue" disabled title="Card on file opens with secure payment">Confirm booking</button>
     </div>
   );
 }
 
-function Field({ label, children }) {
-  return (<div className="pt-field bk-field"><label>{label}</label>{children}</div>);
-}
+function Field({ label, children }) { return (<div className="pt-field bk-field"><label>{label}</label>{children}</div>); }
 
 function GoogleMark() {
   return (
-    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg width="17" height="17" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path fill="#4285F4" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34 6.3 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z"/>
       <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34 6.3 29.3 4 24 4c-7.7 0-14.3 4.4-17.7 10.7z"/>
       <path fill="#FBBC05" d="M24 44c5.2 0 9.9-1.9 13.4-5l-6.2-5.2c-2 1.4-4.5 2.2-7.2 2.2-5.2 0-9.6-3.3-11.2-8l-6.5 5C9.5 39.5 16.2 44 24 44z"/>
@@ -474,18 +564,12 @@ function GoogleMark() {
 
 function prefillFirst(user) {
   const md = user?.user_metadata || {};
-  if (md.first_name) return md.first_name;
-  if (md.given_name) return md.given_name;
-  if (md.full_name) return String(md.full_name).split(' ')[0];
-  if (md.name) return String(md.name).split(' ')[0];
-  if (user?.email) return user.email.split('@')[0];
-  return '';
+  return md.first_name || md.given_name || (md.full_name || md.name || '').split(' ')[0] || (user?.email ? user.email.split('@')[0] : '');
 }
 function prefillLast(user) {
   const md = user?.user_metadata || {};
   if (md.last_name) return md.last_name;
   if (md.family_name) return md.family_name;
-  const full = md.full_name || md.name;
-  if (full && String(full).includes(' ')) return String(full).split(' ').slice(1).join(' ');
-  return '';
+  const full = md.full_name || md.name || '';
+  return full.includes(' ') ? full.split(' ').slice(1).join(' ') : '';
 }
