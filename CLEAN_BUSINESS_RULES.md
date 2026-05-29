@@ -92,7 +92,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | smoke_test_on_every_build | Engineering | Oracle (carried) | `scripts/smoke-build.mjs` |
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
 | bath_only_no_mats | Hurricane Bath: product | Oracle; DB `bath_dogs.coat_tier` CHECK; **`check.py`** asserts "Smoothcoat" + "Doublecoat" tier names + "we bath" / "we do not bath" eligibility headers present on `the-villages.astro` | `src/data/breeds.json` (mixed-breed eligibility); booking-flow gating |
-| villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check; `villages` zone config |
+| villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check (`src/components/portal/maps.js` `isInServiceArea` vs `cities.polygon`); `villages` zone config |
 | villages_only_in_copy | Hurricane Bath: copy | Oracle; **`check.py`** forbids "Ocala", "Fernandina", "St. Simons", "Saint Simons" in customer-facing markup on `index.astro`, `the-villages.astro`, `process.astro` (frontmatter + HTML comments stripped before check) | n/a |
 | three_dog_cap | Hurricane Bath: product | Oracle; DB `bath_appointments.dog_count` CHECK (1-3); **`check.py`** asserts "three dogs" present on `the-villages.astro` and `book.astro` | booking flow dog-count limit; `src/business/pricing.js` |
 | premium_inclusive_no_addons | Hurricane Bath: product | Oracle; **`check.py`** asserts "no add ons" present on `the-villages.astro` | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy in booking |

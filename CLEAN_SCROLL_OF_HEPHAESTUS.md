@@ -579,8 +579,25 @@ per dog (0005 fix: each dog its own tier, stacking discount), 2-week
 cadence, three-dog cap, no add-ons. Parked the portal-claim path and
 returning-client lookup as follow-ons.
 
-No new Oracle rules this chapter (the funnel enforces the existing 24-rule
-pack). Blocked / handed to Paul: the Stripe SetupIntent edge function
+Same day, third pass: Paul supplied the Clean Google Maps BROWSER key and
+I wired it (`src/components/portal/maps.js`). Step 1's address field is now
+Google Places Autocomplete; on pick it captures lat/lng and runs a ray-cast
+point-in-polygon against the real 308-point `cities.polygon` Villages
+boundary. In-area reveals the gate code + the rest of the funnel and stores
+serviceLat/serviceLng for the signup payload; out-of-area routes to the
+waitlist and blocks. Manual-entry fallback if the Maps script fails (no dead
+end). Verified the in-area math against an independent SQL ray-cast on the
+real polygon (interior + exterior points all agreed). The key is a source
+constant (ships in the page like the Supabase publishable key); its
+protection is the HTTP-referrer + API restrictions in Google Cloud, which
+Paul holds. Refined `maps_js_api_only` to record that the browser key also
+needs the Places API enabled (for the JS Places library / Autocomplete),
+still referrer-locked and still not a REST call, so a future session does
+not strip it. Still open: per-address allow/deny exceptions over the polygon.
+
+No new Oracle rules this chapter; one refinement (`maps_js_api_only`, above).
+The funnel enforces the existing rule pack. Blocked / handed to Paul: the
+Stripe SetupIntent edge function
 (needs the Dog Gone Clean TEST keys) to activate the card step, and the
 real availability data (per-visit duration, weekly windows) to light up
 the slot picker. Both parked in CLEAN_PARKING_LOT.md. Also set up a
