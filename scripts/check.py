@@ -822,6 +822,35 @@ def check_rule_survival():
                             f"calls in a separate useEffect that watches auth state)"
                         )
 
+    # ── service_area_enforced_server_side (polygon stays in the data layer) ─
+    # The service-area boundary must come from the database (cities.polygon),
+    # read at runtime, NEVER hard-coded into page/component source. An in-code
+    # polygon is exactly what a website redesign flushes away (the failure the
+    # old Dog Gone Nails site had, with its coordinates living in the code).
+    # Fail the build if a ring of coordinate-like pairs is embedded under src/.
+    # A handful of incidental coordinates is fine; a ring (12+ high-precision
+    # [n, n] pairs in one file) is a polygon that belongs in the database.
+    src_dir = REPO / "src"
+    coord_pair = re.compile(r"\[\s*-?\d{1,3}\.\d{3,}\s*,\s*-?\d{1,3}\.\d{3,}\s*\]")
+    if src_dir.exists():
+        for path in sorted(src_dir.rglob("*")):
+            if not path.is_file() or path.suffix.lower() not in (
+                ".js", ".jsx", ".ts", ".tsx", ".astro", ".json"
+            ):
+                continue
+            text = _read(path)
+            if text is None:
+                continue
+            hits = len(coord_pair.findall(text))
+            if hits >= 12:
+                failures.append(
+                    f"{path.relative_to(REPO)}: forbidden pattern for rule "
+                    f"'service_area_enforced_server_side': {hits} hard-coded coordinate "
+                    f"pairs (a service-area polygon ring) embedded in source. The polygon "
+                    f"lives in the database (cities.polygon) and is read at runtime; an "
+                    f"in-code polygon is flushed by a redesign (the old Nails-site failure)."
+                )
+
 
 def main():
     check_clients()
