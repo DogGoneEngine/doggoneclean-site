@@ -62,6 +62,25 @@ advantage a smart AI cannot prompt past?).
 
 ## Process
 
+`redesign_survival_is_a_ship_gate` (process):
+Nothing ships until it would survive a major website redesign. Before any change is
+shipped (a rule, business logic, a decision, copy, a feature, a schema change), the assistant
+asks one question on its own, without being prompted and without involving Paul: if the entire
+website were torn down and rebuilt tomorrow, would this still hold? If the answer is no, because
+its only enforcement is a string on a page or markup a redesign would rewrite away, the assistant
+reworks it so the rule's teeth live in a durable layer (a database constraint, a server RPC, a
+data file, or a build-time guard) and only then ships. A page's copy or a single component is
+never the last line of defense for anything that matters; at most it is a reminder sitting on top
+of the durable layer. The check runs on every ship, automatically; a change that cannot pass it is
+reworked and retried before shipping, never shipped with a note to fix it later. Because the
+May 2026 DGN portal redesign silently deleted business logic that lived only in component code,
+and Clean is a fork of that same platform carrying the same risk; durability is what makes a rule
+real, and a gate that depends on Paul remembering to ask fails exactly when a session is moving
+fast. This is the principle behind the tiered build audit (`scripts/check.py`): a missing durable
+layer blocks the build, a missing page-copy reminder only warns, because a rule's survival never
+depends on the copy. Pairs with `read_before_redesign` (the human discipline) and the four-layer
+map in `CLEAN_BUSINESS_RULES.md` (the mechanism).
+
 `recommendation_with_reason` (process):
 Every offered choice leads with the recommended option, labeled "(Recommended)", each with
 a because. Because choices without reasons make Paul do the reasoning twice, and a
@@ -1064,6 +1083,22 @@ works only because nails' project predates the cutoff). Wired 2026-05-29 in
 form Clean's project loads cleanly), then `google.maps.places.PlaceAutocompleteElement`
 used directly off the namespace. The address field is a single box, never a
 multi-field form (the fallback if Maps fails is one plain text input, not a form).
+
+`service_area_enforced_server_side` (engineering):
+The service-area (in-polygon) check is authoritative in the signup RPC
+(`bath_start_subscription` calling `_bath_point_in_area` over `cities.polygon`), not in the
+browser. Coordinates inside the polygon set `bath_subscribers.address_verified = true`;
+coordinates outside are rejected before any row is written; a signup with no coordinates (manual
+entry, or an autocomplete that is unavailable) is recorded with `address_verified = false` and
+must be confirmed before any charge, never treated as in-area on trust. The Google Places
+autocomplete in the booking island is a convenience for entering an address, not the gate.
+Because the only area check used to live in the browser (`maps.js`) and ran only when autocomplete
+returned coordinates, so a dead autocomplete box, the manual-entry fallback, or any crafted
+request could place an out-of-area signup. A location gate a redesign or a dead widget can bypass
+is not a gate (see `redesign_survival_is_a_ship_gate`). Auto-verifying a typed manual address
+needs the Geocoding API on Clean's server Maps key (Paul's console, per `maps_js_api_only`); until
+then manual addresses are confirmed by the operator before the first visit, and the charge job
+must refuse to charge an appointment whose subscriber `address_verified` is false.
 
 `supabase_rpc_not_raw_fetch` (engineering):
 In a Supabase client app, use the client's `rpc()` for database/auth calls, not raw

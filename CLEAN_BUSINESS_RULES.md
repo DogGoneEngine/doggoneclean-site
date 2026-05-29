@@ -12,6 +12,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 
 | Rule | Oracle domain | Enforced today | Deferred layer (when built) |
 |------|---------------|----------------|------------------------------|
+| redesign_survival_is_a_ship_gate | Process | CLAUDE.md "Ship gate"; Oracle; **`check.py`** tiered audit (durable-layer misses BLOCK, copy reminders WARN); SessionStart + pre-commit + CI | `business_rules` row |
 | recommendation_with_reason | Process | CLAUDE.md; convention | `business_rules` row |
 | outcomes_not_actions | Process | CLAUDE.md; convention | `business_rules` row |
 | no_mockups | Process | CLAUDE.md; convention | `business_rules` row |
@@ -85,6 +86,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | no_trailer_graphics | Copy | Oracle | n/a (real-world) |
 | show_dont_tell | Copy | Oracle; site structure (the "See it work" video block sits above the intro on `process.astro`); convention | footage shot-list parked in CLEAN_PARKING_LOT.md; `check.py` lint asserting the video block precedes the intro on `process.astro` once the layout settles |
 | maps_js_api_only | Engineering | Oracle (carried) | code + lint when site exists |
+| service_area_enforced_server_side | Engineering | Oracle; DB `_bath_point_in_area` + `bath_start_subscription` gate + `bath_subscribers.address_verified` (migration 0008) | charge job must skip `address_verified=false`; server geocode for manual addresses (Geocoding API on the server key) |
 | supabase_rpc_not_raw_fetch | Engineering | Oracle (carried); **`check.py`** forbids `fetch(...SUPABASE_URL...)` pattern in `src/components/portal/` (catches raw REST without flagging legitimate edge-function calls) | n/a |
 | auth_listener_sets_state_only | Engineering | Oracle (carried); **`check.py`** scans `onAuthStateChange((...))` blocks in `src/components/portal/` and forbids `.from(`, `.rpc(`, `await fetch(`, `loadPortalData(` inside them | n/a |
 | nav_no_backdrop_filter | Engineering | Oracle (carried); **`check.py`** forbids "backdrop-filter" anywhere in `src/components/Nav.astro` | n/a |
@@ -92,7 +94,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | smoke_test_on_every_build | Engineering | Oracle (carried) | `scripts/smoke-build.mjs` |
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
 | bath_only_no_mats | Hurricane Bath: product | Oracle; DB `bath_dogs.coat_tier` CHECK; **`check.py`** asserts "Smoothcoat" + "Doublecoat" tier names + "we bath" / "we do not bath" eligibility headers on `the-villages.astro`, and the two tier names on `BookingApp.jsx` (the booking coat picker) | `src/data/breeds.json` (mixed-breed eligibility); booking-flow gating |
-| villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check (`src/components/portal/maps.js` `isInServiceArea` vs `cities.polygon`); `villages` zone config |
+| villages_only_at_launch | Hurricane Bath: product | Oracle; DB `bath_start_subscription` rejects out-of-area via `_bath_point_in_area` (authoritative, migration 0008); client `maps.js` `isInServiceArea` as UX | server geocode for manual addresses (Geocoding API on the server key) |
 | villages_only_in_copy | Hurricane Bath: copy | Oracle; **`check.py`** forbids "Ocala", "Fernandina", "St. Simons", "Saint Simons" in customer-facing markup on `index.astro`, `the-villages.astro`, `process.astro` (frontmatter + HTML comments stripped before check) | n/a |
 | three_dog_cap | Hurricane Bath: product | Oracle; DB `bath_appointments.dog_count` CHECK (1-3); **`check.py`** asserts "three dogs" present on `the-villages.astro` and `book.astro` | booking flow dog-count limit; `src/business/pricing.js` |
 | premium_inclusive_no_addons | Hurricane Bath: product | Oracle; **`check.py`** asserts "no add ons" present on `the-villages.astro` and bans priced add-ons / "+ $N" upcharges in `BookingApp.jsx` | absence of add-on UI in portal |

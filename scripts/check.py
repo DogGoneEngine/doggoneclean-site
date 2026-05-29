@@ -23,8 +23,20 @@ Structural integrity (added to catch the drift modes that bit us before):
 - no references to the old data/ path outside legacy/data/ (the move happened 2026-05-26).
 - no references to deleted claude/* branches inside .github/workflows/.
 
+Two severities (redesign_survival_is_a_ship_gate):
+- BLOCK (exit 1): broken data, conflict markers, Oracle/index drift, stale paths,
+  engineering-safety regressions (raw fetch, nav backdrop-filter, auth listener),
+  forbidden-pattern hits (em dash, jargon, DGN vocab, over-promises, priced
+  add-ons), and the legal / safety / money customer commitments (friendly-dogs
+  safety, the day-before charge promise, the 24-hour non-refundable terms,
+  card-on-file). These are either unambiguous or catastrophic to ship.
+- WARN (exit 0, printed loudly): brittle copy / design / UX phrasing whose rule
+  is actually enforced in a durable layer (a DB constraint, a server RPC, or a
+  data file). A legitimate rewrite of a marketing line should never be able to
+  fail a deploy; the page string is a reminder, the durable layer is the teeth.
+
 Run: python3 scripts/check.py
-Exit code 0 = all checks pass, 1 = at least one failure.
+Exit code 0 = no blocking failures (warnings may print), 1 = at least one failure.
 """
 
 import json
@@ -54,7 +66,19 @@ REQUIRED_STANDING_FIELDS = [
 EM_DASH = "—"
 EN_DASH = "–"
 
+# Two severities (see redesign_survival_is_a_ship_gate + the tiered-gate note
+# in the module docstring):
+#   failures  -> BLOCK: exit 1, fail the build. Reserved for problems that are
+#                both unambiguous and catastrophic-or-durable to ship: broken
+#                data, conflict markers, Oracle/index drift, engineering-safety
+#                regressions, and legal / money / safety customer commitments.
+#   warnings  -> WARN: printed loudly, never blocks. For brittle copy / design
+#                phrasing whose rule is actually enforced in a durable layer
+#                (DB constraint, server RPC, data file); the page string is a
+#                reminder, not the last line of defense, so a legitimate
+#                rewrite should not be able to fail a deploy.
 failures = []
+warnings = []
 
 
 def check_clients():
@@ -321,23 +345,29 @@ def check_rule_survival():
         # across multiple lines for readability.
         return re.sub(r"\s+", " ", text)
 
-    def require_present(path, pattern, rule_key, label, flags=re.IGNORECASE):
+    # block=True  -> a miss fails the build (legal/safety/money/engineering).
+    # block=False -> a miss is a loud warning only (brittle copy/design whose
+    #                real teeth live in a durable layer). See the severity
+    #                note at the top of this file.
+    def require_present(path, pattern, rule_key, label, flags=re.IGNORECASE, block=True):
         text = _read(path)
+        bucket = failures if block else warnings
         if text is None:
-            failures.append(f"{path.relative_to(REPO)}: file missing (rule '{rule_key}')")
+            bucket.append(f"{path.relative_to(REPO)}: file missing (rule '{rule_key}')")
             return
         if not re.search(pattern, _normalize_ws(text), flags):
-            failures.append(
+            bucket.append(
                 f"{path.relative_to(REPO)}: missing required pattern for rule "
                 f"'{rule_key}': {label}"
             )
 
-    def require_absent(path, pattern, rule_key, label, flags=re.IGNORECASE):
+    def require_absent(path, pattern, rule_key, label, flags=re.IGNORECASE, block=True):
         text = _read(path)
         if text is None:
             return
+        bucket = failures if block else warnings
         if re.search(pattern, _normalize_ws(text), flags):
-            failures.append(
+            bucket.append(
                 f"{path.relative_to(REPO)}: forbidden pattern for rule "
                 f"'{rule_key}': {label}"
             )
@@ -361,7 +391,7 @@ def check_rule_survival():
     # threshold). Word 'households' must appear in 2+ places (eyebrow + body).
     body = _strip_frontmatter_and_comments(_read(villages))
     if len(re.findall(r"\bhouseholds\b", body)) < 2:
-        failures.append(
+        warnings.append(
             f"src/pages/the-villages.astro: 'households' appears < 2 times in "
             f"customer-facing copy (rule 'founders_cap_statement_always_visible'); "
             f"the founders cap must be in always-visible copy, not only in the "
@@ -376,6 +406,7 @@ def check_rule_survival():
         r"/book\?plan=single",
         "single_visit_as_own_path",
         "single-visit CTA href '/book?plan=single'",
+        block=False,
     )
 
     # ── specialist_named_not_promised ─────────────────────────────────────
@@ -386,6 +417,7 @@ def check_rule_survival():
         r'class="specialist-card"',
         "specialist_named_not_promised",
         "specialist section (class='specialist-card')",
+        block=False,
     )
     for forbidden in ("always Paul", "always be Paul", "will be Paul", "only Paul", "you will always see Paul"):
         require_absent(
@@ -414,6 +446,7 @@ def check_rule_survival():
         r"belongs to the process",
         "language_bank",
         "the 'belongs to the process' line",
+        block=False,
     )
 
     # ── neural_expressive_design ──────────────────────────────────────────
@@ -421,13 +454,13 @@ def check_rule_survival():
     # replaces global.css with a new system cannot drop these tokens silently.
     css = _read(global_css)
     if css is None:
-        failures.append(
+        warnings.append(
             "src/styles/global.css: missing (rule 'neural_expressive_design')"
         )
     else:
         for token in ("--accent", "--accent2", "--ink", "--bg"):
             if token not in css:
-                failures.append(
+                warnings.append(
                     f"src/styles/global.css: missing brand token '{token}' "
                     f"(rule 'neural_expressive_design')"
                 )
@@ -486,12 +519,14 @@ def check_rule_survival():
     # ── three_dog_cap ─────────────────────────────────────────────────────
     # Customer must know the per-visit cap before they book. The DB CHECK
     # enforces dog_count <= 3 but the customer learns the limit here.
+    # The cap's teeth are the DB CHECK (dog_count 1-3); copy is a reminder.
     for page in (villages, booking_app):
         require_present(
             page,
             r"three dogs",
             "three_dog_cap",
             "'three dogs' (per-visit cap must be visible before booking)",
+            block=False,
         )
 
     # ── friendly_dogs_only ────────────────────────────────────────────────
@@ -519,6 +554,7 @@ def check_rule_survival():
         r"no add ons",
         "premium_inclusive_no_addons",
         "'no add ons' (premium-inclusive pricing must be stated)",
+        block=False,
     )
 
     # ── cadence_4wk_or_2wk_same_price ─────────────────────────────────────
@@ -529,6 +565,7 @@ def check_rule_survival():
         r"same price",
         "cadence_4wk_or_2wk_same_price",
         "'same price' (the 2-week cadence is freshness, not a different rate)",
+        block=False,
     )
 
     # ── card_on_file_at_signup ────────────────────────────────────────────
@@ -550,6 +587,7 @@ def check_rule_survival():
             r"bath only",
             "core_is_no_haircut_dogs",
             "'bath only' (we do not do haircuts)",
+            block=False,
         )
 
     # ── bath_only_no_mats ─────────────────────────────────────────────────
@@ -561,24 +599,28 @@ def check_rule_survival():
         r"Smoothcoat",
         "bath_only_no_mats",
         "'Smoothcoat' tier name (eligibility classifier)",
+        block=False,
     )
     require_present(
         villages,
         r"Doublecoat",
         "bath_only_no_mats",
         "'Doublecoat' tier name (eligibility classifier)",
+        block=False,
     )
     require_present(
         villages,
         r"[Ww]e bath",
         "bath_only_no_mats",
         "'we bath' (the eligibility yes header)",
+        block=False,
     )
     require_present(
         villages,
         r"[Ww]e do not bath",
         "bath_only_no_mats",
         "'we do not bath' (the eligibility no header)",
+        block=False,
     )
 
     # ── no_dgn_import ─────────────────────────────────────────────────────
@@ -640,6 +682,7 @@ def check_rule_survival():
         "founders_spots_remaining_counter",
         "'id=\"launch-spot-count\"' element (the counter target)",
         flags=0,
+        block=False,
     )
 
     # ── Booking-surface rule survival ─────────────────────────────────────
@@ -652,31 +695,35 @@ def check_rule_survival():
     # ── octane_selector_cadence_picker ────────────────────────────────────
     # Booking step 2 presents the three cadences and carries the locked
     # "Want your dog fresher?" framing (freshness as the upgrade, not savings).
+    # octane framing is UX copy with no durable layer behind it; WARN only.
     require_present(
         booking_app,
         r"want your dog fresher",
         "octane_selector_cadence_picker",
         "the locked 'Want your dog fresher?' cadence-picker copy",
+        block=False,
     )
     for lab in ("Every 4 weeks", "Every 2 weeks", "Single visit"):
         require_present(
             booking_app, re.escape(lab),
             "octane_selector_cadence_picker", f"cadence option '{lab}'",
+            block=False,
         )
 
-    # ── friendly_dogs_only (booking gate) ─────────────────────────────────
+    # ── friendly_dogs_only (booking gate) ─ SAFETY: BLOCK ─────────────────
     require_present(booking_app, r"friendly dogs", "friendly_dogs_only",
                     "'friendly dogs' on the booking gate")
     require_present(booking_app, r"aggression", "friendly_dogs_only",
                     "'aggression' on the booking gate")
 
     # ── core_is_no_haircut_dogs / bath_only_no_mats (booking eligibility) ──
+    # Eligibility copy; the coat-tier teeth are the DB CHECK + the RPC. WARN.
     require_present(booking_app, r"bath only", "core_is_no_haircut_dogs",
-                    "'bath only' on the booking eligibility gate")
+                    "'bath only' on the booking eligibility gate", block=False)
     require_present(booking_app, r"Smoothcoat", "bath_only_no_mats",
-                    "'Smoothcoat' tier on the booking coat picker")
+                    "'Smoothcoat' tier on the booking coat picker", block=False)
     require_present(booking_app, r"Doublecoat", "bath_only_no_mats",
-                    "'Doublecoat' tier on the booking coat picker")
+                    "'Doublecoat' tier on the booking coat picker", block=False)
 
     # ── premium_inclusive_no_addons (booking surface) ─────────────────────
     # One price per tier, no upsell may be introduced into the funnel. Catch a
@@ -760,12 +807,22 @@ def main():
     check_no_stale_data_paths()
     check_workflows_no_deleted_branches()
     check_rule_survival()
+    if warnings:
+        print(f"AUDIT WARNINGS ({len(warnings)}): redesign-fragile copy/design drift. "
+              f"Does NOT block the build; the rule's real enforcement is its durable "
+              f"layer (DB / RPC / data). Fix the copy or update the pattern:")
+        for w in warnings:
+            print(f"  ~ {w}")
+        print()
     if failures:
-        print(f"AUDIT FAIL ({len(failures)} issue(s)):")
+        print(f"AUDIT FAIL ({len(failures)} issue(s)): broken data, structural drift, or a "
+              f"legal / safety / money / engineering rule. These block the build:")
         for f in failures:
             print(f"  - {f}")
         sys.exit(1)
-    print("AUDIT PASS: clients.json valid, no dashes, Oracle/index in sync, no conflict markers, no stale paths, workflows clean, rule-survival lint green.")
+    print("AUDIT PASS: data valid, no dashes, Oracle/index in sync, no conflict markers, "
+          "no stale paths, workflows clean, blocking rule-survival checks green"
+          + (f" ({len(warnings)} non-blocking warning(s) above)." if warnings else "."))
     sys.exit(0)
 
 

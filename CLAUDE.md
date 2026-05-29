@@ -34,6 +34,16 @@ tests every decision is held against: earn more grind less, runs without Paul, f
 and in, good for body and mind, a unicorn job, clients grateful it exists, the world better for
 it) is the first section of CLEAN_ORACLE.md and is the apex every rule serves.
 
+**Ship gate: survive a redesign (non-negotiable).** Nothing ships until it would survive a major
+website redesign. Before shipping anything (a rule, business logic, a decision, copy, a feature, a
+schema change), consider on your own, without involving Paul: if the whole site were rebuilt
+tomorrow, would this still hold? If its only enforcement is copy or markup a redesign could rewrite
+away, rework it so the teeth live in a durable layer (a DB constraint, a server RPC, a data file,
+or a build guard) and only then ship. A change that cannot pass this is reworked and retried, never
+shipped with a note to fix later. This is the apex engineering rule, recorded as
+`redesign_survival_is_a_ship_gate` in CLEAN_ORACLE.md, and it is why the build audit is tiered: a
+missing durable layer blocks the build, a missing copy reminder only warns.
+
 ## Read order (the doc set)
 
 1. **CLAUDE.md** (this file) - operating manual. Permanent rules, stack, constraints.
@@ -203,7 +213,12 @@ authoritative client file until the app writes back to Supabase.
 - Validate + lint locally: `python3 scripts/check.py` (full structural audit: data,
   copy, Oracle/index sync, conflict markers, stale paths, workflows). Pre-commit hook
   runs this automatically; SessionStart hook installs the pre-commit hook on every
-  session start.
+  session start. The audit is tiered (`redesign_survival_is_a_ship_gate`): broken data,
+  conflict markers, Oracle/index drift, engineering-safety regressions, and the legal /
+  safety / money customer commitments BLOCK the build; brittle marketing / design / UX
+  copy whose rule is enforced in a durable layer (DB / RPC / data) prints a loud WARNING
+  but never blocks a deploy. A rewritten marketing line will not fail your build; a
+  dropped durable rule will.
 - **Verify the change before reporting done.** Before saying a task is finished, verify
   that the specific change you just made does what was asked. Targeted on the change, not
   a generic regression sweep: for a UI change, load the affected page in a real browser
