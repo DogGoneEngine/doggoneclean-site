@@ -11,14 +11,13 @@
   max-width: 680px;
   margin-inline: auto;
   padding: var(--space-2xl) var(--space-lg) var(--space-3xl);
-  position: relative;
-  z-index: 1;
 }
 
-/* Neural Expressive ambient glows (signature haze) behind the funnel. Kept in
-   their own absolutely-positioned, clipped layer so they can never clip the
-   address autocomplete dropdown or cause horizontal scroll on mobile. */
-.bk-glows { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+/* Neural Expressive ambient glows (signature haze) behind the funnel. They live
+   in a true background layer (z-index:-1, behind all content) so they never
+   create a stacking context that traps the Google address autocomplete dropdown,
+   never clip it, and never cause horizontal scroll on mobile. */
+.bk-glows { position: absolute; inset: 0; overflow: hidden; z-index: -1; pointer-events: none; }
 .bk-glows .glow-a { top: -120px; right: -100px; width: 420px; height: 420px; }
 .bk-glows .glow-b { top: 360px; left: -140px; width: 360px; height: 360px; }
 
