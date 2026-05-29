@@ -38,7 +38,7 @@ const TOTAL_STEPS = 4;
 // the intro already says The Villages. Stating it as a requirement is noise.
 const ELIGIBILITY = [
   'You live in a private home with a driveway.',
-  'There is room to park our truck and trailer (about 2 standard car spaces).',
+  'There is room to park our truck and trailer (about 2 standard car spaces, front to back).',
 ];
 
 const MONTHS = [
@@ -335,6 +335,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
           <li key={item} className="bk-checklist__item"><span className="bk-checklist__bullet">✓</span><span>{item}</span></li>
         ))}
       </ul>
+      <p className="bk-fineprint">You don't need to clear your driveway. We can park on the street when it's safe and legal.</p>
       <label className="bk-fit">
         <input type="checkbox" checked={eligibilityAcked} onChange={(e) => setEligibilityAcked(e.target.checked)} />
         <span>My location fits these requirements and my dog is friendly toward people.</span>
