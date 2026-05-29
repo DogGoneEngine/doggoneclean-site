@@ -41,15 +41,18 @@ optimizer (deferred). Slices shipped to `main`:
   on `/the-villages` (reveals below the visibility threshold).
 
 **Still ahead on booking (blocked or next):**
-- **Address autocomplete + service-area verification** (DGN-style, ported
-  from `doggonenails-site` `checkServiceArea`): Google Places Autocomplete
-  on the address field -> lat/lng -> point-in-polygon against
-  `cities.polygon` + per-address allow/deny exceptions. Today the funnel
-  takes a typed address with NO verification. Needs from Paul: a Clean
-  Google Maps API key (its own Google Cloud project, domain-locked, per
-  `clean_stays_saleable`) and the real Villages polygon (drawable, or a
-  center+radius to start). DGN's `isInCityPolygon`/`checkServiceArea` in
-  `src/business/cities.js` is the reference.
+- ~~Address autocomplete + service-area verification~~ DONE (2026-05-29).
+  `src/components/portal/maps.js`: Places Autocomplete on the address
+  field -> lat/lng -> ray-cast point-in-polygon against `cities.polygon`
+  (real 308-point Villages boundary). In-area reveals the rest of the
+  funnel; out-of-area routes to the waitlist and blocks. Manual-entry
+  fallback if the Maps script fails. Verified vs an independent SQL
+  ray-cast. The Maps BROWSER key is a source constant (ships in the page
+  like the Supabase publishable key); Paul must keep it HTTP-referrer
+  locked to hurricanebath.com + API-restricted to Maps JS + Places in
+  Google Cloud (its own Clean project per `clean_stays_saleable`). NOT YET
+  done: per-address allow/deny exceptions (override the polygon for edge
+  lots); add when a real case appears.
 - **Slice 4: Stripe SetupIntent edge function** + activate the card step.
   BLOCKED on Paul creating the Dog Gone Clean Stripe account and providing
   TEST keys. The funnel's final "Confirm booking" button is disabled until
