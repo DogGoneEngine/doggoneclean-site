@@ -327,7 +327,8 @@
 /* Friendly-dogs callout + eligibility checklist */
 .bk-friendly { background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--accent2); border-radius: var(--radius-md); padding: var(--space-md) var(--space-lg); margin-bottom: var(--space-lg); }
 .bk-friendly__title { font-weight: 700; margin: 0 0 4px; color: var(--ink); }
-.bk-friendly__body { margin: 0; font-size: var(--text-sm); color: var(--soft); line-height: 1.6; }
+.bk-friendly__body { margin: 0; font-size: var(--text-sm); color: var(--ink); line-height: 1.6; }
+.bk-friendly__note { margin: var(--space-sm) 0 0; font-size: var(--text-xs); color: var(--soft); line-height: 1.5; }
 .bk-checklist { list-style: none; padding: 0; margin: 0 0 var(--space-lg); display: flex; flex-direction: column; gap: var(--space-sm); }
 .bk-checklist__item { display: flex; gap: var(--space-sm); align-items: flex-start; font-size: var(--text-sm); color: var(--ink); line-height: 1.5; }
 .bk-checklist__bullet { color: var(--accent2); font-weight: 700; flex-shrink: 0; }
@@ -389,22 +390,6 @@
 /* Back + continue buttons */
 .bk-back { display: inline-block; margin-top: var(--space-lg); background: none; border: none; color: var(--soft); font-size: var(--text-sm); cursor: pointer; }
 .bk-continue { width: 100%; margin-top: var(--space-xl); }
-
-/* Step 1 only: 25% more breathing room between elements (Paul's tweak). Scoped
-   to .bk-card--s1 so the other steps' rhythm is untouched; calc(* 1.25) keeps it
-   exactly 25% over whatever the base spacing token is. */
-.bk-card--s1 .bk-step__title { margin-bottom: calc(var(--space-sm) * 1.25); }
-.bk-card--s1 .bk-step__sub { margin-bottom: calc(var(--space-xl) * 1.25); }
-.bk-card--s1 .bk-friendly { margin-bottom: calc(var(--space-lg) * 1.25); }
-.bk-card--s1 .bk-checklist { margin-bottom: calc(var(--space-lg) * 1.25); gap: calc(var(--space-sm) * 1.25); }
-.bk-card--s1 .bk-fineprint { margin-top: calc(var(--space-md) * 1.25); }
-.bk-card--s1 .bk-reveal { margin-top: calc(var(--space-xl) * 1.25); }
-.bk-card--s1 .bk-field { margin-bottom: calc(var(--space-lg) * 1.25); }
-.bk-card--s1 .bk-stage__divider { margin: calc(var(--space-xl) * 1.25) 0 calc(var(--space-lg) * 1.25); }
-.bk-card--s1 .bk-stage__heading { margin-bottom: calc(var(--space-md) * 1.25); }
-.bk-card--s1 .bk-counter { margin-bottom: calc(var(--space-lg) * 1.25); }
-.bk-card--s1 .bk-dog { margin-bottom: calc(var(--space-md) * 1.25); }
-.bk-card--s1 .bk-continue { margin-top: calc(var(--space-xl) * 1.25); }
 
 /* Address autocomplete: confirmed readback + service-area banners */
 .bk-addr-confirmed { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-md) var(--space-lg); background: var(--bg); }

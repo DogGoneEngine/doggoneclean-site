@@ -334,14 +334,15 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   }
 
   return (
-    <div className="bk-card bk-card--s1">
+    <div className="bk-card">
       <h2 className="bk-step__title">Let's Get <span className="grad">Started</span></h2>
       <p className="bk-step__sub">First, let's make sure we're a good fit for The Villages.</p>
 
       {/* Stage 1: fit check */}
       <div className="bk-friendly">
         <p className="bk-friendly__title">Friendly Dogs Only</p>
-        <p className="bk-friendly__body">A mobile dog bath runs on the trust between the dog and the operator. Dogs that show aggression toward people or are excessively uncooperative are not eligible for this service. Normal wiggling is fine.</p>
+        <p className="bk-friendly__body">Normal wiggling is fine. Dogs that show aggression toward people or are excessively uncooperative are not eligible for this service.</p>
+        <p className="bk-friendly__note">A mobile dog bath runs on the trust between the dog and the operator.</p>
       </div>
       <ul className="bk-checklist">
         {ELIGIBILITY.map((item) => (
