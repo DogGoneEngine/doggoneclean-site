@@ -257,7 +257,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   // fetch the place fields, parse to structured address + lat/lng, and run
   // the in-area polygon check.
   useEffect(() => {
-    if (!mapsReady || !boxRef.current || elRef.current) return undefined;
+    if (!mapsReady || !stage1 || !boxRef.current || elRef.current) return undefined;
     const places = window.google && window.google.maps && window.google.maps.places;
     if (!places || !places.PlaceAutocompleteElement) { setMapsFailed(true); return undefined; }
     const opts = { includedRegionCodes: ['us'] };
@@ -289,8 +289,17 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
     // gmp-select is the current event; gmp-placeselect covers older builds.
     el.addEventListener('gmp-select', onSelect);
     el.addEventListener('gmp-placeselect', onSelect);
-    return undefined;
-  }, [mapsReady, setPlace]);
+
+    // Tear down when the address stage unmounts (eligibility unchecked). Without
+    // this, elRef kept pointing at the detached element, so re-checking the box
+    // skipped re-creating it and left an empty, cursorless box until a refresh.
+    return () => {
+      el.removeEventListener('gmp-select', onSelect);
+      el.removeEventListener('gmp-placeselect', onSelect);
+      el.remove();
+      if (elRef.current === el) elRef.current = null;
+    };
+  }, [mapsReady, stage1, setPlace]);
 
   function updateDog(i, field, val) { setDogs((ds) => ds.map((d, idx) => (idx === i ? { ...d, [field]: val } : d))); }
   function setDogCount(n) {
