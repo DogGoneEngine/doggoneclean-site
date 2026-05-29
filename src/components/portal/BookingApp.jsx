@@ -36,29 +36,28 @@ function dollars(cents) {
   return Number.isInteger(d) ? `$${d}` : `$${d.toFixed(2)}`;
 }
 
-// Base tier for a set of dogs: doublecoat if any dog is doublecoat, else
-// smoothcoat. Mirrors the server's pricing rule so the estimate matches.
-function baseTier(dogs) {
-  return dogs.some((d) => d.coat_tier === 'doublecoat') ? 'doublecoat' : 'smoothcoat';
-}
-
-// Estimated first-dog price for a cadence, from the city row. Recurring
+// Per-dog price for its OWN coat tier at the chosen cadence. Recurring
 // shows the founders rate (the launch rate while spots remain); one-off
-// shows the single price. The server snapshot is authoritative; this is
-// labeled an estimate until the confirmation returns the exact amount.
-function basePriceCents(city, tier, cadence) {
-  if (!city) return null;
+// shows the single price. The server snapshot is authoritative.
+function dogTierCents(city, tier, cadence) {
+  if (!city || (tier !== 'smoothcoat' && tier !== 'doublecoat')) return null;
   if (cadence === 'oneoff') {
     return tier === 'doublecoat' ? city.hb_doublecoat_single_cents : city.hb_smoothcoat_single_cents;
   }
   return tier === 'doublecoat' ? city.hb_founders_doublecoat_cents : city.hb_founders_smoothcoat_cents;
 }
 
+// Visit total: every dog priced at its own tier, ordered most-expensive
+// first, with the per-additional-dog discount stacking down the line
+// (matches the city page copy and the bath_start_subscription RPC).
 function visitPriceCents(city, dogs, cadence) {
-  const base = basePriceCents(city, baseTier(dogs), cadence);
-  if (base == null) return null;
+  if (!city) return null;
+  const prices = dogs.map((d) => dogTierCents(city, d.coat_tier, cadence));
+  if (prices.some((p) => p == null)) return null;
   const decrement = city.hb_addon_decrement_cents || 0;
-  return Math.max(0, base - decrement * (dogs.length - 1));
+  return [...prices]
+    .sort((a, b) => b - a)
+    .reduce((sum, c, i) => sum + Math.max(0, c - decrement * i), 0);
 }
 
 const slotFmt = new Intl.DateTimeFormat('en-US', {
@@ -265,8 +264,8 @@ function PlaceStep({ place, setPlace }) {
   const set = (f) => (e) => setPlace((p) => ({ ...p, [f]: e.target.value }));
   return (
     <div className="bk-step">
-      <h2 className="bk-step__title">Where does the trailer park?</h2>
-      <p className="bk-step__sub">Hurricane Bath serves The Villages, Florida. We bring the bath to your driveway.</p>
+      <h2 className="bk-step__title">Where do we bring the bath?</h2>
+      <p className="bk-step__sub">Hurricane Bath serves The Villages, Florida. We pull up to your driveway, so this is where your dog gets clean.</p>
       <div className="bk-grid-2">
         <Field label="First name"><input className="pt-input" value={place.firstName} onChange={set('firstName')} autoComplete="given-name" /></Field>
         <Field label="Last name"><input className="pt-input" value={place.lastName} onChange={set('lastName')} autoComplete="family-name" /></Field>
@@ -321,7 +320,6 @@ function DogsStep({ dogs, updateDog, addDog, removeDog }) {
 }
 
 function PlanStep({ city, dogs, cadence, setCadence }) {
-  const tier = baseTier(dogs);
   const options = [
     { key: '4wk', label: 'Every 4 weeks', sub: 'The standard cadence. Most dogs, most coats.' },
     { key: '2wk', label: 'Every 2 weeks', sub: 'Same price, more freshness. Heavy shedders love it.' },
@@ -347,7 +345,7 @@ function PlanStep({ city, dogs, cadence, setCadence }) {
         })}
       </div>
       {dogs.length > 1 && (
-        <p className="bk-fineprint">Prices shown are for all {dogs.length} dogs ({dollars(city?.hb_addon_decrement_cents)} off each dog after the first). Base coat: {tier}.</p>
+        <p className="bk-fineprint">Total for all {dogs.length} dogs. Each dog is priced for its own coat; each additional dog is {dollars(city?.hb_addon_decrement_cents)} less than the one before.</p>
       )}
     </div>
   );
