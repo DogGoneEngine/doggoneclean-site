@@ -4,6 +4,11 @@ name: Deploy staging
 # where Caddy serves it at hurricanebath.com from /srv/doggoneclean.
 # Triggers on the active working branch for now; when doggoneclean.us (production)
 # is wired, main will deploy there and this staging trigger gets cleaned up.
+#
+# The deploy is GATED on the audit: the `deploy` job `needs` the `audit` job, so
+# a push to main that fails scripts/check.py never reaches the rsync step and
+# never publishes. "Shipped" therefore cannot mean "reached the live site
+# broken" - the gate runs the same check that powers the pre-commit hook and CI.
 
 on:
   push:
@@ -15,7 +20,18 @@ permissions:
   contents: read
 
 jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python3 scripts/check.py
+
   deploy:
+    needs: audit
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

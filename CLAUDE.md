@@ -152,9 +152,10 @@ See `lock_it_in_capture` in the Oracle.
   hurricanebath.com, which is live serving a single-page placeholder. hurricanebath.com is the
   Dog Gone Clean v2.0 surface (bath-only, subscription-default, The Villages); doggoneclean.us
   keeps serving the legacy Squarespace site for full-grooming clients indefinitely, until its
-  own separate rebuild. A planned build gate (run `scripts/check.py` before deploy) is not
-  wired yet, so a lint-failing push can still reach staging; stand it up so bad copy cannot
-  publish.
+  own separate rebuild. The deploy is now gated on the audit: `.github/workflows/deploy.yml`
+  runs `scripts/check.py` as a required `audit` job and the publish step `needs` it, so a push
+  to `main` that fails the audit never reaches the droplet (wired 2026-05-29). A failing audit
+  therefore cannot become a live deploy: live means it passed.
 
 ## Terminology
 
@@ -265,10 +266,12 @@ second web server. The site is NOT Squarespace; do not assume so again.
 structural lint runs in three places off one script: `scripts/check.py` runs on every
 SessionStart, on every local commit via the pre-commit hook the SessionStart installs, and on
 every push and PR via `.github/workflows/audit.yml`. The deploy workflow
-(`.github/workflows/deploy.yml`) publishes on push to `main`: builds Astro, rsyncs `dist/`
-to the droplet over SSH; verified working end-to-end 2026-05-26 after the verify-gate
-disaster was unwound. The not-yet-built part is a single local `npm run build` that chains
-structural lint -> Astro build -> smoke test so a bad copy edit cannot reach staging. The
+(`.github/workflows/deploy.yml`) publishes on push to `main`, but only behind the audit: it
+runs `scripts/check.py` as a required `audit` job and the publish step `needs` it, then builds
+Astro and rsyncs `dist/` to the droplet over SSH (deploy gate wired 2026-05-29; the rsync was
+verified working end-to-end 2026-05-26 after the verify-gate disaster was unwound). The
+not-yet-built part is a single local `npm run build` that chains structural lint -> Astro
+build -> smoke test so a bad copy edit is caught before the push too. The
 verify-gate attempt on 2026-05-26 tried this with Playwright and broke the deploy chain for
 hours; the salvage was `verify_the_change_before_done` (the session verifies the actual
 change, not a tool) plus `ci_workflows_capped_and_validated` (every workflow capped) plus
