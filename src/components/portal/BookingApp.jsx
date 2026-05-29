@@ -229,8 +229,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   const [areaStatus, setAreaStatus] = useState(place.serviceLat != null ? 'pass' : null); // null | pass | fail
 
   const stage1 = eligibilityAcked;
-  const manualOk = place.addressLine1.trim() && place.addressCity.trim() && place.addressZip.trim();
-  const stage2done = mapsFailed ? manualOk : areaStatus === 'pass';
+  const stage2done = mapsFailed ? !!place.addressLine1.trim() : areaStatus === 'pass';
 
   useEffect(() => {
     (async () => { const c = sb(); if (!c) return; const { data: { user } } = await c.auth.getUser(); setAuthed(!!user); })();
@@ -253,37 +252,34 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   // the in-area polygon check.
   useEffect(() => {
     if (!mapsReady || !boxRef.current || elRef.current) return undefined;
-    let cancelled = false;
-    (async () => {
-      const places = await window.google.maps.importLibrary('places');
-      if (cancelled || !boxRef.current) return;
-      const el = new places.PlaceAutocompleteElement({ includedRegionCodes: ['us'] });
-      el.style.width = '100%';
-      boxRef.current.appendChild(el);
-      elRef.current = el;
+    const places = window.google && window.google.maps && window.google.maps.places;
+    if (!places || !places.PlaceAutocompleteElement) { setMapsFailed(true); return undefined; }
+    const el = new places.PlaceAutocompleteElement({ includedRegionCodes: ['us'] });
+    el.style.width = '100%';
+    boxRef.current.appendChild(el);
+    elRef.current = el;
 
-      async function onSelect(event) {
-        try {
-          const place_ = event.placePrediction ? event.placePrediction.toPlace() : event.place;
-          if (!place_) { setAreaStatus('fail'); return; }
-          await place_.fetchFields({ fields: ['formattedAddress', 'addressComponents', 'location'] });
-          const parsed = parsePlace(place_);
-          setPlace((p) => ({
-            ...p,
-            addressLine1: parsed.line1, addressCity: parsed.city,
-            addressState: parsed.state || 'FL', addressZip: parsed.zip,
-            serviceLat: parsed.lat, serviceLng: parsed.lng, verifiedAddress: parsed.formatted,
-          }));
-          setAreaStatus(isInServiceArea(parsed.lat, parsed.lng, cityRef.current) ? 'pass' : 'fail');
-        } catch {
-          setAreaStatus('fail');
-        }
+    async function onSelect(event) {
+      try {
+        const place_ = event.placePrediction ? event.placePrediction.toPlace() : event.place;
+        if (!place_) { setAreaStatus('fail'); return; }
+        await place_.fetchFields({ fields: ['formattedAddress', 'addressComponents', 'location'] });
+        const parsed = parsePlace(place_);
+        setPlace((p) => ({
+          ...p,
+          addressLine1: parsed.line1, addressCity: parsed.city,
+          addressState: parsed.state || 'FL', addressZip: parsed.zip,
+          serviceLat: parsed.lat, serviceLng: parsed.lng, verifiedAddress: parsed.formatted,
+        }));
+        setAreaStatus(isInServiceArea(parsed.lat, parsed.lng, cityRef.current) ? 'pass' : 'fail');
+      } catch {
+        setAreaStatus('fail');
       }
-      // gmp-select is the current event; gmp-placeselect covers older builds.
-      el.addEventListener('gmp-select', onSelect);
-      el.addEventListener('gmp-placeselect', onSelect);
-    })();
-    return () => { cancelled = true; };
+    }
+    // gmp-select is the current event; gmp-placeselect covers older builds.
+    el.addEventListener('gmp-select', onSelect);
+    el.addEventListener('gmp-placeselect', onSelect);
+    return undefined;
   }, [mapsReady, setPlace]);
 
   function updateDog(i, field, val) { setDogs((ds) => ds.map((d, idx) => (idx === i ? { ...d, [field]: val } : d))); }
@@ -340,15 +336,10 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
               {place.verifiedAddress && <p className="bk-fineprint">Selected: {place.verifiedAddress}</p>}
             </Field>
           ) : (
-            <>
-              <Field label="Street address"><input className="pt-input" value={place.addressLine1} onChange={set('addressLine1')} autoComplete="address-line1" /></Field>
-              <div className="bk-grid-3">
-                <Field label="City"><input className="pt-input" value={place.addressCity} onChange={set('addressCity')} autoComplete="address-level2" /></Field>
-                <Field label="State"><input className="pt-input" value={place.addressState} onChange={set('addressState')} autoComplete="address-level1" /></Field>
-                <Field label="ZIP"><input className="pt-input" inputMode="numeric" value={place.addressZip} onChange={set('addressZip')} autoComplete="postal-code" /></Field>
-              </div>
-              <p className="bk-fineprint">Address search is unavailable right now; we confirm your address is on the route before your first visit.</p>
-            </>
+            <Field label="Service address">
+              <input className="pt-input" value={place.addressLine1} onChange={set('addressLine1')} placeholder="Type your full address" autoComplete="off" />
+              <p className="bk-fineprint">We confirm your address is on the route before your first visit.</p>
+            </Field>
           )}
 
           {areaStatus === 'pass' && <div className="bk-area bk-area--in"><span className="bk-area__icon">✓</span> You're in our service area.</div>}

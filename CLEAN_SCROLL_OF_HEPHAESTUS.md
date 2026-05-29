@@ -619,15 +619,21 @@ so nails' legacy-widget code cannot work here no matter what (nails works only
 because its project predates the cutoff). It was not the referrer (the key
 already allows hurricanebath.com per the build record) and not billing. Migrated
 the address field to the modern `PlaceAutocompleteElement` (Places API New,
-already enabled on Clean's project, which is what drew the suggestions): loader
-back to `loading=async` + `importLibrary`; on `gmp-select` ->
-`placePrediction.toPlace()` -> `fetchFields(['formattedAddress',
-'addressComponents','location'])` -> parse (New API uses longText/shortText +
-`location`) -> in-area polygon check. Confirmed the event/fetchFields shape
-against Google's current docs. A forced, documented divergence from nails
-(Google policy, not a choice); nails will face the same migration. The earlier
-"remove loading=async" fix is superseded by this. `maps_js_api_only` refinement
-updated to say New, not the legacy widget.
+already enabled on Clean's project, which is what drew the suggestions). Used
+the classic `libraries=places&v=weekly` loader (the form Clean's project loads
+cleanly) with `google.maps.places.PlaceAutocompleteElement` directly off the
+namespace; on `gmp-select` -> `placePrediction.toPlace()` ->
+`fetchFields(['formattedAddress','addressComponents','location'])` -> parse (New
+API uses longText/shortText + `location`) -> in-area polygon check. The address
+field is now a SINGLE box in all cases: the Maps-failed fallback is one plain
+text input, not the old multi-field form (Paul disliked the form). Confirmed the
+event/fetchFields shape against Google's current docs. A forced divergence from
+nails (Google policy, not a choice); nails will face the same migration. NOTE
+the standing limit: this session cannot run a real browser (no headless +
+referrer-locked key), so interactive autocomplete is verified by code/docs and
+the built bundle, NOT by a live click; final confirmation is Paul on the
+deployed page. `maps_js_api_only` refinement updated to say New, not the legacy
+widget.
 
 No new Oracle rules this chapter; one refinement (`maps_js_api_only`, above).
 The funnel enforces the existing rule pack. Blocked / handed to Paul: the

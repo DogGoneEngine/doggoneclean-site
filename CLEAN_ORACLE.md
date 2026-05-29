@@ -1060,7 +1060,10 @@ JS Places library. Use the NEW element, not the legacy `google.maps.places.Autoc
 Google blocked the legacy widget for Cloud projects created after March 2025 (Clean's project is
 new, so the legacy `Autocomplete` errors with LegacyApiNotActivatedMapError; nails' legacy widget
 works only because nails' project predates the cutoff). Wired 2026-05-29 in
-`src/components/portal/maps.js` (loader uses `loading=async` + `importLibrary`).
+`src/components/portal/maps.js`: classic `libraries=places&v=weekly` loader (the
+form Clean's project loads cleanly), then `google.maps.places.PlaceAutocompleteElement`
+used directly off the namespace. The address field is a single box, never a
+multi-field form (the fallback if Maps fails is one plain text input, not a form).
 
 `supabase_rpc_not_raw_fetch` (engineering):
 In a Supabase client app, use the client's `rpc()` for database/auth calls, not raw

@@ -17,25 +17,24 @@ export const MAPS_BROWSER_KEY = 'AIzaSyA77l7vz6_hr1CtJ8OGAUsy549TEAAclhw';
 let _mapsPromise = null;
 export function loadGoogleMaps() {
   if (typeof window === 'undefined') return Promise.reject(new Error('no_window'));
-  if (window.google && window.google.maps && window.google.maps.importLibrary) {
-    return Promise.resolve(window.google.maps);
-  }
+  const ready = () => window.google && window.google.maps && window.google.maps.places
+    && window.google.maps.places.PlaceAutocompleteElement;
+  if (ready()) return Promise.resolve(window.google.maps);
   if (_mapsPromise) return _mapsPromise;
   _mapsPromise = new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    // loading=async is the recommended bootstrap for the modern Places API
-    // (New) and its PlaceAutocompleteElement, which Clean uses because Google
-    // blocked the legacy google.maps.places.Autocomplete widget for new Cloud
-    // projects (March 2025) — nails' legacy widget only works because nails'
-    // project predates that cutoff; Clean's new project does not. Readiness
-    // here is google.maps.importLibrary, the New-API entry point.
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_BROWSER_KEY}&loading=async&libraries=places&v=weekly`;
+    // Classic loader (libraries=places, v=weekly): this is the exact form
+    // that loads successfully on Clean's project (proven by the suggestions
+    // rendering in the field). We use the MODERN PlaceAutocompleteElement off
+    // it, NOT the legacy google.maps.places.Autocomplete widget — Google
+    // blocked the legacy widget for new Cloud projects (March 2025), so it
+    // errors here (nails' legacy widget works only because nails' project
+    // predates the cutoff). v=weekly guarantees the element is present.
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_BROWSER_KEY}&libraries=places&v=weekly`;
     s.async = true;
+    s.defer = true;
     s.onerror = () => { _mapsPromise = null; reject(new Error('maps_load_failed')); };
-    s.onload = () => {
-      if (window.google && window.google.maps && window.google.maps.importLibrary) resolve(window.google.maps);
-      else reject(new Error('maps_load_failed'));
-    };
+    s.onload = () => { if (ready()) resolve(window.google.maps); else { _mapsPromise = null; reject(new Error('maps_load_failed')); } };
     document.head.appendChild(s);
   });
   return _mapsPromise;
