@@ -11,7 +11,7 @@
 import { useState, useRef } from 'react';
 import { sendOtp, verifyOtp, signInWithGoogle } from './supabase.js';
 
-export default function AuthScreen() {
+export default function AuthScreen({ redirectPath = '/portal/' }) {
   const [step, setStep]               = useState('identity'); // 'identity' | 'otp' | 'magic_sent'
   const [identity, setIdentity]       = useState('');
   const [isPhone, setIsPhone]         = useState(false);
@@ -31,7 +31,7 @@ export default function AuthScreen() {
     setSending(true);
     setError('');
 
-    const result = await sendOtp(val);
+    const result = await sendOtp(val, redirectPath);
     setSending(false);
 
     if (result.error) {
@@ -107,7 +107,7 @@ export default function AuthScreen() {
     setGoogleLoading(true);
     setError('');
     try {
-      await signInWithGoogle();
+      await signInWithGoogle(redirectPath);
       // Browser redirects to Google; no further action here.
     } catch {
       setError('Could not connect to Google. Try again, or sign in with your phone or email.');

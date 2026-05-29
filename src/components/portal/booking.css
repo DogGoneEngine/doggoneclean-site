@@ -1,0 +1,256 @@
+/* src/components/portal/booking.css
+ *
+ * Styles for the Hurricane Bath signup funnel (BookingApp.jsx). Reuses
+ * the portal's pt-* primitives (buttons, inputs, fields, spinner) and the
+ * site design tokens from global.css; bk-* classes are funnel-specific
+ * layout. Neural Expressive idiom: clean cards, blue accents, gradient
+ * tags, strong heading/body contrast.
+ */
+
+.bk-wrap {
+  max-width: 680px;
+  margin-inline: auto;
+  padding: var(--space-2xl) var(--space-lg) var(--space-3xl);
+}
+
+/* Anonymous intro above the auth card */
+.bk-auth-intro {
+  max-width: 460px;
+  margin: var(--space-2xl) auto 0;
+  text-align: center;
+  padding-inline: var(--space-lg);
+}
+.bk-auth-intro__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--accent2);
+  margin-bottom: var(--space-sm);
+}
+.bk-auth-intro p {
+  color: var(--soft);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+/* Progress rail */
+.bk-progress {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-xl);
+  gap: var(--space-xs);
+}
+.bk-progress__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  opacity: 0.5;
+}
+.bk-progress__item.is-current,
+.bk-progress__item.is-done { opacity: 1; }
+.bk-progress__dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--soft);
+}
+.bk-progress__item.is-current .bk-progress__dot {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  border-color: transparent;
+}
+.bk-progress__item.is-done .bk-progress__dot {
+  background: var(--accent2);
+  color: #fff;
+  border-color: transparent;
+}
+.bk-progress__label {
+  font-size: 0.68rem;
+  color: var(--soft);
+  text-align: center;
+}
+@media (max-width: 540px) {
+  .bk-progress__label { display: none; }
+}
+
+/* Card + steps */
+.bk-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-sm);
+}
+.bk-step__title {
+  font-size: var(--text-xl);
+  margin: 0 0 var(--space-xs);
+  color: var(--ink);
+}
+.bk-step__sub {
+  color: var(--soft);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  margin: 0 0 var(--space-xl);
+}
+
+.bk-field { margin-bottom: var(--space-lg); }
+.bk-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+.bk-grid-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--space-md); }
+@media (max-width: 480px) {
+  .bk-grid-2, .bk-grid-3 { grid-template-columns: 1fr; }
+}
+
+/* Dogs */
+.bk-dog {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+.bk-dog__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+.bk-dog__n { font-weight: 700; font-size: var(--text-sm); color: var(--accent); }
+.bk-dog__remove {
+  background: none; border: none; cursor: pointer;
+  color: var(--soft); font-size: var(--text-xs); text-decoration: underline;
+}
+.bk-add-dog {
+  width: 100%;
+  padding: var(--space-md);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+.bk-add-dog:hover { border-color: var(--accent2); }
+
+/* Coat tier + plan choice cards */
+.bk-tier-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); }
+.bk-tier {
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bk-tier.is-on { border-color: var(--accent2); box-shadow: 0 0 0 2px var(--accent2) inset; }
+.bk-tier__lab { font-weight: 700; font-size: var(--text-sm); }
+.bk-tier__sub { font-size: var(--text-xs); color: var(--soft); }
+
+.bk-plans { display: flex; flex-direction: column; gap: var(--space-md); }
+.bk-plan {
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bk-plan.is-on { border-color: var(--accent2); box-shadow: 0 0 0 2px var(--accent2) inset; }
+.bk-plan__top { display: flex; justify-content: space-between; align-items: baseline; }
+.bk-plan__label { font-weight: 700; }
+.bk-plan__price { font-weight: 700; font-size: var(--text-lg); color: var(--accent); }
+.bk-plan__sub { font-size: var(--text-sm); color: var(--soft); }
+
+.bk-founders-tag {
+  align-self: flex-start;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+/* Time picker */
+.bk-days { display: flex; flex-direction: column; gap: var(--space-lg); }
+.bk-day__label { font-weight: 700; font-size: var(--text-sm); margin-bottom: var(--space-sm); color: var(--ink); }
+.bk-day__slots { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.bk-slot {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.bk-slot.is-on {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+}
+.bk-empty-slots { text-align: center; padding: var(--space-xl) 0; }
+.bk-empty-slots p { color: var(--soft); margin: 0 0 var(--space-md); }
+
+/* Review */
+.bk-review { margin: 0 0 var(--space-xl); }
+.bk-review > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--line);
+}
+.bk-review dt { color: var(--soft); font-size: var(--text-sm); }
+.bk-review dd { margin: 0; text-align: right; font-weight: 600; font-size: var(--text-sm); }
+
+.bk-notice {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  font-size: var(--text-sm);
+  color: var(--soft);
+  line-height: 1.6;
+}
+.bk-notice--soft { border-left: 3px solid var(--accent2); }
+.bk-notice strong { color: var(--ink); }
+
+.bk-fineprint { font-size: var(--text-xs); color: var(--soft); margin-top: var(--space-md); line-height: 1.6; }
+.bk-error { margin-top: var(--space-md); }
+
+/* Nav + footer */
+.bk-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-xl);
+  gap: var(--space-md);
+}
+.bk-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-lg);
+  padding-inline: var(--space-xs);
+}
+.bk-footer__price { font-size: var(--text-sm); color: var(--ink); font-weight: 600; display: inline-flex; align-items: center; gap: var(--space-sm); }
+.bk-signout { background: none; border: none; color: var(--soft); font-size: var(--text-xs); cursor: pointer; text-decoration: underline; }

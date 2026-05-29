@@ -310,6 +310,9 @@ def check_rule_survival():
     # The portal copy lives in the React island once Phase 1 ships, not
     # in the page shell. Point the portal-control checks at the island.
     portal_app = COMPONENTS / "portal" / "PortalApp.jsx"
+    # The booking copy lives in the React island once the funnel ships, not
+    # in the page shell. Point the booking-surface checks at the island.
+    booking_app = COMPONENTS / "portal" / "BookingApp.jsx"
 
     def _normalize_ws(text):
         # Collapse all runs of whitespace to a single space so multi-word
@@ -444,7 +447,7 @@ def check_rule_survival():
     # booking step 4, portal control). On the current site set, the
     # home page, the city page, the booking entry, the terms page,
     # and the portal React island each carry "two taps".
-    for page in (home, villages, book, terms, portal_app):
+    for page in (home, villages, booking_app, terms, portal_app):
         require_present(
             page,
             r"two taps",
@@ -455,7 +458,7 @@ def check_rule_survival():
     # ── auto_charge_at_24h ────────────────────────────────────────────────
     # The customer-facing promise is "charged the day before, never sooner."
     # Required wherever the bath surface discusses billing.
-    for page in (villages, book, terms):
+    for page in (villages, booking_app, terms):
         require_present(
             page,
             r"the day before",
@@ -483,7 +486,7 @@ def check_rule_survival():
     # ── three_dog_cap ─────────────────────────────────────────────────────
     # Customer must know the per-visit cap before they book. The DB CHECK
     # enforces dog_count <= 3 but the customer learns the limit here.
-    for page in (villages, book):
+    for page in (villages, booking_app):
         require_present(
             page,
             r"three dogs",
@@ -531,7 +534,7 @@ def check_rule_survival():
     # ── card_on_file_at_signup ────────────────────────────────────────────
     # Card-on-file at booking is the model. Customers learn about it
     # before they enter the flow.
-    for page in (villages, book, terms):
+    for page in (villages, booking_app, terms):
         require_present(
             page,
             r"card on file",
@@ -587,7 +590,7 @@ def check_rule_survival():
         (r"sculpt nails", "sculpt nails"),
         (r"grind nails", "grind nails"),
     ]
-    customer_pages = [home, villages, process_page, book, portal, terms,
+    customer_pages = [home, villages, process_page, book, booking_app, portal, terms,
                       PAGES / "privacy.astro", PAGES / "sms.astro"]
     for page in customer_pages:
         for pat, label in dgn_nail_vocab:

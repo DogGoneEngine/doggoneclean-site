@@ -55,7 +55,7 @@ export function toE164US(raw) {
 // ── Auth ──────────────────────────────────────────────────────────────
 // Send an OTP (SMS) for a phone, or a magic link for an email.
 // Returns { error, isPhone, e164 }.
-export async function sendOtp(identity) {
+export async function sendOtp(identity, redirectPath = '/portal/') {
   const client = sb();
   if (!client) return { error: new Error('No client'), isPhone: false };
   const isPhone = !looksLikeEmail(identity);
@@ -68,7 +68,7 @@ export async function sendOtp(identity) {
     const { error } = await client.auth.signInWithOtp({
       email: identity,
       options: {
-        emailRedirectTo: `${window.location.origin}/portal/`,
+        emailRedirectTo: `${window.location.origin}${redirectPath}`,
       },
     });
     return { error, isPhone: false };
@@ -88,13 +88,13 @@ export async function verifyOtp(identity, isPhone, e164, token) {
 }
 
 // Sign in with Google OAuth. Redirects the tab; no return value.
-export async function signInWithGoogle() {
+export async function signInWithGoogle(redirectPath = '/portal/') {
   const client = sb();
   if (!client) return;
   await client.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/portal/`,
+      redirectTo: `${window.location.origin}${redirectPath}`,
     },
   });
 }
@@ -167,4 +167,72 @@ export async function getPortalData() {
     appointments: appts || [],
     city: (cities && cities[0]) || null,
   };
+}
+
+// ── Booking flow (Hurricane Bath signup) ──────────────────────────────
+// The /book funnel reads the public city row (anon-readable) for live
+// pricing, reads open slots from the SECURITY DEFINER bath_open_slots
+// (which returns only free timestamps, no PII), and submits through the
+// bath_start_subscription RPC, which enforces the rule pack server-side.
+
+// Read the launch city by slug (anon-readable). Returns { city } or
+// { error }. Pricing columns may be null on a city without v2.0 yet.
+export async function getBookingCity(slug = 'the-villages') {
+  const client = sb();
+  if (!client) return { error: 'no_client' };
+  const { data, error } = await client
+    .from('cities')
+    .select('*')
+    .eq('slug', slug)
+    .eq('hb_active', true)
+    .limit(1);
+  if (error) return { error: error.message };
+  if (!data || data.length === 0) return { error: 'city_not_open' };
+  return { city: data[0] };
+}
+
+// Fetch open slots for a city over the booking horizon. Returns an array
+// of { slot_start, slot_end } (ISO strings), already filtered to free,
+// future times by the database function. Empty until the operator has
+// posted availability windows (honest empty state in the picker).
+export async function getOpenSlots(cityId, days = 28) {
+  const client = sb();
+  if (!client) return { error: 'no_client', slots: [] };
+  const from = new Date();
+  const to = new Date(from.getTime() + days * 24 * 60 * 60 * 1000);
+  const { data, error } = await client.rpc('bath_open_slots', {
+    p_city_id: cityId,
+    p_from: from.toISOString(),
+    p_to: to.toISOString(),
+  });
+  if (error) return { error: error.message, slots: [] };
+  return { slots: data || [] };
+}
+
+// Submit the signup. `payload` carries the profile, dogs, cadence, and
+// chosen slot; the card (stripe_payment_method_id) is null on the
+// pre-launch path and becomes required once Stripe is wired. Returns the
+// RPC result object or { error }.
+export async function startSubscription(payload) {
+  const client = sb();
+  if (!client) return { error: 'no_client' };
+  const { data, error } = await client.rpc('bath_start_subscription', {
+    p_city_slug: payload.citySlug,
+    p_first_name: payload.firstName,
+    p_last_name: payload.lastName,
+    p_email: payload.email,
+    p_phone_e164: payload.phoneE164,
+    p_address_line_1: payload.addressLine1,
+    p_address_city: payload.addressCity,
+    p_address_state: payload.addressState,
+    p_address_zip: payload.addressZip,
+    p_service_lat: payload.serviceLat ?? null,
+    p_service_lng: payload.serviceLng ?? null,
+    p_dogs: payload.dogs,
+    p_cadence: payload.cadence,
+    p_slot_start: payload.slotStart,
+    p_stripe_payment_method_id: payload.stripePaymentMethodId ?? null,
+  });
+  if (error) return { error: error.message };
+  return { result: data };
 }
