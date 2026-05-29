@@ -334,6 +334,37 @@ const reminders = [
 
 </BaseLayout>
 
+<script>
+  // founders_spots_remaining_counter: feed the (initially hidden)
+  // #launch-spot-count element from the live count. The number comes from
+  // the SECURITY DEFINER bath_founders_remaining RPC (anon-safe: it
+  // returns only an integer, never subscriber data). The counter stays
+  // hidden until remaining drops below the threshold, so the page never
+  // shows the "97 spots left" anti-signal while the cohort is wide open.
+  import { createClient } from '@supabase/supabase-js';
+  import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../components/portal/supabase.js';
+
+  const VISIBILITY_THRESHOLD = 10;
+  const el = document.getElementById('launch-spot-count');
+  if (el) {
+    const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    });
+    client
+      .rpc('bath_founders_remaining', { p_city_slug: 'the-villages' })
+      .then(({ data, error }) => {
+        if (error || data == null) return;
+        const remaining = Number(data);
+        if (remaining > 0 && remaining <= VISIBILITY_THRESHOLD) {
+          el.textContent = remaining === 1
+            ? 'Only 1 founders spot left at this rate'
+            : `Only ${remaining} founders spots left at this rate`;
+          el.hidden = false;
+        }
+      });
+  }
+</script>
+
 <style>
   /* HERO */
   .city-hero {
