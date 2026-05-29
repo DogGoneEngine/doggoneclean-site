@@ -529,16 +529,17 @@ def check_rule_survival():
     )
 
     # ── three_dog_cap ─────────────────────────────────────────────────────
-    # Customer must know the per-visit cap before they book. The DB CHECK
-    # enforces dog_count <= 3 but the customer learns the limit here.
-    # The cap's teeth are the DB CHECK (dog_count 1-3); copy is a reminder.
-    for page in (villages, booking_app):
-        require_present(
+    # The cap is the Villages HOA limit (2 dogs, 3 grandfathered), NOT a Dog
+    # Gone rule, so it is deliberately NOT stated to customers. Its teeth are
+    # the DB CHECK (dog_count 1-3) + the RPC. Forbid the customer-facing
+    # statement so a redesign cannot reintroduce it as our rule.
+    for page in (villages, terms, portal_app, booking_app):
+        require_absent(
             page,
             r"three dogs",
             "three_dog_cap",
-            "'three dogs' (per-visit cap must be visible before booking)",
-            block=False,
+            "a customer-facing 'three dogs' limit (the cap is the Villages HOA "
+            "rule, enforced in the DB, never stated to customers as ours)",
         )
 
     # ── friendly_dogs_only ────────────────────────────────────────────────

@@ -180,7 +180,6 @@ function EmptyStateNoSubscriber({ authUser, onLogout }) {
             <li>Check your address (Villages, FL service area)</li>
             <li>Quick coat eligibility check (smoothcoat or doublecoat)</li>
             <li>Pick your cadence: every 4 weeks, every 2 weeks, or single visit</li>
-            <li>Up to three dogs per visit</li>
             <li>Card on file, charged the day before each visit (never sooner)</li>
             <li>Cancel any time in two taps from this portal</li>
           </ul>
