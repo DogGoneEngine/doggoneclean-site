@@ -728,16 +728,6 @@ tiered audit into a real ship gate (`redesign_survival_is_a_ship_gate`,
 `build_gate`), not advisory. Confirmed Nails was already gated this way (its
 deploy runs `npm run build`, which chains the guards, before the rsync).
 
-The polygon was Paul's EXAMPLE of the principle, not a thing to special-case.
-The service-area polygon already lives in `cities.polygon` (DB) and is read at
-runtime, so it is durable by construction. A polygon-specific `check.py` guard
-was briefly added and then removed: Paul was clear the polygon was an
-illustration, not a detail to build machinery around. The general rule stands on
-its own: build durably (teeth in DB/RPC/data), the audit-gated deploy is the
-framework, and guards get added only for genuinely critical things by judgment,
-not pre-built for every example. A script can detect, not decide what is
-"important."
-
 Service-area gate hardened (migration 0009, applied to dgc-prod). Removed the
 manual address path entirely (Paul: no manual options; the address
 autocompletes, you tap it, in-polygon passes, out-of-polygon fails).
