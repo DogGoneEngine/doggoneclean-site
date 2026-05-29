@@ -334,6 +334,9 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
               {!mapsReady && <input type="text" className="pt-input" placeholder="Loading address search..." disabled />}
               <div ref={boxRef} className="bk-place-box" />
               {place.verifiedAddress && <p className="bk-fineprint">Selected: {place.verifiedAddress}</p>}
+              <button type="button" className="bk-manual-link" onClick={() => setMapsFailed(true)}>
+                Can't find your address? Enter it manually
+              </button>
             </Field>
           ) : (
             <Field label="Service address">
@@ -461,6 +464,10 @@ function Step2({ city, dogs, cadence, setCadence, onAdvance }) {
     <div className="bk-card">
       <h2 className="bk-step__title">Choose your plan</h2>
       <p className="bk-step__sub">Every 4 and every 2 weeks are the same price; pick the freshness you want. Cancel any time in two taps.</p>
+      <div className="bk-octane">
+        <span className="bk-octane__q">Want your dog fresher?</span>
+        <span className="bk-octane__arrow" aria-hidden="true">→</span>
+      </div>
       <div className="bk-plans">
         {options.map((o) => {
           const cents = visitPriceCents(city, dogs, o.key);

@@ -642,6 +642,51 @@ def check_rule_survival():
         flags=0,
     )
 
+    # ── Booking-surface rule survival ─────────────────────────────────────
+    # These four rules shipped 2026-05-29 as copy/logic living ONLY inside the
+    # booking island. The marketing-page lints above do not cover the funnel,
+    # so a redesign of BookingApp.jsx could drop them silently. Each one is the
+    # actual gate or framing the customer hits while booking; lint it where it
+    # lives.
+
+    # ── octane_selector_cadence_picker ────────────────────────────────────
+    # Booking step 2 presents the three cadences and carries the locked
+    # "Want your dog fresher?" framing (freshness as the upgrade, not savings).
+    require_present(
+        booking_app,
+        r"want your dog fresher",
+        "octane_selector_cadence_picker",
+        "the locked 'Want your dog fresher?' cadence-picker copy",
+    )
+    for lab in ("Every 4 weeks", "Every 2 weeks", "Single visit"):
+        require_present(
+            booking_app, re.escape(lab),
+            "octane_selector_cadence_picker", f"cadence option '{lab}'",
+        )
+
+    # ── friendly_dogs_only (booking gate) ─────────────────────────────────
+    require_present(booking_app, r"friendly dogs", "friendly_dogs_only",
+                    "'friendly dogs' on the booking gate")
+    require_present(booking_app, r"aggression", "friendly_dogs_only",
+                    "'aggression' on the booking gate")
+
+    # ── core_is_no_haircut_dogs / bath_only_no_mats (booking eligibility) ──
+    require_present(booking_app, r"bath only", "core_is_no_haircut_dogs",
+                    "'bath only' on the booking eligibility gate")
+    require_present(booking_app, r"Smoothcoat", "bath_only_no_mats",
+                    "'Smoothcoat' tier on the booking coat picker")
+    require_present(booking_app, r"Doublecoat", "bath_only_no_mats",
+                    "'Doublecoat' tier on the booking coat picker")
+
+    # ── premium_inclusive_no_addons (booking surface) ─────────────────────
+    # One price per tier, no upsell may be introduced into the funnel. Catch a
+    # priced add-on ("Deshed add-on $15") or a "+ $N" upcharge, without
+    # tripping on a legitimate "no add ons" reassurance line.
+    require_absent(booking_app, r"add[- ]?on[^.]{0,40}\$\d", "premium_inclusive_no_addons",
+                   "a priced add-on in the booking flow (one price per tier, no upsells)")
+    require_absent(booking_app, r"\+\s?\$\d", "premium_inclusive_no_addons",
+                   "a '+ $N' upcharge in the booking flow (no per-visit extras)")
+
     # ── supabase_rpc_not_raw_fetch ────────────────────────────────────────
     # Forbid `fetch(...SUPABASE_URL...)` in portal code: this is the raw
     # REST call pattern that causes auth-lock conflicts. Edge function

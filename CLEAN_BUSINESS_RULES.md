@@ -68,8 +68,8 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |
 | house_shampoo | Service | Oracle; convention | site copy; intake form |
 | online_only_comms | Process | Oracle; convention | site copy; intake; `business_rules` row |
-| friendly_dogs_only | Safety | Oracle; site copy; **`check.py`** asserts "friendly dogs" + "aggression" present on `index.astro` and `the-villages.astro` | intake gate |
-| core_is_no_haircut_dogs | Roster | Oracle; site copy; **`check.py`** asserts "bath only" present on `the-villages.astro` and `process.astro` | intake gate |
+| friendly_dogs_only | Safety | Oracle; site copy; **`check.py`** asserts "friendly dogs" + "aggression" present on `index.astro`, `the-villages.astro`, and `BookingApp.jsx` (the booking gate) | intake gate |
+| core_is_no_haircut_dogs | Roster | Oracle; site copy; **`check.py`** asserts "bath only" present on `the-villages.astro`, `process.astro`, and `BookingApp.jsx` | intake gate |
 | service_area_ocala | Routing | Oracle; `legacy/data/` | scheduling engine; intake address check |
 | no_dgn_import | Copy | CLAUDE.md; "Repo separation"; **`check.py`** forbids "rotary tool" / "sculpt nails" / "grind nails" on customer-facing pages | n/a |
 | no_em_dashes | Copy | CLAUDE.md; **`check.py`** | `lint-business-rules` em_dash |
@@ -91,11 +91,11 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | overlay_opacity_pairs_pointer_events | Engineering | Oracle (carried) | component CSS |
 | smoke_test_on_every_build | Engineering | Oracle (carried) | `scripts/smoke-build.mjs` |
 | offline_first_field_app | Engineering | Oracle (carried) | field-app code |
-| bath_only_no_mats | Hurricane Bath: product | Oracle; DB `bath_dogs.coat_tier` CHECK; **`check.py`** asserts "Smoothcoat" + "Doublecoat" tier names + "we bath" / "we do not bath" eligibility headers present on `the-villages.astro` | `src/data/breeds.json` (mixed-breed eligibility); booking-flow gating |
+| bath_only_no_mats | Hurricane Bath: product | Oracle; DB `bath_dogs.coat_tier` CHECK; **`check.py`** asserts "Smoothcoat" + "Doublecoat" tier names + "we bath" / "we do not bath" eligibility headers on `the-villages.astro`, and the two tier names on `BookingApp.jsx` (the booking coat picker) | `src/data/breeds.json` (mixed-breed eligibility); booking-flow gating |
 | villages_only_at_launch | Hurricane Bath: product | Oracle | booking step 1 polygon check (`src/components/portal/maps.js` `isInServiceArea` vs `cities.polygon`); `villages` zone config |
 | villages_only_in_copy | Hurricane Bath: copy | Oracle; **`check.py`** forbids "Ocala", "Fernandina", "St. Simons", "Saint Simons" in customer-facing markup on `index.astro`, `the-villages.astro`, `process.astro` (frontmatter + HTML comments stripped before check) | n/a |
 | three_dog_cap | Hurricane Bath: product | Oracle; DB `bath_appointments.dog_count` CHECK (1-3); **`check.py`** asserts "three dogs" present on `the-villages.astro` and `book.astro` | booking flow dog-count limit; `src/business/pricing.js` |
-| premium_inclusive_no_addons | Hurricane Bath: product | Oracle; **`check.py`** asserts "no add ons" present on `the-villages.astro` | absence of add-on UI in booking + portal; lint pattern banning add-on / upsell copy in booking |
+| premium_inclusive_no_addons | Hurricane Bath: product | Oracle; **`check.py`** asserts "no add ons" present on `the-villages.astro` and bans priced add-ons / "+ $N" upcharges in `BookingApp.jsx` | absence of add-on UI in portal |
 | breed_tier_pricing | Hurricane Bath: pricing | Oracle; `src/data/breeds.json` (Phase 4) | `src/business/pricing.js`; DB `subscriptions.base_price_cents` + `additional_dog_cents`; `business_rules` row |
 | cadence_4wk_or_2wk_same_price | Hurricane Bath: pricing | Oracle; **`check.py`** asserts "same price" present on `index.astro` (the 2-week cadence is freshness, not a different rate) | booking step 2 cadence picker; `src/business/pricing.js` quoter |
 | single_oneoff_higher | Hurricane Bath: pricing | Oracle | `src/business/pricing.js` Reset rate = Maintenance + $20 first dog |
@@ -113,7 +113,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | reschedule_two_paths_for_recurring | Hurricane Bath: reschedule | Oracle | portal reschedule UI two-button choice; `portal_reschedule_appointment` `change_cadence` param; subscription cadence update branch |
 | no_reason_field_ever | Hurricane Bath: ux | Oracle | absence of reason textbox/dropdown in skip + reschedule + cancel flows; lint pattern banning `cancel_reason` / `skip_reason` form fields in portal code |
 | stop_sign_two_taps | Hurricane Bath: ux | Oracle; **`check.py`** asserts "two taps" present on `index.astro`, `the-villages.astro`, `book.astro`, `terms.astro`, and `src/components/portal/PortalApp.jsx` (the four-surfaces requirement from the Oracle) | portal cancel flow (2-tap with cascade preview) when the cancel RPC lands |
-| octane_selector_cadence_picker | Hurricane Bath: ux | Oracle | booking step 2 React component (3 buttons + arrow); locked copy "Want your dog fresher?"; smoke test asserts component renders all 3 options |
+| octane_selector_cadence_picker | Hurricane Bath: ux | Oracle; `BookingApp.jsx` Step 2 (3 cadence options + "Want your dog fresher?" framing); **`check.py`** asserts the locked copy + all 3 cadence options on the booking island | smoke test asserts component renders all 3 options |
 | calendar_shows_price_per_date | Hurricane Bath: ux | Oracle | portal reschedule + skip-pick calendar component (per-date price label); `src/business/pricing.js` quote-per-date helper |
 | founders_spots_remaining_counter | Hurricane Bath: ux | Oracle; `/the-villages` page `#launch-spot-count` element (hidden above threshold, fed by public read on counted subscriptions); **`check.py`** asserts `id="launch-spot-count"` present on `the-villages.astro` | threshold constant in `src/business/pricing.js`; counter JS wires up when `bath_subscriptions` is being written to |
 | founders_cap_statement_always_visible | Hurricane Bath: ux | Oracle; `/the-villages` launch card eyebrow + headline + subhead + terms-grid tile (cap stated four places, always visible, independent of the counter element); **`check.py`** asserts "households" appears 2+ times in customer-facing copy on `the-villages.astro` | n/a |
