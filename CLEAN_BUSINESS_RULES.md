@@ -34,7 +34,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | no_database_until_rules_agreed | Build | CLAUDE.md "Hard constraints"; Oracle | lifts once rules agreed |
 | own_infrastructure | Build | CLAUDE.md "Hard constraints" | infra config |
 | reuse_dgn_stack | Build | CLAUDE.md "Stack"; Oracle | `package.json`, deploy workflow |
-| build_gate | Build | Oracle (planned) | `npm run build` (lint + smoke) |
+| build_gate | Build | Oracle; **CI deploy gate live (2026-05-29)**: `deploy.yml` `deploy` job `needs` an `audit` job running `scripts/check.py`, so a push to `main` that fails the audit never publishes | local `npm run build` (lint + smoke) chain still to build |
 | classify_by_frequency | Roster | `legacy/data/clients.json` `status`; `legacy/data/README.md` | `business_rules` row |
 | active_set | Roster | `legacy/data/clients.json` scope; `check.py` (count=33) | `business_rules` row |
 | banned_excluded | Roster | `legacy/data/clients.json` `exclude_from_everything`; **`check.py`** (record flag + absent from route) | `business_rules` row |

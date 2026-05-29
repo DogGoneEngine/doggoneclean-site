@@ -71,10 +71,11 @@ optimizer (deferred). Slices shipped to `main`:
   a client signs into `/portal` by phone OTP / Google, match their phone or
   email to an unclaimed `bath_subscribers` row and set `auth_user_id`. A
   small SECURITY DEFINER claim RPC. Until then a booked client has no portal.
-- **Returning-client recognition** (nails parity): phone-blur lookup that
-  shows "Welcome back, X". Needs a SECURITY DEFINER `bath_subscriber_exists
-  (phone)` returning only {found, first_name} (no PII to anon). Skipped for
-  now (no subscribers yet).
+- ~~**Returning-client recognition** (nails parity): phone-blur lookup that
+  shows "Welcome back, X"~~ DONE 2026-05-29: anon RPC `bath_lookup_subscriber`
+  (migration 0010, applied to dgc-prod) returns only {found, first_name}; the
+  Step 1 phone field calls it on blur and greets a known person. No subscribers
+  exist yet, so nothing triggers it until real bookings land.
 - **Paul inputs to light up the slot picker** (real_data_only; the picker
   shows an honest empty state until these exist): per-visit duration
   (`cities.hb_slot_minutes`, currently NULL), the weekly open windows

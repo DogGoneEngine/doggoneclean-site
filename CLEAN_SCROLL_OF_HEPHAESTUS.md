@@ -25,6 +25,14 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Current focus / next action
 
+- **Next action (end of 2026-05-29 session):** The `/book` signup funnel is built and on
+  `main`: four steps, anonymous (keyed on phone), server-enforced in-area gate (no manual
+  path), per-coat pricing, founders cap, returning-client recognition, in the Neural
+  Expressive look. Deploy is now gated on `scripts/check.py`. The gate to going live is the
+  Stripe card step (needs the Dog Gone Clean test keys for the SetupIntent edge function)
+  and real availability data for the slot picker; the Maps autocomplete needs the Google
+  Cloud console setting flipped on Paul's side before it renders. See the 2026-05-29
+  "continued" entry below for the full session.
 - **Direction:** Two businesses in Paul's portfolio. DGN (Dog Gone Nails): new, nails only,
   the Villages, fully separate (own repo `doggonenails-site`). Clean (this repo): the
   existing ~20-year business, one evolving business, a fork of the DGN platform, running on
@@ -51,7 +59,9 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   `public/logo.png`, bath-forward content) and is live at hurricanebath.com as a
   single-page placeholder. A `.claude/settings.json` permission allow-list is in place.
   The Hurricane Bath v2.0 rule pack (24 rules: pricing, skip, reschedule, UX, money) is
-  locked in the Oracle but no code behind it yet. `scripts/check.py` green.
+  locked in the Oracle, and the `/book` signup funnel now implements its booking slice
+  (anonymous booking, server-enforced service-area gate, per-coat pricing, founders cap);
+  the Stripe card step is still parked. `scripts/check.py` green and now gates the deploy.
 - **Marketing content (in `marketing/`):** the Hurricane Bath hero showcase, the
   power-and-fast-drying showcase, and the origin/brand source (story, taglines, doorstep
   copy). The live site's old "Grooming. No Chaos." hero is recorded there but was rejected.
@@ -692,6 +702,102 @@ the slot picker. Both parked in CLEAN_PARKING_LOT.md. Also set up a
 permission allowlist (committed settings.json for shareable tools;
 gitignored settings.local.json for the environment-specific Supabase MCP
 server) so routine work stops prompting; force-push and rm -rf stay denied.
+
+### 2026-05-29 (continued: ship gate made real, booking-flow design + UX hardening)
+
+Same session, after the booking funnel chapter above. Paul opened by bringing
+the wreckage of two bad prior sessions and pushing on trust: he wanted the rules
+that matter enforced mechanically, not promised. No new Oracle rules came out of
+it (refinements and build guards only); the durable outcomes:
+
+Permission allow-list (both repos). The Nails repo's `.claude/settings.json` was
+missing the basic file tools (Read/Write/Edit/Glob/Grep), so routine work kept
+prompting; brought it in line with Clean's and added a deny-list (force-push,
+hard reset, clean -f, rm -rf). Diagnosed that a session rooted at the parent
+directory loads neither repo's settings, which is the real cause of the prompt
+spam (an environment/launch setting, on Paul's side, not a repo file).
+
+Deploy gate (done-means-live; redesign survival enforced). Paul's rule,
+restated and locked: nothing important may be lost in a website redesign, and
+"shipped" must mean live on the site, never stranded on a branch. Before this,
+`deploy.yml` and `audit.yml` were separate workflows running in parallel on a
+push to `main`, so the deploy published to the droplet regardless of whether
+`scripts/check.py` passed. Rewired `deploy.yml` so the `deploy` job `needs` an
+`audit` job: a push that fails the audit never reaches the rsync. This turns the
+tiered audit into a real ship gate (`redesign_survival_is_a_ship_gate`,
+`build_gate`), not advisory. Confirmed Nails was already gated this way (its
+deploy runs `npm run build`, which chains the guards, before the rsync).
+
+Durability guard for the polygon (the canonical example). The service-area
+polygon lives in `cities.polygon` (DB) and is read at runtime; an earlier Nails
+version kept coordinates in code, which a redesign would flush. Added a
+`check.py` guard that fails the build if a coordinate ring (12+ high-precision
+pairs) is hard-coded anywhere under `src/`. Verified it bites on a planted ring
+and stays silent on real source. The general rule is the framework plus the
+discipline: the audit is the net, specific guards get added as critical things
+are identified, and a script can detect but cannot decide what is "important."
+
+Service-area gate hardened (migration 0009, applied to dgc-prod). Removed the
+manual address path entirely (Paul: no manual options; the address
+autocompletes, you tap it, in-polygon passes, out-of-polygon fails).
+`bath_start_subscription` now hard-rejects a booking with absent or out-of-area
+coordinates before any row is written (0009 supersedes 0008's
+accept-as-unverified branch). The page offers autocomplete only; when Maps
+cannot load it shows an honest "booking opens shortly" notice and the gate stays
+closed. A `check.py` guard bans manual-entry copy from the booking island.
+Refined `service_area_enforced_server_side` and the index to match.
+
+Returning-client recognition (migration 0010, applied to dgc-prod). On phone
+blur the funnel calls the new anon RPC `bath_lookup_subscriber` (returns only
+{found, first_name}) and greets a known person by name. Address autocomplete is
+biased toward the service area using a bounding box derived from
+`cities.polygon` (no hard-coded coordinates). Returning-client lookup is now
+DONE (was parked); the portal-claim path is still parked.
+
+Step 1 carbon-copied to the Nails Step 1, then tightened. Per Paul, matched
+Clean's Step 1 to the proven Nails Step 1 (physical-fit eligibility: private
+home with a driveway, room to park the truck and trailer; friendly-dogs callout;
+ack; returning banner; SMS consent; button label). Forced exceptions kept,
+because copying them verbatim would break Clean: the modern
+PlaceAutocompleteElement (Google blocks Nails' legacy widget on Clean's newer
+Cloud project), the coat-tier picker (bath pricing and the RPC require it), and
+the 3-dog cap. Note on the cap: it reflects the Villages HOA limit (two dogs,
+three grandfathered), not a Dog Gone rule, so it is never stated to customers as
+one; the form simply stops at three. Eligibility reads "about 2 standard car
+spaces, front to back" with a quiet line: "You don't need to clear your driveway.
+We can park on the street when it's safe and legal." Mirrored the front-to-back
+wording and that line onto Nails too.
+
+Friendly-dog policy trust line propagated. Added the homepage's "a mobile dog
+bath runs on the trust between the dog and the operator" line to the booking
+Step 1 callout, and the parallel line ("a mobile nail appointment runs on the
+trust between the dog and the specialist") to the Nails homepage card and Nails
+Step 1 callout, so both sites' friendly-dog policy carries it.
+
+Booking flow restyled into Neural Expressive, then de-walled. The funnel had
+drifted to flat form styling. Brought back the site's look by reusing the
+existing vocabulary in `global.css` (no new styles invented): ambient glow haze
+behind the funnel, bigger gradient-keyword step headings (`.grad`), more card
+lift. Fixed the black autocomplete box (Google's element followed the device
+dark-mode default; forced `color-scheme: light` and themed it to `.pt-input`).
+Fixed a glow stacking context that trapped the autocomplete dropdown (moved the
+glow to a z-index:-1 background layer). Fixed the address box going empty after
+toggling the eligibility checkbox (the mount effect had no cleanup and a stale
+ref; added teardown so it re-creates on each reveal). Tried a +25% spacing pass
+on Step 1 at Paul's request, then reverted it when it made the wall taller, not
+smaller; instead re-ranked the friendly callout to lead with the rule and demote
+the trust sentence to a small note, keeping all words. Paul confirmed it reads
+better and stopped here.
+
+Standing limits, honestly stated: this environment cannot run a browser or load
+the referrer-locked Maps key, so interactive autocomplete and the visual restyle
+are verified by code, the built bundle, and Paul's eyes on the deployed page,
+not by a live click here. The Maps autocomplete still depends on a Google Cloud
+console setting on Paul's side before it renders. Still parked: the Stripe
+SetupIntent card step (needs the Dog Gone Clean test keys), real availability
+data for the slot picker, per-address allow/deny exceptions over the polygon,
+the "you are on [operator]'s route" personalization (needs route-operator data),
+and the portal-claim path.
 
 ### 2026-05-28 (process-page video placement + sound, logo crop, favicon, nav size)
 
