@@ -42,17 +42,26 @@ optimizer (deferred). Slices shipped to `main`:
 
 **Still ahead on booking (blocked or next):**
 - ~~Address autocomplete + service-area verification~~ DONE (2026-05-29).
-  `src/components/portal/maps.js`: Places Autocomplete on the address
-  field -> lat/lng -> ray-cast point-in-polygon against `cities.polygon`
+  `src/components/portal/maps.js`: a SINGLE service-address box using the
+  modern `PlaceAutocompleteElement` (Places API New) -> on select, fetch
+  fields -> lat/lng -> ray-cast point-in-polygon against `cities.polygon`
   (real 308-point Villages boundary). In-area reveals the rest of the
-  funnel; out-of-area routes to the waitlist and blocks. Manual-entry
-  fallback if the Maps script fails. Verified vs an independent SQL
-  ray-cast. The Maps BROWSER key is a source constant (ships in the page
-  like the Supabase publishable key); Paul must keep it HTTP-referrer
-  locked to hurricanebath.com + API-restricted to Maps JS + Places in
-  Google Cloud (its own Clean project per `clean_stays_saleable`). NOT YET
-  done: per-address allow/deny exceptions (override the polygon for edge
-  lots); add when a real case appears.
+  funnel; out-of-area routes to the waitlist and blocks. If the Maps script
+  fails, the fallback is one plain text box (never a multi-field form).
+  Uses the modern element, NOT the legacy `google.maps.places.Autocomplete`
+  widget: Google blocked the legacy widget for Cloud projects created after
+  March 2025, and Clean's project is new (the legacy widget throws
+  LegacyApiNotActivatedMapError; nails works only because its project is
+  older). Verified vs an independent SQL ray-cast; interactive click NOT
+  verifiable from the build environment (no headless browser + referrer-
+  locked key), so final confirm is Paul on the deployed page. The Maps
+  BROWSER key is a source constant (ships in the page like the Supabase
+  publishable key); Paul keeps it HTTP-referrer locked to hurricanebath.com
+  and the project needs the Places API (New) enabled (its own Clean Google
+  Cloud project per `clean_stays_saleable`). NOT YET done: per-address
+  allow/deny exceptions (override the polygon for edge lots); add when a
+  real case appears. Open polish: theme the element to match the form
+  (limited to its CSS hooks).
 - **Slice 4: Stripe SetupIntent edge function** + activate the card step.
   BLOCKED on Paul creating the Dog Gone Clean Stripe account and providing
   TEST keys. The funnel's final "Confirm booking" button is disabled until
