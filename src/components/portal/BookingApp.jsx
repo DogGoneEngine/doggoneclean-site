@@ -26,9 +26,9 @@ import './portal.css';
 import './booking.css';
 import {
   sb, getBookingCity, getOpenSlots, getOpenSlotsBetween,
-  signInWithGoogle, toE164US, looksLikeEmail,
+  signInWithGoogle, toE164US, looksLikeEmail, lookupSubscriberByPhone,
 } from './supabase.js';
-import { loadGoogleMaps, parsePlace, isInServiceArea } from './maps.js';
+import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds } from './maps.js';
 
 const CITY_SLUG = 'the-villages';
 const STORE_KEY = 'dgc_booking_v2';
@@ -227,6 +227,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   const [mapsReady, setMapsReady] = useState(false);
   const [mapsFailed, setMapsFailed] = useState(false);
   const [areaStatus, setAreaStatus] = useState(place.serviceLat != null ? 'pass' : null); // null | pass | fail
+  const [returning, setReturning] = useState(null); // null | { firstName }
 
   const stage1 = eligibilityAcked;
   // No manual path: the ONLY way past this gate is an address chosen from
@@ -257,7 +258,11 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
     if (!mapsReady || !boxRef.current || elRef.current) return undefined;
     const places = window.google && window.google.maps && window.google.maps.places;
     if (!places || !places.PlaceAutocompleteElement) { setMapsFailed(true); return undefined; }
-    const el = new places.PlaceAutocompleteElement({ includedRegionCodes: ['us'] });
+    const opts = { includedRegionCodes: ['us'] };
+    // Bias suggestions toward the service area (derived from the DB polygon).
+    const bias = polygonBounds(cityRef.current);
+    if (bias) opts.locationBias = bias;
+    const el = new places.PlaceAutocompleteElement(opts);
     el.style.width = '100%';
     boxRef.current.appendChild(el);
     elRef.current = el;
@@ -304,6 +309,17 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 
   async function googlePrefill() {
     try { await signInWithGoogle('/book/'); } catch { /* user can type manually */ }
+  }
+
+  // Returning-client recognition: on blur, if the phone matches someone we
+  // already know, greet them by name. Never blocks the flow.
+  async function onPhoneBlur() {
+    const e164 = toE164US(place.phone);
+    if (!e164) { setReturning(null); return; }
+    try {
+      const { found, firstName } = await lookupSubscriberByPhone(e164);
+      setReturning(found ? { firstName } : null);
+    } catch { setReturning(null); }
   }
 
   return (
@@ -376,7 +392,12 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
             <Field label="Last name"><input className="pt-input" value={place.lastName} onChange={set('lastName')} autoComplete="family-name" /></Field>
           </div>
           <Field label="Email address"><input className="pt-input" type="email" value={place.email} onChange={set('email')} autoComplete="email" placeholder="you@example.com" /></Field>
-          <Field label="Mobile number"><input className="pt-input" type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} autoComplete="tel" /></Field>
+          <Field label="Mobile number"><input className="pt-input" type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} onBlur={onPhoneBlur} autoComplete="tel" /></Field>
+          {returning && (
+            <p className="bk-fineprint" style={{ color: 'var(--accent)' }}>
+              Welcome back{returning.firstName ? `, ${returning.firstName}` : ''}! Good to see you again.
+            </p>
+          )}
 
           <label className="bk-fit bk-fit--sms">
             <input type="checkbox" checked={smsConsent} onChange={(e) => setSmsConsent(e.target.checked)} />

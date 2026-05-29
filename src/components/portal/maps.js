@@ -82,6 +82,27 @@ function pointInRing(lng, lat, ring) {
   return inside;
 }
 
+// Bounding box of the city's service polygon as a LatLngBounds literal
+// ({north, south, east, west}), for biasing the address autocomplete toward
+// the service area so the right address surfaces fast. Derived from
+// cities.polygon (the database), so the bias moves with the polygon and no
+// coordinates are hard-coded in the page. Returns null if there is no polygon.
+export function polygonBounds(city) {
+  if (!city || !city.polygon) return null;
+  const poly = city.polygon;
+  const ring = Array.isArray(poly[0]) && Array.isArray(poly[0][0]) ? poly[0] : poly;
+  if (!Array.isArray(ring) || ring.length < 3) return null;
+  let north = -90; let south = 90; let east = -180; let west = 180;
+  for (const pt of ring) {
+    const lng = pt[0]; const lat = pt[1];
+    if (lat > north) north = lat;
+    if (lat < south) south = lat;
+    if (lng > east) east = lng;
+    if (lng < west) west = lng;
+  }
+  return { north, south, east, west };
+}
+
 // True if (lat,lng) falls inside the city's service polygon. city.polygon
 // is GeoJSON-style [[[lng,lat], ...]] (a single outer ring); we also
 // tolerate a bare ring [[lng,lat], ...]. Returns false if no polygon.

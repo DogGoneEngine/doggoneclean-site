@@ -652,6 +652,19 @@ manual-entry copy returns to the island. The "manual-entry fallback (no dead
 end)" recorded earlier in this chapter was a mistake against this rule;
 reality wins.
 
+Seventh pass (Step 1 nails-parity, Paul walking the flow one step at a time):
+two pieces from the nails Step 1 that apply to Clean but had been dropped. (1)
+Returning-client recognition: on phone blur the funnel now asks the new
+anon RPC `bath_lookup_subscriber` (migration 0010, applied to dgc-prod) whether
+we already know this phone, and greets a known person by first name. The RPC
+returns only {found, first_name} (minimal PII), matching the nails posture. (2)
+The address autocomplete is now biased toward the service area using a bounding
+box derived from `cities.polygon` (maps.js `polygonBounds`), so no coordinates
+are hard-coded and the polygon stays in the database. Still parked from the
+nails Step 1, as not-yet-applicable-here: per-address allow/deny exceptions over
+the polygon, and the "you are on [operator]'s route" personalization (needs the
+route-operator data, which Clean does not have wired yet).
+
 No new Oracle rules this chapter; two refinements (`maps_js_api_only` and
 `service_area_enforced_server_side`, above).
 The funnel enforces the existing rule pack. Blocked / handed to Paul: the

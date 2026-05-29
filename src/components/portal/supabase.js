@@ -244,3 +244,15 @@ export async function startSubscription(payload) {
   if (error) return { error: error.message };
   return { result: data };
 }
+
+// Returning-client recognition (Step 1): given an E164 phone, ask the server if
+// we already know this person, so the funnel can greet them by name. The RPC
+// returns only { found, first_name } (minimal PII). Returns { found:false } on
+// any error so a hiccup never blocks typing.
+export async function lookupSubscriberByPhone(phoneE164) {
+  const client = sb();
+  if (!client || !phoneE164) return { found: false };
+  const { data, error } = await client.rpc('bath_lookup_subscriber', { p_phone_e164: phoneE164 });
+  if (error || !data) return { found: false };
+  return { found: !!data.found, firstName: data.first_name || '' };
+}
