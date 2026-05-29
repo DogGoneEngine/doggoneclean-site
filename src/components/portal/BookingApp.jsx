@@ -37,10 +37,8 @@ const TOTAL_STEPS = 4;
 // No service-area line here: the address step right below verifies it, and
 // the intro already says The Villages. Stating it as a requirement is noise.
 const ELIGIBILITY = [
-  'Bath only, no haircuts. We do not do scissor or clipper work.',
-  'Smoothcoat or doublecoat that sheds without matting.',
-  'No doodles or heavily matted coats (those need a full groom).',
-  'Up to three dogs per visit.',
+  'You live in a private home with a driveway.',
+  'There is room to park our truck and trailer (about 2 standard car spaces).',
 ];
 
 const MONTHS = [
@@ -324,13 +322,13 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 
   return (
     <div className="bk-card">
-      <h2 className="bk-step__title">Let's get started</h2>
-      <p className="bk-step__sub">First, let's make sure the Hurricane Bath is a good fit for your dog in The Villages.</p>
+      <h2 className="bk-step__title">Let's Get Started</h2>
+      <p className="bk-step__sub">First, let's make sure we're a good fit for The Villages.</p>
 
       {/* Stage 1: fit check */}
       <div className="bk-friendly">
-        <p className="bk-friendly__title">Friendly dogs only</p>
-        <p className="bk-friendly__body">Dogs that show aggression toward people, or are excessively uncooperative, are not eligible. Normal wiggling is fine.</p>
+        <p className="bk-friendly__title">Friendly Dogs Only</p>
+        <p className="bk-friendly__body">Dogs that show aggression toward people or are excessively uncooperative are not eligible for this service. Normal wiggling is fine.</p>
       </div>
       <ul className="bk-checklist">
         {ELIGIBILITY.map((item) => (
@@ -339,7 +337,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
       </ul>
       <label className="bk-fit">
         <input type="checkbox" checked={eligibilityAcked} onChange={(e) => setEligibilityAcked(e.target.checked)} />
-        <span>My dog fits these requirements and is friendly toward people.</span>
+        <span>My location fits these requirements and my dog is friendly toward people.</span>
       </label>
 
       {/* Stage 2: service-area address */}
@@ -352,8 +350,6 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
             <Field label="Service address">
               {!mapsReady && <input type="text" className="pt-input" placeholder="Loading address search..." disabled />}
               <div ref={boxRef} className="bk-place-box" />
-              {place.verifiedAddress && <p className="bk-fineprint">Selected: {place.verifiedAddress}</p>}
-              <p className="bk-fineprint">Start typing and pick your address from the list so we can confirm it is on the route.</p>
             </Field>
           ) : (
             <div className="bk-notice">
@@ -394,14 +390,14 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
           <Field label="Email address"><input className="pt-input" type="email" value={place.email} onChange={set('email')} autoComplete="email" placeholder="you@example.com" /></Field>
           <Field label="Mobile number"><input className="pt-input" type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} onBlur={onPhoneBlur} autoComplete="tel" /></Field>
           {returning && (
-            <p className="bk-fineprint" style={{ color: 'var(--accent)' }}>
-              Welcome back{returning.firstName ? `, ${returning.firstName}` : ''}! Good to see you again.
-            </p>
+            <div className="bk-area bk-area--in">
+              <span className="bk-area__icon">✓</span> Welcome back{returning.firstName ? `, ${returning.firstName}` : ''}. We already have you on file. Fill in your current information and we'll make sure everything is up to date.
+            </div>
           )}
 
           <label className="bk-fit bk-fit--sms">
             <input type="checkbox" checked={smsConsent} onChange={(e) => setSmsConsent(e.target.checked)} />
-            <span>Text me appointment reminders and account messages. Msg &amp; data rates may apply. Reply STOP to unsubscribe. <a href="/sms" target="_blank" rel="noopener">SMS Terms</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy</a>.</span>
+            <span>I agree to receive appointment and account text messages from Dog Gone Clean. Msg &amp; data rates may apply. Reply STOP to unsubscribe or HELP for help. <a href="/sms" target="_blank" rel="noopener">SMS Terms</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span>
           </label>
 
           <div className="bk-stage__divider" />
@@ -424,7 +420,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
         disabled={!canContinue}
         onClick={() => { if (!canContinue) { setError('Fill in the fit check, a verified address, your name, email and phone, and each dog (name, breed, coat, date of birth).'); return; } onAdvance(); }}
       >
-        Choose your plan →
+        Choose Your Appointment →
       </button>
     </div>
   );

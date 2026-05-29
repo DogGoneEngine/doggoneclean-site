@@ -665,6 +665,23 @@ nails Step 1, as not-yet-applicable-here: per-address allow/deny exceptions over
 the polygon, and the "you are on [operator]'s route" personalization (needs the
 route-operator data, which Clean does not have wired yet).
 
+Eighth pass (Step 1 carbon-copied to nails, Paul's call to stop iterating
+piecemeal): made Clean's Step 1 read as a carbon copy of the nails Step 1.
+Eligibility is now nails' physical-fit gate (private home with a driveway, room
+to park the truck and trailer); the friendly-dogs callout, ack wording,
+returning-client banner, SMS consent, and the button label all match nails; the
+two extra address helper lines (the "Selected:" echo and the "start typing"
+instruction) were removed. Three things could NOT be carbon-copied without
+breaking Clean and are kept as forced exceptions, to be iterated as
+clean-specifics: (1) the address box uses the modern PlaceAutocompleteElement,
+because Google blocks nails' legacy widget on Clean's newer Cloud project; (2)
+the dog card keeps the coat-tier picker, because Clean's bath pricing (Step 2 +
+the RPC) requires it and removing it zeroes out pricing; (3) the dog cap stays at
+3 (`three_dog_cap`), not nails' 4. This drops the bath-only and three-dogs copy
+from Step 1, so check.py now prints two non-blocking warnings (their teeth live
+in the RPC and the coat-tier CHECK); the bath-specific eligibility copy gets
+re-added in a follow-up.
+
 No new Oracle rules this chapter; two refinements (`maps_js_api_only` and
 `service_area_enforced_server_side`, above).
 The funnel enforces the existing rule pack. Blocked / handed to Paul: the
