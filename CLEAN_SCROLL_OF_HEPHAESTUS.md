@@ -563,6 +563,22 @@ from commit one (no_mockups). Three slices shipped to `main`:
 - Slice 3 (migration 0004): `bath_founders_remaining(slug)` feeds the
   hidden `#launch-spot-count` on `/the-villages`; reveals below threshold.
 
+Same day, second pass on the funnel: Paul flagged that the nails booking
+flow is the proven baseline and Clean must match it or beat it, and that
+my first cut diverged worse. Studied the nails flow in full and rebuilt
+Clean's funnel as a faithful port (friendly-dogs callout + eligibility
+checklist, address + gate code, contact + dogs with coat tier and optional
+DOB, plan cards, next-available/specific-month slot picker with a "Best
+fit" badge, card-on-file trust framing, review with a recurring preview).
+The big correction: nails requires NO account to book, so Clean shouldn't
+either. Migration 0007 reworked `bath_start_subscription` to run
+anonymously (keyed on phone, auth_user_id NULL until the portal is
+claimed), reversing the earlier account-required model. Verified end-to-end
+on dgc-prod (rolled back). Bath-only divergences kept: coat-tier pricing
+per dog (0005 fix: each dog its own tier, stacking discount), 2-week
+cadence, three-dog cap, no add-ons. Parked the portal-claim path and
+returning-client lookup as follow-ons.
+
 No new Oracle rules this chapter (the funnel enforces the existing 24-rule
 pack). Blocked / handed to Paul: the Stripe SetupIntent edge function
 (needs the Dog Gone Clean TEST keys) to activate the card step, and the

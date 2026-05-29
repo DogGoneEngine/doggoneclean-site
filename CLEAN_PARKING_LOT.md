@@ -20,14 +20,22 @@ optimizer (deferred). Slices shipped to `main`:
   `bath_availability_windows` + `bath_availability_exceptions`,
   `bath_open_slots()` (free slots, no PII, anon-callable), and
   `bath_start_subscription()` enforcing the rule pack atomically.
-- ~~Slice 2: the funnel UI~~ DONE, then restructured for low friction
-  (2026-05-29). `/book` is `BookingApp.jsx`. NO sign-in wall: anonymous
-  funnel (fit check reveals place + contact + dogs) -> plan -> real slot
-  picker -> review, with sign-in DEFERRED to the final confirm ("create
-  your account to save your card"). Optional Google prefill early. Funnel
-  state persists to sessionStorage so a Google OAuth redirect does not
-  lose progress. Multi-dog pricing fixed (each dog its own tier, stacking
-  per-additional-dog discount; migration 0005). Honors ?plan=single.
+- ~~Slice 2: the funnel UI~~ DONE, restructured for low friction, then
+  rebuilt as a FAITHFUL PORT of the nails booking flow (2026-05-29) after
+  Paul's call that nails is the proven baseline. `/book` is `BookingApp.jsx`,
+  four steps mirroring nails: (1) friendly-dogs callout + eligibility
+  checklist + ack, then address + gate code, then contact + dogs (coat
+  tier, optional DOB + age badge), optional Google prefill; (2) plan cards
+  4wk/2wk/single + live total; (3) next-available or specific-month, real
+  slots with a "Best fit" badge, card-on-file trust framing + charge
+  policy; (4) review + recurring preview ("your first 4 visits").
+  NO ACCOUNT to book (migration 0007 reworked `bath_start_subscription` to
+  run anonymously, keyed on phone; auth_user_id NULL until the portal is
+  claimed). Bath-only divergences from nails: coat-tier pricing per dog
+  (fixed in 0005: each dog its own tier, stacking discount), 2-week
+  cadence, three-dog cap, and NO add-ons (nails' silk-finish upsell omitted
+  per premium_inclusive_no_addons). State persists to sessionStorage across
+  the Google-prefill redirect. Honors ?plan=single.
 - ~~Slice 3: founders counter feed~~ DONE (migration 0004).
   `bath_founders_remaining(slug)` feeds the hidden `#launch-spot-count`
   on `/the-villages` (reveals below the visibility threshold).
@@ -44,8 +52,17 @@ optimizer (deferred). Slices shipped to `main`:
   `src/business/cities.js` is the reference.
 - **Slice 4: Stripe SetupIntent edge function** + activate the card step.
   BLOCKED on Paul creating the Dog Gone Clean Stripe account and providing
-  TEST keys. The funnel's final "Add card & confirm" button is disabled
-  until this lands; `bath_start_subscription` is built and ready to call.
+  TEST keys. The funnel's final "Confirm booking" button is disabled until
+  this lands; `bath_start_subscription` is built and verified end-to-end.
+  Port the nails `create-setup-intent` edge function + `StripeCardSetup.jsx`.
+- **Portal claim path** (since booking no longer creates an account): when
+  a client signs into `/portal` by phone OTP / Google, match their phone or
+  email to an unclaimed `bath_subscribers` row and set `auth_user_id`. A
+  small SECURITY DEFINER claim RPC. Until then a booked client has no portal.
+- **Returning-client recognition** (nails parity): phone-blur lookup that
+  shows "Welcome back, X". Needs a SECURITY DEFINER `bath_subscriber_exists
+  (phone)` returning only {found, first_name} (no PII to anon). Skipped for
+  now (no subscribers yet).
 - **Paul inputs to light up the slot picker** (real_data_only; the picker
   shows an honest empty state until these exist): per-visit duration
   (`cities.hb_slot_minutes`, currently NULL), the weekly open windows
