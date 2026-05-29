@@ -536,6 +536,42 @@ avatar in place); Stripe account + keys (gates the booking flow);
 Twilio + A2P (gates SMS); attorney review of the legal pages before
 launch.
 
+### 2026-05-29 (booking flow chapter started: availability, funnel, counter)
+
+Picked the next priority with Paul: the booking flow, because the live site
+was a polished brochure that could not take a customer or a dollar, and
+booking is the prerequisite that gives the portal and the founders counter
+real rows. Paul chose a real slot picker at signup over capture-prefs or
+schedule-later. Implementation call (mine): a lean availability layer, not
+the drive-time route optimizer (deferred per elons_algorithm; clients
+picking a slot does not need auto-sequencing). Built against real services
+from commit one (no_mockups). Three slices shipped to `main`:
+
+- Slice 1 (migration 0003, applied to dgc-prod): city booking config,
+  `bath_availability_windows` + `bath_availability_exceptions`,
+  `bath_open_slots()` (free slots only, no PII, anon-callable), and
+  `bath_start_subscription()` enforcing the rule pack atomically (coat
+  eligibility, three-dog cap, cadence + founders pricing with a one-year
+  lock, price snapshot, one-bath-at-a-time). Verified via a rolled-back
+  test: a 9-12 window gave the right 90-min Eastern grid; booking a slot
+  removed exactly that slot.
+- Slice 2: `/book` is now `BookingApp.jsx`, a React island reusing the
+  portal auth (AuthScreen gained a redirectPath prop) and pt-* styles.
+  Steps place -> dogs -> plan -> real slot picker -> review, live pricing
+  from the city row. The card step is gated (no fake form) until Stripe.
+  check.py's book-surface copy lints now point at the island.
+- Slice 3 (migration 0004): `bath_founders_remaining(slug)` feeds the
+  hidden `#launch-spot-count` on `/the-villages`; reveals below threshold.
+
+No new Oracle rules this chapter (the funnel enforces the existing 24-rule
+pack). Blocked / handed to Paul: the Stripe SetupIntent edge function
+(needs the Dog Gone Clean TEST keys) to activate the card step, and the
+real availability data (per-visit duration, weekly windows) to light up
+the slot picker. Both parked in CLEAN_PARKING_LOT.md. Also set up a
+permission allowlist (committed settings.json for shareable tools;
+gitignored settings.local.json for the environment-specific Supabase MCP
+server) so routine work stops prompting; force-push and rm -rf stay denied.
+
 ### 2026-05-28 (process-page video placement + sound, logo crop, favicon, nav size)
 
 Paul added two clips to the `/process` page (water-pressure, bath-in-action)

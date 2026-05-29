@@ -12,23 +12,41 @@ live (`/`, `/the-villages`, `/process`, `/book`, `/portal`, `/privacy`, `/terms`
 `/sms`), Neural Expressive look consistent across all of them, zero DGN aesthetic
 imported. See the 2026-05-27 "fork shipped" entry in the Scroll for the slice list.
 
-**Active next step:** Portal Phase 2 (data views). With the schema in place
-and the auth shell live, the read-side views from DGN's `PortalViews.jsx`
-port next: Dashboard (next-appointment card, card-expiry banners),
-Appointments list + detail, Pack view. Honest empty states until the
-booking flow lands and creates the first real rows.
+**Booking flow chapter (IN PROGRESS, 2026-05-29).** Decision: a real slot
+picker now, backed by a lean availability layer, NOT the drive-time route
+optimizer (deferred). Slices shipped to `main`:
+- ~~Slice 1: availability layer + signup RPC~~ DONE (migration 0003).
+  City booking config (slot length, buffer, horizon, timezone),
+  `bath_availability_windows` + `bath_availability_exceptions`,
+  `bath_open_slots()` (free slots, no PII, anon-callable), and
+  `bath_start_subscription()` enforcing the rule pack atomically.
+- ~~Slice 2: the funnel UI~~ DONE. `/book` is now `BookingApp.jsx` (React
+  island): auth gate -> place -> dogs -> plan -> real slot picker ->
+  review. Live city pricing, real open slots. No fake card form.
+- ~~Slice 3: founders counter feed~~ DONE (migration 0004).
+  `bath_founders_remaining(slug)` feeds the hidden `#launch-spot-count`
+  on `/the-villages` (reveals below the visibility threshold).
+
+**Still ahead on booking (blocked or next):**
+- **Slice 4: Stripe SetupIntent edge function** + activate the card step.
+  BLOCKED on Paul creating the Dog Gone Clean Stripe account and providing
+  TEST keys. The funnel's final "Add card & confirm" button is disabled
+  until this lands; `bath_start_subscription` is built and ready to call.
+- **Paul inputs to light up the slot picker** (real_data_only; the picker
+  shows an honest empty state until these exist): per-visit duration
+  (`cities.hb_slot_minutes`, currently NULL), the weekly open windows
+  (`bath_availability_windows`), booking horizon, buffer between stops.
+- **Open pricing policy (flagged in migration 0003):** multi-dog mixed-coat
+  visits price off the HIGHER coat tier. Confirm or change.
+
+**Active next step (after booking):** Portal Phase 2 (data views). The
+read-side views from DGN's `PortalViews.jsx`: Dashboard (next-appointment
+card, card-expiry banners), Appointments list + detail, Pack view. Now
+has real rows to render once booking starts writing them.
 
 **Phase 3 (mutating views):** Stripe card management, Plan section with
 the two-tap stop sign, Reschedule with per-date pricing, Skip flow,
 Notifications. Each requires its own SECURITY DEFINER RPC plus the UI.
-
-**Booking flow chapter:** still ahead. Replaces the `/book` stub with the
-real signup against the locked 24-rule pack (Stripe SetupIntent, octane
-cadence picker, three-dog cap selector, breed-tier-priced single bath).
-Creates the first `bath_subscriptions` rows. Once the founders cohort
-starts filling, the `founders_spots_remaining_counter` element already on
-`/the-villages` starts showing the live count (counter wiring is its own
-small slice once the table is being written to).
 
 **Resolved 2026-05-27 (kept for history):**
 - ~~Fork the DGN site structure into Clean (multi-page)~~ DONE. Shipped in six
