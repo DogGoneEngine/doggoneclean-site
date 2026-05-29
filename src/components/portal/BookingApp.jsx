@@ -325,7 +325,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   }
 
   return (
-    <div className="bk-card">
+    <div className="bk-card bk-card--s1">
       <h2 className="bk-step__title">Let's Get <span className="grad">Started</span></h2>
       <p className="bk-step__sub">First, let's make sure we're a good fit for The Villages.</p>
 
