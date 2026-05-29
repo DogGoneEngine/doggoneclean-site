@@ -608,9 +608,26 @@ toggle) and uses the single service-address input with the "Are you in our
 service area?" heading + success banner. Aligned all of it, keeping the bath
 divergences (coat tier, three-dog cap, no silk upsell, anonymous). Lesson
 reinforced: when the task is "match nails," read the nails source first, do
-not reconstruct from memory. Still on Paul: confirm the Clean Maps key has
-Places API + billing enabled (nails uses identical code and works, so a
-still-dead box after this deploy points there, not the code).
+not reconstruct from memory.
+
+Fifth pass (the real address fix): with the loader corrected, the box still
+errored. The console (Paul's screenshot) was decisive: `LegacyApiNotActivated
+MapError` plus "as of March 1 2025 `google.maps.places.Autocomplete` is not
+available to new customers, use `PlaceAutocompleteElement`." Google blocked the
+legacy autocomplete widget for new Cloud projects; Clean's Maps project is new,
+so nails' legacy-widget code cannot work here no matter what (nails works only
+because its project predates the cutoff). It was not the referrer (the key
+already allows hurricanebath.com per the build record) and not billing. Migrated
+the address field to the modern `PlaceAutocompleteElement` (Places API New,
+already enabled on Clean's project, which is what drew the suggestions): loader
+back to `loading=async` + `importLibrary`; on `gmp-select` ->
+`placePrediction.toPlace()` -> `fetchFields(['formattedAddress',
+'addressComponents','location'])` -> parse (New API uses longText/shortText +
+`location`) -> in-area polygon check. Confirmed the event/fetchFields shape
+against Google's current docs. A forced, documented divergence from nails
+(Google policy, not a choice); nails will face the same migration. The earlier
+"remove loading=async" fix is superseded by this. `maps_js_api_only` refinement
+updated to say New, not the legacy widget.
 
 No new Oracle rules this chapter; one refinement (`maps_js_api_only`, above).
 The funnel enforces the existing rule pack. Blocked / handed to Paul: the

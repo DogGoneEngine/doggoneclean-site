@@ -222,8 +222,8 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   const set = (f) => (e) => setPlace((p) => ({ ...p, [f]: e.target.value }));
 
   const [authed, setAuthed] = useState(false);
-  const inputRef = useRef(null);
-  const acRef = useRef(null);
+  const boxRef = useRef(null);
+  const elRef = useRef(null);
   const [mapsReady, setMapsReady] = useState(false);
   const [mapsFailed, setMapsFailed] = useState(false);
   const [areaStatus, setAreaStatus] = useState(place.serviceLat != null ? 'pass' : null); // null | pass | fail
@@ -236,11 +236,11 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
     (async () => { const c = sb(); if (!c) return; const { data: { user } } = await c.auth.getUser(); setAuthed(!!user); })();
   }, []);
 
-  // Ref so the once-attached place_changed handler always sees the latest city.
+  // Ref so the once-attached select handler always sees the latest city.
   const cityRef = useRef(city);
   useEffect(() => { cityRef.current = city; }, [city]);
 
-  // Load Maps once eligibility is acked (matches nails' timing).
+  // Load Maps once eligibility is acked.
   useEffect(() => {
     if (!stage1) return undefined;
     let mounted = true;
@@ -248,38 +248,42 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
     return () => { mounted = false; };
   }, [stage1]);
 
-  // Attach Places Autocomplete to the single service-address input, exactly
-  // as nails does (script ready -> input exists -> attach once).
+  // Mount the modern PlaceAutocompleteElement (Places API New). On select,
+  // fetch the place fields, parse to structured address + lat/lng, and run
+  // the in-area polygon check.
   useEffect(() => {
-    if (!mapsReady || !inputRef.current || acRef.current) return undefined;
-    const g = window.google;
-    const ac = new g.maps.places.Autocomplete(inputRef.current, {
-      types: ['address'],
-      componentRestrictions: { country: 'us' },
-      fields: ['address_components', 'geometry', 'formatted_address'],
-    });
-    // Bias suggestions toward the service area using the polygon's bbox.
-    const c = cityRef.current;
-    const ring = c && c.polygon && (Array.isArray(c.polygon[0]) && Array.isArray(c.polygon[0][0]) ? c.polygon[0] : c.polygon);
-    if (ring && g.maps.LatLngBounds) {
-      const b = new g.maps.LatLngBounds();
-      for (const pt of ring) b.extend({ lat: pt[1], lng: pt[0] });
-      ac.setBounds(b);
-    }
-    ac.addListener('place_changed', () => {
-      const pl = ac.getPlace();
-      if (!pl.geometry || !pl.geometry.location) { setAreaStatus('fail'); return; }
-      const parsed = parsePlace(pl);
-      setPlace((p) => ({
-        ...p,
-        addressLine1: parsed.line1, addressCity: parsed.city,
-        addressState: parsed.state || 'FL', addressZip: parsed.zip,
-        serviceLat: parsed.lat, serviceLng: parsed.lng, verifiedAddress: parsed.formatted,
-      }));
-      setAreaStatus(isInServiceArea(parsed.lat, parsed.lng, cityRef.current) ? 'pass' : 'fail');
-    });
-    acRef.current = ac;
-    return undefined;
+    if (!mapsReady || !boxRef.current || elRef.current) return undefined;
+    let cancelled = false;
+    (async () => {
+      const places = await window.google.maps.importLibrary('places');
+      if (cancelled || !boxRef.current) return;
+      const el = new places.PlaceAutocompleteElement({ includedRegionCodes: ['us'] });
+      el.style.width = '100%';
+      boxRef.current.appendChild(el);
+      elRef.current = el;
+
+      async function onSelect(event) {
+        try {
+          const place_ = event.placePrediction ? event.placePrediction.toPlace() : event.place;
+          if (!place_) { setAreaStatus('fail'); return; }
+          await place_.fetchFields({ fields: ['formattedAddress', 'addressComponents', 'location'] });
+          const parsed = parsePlace(place_);
+          setPlace((p) => ({
+            ...p,
+            addressLine1: parsed.line1, addressCity: parsed.city,
+            addressState: parsed.state || 'FL', addressZip: parsed.zip,
+            serviceLat: parsed.lat, serviceLng: parsed.lng, verifiedAddress: parsed.formatted,
+          }));
+          setAreaStatus(isInServiceArea(parsed.lat, parsed.lng, cityRef.current) ? 'pass' : 'fail');
+        } catch {
+          setAreaStatus('fail');
+        }
+      }
+      // gmp-select is the current event; gmp-placeselect covers older builds.
+      el.addEventListener('gmp-select', onSelect);
+      el.addEventListener('gmp-placeselect', onSelect);
+    })();
+    return () => { cancelled = true; };
   }, [mapsReady, setPlace]);
 
   function updateDog(i, field, val) { setDogs((ds) => ds.map((d, idx) => (idx === i ? { ...d, [field]: val } : d))); }
@@ -331,15 +335,9 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 
           {!mapsFailed ? (
             <Field label="Service address">
-              <input
-                ref={inputRef}
-                type="text"
-                className="pt-input"
-                placeholder={mapsReady ? 'Start typing your address...' : 'Loading...'}
-                disabled={!mapsReady}
-                defaultValue={place.verifiedAddress || ''}
-                autoComplete="off"
-              />
+              {!mapsReady && <input type="text" className="pt-input" placeholder="Loading address search..." disabled />}
+              <div ref={boxRef} className="bk-place-box" />
+              {place.verifiedAddress && <p className="bk-fineprint">Selected: {place.verifiedAddress}</p>}
             </Field>
           ) : (
             <>

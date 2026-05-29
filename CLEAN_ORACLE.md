@@ -1051,12 +1051,16 @@ referrer-locked browser key cannot authenticate a server call (no referrer is se
 splitting the keys is the only way each one is both functional and tightly restricted. Make a
 key only when its lock target exists: the browser key now (the domains are known), the server
 key once the droplet exists and its IP is known. Directly relevant since Clean is a routing
-business. The browser key must ALSO have the Places API enabled, not just Maps JavaScript:
-the booking funnel's address field uses the JS Places library (`google.maps.places.Autocomplete`)
-for address entry + the in-area service-area check, which bills as Places but is still a
+business. The browser key must ALSO have the Places API (New) enabled, not just Maps
+JavaScript: the booking funnel's address field uses `PlaceAutocompleteElement` (Places API
+New) for address entry + the in-area service-area check, which bills as Places but is still a
 browser JS call (sends a referrer, stays referrer-locked, NOT a REST call). Do not strip Places
 off the browser key thinking it violates this rule; the rule bans browser REST calls, not the
-JS Places library. Wired 2026-05-29 in `src/components/portal/maps.js`.
+JS Places library. Use the NEW element, not the legacy `google.maps.places.Autocomplete` widget:
+Google blocked the legacy widget for Cloud projects created after March 2025 (Clean's project is
+new, so the legacy `Autocomplete` errors with LegacyApiNotActivatedMapError; nails' legacy widget
+works only because nails' project predates the cutoff). Wired 2026-05-29 in
+`src/components/portal/maps.js` (loader uses `loading=async` + `importLibrary`).
 
 `supabase_rpc_not_raw_fetch` (engineering):
 In a Supabase client app, use the client's `rpc()` for database/auth calls, not raw

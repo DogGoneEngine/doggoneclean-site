@@ -17,24 +17,23 @@ export const MAPS_BROWSER_KEY = 'AIzaSyA77l7vz6_hr1CtJ8OGAUsy549TEAAclhw';
 let _mapsPromise = null;
 export function loadGoogleMaps() {
   if (typeof window === 'undefined') return Promise.reject(new Error('no_window'));
-  if (window.google && window.google.maps && window.google.maps.places) {
+  if (window.google && window.google.maps && window.google.maps.importLibrary) {
     return Promise.resolve(window.google.maps);
   }
   if (_mapsPromise) return _mapsPromise;
   _mapsPromise = new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    // Match the proven nails loader exactly: libraries=places with
-    // async+defer and NO loading=async. With loading=async the places
-    // library is not populated by the time onload fires, so a synchronous
-    // `new google.maps.places.Autocomplete(...)` finds places undefined and
-    // silently no-ops (the dead address box). The plain form below has the
-    // places namespace ready at onload, which is how nails works in prod.
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_BROWSER_KEY}&libraries=places`;
+    // loading=async is the recommended bootstrap for the modern Places API
+    // (New) and its PlaceAutocompleteElement, which Clean uses because Google
+    // blocked the legacy google.maps.places.Autocomplete widget for new Cloud
+    // projects (March 2025) — nails' legacy widget only works because nails'
+    // project predates that cutoff; Clean's new project does not. Readiness
+    // here is google.maps.importLibrary, the New-API entry point.
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_BROWSER_KEY}&loading=async&libraries=places&v=weekly`;
     s.async = true;
-    s.defer = true;
     s.onerror = () => { _mapsPromise = null; reject(new Error('maps_load_failed')); };
     s.onload = () => {
-      if (window.google && window.google.maps && window.google.maps.places) resolve(window.google.maps);
+      if (window.google && window.google.maps && window.google.maps.importLibrary) resolve(window.google.maps);
       else reject(new Error('maps_load_failed'));
     };
     document.head.appendChild(s);
@@ -42,26 +41,30 @@ export function loadGoogleMaps() {
   return _mapsPromise;
 }
 
-// Pull the structured address + coordinates out of a Places result.
+// Pull structured address + coordinates out of a Places API (New) Place
+// (returned by PlaceAutocompleteElement after fetchFields). The New API
+// uses longText/shortText on address components (not long_name/short_name)
+// and `location` (a LatLng or literal) instead of `geometry.location`.
 export function parsePlace(place) {
-  const comp = place.address_components || [];
+  const comp = place.addressComponents || [];
   const get = (type, useShort) => {
-    const c = comp.find((x) => x.types.includes(type));
-    return c ? (useShort ? c.short_name : c.long_name) : '';
+    const c = comp.find((x) => (x.types || []).includes(type));
+    return c ? (useShort ? c.shortText : c.longText) : '';
   };
   const line1 = [get('street_number'), get('route')].filter(Boolean).join(' ');
   const city = get('locality') || get('sublocality') || get('administrative_area_level_3');
   const state = get('administrative_area_level_1', true);
   const zip = get('postal_code');
-  const loc = place.geometry && place.geometry.location;
+  const loc = place.location;
+  const num = (v) => (typeof v === 'function' ? v() : v);
   return {
     line1,
     city,
     state,
     zip,
-    lat: loc ? loc.lat() : null,
-    lng: loc ? loc.lng() : null,
-    formatted: place.formatted_address || '',
+    lat: loc ? num(loc.lat) : null,
+    lng: loc ? num(loc.lng) : null,
+    formatted: place.formattedAddress || '',
   };
 }
 
