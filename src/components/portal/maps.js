@@ -23,11 +23,18 @@ export function loadGoogleMaps() {
   if (_mapsPromise) return _mapsPromise;
   _mapsPromise = new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_BROWSER_KEY}&libraries=places&loading=async`;
+    // Match the proven nails loader exactly: libraries=places with
+    // async+defer and NO loading=async. With loading=async the places
+    // library is not populated by the time onload fires, so a synchronous
+    // `new google.maps.places.Autocomplete(...)` finds places undefined and
+    // silently no-ops (the dead address box). The plain form below has the
+    // places namespace ready at onload, which is how nails works in prod.
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_BROWSER_KEY}&libraries=places`;
     s.async = true;
+    s.defer = true;
     s.onerror = () => { _mapsPromise = null; reject(new Error('maps_load_failed')); };
     s.onload = () => {
-      if (window.google && window.google.maps) resolve(window.google.maps);
+      if (window.google && window.google.maps && window.google.maps.places) resolve(window.google.maps);
       else reject(new Error('maps_load_failed'));
     };
     document.head.appendChild(s);

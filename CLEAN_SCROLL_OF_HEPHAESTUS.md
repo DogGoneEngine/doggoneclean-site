@@ -595,6 +595,23 @@ needs the Places API enabled (for the JS Places library / Autocomplete),
 still referrer-locked and still not a REST call, so a future session does
 not strip it. Still open: per-address allow/deny exceptions over the polygon.
 
+Fourth pass (correction): Paul reported the address box never showed
+suggestions and that page one diverged from nails. Read the real nails
+`src/components/booking/steps.jsx` (not memory) and found two faults. (1)
+The Maps loader used `&loading=async`, which leaves `google.maps.places`
+unpopulated at `script.onload`, so the synchronous `new Autocomplete(...)`
+found places undefined and silently no-opped (the dead box); nails uses the
+plain `libraries=places` + async+defer loader, which has places ready at
+onload. Matched it (verified gone from the built bundle). (2) Page-one parity
+gaps: nails requires email, breed, and date-of-birth (with an exact/approx
+toggle) and uses the single service-address input with the "Are you in our
+service area?" heading + success banner. Aligned all of it, keeping the bath
+divergences (coat tier, three-dog cap, no silk upsell, anonymous). Lesson
+reinforced: when the task is "match nails," read the nails source first, do
+not reconstruct from memory. Still on Paul: confirm the Clean Maps key has
+Places API + billing enabled (nails uses identical code and works, so a
+still-dead box after this deploy points there, not the code).
+
 No new Oracle rules this chapter; one refinement (`maps_js_api_only`, above).
 The funnel enforces the existing rule pack. Blocked / handed to Paul: the
 Stripe SetupIntent edge function

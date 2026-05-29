@@ -26,7 +26,7 @@ import './portal.css';
 import './booking.css';
 import {
   sb, getBookingCity, getOpenSlots, getOpenSlotsBetween,
-  signInWithGoogle, toE164US,
+  signInWithGoogle, toE164US, looksLikeEmail,
 } from './supabase.js';
 import { loadGoogleMaps, parsePlace, isInServiceArea } from './maps.js';
 
@@ -214,48 +214,72 @@ export default function BookingApp() {
 }
 
 /* ── Step 1: Let's get started ─────────────────────────────────────── */
+// Mirrors the nails Step 1 (three reveal stages: fit check -> service-area
+// address -> contact + dogs). Bath divergences: coat-tier picker per dog,
+// three-dog cap, no silk-finish upsell, anonymous (no account).
 function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, smsConsent, setSmsConsent, dogs, setDogs, error, setError, onAdvance }) {
   const set = (f) => (e) => setPlace((p) => ({ ...p, [f]: e.target.value }));
 
   const [authed, setAuthed] = useState(false);
-  const [mapsMode, setMapsMode] = useState('loading'); // loading | auto | manual
-  const [areaStatus, setAreaStatus] = useState(place.serviceLat != null ? 'in' : 'idle'); // idle | in | out
-  const [editingAddr, setEditingAddr] = useState(!place.addressLine1);
+  const inputRef = useRef(null);
+  const acRef = useRef(null);
+  const [mapsReady, setMapsReady] = useState(false);
+  const [mapsFailed, setMapsFailed] = useState(false);
+  const [areaStatus, setAreaStatus] = useState(place.serviceLat != null ? 'pass' : null); // null | pass | fail
+
+  const stage1 = eligibilityAcked;
+  const manualOk = place.addressLine1.trim() && place.addressCity.trim() && place.addressZip.trim();
+  const stage2done = mapsFailed ? manualOk : areaStatus === 'pass';
 
   useEffect(() => {
     (async () => { const c = sb(); if (!c) return; const { data: { user } } = await c.auth.getUser(); setAuthed(!!user); })();
   }, []);
 
-  // Try Google Places; fall back to manual entry if the script can't load.
-  useEffect(() => {
-    let cancelled = false;
-    loadGoogleMaps().then(() => { if (!cancelled) setMapsMode('auto'); })
-      .catch(() => { if (!cancelled) setMapsMode('manual'); });
-    return () => { cancelled = true; };
-  }, []);
-
-  // Ref so the (once-captured) pick handler always sees the latest city.
+  // Ref so the once-attached place_changed handler always sees the latest city.
   const cityRef = useRef(city);
   useEffect(() => { cityRef.current = city; }, [city]);
 
-  function handlePick(parsed) {
-    setEditingAddr(false);
-    setPlace((p) => ({
-      ...p,
-      addressLine1: parsed.line1,
-      addressCity: parsed.city,
-      addressState: parsed.state || 'FL',
-      addressZip: parsed.zip,
-      serviceLat: parsed.lat,
-      serviceLng: parsed.lng,
-    }));
-    setAreaStatus(isInServiceArea(parsed.lat, parsed.lng, cityRef.current) ? 'in' : 'out');
-  }
+  // Load Maps once eligibility is acked (matches nails' timing).
+  useEffect(() => {
+    if (!stage1) return undefined;
+    let mounted = true;
+    loadGoogleMaps().then(() => { if (mounted) setMapsReady(true); }).catch(() => { if (mounted) setMapsFailed(true); });
+    return () => { mounted = false; };
+  }, [stage1]);
 
-  const hasManualAddr = place.addressLine1.trim() && place.addressCity.trim() && place.addressZip.trim();
-  const addrOk = mapsMode === 'manual' ? hasManualAddr : areaStatus === 'in';
-  const stage2 = eligibilityAcked;
-  const stage3 = stage2 && addrOk;
+  // Attach Places Autocomplete to the single service-address input, exactly
+  // as nails does (script ready -> input exists -> attach once).
+  useEffect(() => {
+    if (!mapsReady || !inputRef.current || acRef.current) return undefined;
+    const g = window.google;
+    const ac = new g.maps.places.Autocomplete(inputRef.current, {
+      types: ['address'],
+      componentRestrictions: { country: 'us' },
+      fields: ['address_components', 'geometry', 'formatted_address'],
+    });
+    // Bias suggestions toward the service area using the polygon's bbox.
+    const c = cityRef.current;
+    const ring = c && c.polygon && (Array.isArray(c.polygon[0]) && Array.isArray(c.polygon[0][0]) ? c.polygon[0] : c.polygon);
+    if (ring && g.maps.LatLngBounds) {
+      const b = new g.maps.LatLngBounds();
+      for (const pt of ring) b.extend({ lat: pt[1], lng: pt[0] });
+      ac.setBounds(b);
+    }
+    ac.addListener('place_changed', () => {
+      const pl = ac.getPlace();
+      if (!pl.geometry || !pl.geometry.location) { setAreaStatus('fail'); return; }
+      const parsed = parsePlace(pl);
+      setPlace((p) => ({
+        ...p,
+        addressLine1: parsed.line1, addressCity: parsed.city,
+        addressState: parsed.state || 'FL', addressZip: parsed.zip,
+        serviceLat: parsed.lat, serviceLng: parsed.lng, verifiedAddress: parsed.formatted,
+      }));
+      setAreaStatus(isInServiceArea(parsed.lat, parsed.lng, cityRef.current) ? 'pass' : 'fail');
+    });
+    acRef.current = ac;
+    return undefined;
+  }, [mapsReady, setPlace]);
 
   function updateDog(i, field, val) { setDogs((ds) => ds.map((d, idx) => (idx === i ? { ...d, [field]: val } : d))); }
   function setDogCount(n) {
@@ -268,9 +292,11 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
     });
   }
 
-  const contactValid = place.firstName.trim() && toE164US(place.phone);
-  const dogsValid = dogs.every((d) => d.name.trim() && (d.coat_tier === 'smoothcoat' || d.coat_tier === 'doublecoat'));
-  const canContinue = stage3 && contactValid && dogsValid;
+  const contactValid = place.firstName.trim() && place.lastName.trim() && looksLikeEmail(place.email) && toE164US(place.phone);
+  const dogsValid = dogs.every((d) => d.name.trim() && d.breed.trim()
+    && (d.coat_tier === 'smoothcoat' || d.coat_tier === 'doublecoat')
+    && d.dobMonth && d.dobDay && d.dobYear);
+  const canContinue = stage1 && stage2done && contactValid && dogsValid;
 
   async function googlePrefill() {
     try { await signInWithGoogle('/book/'); } catch { /* user can type manually */ }
@@ -296,39 +322,25 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
         <span>My dog fits these requirements and is friendly toward people.</span>
       </label>
 
-      {/* Stage 2: address (Google Places + in-area check; manual fallback) */}
-      {stage2 && (
+      {/* Stage 2: service-area address */}
+      {stage1 && (
         <div className="bk-reveal">
           <div className="bk-stage__divider" />
-          <div className="bk-stage__heading">Where do we bring the bath?</div>
+          <div className="bk-stage__heading">Are you in our service area?</div>
 
-          {mapsMode === 'loading' && (
-            <Field label="Street address"><input className="pt-input" placeholder="Loading address search..." disabled /></Field>
-          )}
-
-          {mapsMode === 'auto' && (
-            <>
-              {editingAddr ? (
-                <Field label="Street address">
-                  <PlacesInput defaultValue={place.addressLine1} onPick={handlePick} />
-                  <p className="bk-fineprint">Start typing and pick your address from the list.</p>
-                </Field>
-              ) : (
-                <div className="bk-addr-confirmed">
-                  <div className="bk-addr-confirmed__text">{place.addressLine1}, {place.addressCity} {place.addressState} {place.addressZip}</div>
-                  <button type="button" className="bk-addr-confirmed__edit" onClick={() => { setEditingAddr(true); setAreaStatus('idle'); }}>Change</button>
-                </div>
-              )}
-              {areaStatus === 'in' && <div className="bk-area bk-area--in">✓ You're in our service area.</div>}
-              {areaStatus === 'out' && (
-                <div className="bk-area bk-area--out">
-                  That address is just outside the route we run today. <a href="/the-villages">Join the waitlist</a> and we'll let you know the moment we reach you.
-                </div>
-              )}
-            </>
-          )}
-
-          {mapsMode === 'manual' && (
+          {!mapsFailed ? (
+            <Field label="Service address">
+              <input
+                ref={inputRef}
+                type="text"
+                className="pt-input"
+                placeholder={mapsReady ? 'Start typing your address...' : 'Loading...'}
+                disabled={!mapsReady}
+                defaultValue={place.verifiedAddress || ''}
+                autoComplete="off"
+              />
+            </Field>
+          ) : (
             <>
               <Field label="Street address"><input className="pt-input" value={place.addressLine1} onChange={set('addressLine1')} autoComplete="address-line1" /></Field>
               <div className="bk-grid-3">
@@ -336,18 +348,25 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
                 <Field label="State"><input className="pt-input" value={place.addressState} onChange={set('addressState')} autoComplete="address-level1" /></Field>
                 <Field label="ZIP"><input className="pt-input" inputMode="numeric" value={place.addressZip} onChange={set('addressZip')} autoComplete="postal-code" /></Field>
               </div>
-              <p className="bk-fineprint">We confirm your address is on the route before your first visit.</p>
+              <p className="bk-fineprint">Address search is unavailable right now; we confirm your address is on the route before your first visit.</p>
             </>
           )}
 
-          {addrOk && (
+          {areaStatus === 'pass' && <div className="bk-area bk-area--in"><span className="bk-area__icon">✓</span> You're in our service area.</div>}
+          {areaStatus === 'fail' && (
+            <div className="bk-area bk-area--out">
+              <span className="bk-area__icon">!</span> That address is outside our The Villages route right now. Try a different address, or <a href="/the-villages">join the waitlist</a>.
+            </div>
+          )}
+
+          {stage2done && (
             <Field label="Gate code (if applicable)"><input className="pt-input" value={place.gateCode} onChange={set('gateCode')} maxLength={32} autoComplete="off" /></Field>
           )}
         </div>
       )}
 
       {/* Stage 3: contact + dogs */}
-      {stage3 && (
+      {stage1 && stage2done && (
         <div className="bk-reveal">
           <div className="bk-stage__divider" />
           <div className="bk-stage__heading">Your information</div>
@@ -363,10 +382,8 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
             <Field label="First name"><input className="pt-input" value={place.firstName} onChange={set('firstName')} autoComplete="given-name" /></Field>
             <Field label="Last name"><input className="pt-input" value={place.lastName} onChange={set('lastName')} autoComplete="family-name" /></Field>
           </div>
-          <div className="bk-grid-2">
-            <Field label="Mobile number"><input className="pt-input" type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} autoComplete="tel" /></Field>
-            <Field label="Email (optional)"><input className="pt-input" type="email" value={place.email} onChange={set('email')} autoComplete="email" placeholder="you@example.com" /></Field>
-          </div>
+          <Field label="Email address"><input className="pt-input" type="email" value={place.email} onChange={set('email')} autoComplete="email" placeholder="you@example.com" /></Field>
+          <Field label="Mobile number"><input className="pt-input" type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} autoComplete="tel" /></Field>
 
           <label className="bk-fit bk-fit--sms">
             <input type="checkbox" checked={smsConsent} onChange={(e) => setSmsConsent(e.target.checked)} />
@@ -391,7 +408,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
       <button
         className="pt-btn pt-btn-primary bk-continue"
         disabled={!canContinue}
-        onClick={() => { if (!canContinue) { setError('Fill in the fit check, address, your name and phone, and each dog.'); return; } onAdvance(); }}
+        onClick={() => { if (!canContinue) { setError('Fill in the fit check, a verified address, your name, email and phone, and each dog (name, breed, coat, date of birth).'); return; } onAdvance(); }}
       >
         Choose your plan →
       </button>
@@ -404,13 +421,11 @@ function DogCard({ idx, dog, showNumber, onChange }) {
   return (
     <div className="bk-dog">
       <div className="bk-dog__head">
-        {showNumber && <span className="bk-dog__n">Dog {idx + 1}</span>}
+        {showNumber && <span className="bk-dog__n">{idx + 1}</span>}
         <span className="bk-dog__name">Tell us about {dog.name || 'your dog'}</span>
       </div>
-      <div className="bk-grid-2">
-        <Field label="Name"><input className="pt-input" value={dog.name} onChange={(e) => onChange('name', e.target.value)} /></Field>
-        <Field label="Breed (optional)"><input className="pt-input" value={dog.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="e.g. Labrador, Husky" /></Field>
-      </div>
+      <Field label="Name"><input className="pt-input" value={dog.name} onChange={(e) => onChange('name', e.target.value)} autoComplete="off" /></Field>
+      <Field label="Breed"><input className="pt-input" value={dog.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="e.g. Labrador, Husky, or Lab / Poodle mix" autoComplete="off" /></Field>
       <Field label="Coat type">
         <div className="bk-tier-row">
           {[['smoothcoat', 'Smoothcoat', 'Short, single coat'], ['doublecoat', 'Doublecoat', 'Sheds, does not mat']].map(([val, lab, sub]) => (
@@ -420,7 +435,7 @@ function DogCard({ idx, dog, showNumber, onChange }) {
           ))}
         </div>
       </Field>
-      <Field label="Date of birth (optional)">
+      <Field label="Date of birth">
         <div className="bk-dob-row">
           <select className="pt-input" value={dog.dobMonth} onChange={(e) => onChange('dobMonth', e.target.value)} aria-label="Birth month">
             <option value="">Month</option>{MONTHS.map(([v, n]) => <option key={v} value={v}>{n}</option>)}
@@ -433,6 +448,10 @@ function DogCard({ idx, dog, showNumber, onChange }) {
           </select>
         </div>
       </Field>
+      <div className="bk-dob-toggle">
+        <button type="button" className={`bk-dob-toggle__btn${!dog.dobApproximate ? ' is-active' : ''}`} onClick={() => onChange('dobApproximate', false)}>I know the exact date</button>
+        <button type="button" className={`bk-dob-toggle__btn${dog.dobApproximate ? ' is-active' : ''}`} onClick={() => onChange('dobApproximate', true)}>Approximate, my best guess</button>
+      </div>
       {age && <div className="bk-age-badge">{age}</div>}
     </div>
   );
@@ -618,32 +637,6 @@ function Step4({ city, place, dogs, cadence, chosenSlot }) {
 }
 
 function Field({ label, children }) { return (<div className="pt-field bk-field"><label>{label}</label>{children}</div>); }
-
-// Google Places Autocomplete bound to a single address input. Only
-// rendered once the Maps script has loaded (mapsMode === 'auto').
-function PlacesInput({ defaultValue, onPick }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const g = window.google;
-    if (!g || !g.maps || !g.maps.places || !ref.current) return undefined;
-    const ac = new g.maps.places.Autocomplete(ref.current, {
-      types: ['address'],
-      componentRestrictions: { country: 'us' },
-      fields: ['address_components', 'geometry', 'formatted_address'],
-    });
-    const listener = ac.addListener('place_changed', () => {
-      const place = ac.getPlace();
-      if (place && place.geometry) onPick(parsePlace(place));
-    });
-    return () => {
-      if (window.google && window.google.maps && window.google.maps.event) {
-        window.google.maps.event.removeListener(listener);
-        window.google.maps.event.clearInstanceListeners(ac);
-      }
-    };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  return <input ref={ref} className="pt-input" defaultValue={defaultValue} placeholder="Start typing your address" autoComplete="off" aria-label="Street address" />;
-}
 
 function GoogleMark() {
   return (
