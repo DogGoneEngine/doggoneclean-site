@@ -63,22 +63,32 @@ advantage a smart AI cannot prompt past?).
 ## Process
 
 `redesign_survival_is_a_ship_gate` (process):
-Nothing ships until it would survive a major website redesign. Before any change is
-shipped (a rule, business logic, a decision, copy, a feature, a schema change), the assistant
-asks one question on its own, without being prompted and without involving Paul: if the entire
-website were torn down and rebuilt tomorrow, would this still hold? If the answer is no, because
-its only enforcement is a string on a page or markup a redesign would rewrite away, the assistant
-reworks it so the rule's teeth live in a durable layer (a database constraint, a server RPC, a
-data file, or a build-time guard) and only then ships. A page's copy or a single component is
-never the last line of defense for anything that matters; at most it is a reminder sitting on top
-of the durable layer. The check runs on every ship, automatically; a change that cannot pass it is
-reworked and retried before shipping, never shipped with a note to fix it later. Because the
-May 2026 DGN portal redesign silently deleted business logic that lived only in component code,
-and Clean is a fork of that same platform carrying the same risk; durability is what makes a rule
-real, and a gate that depends on Paul remembering to ask fails exactly when a session is moving
-fast. This is the principle behind the tiered build audit (`scripts/check.py`): a missing durable
-layer blocks the build, a missing page-copy reminder only warns, because a rule's survival never
-depends on the copy. Pairs with `read_before_redesign` (the human discipline) and the four-layer
+Nothing ships until it would survive a major website redesign. This is a LOOP, run before every
+ship, on the assistant's own initiative and without involving Paul:
+  1. About to ship something (a rule, business logic, a decision, copy, a feature, a schema
+     change)? Ask: if the whole website were torn down and rebuilt tomorrow, would this still
+     hold?
+  2. If no, because its only enforcement is a string or markup a redesign would rewrite away,
+     fix it right then: move the rule's teeth into a durable layer (a database constraint, a
+     server RPC, a data file, or a build-time guard).
+  3. Ask the question again on the fixed version.
+  4. Repeat 2 and 3 until the answer is yes, then ship.
+The two outcomes this rule exists to forbid are both real and both wrong: shipping something that
+will not survive a redesign, AND leaving something unshipped because it failed the question. The
+answer to a failure is never "do not ship" and never "ship anyway"; it is "fix it and ask again."
+A change only stops moving when it passes, and then it ships.
+The assistant is what runs this loop; a script can DETECT that something will not survive but
+cannot invent the fix, so the tiered build audit (`scripts/check.py`) is the safety net that
+catches a skipped loop, not the thing that does the fixing. In that audit a missing durable layer
+BLOCKS the build and a missing page-copy reminder only WARNS, under one invariant: a check may be
+WARN-only just when the rule's teeth already live in a durable non-page layer, so dropping the copy
+does not lose the rule. A decision whose only home is the page is split: the STRUCTURE that carries
+it (an element, a URL, a set of options) is a BLOCK so a redesign cannot ship without it, and only
+the exact WORDING warns. A copy-only decision is never left as warn-only.
+Because the May 2026 DGN portal redesign silently deleted business logic that lived only in
+component code, and Clean is a fork of that same platform carrying the same risk; durability is
+what makes a rule real, and a gate that depends on Paul remembering to ask fails exactly when a
+session is moving fast. Pairs with `read_before_redesign` (the human discipline) and the four-layer
 map in `CLEAN_BUSINESS_RULES.md` (the mechanism).
 
 `recommendation_with_reason` (process):

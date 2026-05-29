@@ -35,14 +35,18 @@ and in, good for body and mind, a unicorn job, clients grateful it exists, the w
 it) is the first section of CLEAN_ORACLE.md and is the apex every rule serves.
 
 **Ship gate: survive a redesign (non-negotiable).** Nothing ships until it would survive a major
-website redesign. Before shipping anything (a rule, business logic, a decision, copy, a feature, a
-schema change), consider on your own, without involving Paul: if the whole site were rebuilt
-tomorrow, would this still hold? If its only enforcement is copy or markup a redesign could rewrite
-away, rework it so the teeth live in a durable layer (a DB constraint, a server RPC, a data file,
-or a build guard) and only then ship. A change that cannot pass this is reworked and retried, never
-shipped with a note to fix later. This is the apex engineering rule, recorded as
-`redesign_survival_is_a_ship_gate` in CLEAN_ORACLE.md, and it is why the build audit is tiered: a
-missing durable layer blocks the build, a missing copy reminder only warns.
+website redesign. This is a LOOP you run before every ship, on your own, without involving Paul:
+(1) about to ship something? ask "if the whole site were rebuilt tomorrow, would this still hold?";
+(2) if no, fix it right then by moving its teeth into a durable layer (a DB constraint, a server
+RPC, a data file, or a build guard); (3) ask again on the fixed version; (4) repeat until yes, then
+ship. The two outcomes this forbids are BOTH wrong: shipping something that will not survive, and
+leaving something unshipped because it failed. The answer to a failure is never "do not ship" and
+never "ship anyway"; it is "fix it and ask again," until it passes. You run this loop; a script can
+only detect, not fix, so the tiered build audit is the safety net, not the fixer. Apex engineering
+rule, recorded as `redesign_survival_is_a_ship_gate` in CLEAN_ORACLE.md. The audit is tiered under
+one invariant: WARN only when the rule's teeth already live in a durable non-page layer; a
+decision whose only home is the page blocks on its structure (element / URL / option set) and warns
+only on the exact wording.
 
 ## Read order (the doc set)
 

@@ -77,6 +77,16 @@ EN_DASH = "–"
 #                (DB constraint, server RPC, data file); the page string is a
 #                reminder, not the last line of defense, so a legitimate
 #                rewrite should not be able to fail a deploy.
+#
+# The invariant (redesign_survival_is_a_ship_gate): WARN is permitted ONLY when
+# the rule's teeth live in a durable non-page layer (a DB constraint, an RPC, a
+# data file, or a separate BLOCK guard), so dropping the page string does not
+# lose the rule. A decision whose ONLY home is the page is split: BLOCK on the
+# STRUCTURE that carries it (the element, the URL, the set of options) so a
+# redesign cannot ship without it, and WARN only on the exact WORDING so a
+# rewrite never blocks a deploy. A copy-only decision is never left as warn-only
+# (that would let it ship dropped) and a block is never a dead end (the loop
+# fixes it and retries; see the rule in CLEAN_ORACLE.md).
 failures = []
 warnings = []
 
@@ -401,12 +411,14 @@ def check_rule_survival():
     # ── single_visit_as_own_path ──────────────────────────────────────────
     # The city page must offer a single-visit CTA at its own URL, not as a row
     # buried inside a recurring pricing card.
+    # The single-visit path is a locked decision with no durable home but this
+    # guard; the CTA href is structure (a URL, not prose) -> BLOCK, so a
+    # redesign that buries the trial path cannot ship.
     require_present(
         villages,
         r"/book\?plan=single",
         "single_visit_as_own_path",
         "single-visit CTA href '/book?plan=single'",
-        block=False,
     )
 
     # ── specialist_named_not_promised ─────────────────────────────────────
@@ -695,20 +707,22 @@ def check_rule_survival():
     # ── octane_selector_cadence_picker ────────────────────────────────────
     # Booking step 2 presents the three cadences and carries the locked
     # "Want your dog fresher?" framing (freshness as the upgrade, not savings).
-    # octane framing is UX copy with no durable layer behind it; WARN only.
-    require_present(
-        booking_app,
-        r"want your dog fresher",
-        "octane_selector_cadence_picker",
-        "the locked 'Want your dog fresher?' cadence-picker copy",
-        block=False,
-    )
+    # Split by survival: the DECISION (three cadences are offered) has no DB/RPC
+    # home, so this guard is its only durable layer -> BLOCK, so a redesign that
+    # drops the picker cannot ship until it is restored. The exact tagline
+    # WORDING is prose -> WARN, so a rewrite never blocks a deploy.
     for lab in ("Every 4 weeks", "Every 2 weeks", "Single visit"):
         require_present(
             booking_app, re.escape(lab),
             "octane_selector_cadence_picker", f"cadence option '{lab}'",
-            block=False,
         )
+    require_present(
+        booking_app,
+        r"want your dog fresher",
+        "octane_selector_cadence_picker",
+        "the locked 'Want your dog fresher?' tagline wording",
+        block=False,
+    )
 
     # ── friendly_dogs_only (booking gate) ─ SAFETY: BLOCK ─────────────────
     require_present(booking_app, r"friendly dogs", "friendly_dogs_only",
