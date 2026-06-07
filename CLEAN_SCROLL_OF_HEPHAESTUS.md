@@ -1638,3 +1638,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   (4 dogs); the data does not scale with dog count, so per-client history beats a dog-count
   formula. Garrett Little's 2-dog count recorded (names/breeds still a gap). Ocala stays
   hb_active false until the anchor gate is wired; prices and durations are no longer gaps.
+- **Scheduling philosophy locked on Clean (2026-06-07): schedule by client history.** Verified
+  the nails dispute against Paul's source sheet (Time is Money, full CSV, 1,214 rows): Lisa
+  Prater is cleanly bimodal (two full grooms at 45/59 min $75, nine nails at 5-11 min $30), and
+  Crandall (37 visits all $65, median 41) and Little (median 33) are pristine. My earlier
+  "implausible / data artifact" framing was wrong: I trusted a blended median over the source.
+  Pulled two more nails clients for spread (Diana Boos 2 dogs median 26; Suzette LaVallee 2 dogs
+  median 25). Derived nails starting average ~15 one dog / ~25 two-three / ~40 four, which
+  matches DGN's existing service_duration_table and the real data. Locked Oracle
+  `schedule_by_client_history`: schedule each client for their own historical on-site time
+  (clients.visit_minutes), falling back to the derived average only for a client with no track
+  record yet. CONFLICT FLAGGED FOR PAUL on the nails (DGN) side: DGN's service_duration_table
+  says service time is fixed by dog count and "never adjusts... fixed times keep both sides out
+  of the loop" (anti-shaming) - the per-client override reverses that, so it is not yet written
+  into DGN pending Paul's decision on whether to supersede it and how to keep the anti-shaming
+  intent (e.g. route on real time without surfacing it as a judgment in the operator app).

@@ -577,6 +577,19 @@ and single rates, the additional-dog decrement, and the founders rates and cap a
 across. Because it is the same bath product and Paul set them equal to start; adjust a city's
 prices only if its economics later diverge.
 
+`schedule_by_client_history` (scheduling):
+An appointment is scheduled for the length that exact client has historically taken: their own
+on-site time averaged from recent visits, stored per client as `clients.visit_minutes` (grooms
+and nails split where a client gets both, per `time_is_money` source data). The derived service
+average is only the cold-start default, used until a client has a track record. The nails
+starting average is about 15 minutes for the first dog, 25 for two or three, 40 for four (the
+real Time is Money spread validates this: roughly 13 one dog, 26 two, 41 four); the bath
+starting average is 30 minutes smoothcoat / 60 doublecoat (`bath_starting_durations`); every
+stop is floored by `minimum_stop_block`. Because Paul has years of per-visit history and the
+real per-client time beats any average: a chatty household or a slow dog is a permanent,
+plannable fact of that stop, not noise to average away. The average exists only so a brand-new
+client can still be booked before they have a history of their own.
+
 `villages_only_in_copy` (Hurricane Bath: copy):
 The Hurricane Bath surface mentions only The Villages in customer-facing copy:
 no other cities, no reference to the legacy Ocala full-grooming book (which
