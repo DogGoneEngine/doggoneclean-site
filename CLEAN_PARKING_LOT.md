@@ -25,10 +25,14 @@ survive a reset:
   (`ocala_availability_every_other_week`): every other week Tue-Sat anchored on the week of
   2026-06-08, plus manual extra days and brief off-week trips. Build the recurring window generator
   plus a manual day add/remove control, so the slot engine offers only days Paul is in Ocala.
-- **Open Ocala for new bath signups.** Needs the anchor drive-time gate live
-  (ocala_service_area_by_anchor): enable Distance Matrix + Geocoding on Clean's Maps Cloud
-  project, geocode the 31 anchors into clients.geo_lat/geo_lng, wire the client-side drive-time
-  check into the booking gate, then flip Ocala hb_active on. Prices and durations already set.
+- **Open Ocala for new bath signups (drive-time gate built; needs the Maps key).** The gate is
+  the `ocala-service-area` Supabase edge function: real Google Distance Matrix drive time,
+  server-side so anchor homes stay private, deployed and fail-closed. To activate: (1) enable the
+  Distance Matrix API + Geocoding API on Clean's Maps Cloud project and make a server key; (2) set
+  it as the `MAPS_SERVER_KEY` secret on dgc-prod; (3) the function then geocodes and caches anchor
+  coords on first call; (4) wire the booking funnel to call it for Ocala instead of the polygon
+  check, and have `bath_start_subscription` enforce it server-side; (5) flip Ocala `hb_active` on.
+  Prices, durations, and anchors (`clients.is_anchor`, outliers flagged out) already set.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is

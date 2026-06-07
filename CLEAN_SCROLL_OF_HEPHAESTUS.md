@@ -1601,6 +1601,23 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   force-approve) or stay pinned to the legacy seed set? Recommended the former. Not yet captured
   as a rule; build once Paul decides the anchor-growth question.
 
+### Ocala drive-time service-area gate built (2026-06-07, migration 0025 + edge function)
+- Goal Paul restated firmly: keep serving legacy AND take new bath clients in Ocala, but only when
+  they are within 15 minutes' DRIVE of an existing client, so a new stop fits a day he is already
+  nearby. First attempt used straight-line (crow-flies) distance: wrong metric, it ignores roads
+  and his schedule. Reverted (the haversine + crow-flies function are dropped; `ocala_service_area_by_anchor`
+  in the Oracle already specified drive time, so the Oracle was right and the code was the drift).
+- Built the real gate as the `ocala-service-area` Supabase edge function: real Google Distance
+  Matrix drive time, server-side so anchor homes never leak, bounding-box prefilter then driving
+  duration to the nearest anchor, returns only { within, minutes }. Deployed, fail-closed (returns
+  maps_not_configured until the key exists). Added `clients.geo_lat/geo_lng/is_anchor`; anchors are
+  the recurring backbone (standing + at-will), with the favor/outlier clients (Tonya Hunt, Greta
+  Custer) flagged out so they do not stretch the area: 33 anchors.
+- Cannot run until Clean's Maps project has the Distance Matrix + Geocoding APIs enabled and a
+  server key set as the `MAPS_SERVER_KEY` secret (the one genuinely external step). Then: function
+  auto-geocodes anchors, wire the booking funnel to call it for Ocala, enforce it in
+  bath_start_subscription, flip Ocala hb_active on. Parked with the full checklist.
+
 ### Legacy login mechanism built + Ocala availability captured (2026-06-07, migration 0024)
 - Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,
   so a sign-in dead-ended at the empty portal. Built `bath_claim_legacy_account()`: matches the
