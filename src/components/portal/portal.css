@@ -846,6 +846,51 @@
 }
 
 /* ── Profile form ───────────────────────────────────────────────────── */
+.pt-inline-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-left: var(--space-sm);
+}
+
+.pt-inline-link:hover { text-decoration: underline; }
+
+/* ── Address editor (Places autocomplete) ───────────────────────────── */
+.pt-address-box {
+  margin-bottom: var(--space-sm);
+}
+
+/* The Places web component renders its own input; give it room and match
+   the portal field look as closely as the element allows. */
+.pt-address-box gmp-place-autocomplete {
+  width: 100%;
+}
+
+.pt-address-preview {
+  margin-top: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.pt-address-preview__line {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.pt-address-preview__ok {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: #047857;
+  margin-top: 2px;
+}
 .pt-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

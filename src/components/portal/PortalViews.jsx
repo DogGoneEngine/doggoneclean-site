@@ -11,14 +11,15 @@
 // RPC, because bath_subscriptions and bath_appointments expose no direct
 // write policy: the rule has to live in the database, not the page.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './portal.css';
 import {
   pauseSubscription, resumeSubscription, cancelSubscription, changeCadence,
   skipAppointment, rescheduleAppointment, getOpenSlots,
   addDog, updateDog, removeDog,
-  updateProfile, toE164US,
+  updateProfile, updateServiceAddress, toE164US,
 } from './supabase.js';
+import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds } from './maps.js';
 
 // ── Formatting helpers ─────────────────────────────────────────────────
 // Appointment times are timestamptz; render them in the city's wall clock
@@ -249,7 +250,7 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
         {/* Profile */}
         <section className="pt-section">
           <h2 className="pt-section__title">Your details</h2>
-          <ProfileSection subscriber={subscriber} onChanged={onChanged} toast={toast} />
+          <ProfileSection subscriber={subscriber} city={city} onChanged={onChanged} toast={toast} />
         </section>
 
         {/* History */}
@@ -771,63 +772,198 @@ function packError(res) {
 // ── Profile section: view + edit contact details and preferences ────────
 // Service address is shown read-only here: changing it needs the in-area
 // verification flow and lands in its own slice. Everything else is editable.
-function ProfileSection({ subscriber, onChanged, toast }) {
-  const [editing, setEditing] = useState(false);
+function ProfileSection({ subscriber, city, onChanged, toast }) {
+  const [mode, setMode] = useState('view'); // 'view' | 'contact' | 'address'
 
-  if (!editing) {
+  if (mode === 'contact') {
     return (
-      <div className="pt-card">
-        <div className="pt-card__row">
-          <span className="pt-card__label">Name</span>
-          <span className="pt-card__value">
-            {[subscriber.first_name, subscriber.last_name].filter(Boolean).join(' ') || '-'}
-          </span>
-        </div>
-        {subscriber.phone_e164 && (
-          <div className="pt-card__row">
-            <span className="pt-card__label">Phone</span>
-            <span className="pt-card__value">{formatPhone(subscriber.phone_e164)}</span>
-          </div>
-        )}
-        {subscriber.email && (
-          <div className="pt-card__row">
-            <span className="pt-card__label">Email</span>
-            <span className="pt-card__value">{subscriber.email}</span>
-          </div>
-        )}
-        <div className="pt-card__row">
-          <span className="pt-card__label">Service address</span>
-          <span className="pt-card__value">{formatAddress(subscriber)}</span>
-        </div>
-        {subscriber.gate_code && (
-          <div className="pt-card__row">
-            <span className="pt-card__label">Gate code</span>
-            <span className="pt-card__value">{subscriber.gate_code}</span>
-          </div>
-        )}
-        <div className="pt-card__row">
-          <span className="pt-card__label">Text reminders</span>
-          <span className="pt-card__value">{subscriber.sms_opt_in ? 'On' : 'Off'}</span>
-        </div>
-        <div className="pt-card__row">
-          <span className="pt-card__label">Email updates</span>
-          <span className="pt-card__value">{subscriber.email_opt_in ? 'On' : 'Off'}</span>
-        </div>
-        <button className="pt-btn pt-btn-secondary pt-btn-sm" style={{ marginTop: 'var(--space-md)' }}
-          onClick={() => setEditing(true)}>
-          Edit details
-        </button>
-      </div>
+      <ProfileForm
+        subscriber={subscriber}
+        onCancel={() => setMode('view')}
+        onSaved={async () => { setMode('view'); if (onChanged) await onChanged(); }}
+        toast={toast}
+      />
+    );
+  }
+
+  if (mode === 'address') {
+    return (
+      <AddressEditor
+        subscriber={subscriber}
+        city={city}
+        onCancel={() => setMode('view')}
+        onSaved={async () => { setMode('view'); if (onChanged) await onChanged(); }}
+        toast={toast}
+      />
     );
   }
 
   return (
-    <ProfileForm
-      subscriber={subscriber}
-      onCancel={() => setEditing(false)}
-      onSaved={async () => { setEditing(false); if (onChanged) await onChanged(); }}
-      toast={toast}
-    />
+    <div className="pt-card">
+      <div className="pt-card__row">
+        <span className="pt-card__label">Name</span>
+        <span className="pt-card__value">
+          {[subscriber.first_name, subscriber.last_name].filter(Boolean).join(' ') || '-'}
+        </span>
+      </div>
+      {subscriber.phone_e164 && (
+        <div className="pt-card__row">
+          <span className="pt-card__label">Phone</span>
+          <span className="pt-card__value">{formatPhone(subscriber.phone_e164)}</span>
+        </div>
+      )}
+      {subscriber.email && (
+        <div className="pt-card__row">
+          <span className="pt-card__label">Email</span>
+          <span className="pt-card__value">{subscriber.email}</span>
+        </div>
+      )}
+      <div className="pt-card__row">
+        <span className="pt-card__label">Service address</span>
+        <span className="pt-card__value">
+          {formatAddress(subscriber)}
+          <button className="pt-inline-link" onClick={() => setMode('address')}>Change</button>
+        </span>
+      </div>
+      {subscriber.gate_code && (
+        <div className="pt-card__row">
+          <span className="pt-card__label">Gate code</span>
+          <span className="pt-card__value">{subscriber.gate_code}</span>
+        </div>
+      )}
+      <div className="pt-card__row">
+        <span className="pt-card__label">Text reminders</span>
+        <span className="pt-card__value">{subscriber.sms_opt_in ? 'On' : 'Off'}</span>
+      </div>
+      <div className="pt-card__row">
+        <span className="pt-card__label">Email updates</span>
+        <span className="pt-card__value">{subscriber.email_opt_in ? 'On' : 'Off'}</span>
+      </div>
+      <button className="pt-btn pt-btn-secondary pt-btn-sm" style={{ marginTop: 'var(--space-md)' }}
+        onClick={() => setMode('contact')}>
+        Edit details
+      </button>
+    </div>
+  );
+}
+
+// ── Address editor: Google Places autocomplete + in-area gate ───────────
+// Mirrors the booking funnel: pick from Places, check the point against the
+// city polygon client-side for instant feedback, and the server re-verifies
+// on save. No manual address path: an address we cannot verify in-area is
+// not savable.
+function AddressEditor({ subscriber, city, onCancel, onSaved, toast }) {
+  const boxRef = useRef(null);
+  const elRef = useRef(null);
+  const cityRef = useRef(city);
+  useEffect(() => { cityRef.current = city; }, [city]);
+
+  const [mapsReady, setMapsReady] = useState(false);
+  const [mapsFailed, setMapsFailed] = useState(false);
+  const [picked, setPicked] = useState(null);
+  const [areaStatus, setAreaStatus] = useState(null); // null | 'pass' | 'fail'
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    loadGoogleMaps().then(() => { if (alive) setMapsReady(true); }).catch(() => { if (alive) setMapsFailed(true); });
+    return () => { alive = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!mapsReady || !boxRef.current || elRef.current) return undefined;
+    const places = window.google && window.google.maps && window.google.maps.places;
+    if (!places || !places.PlaceAutocompleteElement) { setMapsFailed(true); return undefined; }
+    const opts = { includedRegionCodes: ['us'] };
+    const bias = polygonBounds(cityRef.current);
+    if (bias) opts.locationBias = bias;
+    const el = new places.PlaceAutocompleteElement(opts);
+    el.style.width = '100%';
+    boxRef.current.appendChild(el);
+    elRef.current = el;
+
+    async function onSelect(event) {
+      try {
+        const place = event.placePrediction ? event.placePrediction.toPlace() : event.place;
+        if (!place) { setAreaStatus('fail'); return; }
+        await place.fetchFields({ fields: ['formattedAddress', 'addressComponents', 'location'] });
+        const parsed = parsePlace(place);
+        setPicked(parsed);
+        setErr('');
+        setAreaStatus(isInServiceArea(parsed.lat, parsed.lng, cityRef.current) ? 'pass' : 'fail');
+      } catch {
+        setAreaStatus('fail');
+      }
+    }
+    el.addEventListener('gmp-select', onSelect);
+    el.addEventListener('gmp-placeselect', onSelect);
+    return () => {
+      el.removeEventListener('gmp-select', onSelect);
+      el.removeEventListener('gmp-placeselect', onSelect);
+      el.remove();
+      if (elRef.current === el) elRef.current = null;
+    };
+  }, [mapsReady]);
+
+  async function save() {
+    if (!picked || areaStatus !== 'pass') return;
+    setBusy(true);
+    let res;
+    try {
+      res = await updateServiceAddress({
+        line1: picked.line1, city: picked.city, state: picked.state || 'FL',
+        zip: picked.zip, lat: picked.lat, lng: picked.lng,
+      });
+    } catch { res = { ok: false, error: 'network' }; }
+    setBusy(false);
+    if (res && res.ok) {
+      if (toast) toast('Service address updated.');
+      await onSaved();
+    } else {
+      setErr(res && res.error === 'out_of_area'
+        ? 'That address is outside the service area.'
+        : 'Could not save the address. Please try again.');
+    }
+  }
+
+  return (
+    <div className="pt-card">
+      <div className="pt-slotpicker__head">New service address</div>
+
+      {mapsFailed ? (
+        <>
+          <div className="pt-slotpicker__msg">Address lookup is not available right now. Try again in a moment.</div>
+          <div className="pt-confirm__row"><button className="pt-btn pt-btn-ghost pt-btn-sm" onClick={onCancel}>Back</button></div>
+        </>
+      ) : (
+        <>
+          <div className="pt-address-box" ref={boxRef} />
+          {!mapsReady && <div className="pt-slotpicker__msg"><span className="pt-spinner-sm" /> Loading address lookup...</div>}
+
+          {picked && (
+            <div className="pt-address-preview">
+              <div className="pt-address-preview__line">{picked.formatted || `${picked.line1}, ${picked.city} ${picked.state} ${picked.zip}`}</div>
+              {areaStatus === 'fail' && (
+                <div className="pt-error-msg">That address is outside the Villages service area.</div>
+              )}
+              {areaStatus === 'pass' && (
+                <div className="pt-address-preview__ok">In the service area.</div>
+              )}
+            </div>
+          )}
+
+          {err && <div className="pt-error-msg" style={{ marginTop: 'var(--space-sm)' }}>{err}</div>}
+
+          <div className="pt-confirm__row" style={{ marginTop: 'var(--space-md)' }}>
+            <button className="pt-btn pt-btn-primary pt-btn-sm" disabled={!picked || areaStatus !== 'pass' || busy} onClick={save}>
+              {busy ? <span className="pt-spinner-sm" /> : 'Save address'}
+            </button>
+            <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy} onClick={onCancel}>Cancel</button>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 

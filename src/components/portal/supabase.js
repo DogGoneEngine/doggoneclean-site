@@ -328,6 +328,24 @@ export async function updateProfile(fields) {
   return data || { ok: false, error: 'no_result' };
 }
 
+// Change the service address. Coordinates must fall inside the
+// subscriber's city polygon; the server re-verifies and sets
+// address_verified. Returns { ok } or { ok:false, error:'out_of_area' | ... }.
+export async function updateServiceAddress(fields) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc('bath_update_service_address', {
+    p_address_line_1: fields.line1,
+    p_address_city: fields.city,
+    p_address_state: fields.state || 'FL',
+    p_address_zip: fields.zip,
+    p_service_lat: fields.lat,
+    p_service_lng: fields.lng,
+  });
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}
+
 // ── Pack management (portal self-service) ─────────────────────────────
 // Ownership is enforced by the bath_dogs self RLS policies; the 3-active
 // household cap is enforced by the bath_dogs_cap trigger. These use the
