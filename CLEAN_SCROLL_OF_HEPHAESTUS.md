@@ -1639,6 +1639,16 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   southern pocket accepted; Belleview REFUSED (10-minute drive but outside the fence, the proof the
   cap works); Gainesville refused. Oracle `ocala_service_area_by_anchor` corrected from
   drive-time-only to the drive-time + perimeter hybrid (reality wins over the old "no polygon" line).
+- 2026-06-07 (Acuity/Squarespace teardown scoped): Squarespace's job is already done better by the
+  app, so the live question is Acuity. Acuity's jobs are: hold the recurring schedule, let clients
+  self-manage (the portal already does reschedule/skip/cancel/cadence), email confirmations and
+  reminders, and Google Calendar sync. Grounded check: the portal management engine and the
+  recurring-service schema (`bath_subscriptions` / `bath_appointments` carry `service_type` +
+  `payment_method`) are built, but 0 legacy clients exist as subscriptions (only the bath test
+  account), no notification function exists, and no calendar sync exists. Decisions: reminders are
+  EMAIL only to match Acuity (which only emails); SMS/Twilio deferred and NOT on the teardown path
+  (do not keep raising it). Build list + Paul-action checklist parked under "Acuity + Squarespace
+  teardown"; the immediate Paul action is verifying `service@doggoneclean.us` as a Resend sender.
 
 ### Legacy login mechanism built + Ocala availability captured (2026-06-07, migration 0024)
 - Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,

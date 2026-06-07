@@ -37,6 +37,20 @@ survive a reset:
   New autocomplete to capture it), and have `bath_start_subscription` enforce the gate server-side at
   signup; (2) flip Ocala `hb_active` on. Prices, durations, anchors (`clients.is_anchor`, outliers
   flagged out) already set.
+- **Acuity + Squarespace teardown (legacy folds into the app, `legacy_folds_into_v2`).** Replace
+  both with the one Clean app. BUILD (mine): load the Tue-Sat noon-to-8 availability (every other
+  week, days addable), migrate the 33 standing + at-will clients into recurring full-groom
+  subscriptions, generate their upcoming appointments, automatic Google Calendar sync (via the
+  droplet n8n), automated email confirmations + reminders (Supabase cron), portal full-groom
+  display, and the doggoneclean.us -> app Caddy redirect. PAUL ACTIONS (no tool reaches these),
+  immediate first:
+  1. **Set up `service@doggoneclean.us` as a verified sender in Resend and hand over the API key**,
+     so confirmation/reminder emails can send. IMMEDIATE NEXT.
+  2. Connect Paul's Google Calendar to the app once (OAuth) so the sync writes to it hands-off.
+  3. Point doggoneclean.us DNS at the droplet for the redirect cutover.
+  4. Cancel Acuity, then Squarespace, once a real client is verified end to end.
+  SMS/Twilio is parked and NOT on this path: Acuity only emails reminders, so email reminders fully
+  replace it; text reminders are a later bonus, not a blocker.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is
