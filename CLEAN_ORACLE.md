@@ -590,6 +590,25 @@ real per-client time beats any average: a chatty household or a slow dog is a pe
 plannable fact of that stop, not noise to average away. The average exists only so a brand-new
 client can still be booked before they have a history of their own.
 
+`ocala_availability_every_other_week` (scheduling):
+Paul works the Ocala route every other week, Tuesday through Saturday, anchored on the week of
+Monday June 8, 2026 (the Ocala weeks are June 8, June 22, July 6, and every second Monday after).
+On top of that recurring block he can manually open extra days, or add a brief return trip to
+Ocala on an off week, and the schedule offers slots only on days he is actually there. Because his
+real Ocala presence alternates by week, so the booking engine must never offer a day he is in The
+Villages, and his route still throws off ad-hoc Ocala trips that need room (for example the
+multi-dog Cummings job that landed on an off week in his calendar).
+
+`legacy_login_by_claim` (auth):
+A legacy client signs in with phone (SMS OTP), email (magic link), or Google, and the portal links
+them to their existing clients record by matching the verified identity (phone last ten digits or
+email) through `bath_claim_legacy_account()`, which creates or adopts a `bath_subscribers` row
+carrying `client_id`. A clients record already claimed by another auth user is never handed over,
+and a repeat claim by the same user is a no-op. Because legacy clients live in the clients book,
+not in `bath_subscribers`, so sign-in has to bridge the two by verified identity; the match targets
+`clients.phone_e164` and `clients.email` are backfilled from the Acuity calendar feed, which
+carries each client's phone and email.
+
 `villages_only_in_copy` (Hurricane Bath: copy):
 The Hurricane Bath surface mentions only The Villages in customer-facing copy:
 no other cities, no reference to the legacy Ocala full-grooming book (which

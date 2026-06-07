@@ -1601,6 +1601,24 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   force-approve) or stay pinned to the legacy seed set? Recommended the former. Not yet captured
   as a rule; build once Paul decides the anchor-growth question.
 
+### Legacy login mechanism built + Ocala availability captured (2026-06-07, migration 0024)
+- Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,
+  so a sign-in dead-ended at the empty portal. Built `bath_claim_legacy_account()`: matches the
+  verified sign-in identity (phone last ten digits from the JWT, or email) to a clients row and
+  creates or adopts a linked `bath_subscribers` row (client_id + auth_user_id), copying name,
+  address, and Ocala city. An already-claimed record is never handed over; a repeat claim is a
+  no-op. Wired into `getPortalData` (supabase.js): a first sign-in with no subscriber row attempts
+  the claim, then re-reads. Added `clients.phone_e164` + `clients.email` as the match targets.
+  Verified end-to-end in a rolled-back transaction (seeded client + fake auth user + simulated
+  JWT): phone match returned claimed with the linked row carrying the client's name, address, and
+  Ocala; a second call returned already_linked. Remaining (step 2): backfill clients contact info
+  from the Acuity calendar feed so it matches real clients.
+- Ocala availability (number 2) captured, not yet built: every other week Tue-Sat anchored on the
+  week of Monday June 8, 2026, plus manual extra days and brief off-week trips
+  (`ocala_availability_every_other_week`). Confirmed against Paul's calendar: the week of June 8 is
+  a packed Ocala week (about 15 stops Tue-Sat), the next week drops to a couple (the Cummings
+  off-week trip). The recurring windows + every-other-week generator are the next build.
+
 ### schedule_by_client_history implemented on Clean (2026-06-07, migration 0023)
 - Paul: "schedule based on guess for a new client, then historical duration for the exact client
   in the future. go." Built `clean_effective_duration_minutes(subscriber_id)`: returns the linked

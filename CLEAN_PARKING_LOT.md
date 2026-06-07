@@ -13,8 +13,16 @@ survive a reset:
   reminders today, so a Supabase scheduled edge function (pg_cron + SMS/email, mirroring DGN
   send-notification) must exist before Acuity is cancelled or clients no-show
   (confirmations_and_reminders_via_supabase). n8n is deferred.
-- **Legacy client login + accounts.** Legacy clients need to sign in and get a bath_subscribers
-  account linked to their clients record before they can self-schedule.
+- **Legacy client login: backfill the match targets.** The claim mechanism is built and verified
+  (`bath_claim_legacy_account`, migration 0024, wired into getPortalData). Remaining: backfill
+  `clients.phone_e164` + `clients.email` from the Acuity calendar feed so sign-in matches real
+  legacy clients (each calendar appointment carries the client's phone + email; match by name to
+  the clients row). Until then the mechanism is live but matches only clients whose contact info
+  is filled in.
+- **Enter Ocala availability + every-other-week generator.** Spec captured
+  (`ocala_availability_every_other_week`): every other week Tue-Sat anchored on the week of
+  2026-06-08, plus manual extra days and brief off-week trips. Build the recurring window generator
+  plus a manual day add/remove control, so the slot engine offers only days Paul is in Ocala.
 - **Open Ocala for new bath signups.** Needs the anchor drive-time gate live
   (ocala_service_area_by_anchor): enable Distance Matrix + Geocoding on Clean's Maps Cloud
   project, geocode the 31 anchors into clients.geo_lat/geo_lng, wire the client-side drive-time

@@ -140,13 +140,28 @@ export async function getPortalData() {
   if (userErr || !user) return { error: 'not_authenticated' };
 
   // Look for an existing subscriber row tied to this auth user.
-  const { data: subRows, error: subErr } = await client
+  let { data: subRows, error: subErr } = await client
     .from('bath_subscribers')
     .select('*')
     .eq('auth_user_id', user.id)
     .limit(1);
 
   if (subErr) return { error: 'load_failed', detail: subErr.message };
+
+  // Legacy clients live in `clients`, not bath_subscribers, so a first
+  // sign-in finds no row. Attempt to claim/link their legacy account by the
+  // verified sign-in identity (phone or email), then re-read.
+  if (!subRows || subRows.length === 0) {
+    const { data: claim } = await client.rpc('bath_claim_legacy_account');
+    if (claim && claim.claimed) {
+      const reSub = await client
+        .from('bath_subscribers')
+        .select('*')
+        .eq('auth_user_id', user.id)
+        .limit(1);
+      subRows = reSub.data;
+    }
+  }
 
   if (!subRows || subRows.length === 0) {
     return { authUser: user, subscriber: null };
