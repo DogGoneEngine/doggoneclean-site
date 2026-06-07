@@ -1600,3 +1600,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   clients also become anchors (organic growth, with each anchor toggleable, plus a manual
   force-approve) or stay pinned to the legacy seed set? Recommended the former. Not yet captured
   as a rule; build once Paul decides the anchor-growth question.
+- **Ocala anchor decided + foundation built; notification path corrected (2026-06-07).** Paul:
+  do the Ocala anchor, new clients become anchors. Locked as Oracle `ocala_service_area_by_anchor`
+  (15-min drive to an anchor; new bath clients anchor by default, toggleable, plus manual
+  force-approve; exception clients flagged out), replacing the polygon requirement for Ocala
+  only. Migration 0020 added `clients.geo_lat/geo_lng/is_anchor` + `bath_subscribers.is_anchor`;
+  designated 31 legacy anchors (33 standing minus Tonya Hunt and Greta Custer, both carrying
+  "anchor": false in clients.json so a reseed preserves it); gen_seed emits is_anchor. Verified
+  in prod (31 anchors). Paul also corrected the notification path: confirmations and reminders
+  run from Clean's own Supabase (scheduled edge function on pg_cron, mirroring DGN
+  send-notification), NOT n8n (n8n is later automation) - captured as
+  `confirmations_and_reminders_via_supabase` and folded into `legacy_folds_into_v2`. Remaining
+  to make the gate live (verify-blocked here, needs the key): enable Distance Matrix on Clean's
+  existing Maps Cloud project (MAPS_BROWSER_KEY in maps.js), run a one-time geocode of the 31
+  anchors into geo_lat/geo_lng, then wire the client-side drive-time check into the Ocala booking
+  gate and verify in dev. Also still needed to open Ocala: bath pricing + slot minutes.

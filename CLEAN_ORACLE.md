@@ -515,8 +515,10 @@ location, present in the cities model as slug 'ocala'. It is the home of the
 entire legacy book (every legacy client's service address is there) and the first
 city of the bath pivot, which deliberately starts in Ocala where Paul already
 works before migrating to The Villages. Ocala is added but not yet open for
-new-client v2 booking (hb_active false): opening it needs its real service-area
-polygon, bath pricing, and slot minutes, which are current data gaps. Because the
+new-client v2 booking (hb_active false): opening it needs the anchor drive-time
+gate live (`ocala_service_area_by_anchor`: Distance Matrix enabled on Clean's
+Maps key plus a one-time anchor geocode), bath pricing, and slot minutes, which
+are the current gaps. Ocala needs no drawn polygon. Because the
 legacy clients are all in Ocala and need a city to belong to, and the pivot
 begins where Paul works; but a city is not bookable for new clients until its real
 area and prices exist, so the row exists without going live.
@@ -533,6 +535,23 @@ business motion is the pivot off labor-intensive low-hourly full grooming toward
 fast high-hourly bath work (`favor_high_hourly_work`, `core_is_no_haircut_dogs`),
 and taking new full-groom clients would regrow the exact book Clean is winding
 down.
+
+`ocala_service_area_by_anchor` (service area):
+Ocala's service area for new clients is a drive-time gate, not a drawn polygon: a new address
+qualifies if it is within a 15-minute drive of an existing anchor stop (a real client Paul
+already serves). Anchors are the routed legacy standing clients plus active bath clients;
+exception clients Paul serves as favors (Tonya Hunt in Williston, Greta Custer's Dunnellon
+outlier) are flagged out (`clients.is_anchor` / `bath_subscribers.is_anchor`) so they do not
+extend the area. New bath clients become anchors by default, each individually toggleable, with
+a manual force-approve for an address Paul chooses to take outside the gate. Drive time is
+computed against Google Distance Matrix on Clean's own Maps key, the same mechanism DGN uses
+for inter-stop drive time. Because a hand-drawn Ocala polygon is a maintenance burden and an
+arbitrary edge, while proximity-to-anchor makes the service area a living function of where
+Paul already profitably drives: it opens Ocala now with nothing to draw, and it auto-contracts
+as the book shifts to The Villages and Ocala anchors thin out, so the geography enforces the
+wind-down. Decided 2026-06-07 (new clients become anchors, per Paul). This replaces the
+polygon requirement for Ocala only; The Villages keeps its polygon (`villages_only_at_launch`)
+for now.
 
 `villages_only_in_copy` (Hurricane Bath: copy):
 The Hurricane Bath surface mentions only The Villages in customer-facing copy:
@@ -882,7 +901,9 @@ the actual inbound drive time to each stop separately and does not fold it into 
 block. Every existing legacy client is carried into the app; none are dropped in the migration. Legacy keeps paying in person via Square through the cutover; moving legacy
 to card-on-file is a deferred, separate decision and is not part of this work. Acuity's
 reminders are load-bearing, so reminders must exist in the app before Acuity is cancelled or
-clients no-show; n8n on the shared droplet is the reminder host. Because killing Squarespace
+clients no-show; those reminders and confirmations are sent from Clean's own Supabase as a
+scheduled edge function (see `confirmations_and_reminders_via_supabase`), not n8n, which is
+reserved for later automation. Because killing Squarespace
 and Acuity removes legacy's only operational home, so legacy needs that home in the app now,
 not at a later rebuild; one app with one login preserves the client relationship and full
 history through the Ocala-to-Villages, grooming-to-bath migration that is the core business
@@ -891,6 +912,17 @@ build under a deadline; and Acuity's death is not Square's death, so in-person p
 working and stays out of the cutover's critical path. This supersedes the 2026-05-26 "two URL
 surfaces, legacy rebuilt later" framing per reality_wins: the legacy rebuild is this, folded
 into the app.
+
+`confirmations_and_reminders_via_supabase` (architecture):
+Appointment confirmations and reminders are sent from Clean's own Supabase: a scheduled edge
+function on a pg_cron trigger calls the SMS and email providers, mirroring DGN's
+`send-notification` edge function but with Clean's own instances and keys (never shared, per
+`clean_stays_saleable`). n8n on the shared droplet is reserved for later, non-core automation
+and is not the confirmation or reminder path. Because Acuity's reminders are load-bearing and
+must be rebuilt before Acuity is cancelled (`legacy_folds_into_v2`); the notification path
+belongs in the same Supabase that owns the appointments, on the same scheduled-function
+pattern DGN already proved, rather than in a separate automation tool that would split the
+system and complicate a future sale.
 
 `if_payments_added_handle_money_safely` (money):
 If online payment is ever added, store all money in cents (convert to dollars only at the

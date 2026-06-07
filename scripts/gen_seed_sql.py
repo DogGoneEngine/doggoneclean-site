@@ -56,6 +56,10 @@ def client_row(c, roster_group, block):
     avail = c.get("availability") or {}
     note = c.get("note") or c.get("reason")
     routed = c.get("routed", roster_group == "standing")
+    # Service-area anchors are routed standing stops, minus the exception clients
+    # Paul serves as favors (those carry "anchor": false). See
+    # ocala_service_area_by_anchor.
+    is_anchor = bool(routed) and roster_group == "standing" and c.get("anchor", True)
     bt = block.get(c.get("name")) or {}
     cols = [
         ("name", q(c.get("name"))),
@@ -69,6 +73,7 @@ def client_row(c, roster_group, block):
         ("hardness", q(c.get("hardness"))),
         ("visit_minutes", q(bt.get("minutes"))),
         ("visit_minutes_confidence", q(bt.get("confidence"))),
+        ("is_anchor", q(bool(is_anchor))),
         ("location_address", q(address)),
         ("location_zip", q(loc.get("zip"))),
         ("location_zone", q(zone)),

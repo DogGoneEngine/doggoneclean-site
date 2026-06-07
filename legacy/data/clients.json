@@ -229,6 +229,7 @@
     {
       "name": "Greta Custer",
       "aka": null,
+      "anchor": false,
       "status": "standing",
       "service_type": "full_groom",
       "cadence_days": 49,
@@ -630,6 +631,7 @@
     {
       "name": "Tonya Hunt",
       "aka": null,
+      "anchor": false,
       "status": "standing",
       "service_type": "full_groom",
       "cadence_days": 28,
