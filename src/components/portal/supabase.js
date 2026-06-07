@@ -298,3 +298,28 @@ export function resumeSubscription() {
 export function cancelSubscription() {
   return callSubscriptionRpc('bath_cancel_subscription');
 }
+
+// ── Per-visit actions (portal self-service) ───────────────────────────
+// Skip one upcoming visit. Returns { ok, status } or { ok:false, error }.
+export async function skipAppointment(appointmentId) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc('bath_skip_appointment', {
+    p_appointment_id: appointmentId,
+  });
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}
+
+// Move one upcoming visit to a free slot. newStart is an ISO timestamp that
+// must match a slot returned by getOpenSlots; the server revalidates it.
+export async function rescheduleAppointment(appointmentId, newStart) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc('bath_reschedule_appointment', {
+    p_appointment_id: appointmentId,
+    p_new_start: newStart,
+  });
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}

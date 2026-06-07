@@ -11,9 +11,12 @@
 // RPC, because bath_subscriptions and bath_appointments expose no direct
 // write policy: the rule has to live in the database, not the page.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './portal.css';
-import { pauseSubscription, resumeSubscription, cancelSubscription } from './supabase.js';
+import {
+  pauseSubscription, resumeSubscription, cancelSubscription,
+  skipAppointment, rescheduleAppointment, getOpenSlots,
+} from './supabase.js';
 
 // ── Formatting helpers ─────────────────────────────────────────────────
 // Appointment times are timestamptz; render them in the city's wall clock
@@ -189,6 +192,9 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
                   : 'Book a visit to get back on the route.'}
               </div>
             </div>
+          )}
+          {nextAppt && (
+            <VisitActions appt={nextAppt} city={city} onChanged={onChanged} toast={toast} />
           )}
         </section>
 
@@ -411,7 +417,168 @@ function humanError(res) {
   const e = res && res.error;
   if (e === 'no_active_subscription') return 'No active plan to change.';
   if (e === 'no_paused_subscription') return 'Your plan is not paused.';
+  if (e === 'too_late') return 'Changes close 24 hours before your visit.';
+  if (e === 'slot_unavailable') return 'That time is no longer open. Pick another.';
+  if (e === 'not_found') return 'That visit could not be found.';
+  if (e === 'not_skippable' || e === 'not_reschedulable') return 'That visit can no longer be changed.';
   return 'Something went wrong. Please try again.';
+}
+
+// ── Visit actions: reschedule, skip (the upcoming visit) ────────────────
+// Locked inside the 24-hour window (matches the charge window). Reschedule
+// only lands on a free slot the server revalidates: no human in the loop.
+function VisitActions({ appt, city, onChanged, toast }) {
+  const [mode, setMode] = useState('idle'); // 'idle' | 'confirmSkip' | 'pickSlot'
+  const [busy, setBusy] = useState(false);
+
+  const hoursUntil = appt.scheduled_start
+    ? (new Date(appt.scheduled_start).getTime() - Date.now()) / 3600000
+    : null;
+  const locked = hoursUntil !== null && hoursUntil < 24;
+
+  if (locked) {
+    return (
+      <div className="pt-locked-note">
+        This visit is locked in. Changes close 24 hours before.
+      </div>
+    );
+  }
+
+  async function run(fn, successMsg) {
+    setBusy(true);
+    let res;
+    try {
+      res = await fn();
+    } catch {
+      res = { ok: false, error: 'network' };
+    }
+    setBusy(false);
+    if (res && res.ok) {
+      setMode('idle');
+      if (toast) toast(successMsg);
+      if (onChanged) await onChanged();
+    } else if (toast) {
+      toast(humanError(res), true);
+    }
+  }
+
+  if (mode === 'confirmSkip') {
+    return (
+      <div className="pt-confirm">
+        <div className="pt-confirm__text">
+          Skip this visit? It comes off the schedule. Your plan stays active.
+        </div>
+        <div className="pt-confirm__row">
+          <button className="pt-btn pt-btn-danger pt-btn-sm" disabled={busy}
+            onClick={() => run(() => skipAppointment(appt.id), 'Visit skipped.')}>
+            {busy ? <span className="pt-spinner-sm" /> : 'Yes, skip it'}
+          </button>
+          <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy}
+            onClick={() => setMode('idle')}>
+            Keep visit
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'pickSlot') {
+    return (
+      <SlotPicker
+        city={city}
+        busy={busy}
+        onPick={(slotStart) => run(() => rescheduleAppointment(appt.id, slotStart), 'Visit moved.')}
+        onCancel={() => setMode('idle')}
+      />
+    );
+  }
+
+  return (
+    <div className="pt-visit-actions">
+      <button className="pt-btn pt-btn-secondary pt-btn-sm" onClick={() => setMode('pickSlot')}>
+        Reschedule
+      </button>
+      <button className="pt-btn pt-btn-ghost pt-btn-sm" onClick={() => setMode('confirmSkip')}>
+        Skip this visit
+      </button>
+    </div>
+  );
+}
+
+// ── Slot picker: live open times from bath_open_slots ──────────────────
+function SlotPicker({ city, busy, onPick, onCancel }) {
+  const [state, setState] = useState('loading'); // 'loading' | 'ready' | 'error'
+  const [slots, setSlots] = useState([]);
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      if (!city || !city.id) { setState('ready'); setSlots([]); return; }
+      const res = await getOpenSlots(city.id);
+      if (!alive) return;
+      if (res.error) { setState('error'); return; }
+      setSlots(res.slots || []);
+      setState('ready');
+    })();
+    return () => { alive = false; };
+  }, [city]);
+
+  // Group slots by local calendar day.
+  const days = [];
+  const byDay = new Map();
+  for (const s of slots) {
+    const key = new Date(s.slot_start).toLocaleDateString('en-US', { timeZone: tz(city) });
+    if (!byDay.has(key)) { byDay.set(key, []); days.push(key); }
+    byDay.get(key).push(s);
+  }
+
+  return (
+    <div className="pt-slotpicker">
+      <div className="pt-slotpicker__head">Pick a new time</div>
+
+      {state === 'loading' && (
+        <div className="pt-slotpicker__msg"><span className="pt-spinner-sm" /> Loading open times...</div>
+      )}
+      {state === 'error' && (
+        <div className="pt-slotpicker__msg">Could not load open times. Try again.</div>
+      )}
+      {state === 'ready' && slots.length === 0 && (
+        <div className="pt-slotpicker__msg">No open times right now. Check back soon.</div>
+      )}
+
+      {state === 'ready' && slots.length > 0 && (
+        <div className="pt-slotpicker__days">
+          {days.map(day => (
+            <div className="pt-slot-day" key={day}>
+              <div className="pt-slot-day__label">{fmtDate(byDay.get(day)[0].slot_start, city)}</div>
+              <div className="pt-slot-grid">
+                {byDay.get(day).map(s => (
+                  <button
+                    key={s.slot_start}
+                    className={`pt-slot${selected === s.slot_start ? ' pt-slot--selected' : ''}`}
+                    onClick={() => setSelected(s.slot_start)}
+                  >
+                    {fmtTime(s.slot_start, city)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="pt-confirm__row" style={{ marginTop: 'var(--space-md)' }}>
+        <button className="pt-btn pt-btn-primary pt-btn-sm" disabled={!selected || busy}
+          onClick={() => onPick(selected)}>
+          {busy ? <span className="pt-spinner-sm" /> : 'Confirm new time'}
+        </button>
+        <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy} onClick={onCancel}>
+          Back
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // ── small shared helpers (kept local to the portal island) ─────────────
