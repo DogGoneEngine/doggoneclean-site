@@ -14,7 +14,7 @@
 import { useState, useEffect } from 'react';
 import './portal.css';
 import {
-  pauseSubscription, resumeSubscription, cancelSubscription,
+  pauseSubscription, resumeSubscription, cancelSubscription, changeCadence,
   skipAppointment, rescheduleAppointment, getOpenSlots,
 } from './supabase.js';
 
@@ -228,6 +228,7 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
                 </div>
               )}
             </div>
+            <CadenceControl subscription={subscription} onChanged={onChanged} toast={toast} />
             <PlanActions subscription={subscription} onChanged={onChanged} toast={toast} />
           </section>
         )}
@@ -316,6 +317,55 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
           <button className="pt-signout-link" onClick={onLogout}>Sign out</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Cadence control: switch every 4 weeks <-> every 2 weeks ─────────────
+// Only for an active recurring plan. Same price either way (the server
+// enforces that; this is just the chooser). One tap to switch.
+function CadenceControl({ subscription, onChanged, toast }) {
+  const [busy, setBusy] = useState(false);
+  const current = subscription.cadence;
+
+  if (subscription.status !== 'active') return null;
+  if (current !== '4wk' && current !== '2wk') return null;
+
+  async function pick(next) {
+    if (next === current || busy) return;
+    setBusy(true);
+    let res;
+    try {
+      res = await changeCadence(next);
+    } catch {
+      res = { ok: false, error: 'network' };
+    }
+    setBusy(false);
+    if (res && res.ok) {
+      if (toast) toast(next === '2wk' ? 'Switched to every 2 weeks.' : 'Switched to every 4 weeks.');
+      if (onChanged) await onChanged();
+    } else if (toast) {
+      toast('Could not change your cadence. Please try again.', true);
+    }
+  }
+
+  return (
+    <div className="pt-cadence">
+      <div className="pt-cadence__seg" role="group" aria-label="Visit cadence">
+        {[['4wk', 'Every 4 weeks'], ['2wk', 'Every 2 weeks']].map(([val, label]) => (
+          <button
+            key={val}
+            type="button"
+            className={`pt-cadence__opt${current === val ? ' pt-cadence__opt--on' : ''}`}
+            aria-pressed={current === val}
+            disabled={busy}
+            onClick={() => pick(val)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="pt-cadence__hint">Same price either way. Every 2 weeks just keeps the coat fresher.</div>
     </div>
   );
 }

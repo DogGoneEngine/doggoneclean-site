@@ -775,6 +775,52 @@
   color: var(--ink);
 }
 
+/* ── Cadence control (segmented 4wk / 2wk) ──────────────────────────── */
+.pt-cadence {
+  margin-top: var(--space-md);
+}
+
+.pt-cadence__seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 4px;
+}
+
+.pt-cadence__opt {
+  padding: 0.55rem 0.5rem;
+  border: none;
+  border-radius: calc(var(--radius-md) - 3px);
+  background: transparent;
+  color: var(--soft);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.pt-cadence__opt:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.pt-cadence__opt--on {
+  background: linear-gradient(100deg, var(--accent), var(--accent2));
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.pt-cadence__hint {
+  font-size: var(--text-xs);
+  color: var(--soft);
+  margin-top: var(--space-xs);
+  line-height: 1.5;
+}
+
 /* ── Plan actions (pause / restart / cancel) ────────────────────────── */
 .pt-plan-actions {
   display: flex;

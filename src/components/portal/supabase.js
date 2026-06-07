@@ -299,6 +299,16 @@ export function cancelSubscription() {
   return callSubscriptionRpc('bath_cancel_subscription');
 }
 
+// Switch recurring cadence ('4wk' <-> '2wk'). Same price either way.
+// Returns { ok, cadence } or { ok:false, error }.
+export async function changeCadence(cadence) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc('bath_change_cadence', { p_cadence: cadence });
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}
+
 // ── Per-visit actions (portal self-service) ───────────────────────────
 // Skip one upcoming visit. Returns { ok, status } or { ok:false, error }.
 export async function skipAppointment(appointmentId) {
