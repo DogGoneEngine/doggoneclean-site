@@ -36,6 +36,23 @@ export function sb() {
   return _client;
 }
 
+// ── Reachability guard ────────────────────────────────────────────────
+// Wrap any promise so it rejects if the backend does not answer in time.
+// A paused or unreachable Supabase project makes auth/refresh and getUser
+// calls hang with no response; without this the portal would spin forever
+// on the "checking" or "loading" state. With it, a hang surfaces as an
+// honest error the user can retry. Default ceiling is generous so a slow
+// but live network never trips it.
+export const BACKEND_TIMEOUT_MS = 8000;
+export function withTimeout(promise, ms = BACKEND_TIMEOUT_MS, label = 'backend') {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`timeout: ${label} did not respond`)), ms)
+    ),
+  ]);
+}
+
 // ── Identity / E.164 ──────────────────────────────────────────────────
 // Permissive email detector (anything containing an @).
 export function looksLikeEmail(s) {

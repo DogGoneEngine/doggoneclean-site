@@ -13,7 +13,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import './portal.css';
-import { sb, getPortalData, signOut } from './supabase.js';
+import { sb, getPortalData, signOut, withTimeout } from './supabase.js';
 import AuthScreen from './AuthScreen.jsx';
 
 export default function PortalApp() {
@@ -23,6 +23,10 @@ export default function PortalApp() {
   const [data, setData] = useState(null);
   const [dataError, setDataError] = useState(null);
   const [dataLoading, setDataLoading] = useState(false);
+  // True when the auth check has hung past the timeout (paused or
+  // unreachable backend). Lets us show a retry card instead of spinning
+  // forever on the "checking" state.
+  const [bootStuck, setBootStuck] = useState(false);
 
   const loadingInProgress = useRef(false);
   const [toastState, setToastState] = useState(null);
@@ -40,7 +44,7 @@ export default function PortalApp() {
     setDataLoading(true);
     setDataError(null);
     try {
-      const payload = await getPortalData();
+      const payload = await withTimeout(getPortalData(), 8000, 'portal data');
       if (payload.error === 'not_authenticated') {
         setDataLoading(false);
         loadingInProgress.current = false;
@@ -83,6 +87,16 @@ export default function PortalApp() {
     return () => authSub.unsubscribe();
   }, []);
 
+  // Watchdog: if the auth check is still running after the timeout, the
+  // backend is unreachable (paused project, dead network). Flip to a retry
+  // card instead of spinning on "checking" forever. The first auth event
+  // (INITIAL_SESSION) normally lands in well under a second.
+  useEffect(() => {
+    if (authState !== 'checking') return;
+    const t = setTimeout(() => setBootStuck(true), 8000);
+    return () => clearTimeout(t);
+  }, [authState]);
+
   // Load portal data when auth becomes authenticated and we have nothing yet.
   useEffect(() => {
     if (authState === 'authenticated' && !data && !dataLoading) {
@@ -97,9 +111,28 @@ export default function PortalApp() {
 
   return (
     <div className="pt-shell">
-      {authState === 'checking' && (
+      {authState === 'checking' && !bootStuck && (
         <div className="pt-center-fill">
           <div className="pt-spinner" />
+        </div>
+      )}
+
+      {authState === 'checking' && bootStuck && (
+        <div className="pt-center-fill">
+          <div className="pt-auth-card" style={{ textAlign: 'center' }}>
+            <h2 style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-md)' }}>
+              We could not reach the server
+            </h2>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--soft)', marginBottom: 'var(--space-xl)' }}>
+              The portal is not responding right now. Check your connection and try again in a moment.
+            </p>
+            <button
+              className="pt-btn pt-btn-primary"
+              onClick={() => window.location.reload()}
+            >
+              Try again
+            </button>
+          </div>
         </div>
       )}
 
