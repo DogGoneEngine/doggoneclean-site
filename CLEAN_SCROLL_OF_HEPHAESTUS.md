@@ -1600,6 +1600,19 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   clients also become anchors (organic growth, with each anchor toggleable, plus a manual
   force-approve) or stay pinned to the legacy seed set? Recommended the former. Not yet captured
   as a rule; build once Paul decides the anchor-growth question.
+
+### schedule_by_client_history implemented on Clean (2026-06-07, migration 0023)
+- Paul: "schedule based on guess for a new client, then historical duration for the exact client
+  in the future. go." Built `clean_effective_duration_minutes(subscriber_id)`: returns the linked
+  legacy client's `visit_minutes` when present (the exact client's history), else the coat-tier
+  bath default (smoothcoat 30 / doublecoat 60), floored by the city minimum stop (30). Wired into
+  `bath_reschedule_appointment` (a known client re-books at their real length) and into
+  `bath_start_subscription` (a new client's first appointment uses the guess; the appointment now
+  also stamps service_type, payment_method, duration_minutes). This also repaired booking, which
+  had broken when durations moved from the single `hb_slot_minutes` to per-tier minutes (the old
+  RPCs keyed off the now-null `hb_slot_minutes`). Verified in a rolled-back transaction: a new
+  (unlinked) subscriber returns 60 (its doublecoat guess), linked to Kevin Cummings returns 395,
+  linked to Steve Crandall returns 53 - the exact per-client history. DGN side next.
 - **Ocala anchor decided + foundation built; notification path corrected (2026-06-07).** Paul:
   do the Ocala anchor, new clients become anchors. Locked as Oracle `ocala_service_area_by_anchor`
   (15-min drive to an anchor; new bath clients anchor by default, toggleable, plus manual
