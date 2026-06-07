@@ -1628,6 +1628,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   "Miami, FL" within=false (266 min). Addresses stay the fallback if coords are ever missing, so a
   fresh DB rebuild still works before any re-geocode. Also enabled Places API (New) for the future
   booking-form autocomplete.
+- 2026-06-07 (perimeter added): Paul named the breadcrumb hole in the anchor model: an edge client
+  becoming an anchor would let the 15-minute gate walk the area outward forever. Fix is a frozen
+  containment perimeter ANDed with the drive-time gate. Paul hand-drew the fence on geojson.io
+  around his outermost clients (I handed him a GeoJSON of all 33 as pins to draw around). 3 clients
+  were clipped by his southern edge, so the south line was nudged down about 1 mile to take them in
+  plus a cushion; all 33 now inside. Stored in `public.service_perimeters` (slug 'ocala', GeoJSON,
+  migration 0027, public-readable). The `ocala-service-area` function now geocodes the address,
+  refuses anything outside the fence, then runs the drive-time check. Verified: Ocala center and the
+  southern pocket accepted; Belleview REFUSED (10-minute drive but outside the fence, the proof the
+  cap works); Gainesville refused. Oracle `ocala_service_area_by_anchor` corrected from
+  drive-time-only to the drive-time + perimeter hybrid (reality wins over the old "no polygon" line).
 
 ### Legacy login mechanism built + Ocala availability captured (2026-06-07, migration 0024)
 - Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,

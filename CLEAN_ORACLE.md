@@ -538,21 +538,28 @@ and taking new full-groom clients would regrow the exact book Clean is winding
 down.
 
 `ocala_service_area_by_anchor` (service area):
-Ocala's service area for new clients is a drive-time gate, not a drawn polygon: a new address
-qualifies if it is within a 15-minute drive of an existing anchor stop (a real client Paul
-already serves). Anchors are the routed legacy standing clients plus active bath clients;
-exception clients Paul serves as favors (Tonya Hunt in Williston, Greta Custer's Dunnellon
-outlier) are flagged out (`clients.is_anchor` / `bath_subscribers.is_anchor`) so they do not
-extend the area. New bath clients become anchors by default, each individually toggleable, with
-a manual force-approve for an address Paul chooses to take outside the gate. Drive time is
-computed against Google Distance Matrix on Clean's own Maps key, the same mechanism DGN uses
-for inter-stop drive time. Because a hand-drawn Ocala polygon is a maintenance burden and an
-arbitrary edge, while proximity-to-anchor makes the service area a living function of where
-Paul already profitably drives: it opens Ocala now with nothing to draw, and it auto-contracts
-as the book shifts to The Villages and Ocala anchors thin out, so the geography enforces the
-wind-down. Decided 2026-06-07 (new clients become anchors, per Paul). This replaces the
-polygon requirement for Ocala only; The Villages keeps its polygon (`villages_only_at_launch`)
-for now.
+Ocala's service area for new clients is two gates ANDed together: a new service address qualifies
+only if it is (1) INSIDE a frozen containment perimeter Paul drew by hand around his outermost
+existing clients, AND (2) within a 15-minute drive of an existing anchor stop (a real client Paul
+already serves), measured by Google Distance Matrix on Clean's own Maps key. The drive-time gate
+keeps each new stop efficient (no isolated runs); the perimeter is the hard cap that stops an edge
+client, once it becomes an anchor, from breadcrumbing the area outward one stop at a time. Anchors
+are the routed legacy standing clients plus active bath clients; favor/outlier clients (Tonya Hunt
+in Williston, Greta Custer's Dunnellon outlier) are flagged out (`clients.is_anchor` /
+`bath_subscribers.is_anchor`) so they neither anchor a new stop nor extend the area. New bath
+clients become anchors by default, each individually toggleable, with a manual force-approve for an
+address Paul chooses to take outside the gate; because the perimeter is frozen (never recomputed
+from new clients), new anchors only densify coverage inside the fence, they never push it out. The
+perimeter lives in `public.service_perimeters` (slug `ocala`, GeoJSON, public-readable so the
+booking form can pre-check); the anchor coordinates and drive math stay server-side in the
+`ocala-service-area` edge function. Because proximity-to-anchor alone makes the area a living
+function of where Paul already profitably drives and auto-contracts as the book shifts to The
+Villages, but on its own a single edge signup turning into an anchor would let the area walk outward
+forever; the frozen perimeter caps that, the drive-time gate keeps efficiency, and the two together
+are stricter than either alone (a stop can be a 10-minute drive yet still outside the fence, for
+example Belleview, and is then refused). Drawn and decided 2026-06-07 (Paul hand-drew the fence on
+geojson.io, southern edge nudged about 1 mile to take in three clipped clients; new clients become
+anchors, per Paul). The Villages keeps its own polygon (`villages_only_at_launch`).
 
 `bath_starting_durations` (scheduling):
 To start, a bath visit is 30 minutes for a smoothcoat dog (quick) and 60 minutes for a

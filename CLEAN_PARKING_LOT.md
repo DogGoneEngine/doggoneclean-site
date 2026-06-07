@@ -25,18 +25,18 @@ survive a reset:
   (`ocala_availability_every_other_week`): every other week Tue-Sat anchored on the week of
   2026-06-08, plus manual extra days and brief off-week trips. Build the recurring window generator
   plus a manual day add/remove control, so the slot engine offers only days Paul is in Ocala.
-- **Open Ocala for new bath signups (drive-time gate LIVE; remaining: perimeter + wire + flip).**
-  The `ocala-service-area` edge function is deployed and verified end to end (2026-06-07): it routes
-  on the 33 anchors' cached coordinates (addresses as fallback) via Google Distance Matrix and
-  returns { within, minutes }. Ocala center and Belleview read within=true (0 and 10 min), Miami
-  within=false (266 min), all 33 anchors resolved. Distance Matrix + Geocoding are both enabled; the
-  33 anchors are geocoded and cached on `clients.geo_lat/geo_lng`; the Google key is stored
-  server-side in `public.app_secrets`. Remaining to
-  actually open Ocala: (1) draw the containment perimeter polygon (the fence new clients cannot
-  cross, so edge anchors cannot breadcrumb the area outward) and AND it with the drive-time gate;
-  (2) wire the booking funnel to call the function for an Ocala service address, and have
-  `bath_start_subscription` enforce it server-side; (3) flip Ocala `hb_active` on. Prices,
-  durations, anchors (`clients.is_anchor`, outliers flagged out) already set.
+- **Open Ocala for new bath signups (gate + perimeter LIVE; remaining: wire the form + flip).**
+  The `ocala-service-area` edge function is deployed and verified end to end (2026-06-07). It
+  geocodes the service address, refuses anything outside Paul's hand-drawn containment perimeter
+  (migration 0027, `public.service_perimeters` slug 'ocala'; all 33 clients inside after the
+  southern edge was nudged about 1 mile), then checks it is within a 15-minute drive of an anchor
+  via Google Distance Matrix on the 33 cached coordinates. Verified: Ocala center and the southern
+  pocket accepted; Belleview refused (10-minute drive but outside the fence); Gainesville refused.
+  Distance Matrix + Geocoding enabled; key in `public.app_secrets`. Remaining to actually open
+  Ocala: (1) wire the booking funnel to call the function for the typed Ocala service address (Places
+  New autocomplete to capture it), and have `bath_start_subscription` enforce the gate server-side at
+  signup; (2) flip Ocala `hb_active` on. Prices, durations, anchors (`clients.is_anchor`, outliers
+  flagged out) already set.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is

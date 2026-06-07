@@ -1,16 +1,14 @@
 // supabase/functions/ocala-service-area/index.ts
 //
-// Drive-time service-area gate for new Ocala bath signups. Given a prospective
-// client's address (or coordinates), returns whether they are within N minutes'
-// DRIVE of an existing client (an "anchor"). Drive time is REAL, from Google
-// Distance Matrix, not straight-line distance. Anchor addresses are sent to
-// Google server-side and never returned to the caller; the response is only
-// { within, minutes }.
+// Service-area gate for new Ocala bath signups. A prospective service address
+// qualifies only if it passes BOTH checks (ocala_service_area_by_anchor):
+//   1. INSIDE the frozen containment perimeter Paul drew (service_perimeters),
+//      the hard cap that stops edge clients from breadcrumbing the area outward;
+//   2. within N minutes' real DRIVE of an existing client (an "anchor"), from
+//      Google Distance Matrix, which keeps every stop efficient.
 //
-// Anchor locations are fed to Distance Matrix as addresses, which Google
-// geocodes internally, so no separate Geocoding API is needed. If an anchor ever
-// has cached coordinates (geo_lat/geo_lng) they are used in preference to the
-// address as a faster, cheaper input.
+// The address is geocoded server-side; anchor coordinates and the drive math
+// never leave the server. The response is only { within, in_area, minutes }.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
@@ -41,33 +39,65 @@ async function getMapsKey(sb: ReturnType<typeof createClient>): Promise<string |
   return (data?.value as string) ?? null;
 }
 
+async function geocode(address: string, key: string): Promise<{ lat: number; lng: number } | null> {
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${key}`;
+  const r = await fetch(url);
+  const d = await r.json();
+  const loc = d?.results?.[0]?.geometry?.location;
+  return loc ? { lat: loc.lat, lng: loc.lng } : null;
+}
+
+// Ray-casting point-in-polygon. ring is GeoJSON [[lng,lat], ...].
+function pointInRing(lng: number, lat: number, ring: number[][]): boolean {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1];
+    const xj = ring[j][0], yj = ring[j][1];
+    const intersect = (yi > lat) !== (yj > lat) &&
+      lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ ok: false, error: 'method' }, 405);
 
-  let body: { address?: string; lat?: number; lng?: number; max_minutes?: number };
+  let body: { address?: string; lat?: number; lng?: number; max_minutes?: number; area?: string };
   try {
     body = await req.json();
   } catch {
     return json({ ok: false, error: 'bad_json' }, 400);
   }
-
-  // Origin can be a typed service address or coordinates; Distance Matrix takes either.
-  let origin = '';
-  if (typeof body.address === 'string' && body.address.trim().length > 3) {
-    origin = body.address.trim();
-  } else if (typeof body.lat === 'number' && typeof body.lng === 'number') {
-    origin = `${body.lat},${body.lng}`;
-  } else {
-    return json({ ok: false, error: 'bad_input' }, 400);
-  }
   const limit = Number(body.max_minutes) > 0 ? Number(body.max_minutes) : DEFAULT_THRESHOLD_MIN;
+  const area = (typeof body.area === 'string' && body.area.trim()) ? body.area.trim() : 'ocala';
 
   const sb = createClient(SUPABASE_URL, SERVICE_KEY);
 
   const key = await getMapsKey(sb);
   if (!key) return json({ ok: false, error: 'maps_not_configured' }, 503);
 
+  // Resolve the prospect to coordinates (geocode a typed address; Geocoding is enabled).
+  let lat: number, lng: number;
+  if (typeof body.lat === 'number' && typeof body.lng === 'number') {
+    lat = body.lat; lng = body.lng;
+  } else if (typeof body.address === 'string' && body.address.trim().length > 3) {
+    const g = await geocode(body.address.trim(), key);
+    if (!g) return json({ ok: true, within: false, in_area: false, minutes: null, reason: 'address_not_found' });
+    lat = g.lat; lng = g.lng;
+  } else {
+    return json({ ok: false, error: 'bad_input' }, 400);
+  }
+
+  // Check 1: inside the frozen perimeter. No perimeter row = no fence (drive-time only).
+  const { data: perim } = await sb.from('service_perimeters').select('polygon').eq('slug', area).maybeSingle();
+  const ring = (perim?.polygon as number[][][] | undefined)?.[0];
+  if (Array.isArray(ring) && ring.length > 2 && !pointInRing(lng, lat, ring)) {
+    return json({ ok: true, within: false, in_area: false, minutes: null });
+  }
+
+  // Check 2: within the drive-time threshold of an anchor.
   const { data: anchors, error } = await sb
     .from('clients')
     .select('id, location_address, geo_lat, geo_lng')
@@ -81,9 +111,9 @@ Deno.serve(async (req) => {
         : (a.location_address ?? '').trim(),
     )
     .filter((d) => d.length > 3);
-  if (dests.length === 0) return json({ ok: true, within: false, minutes: null, anchor_count: 0, resolved: 0 });
+  if (dests.length === 0) return json({ ok: true, within: false, in_area: true, minutes: null, anchor_count: 0, resolved: 0 });
 
-  // Distance Matrix allows up to 25 destinations per origin per request.
+  const origin = `${lat},${lng}`;
   let bestSeconds = Infinity;
   let resolved = 0;
   for (let i = 0; i < dests.length; i += 25) {
@@ -103,8 +133,8 @@ Deno.serve(async (req) => {
   }
 
   if (!isFinite(bestSeconds)) {
-    return json({ ok: true, within: false, minutes: null, anchor_count: dests.length, resolved: 0 });
+    return json({ ok: true, within: false, in_area: true, minutes: null, anchor_count: dests.length, resolved: 0 });
   }
   const minutes = Math.round(bestSeconds / 60);
-  return json({ ok: true, within: minutes <= limit, minutes, anchor_count: dests.length, resolved });
+  return json({ ok: true, within: minutes <= limit, in_area: true, minutes, anchor_count: dests.length, resolved });
 });
