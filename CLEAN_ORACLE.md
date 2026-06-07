@@ -840,11 +840,16 @@ separate portal and not a reduced mode. They sign in, self-schedule, reschedule,
 manage their account exactly as a bath subscriber does. The doggoneclean.us domain redirects
 into the app; the Squarespace site and the Acuity scheduler are retired (target: within days
 of 2026-06-07). One generalized recurring-service model carries both surfaces: a service
-relationship has a service type (bath or full groom), a per-visit block duration, a cadence,
-and a payment method. Bath is Stripe card-on-file plus a fixed bath duration; grooming is
-in-person Square plus the client's real block time, seeded per client from years of
-appointment cycle-time history, so the scheduler blocks each grooming client's actual time
-with no guesswork. Legacy keeps paying in person via Square through the cutover; moving legacy
+relationship has a service type (full groom, bath, or nails), whether it recurs or does not, a
+per-visit block duration, and a payment method. Recurring-versus-not is a real per-client
+attribute, recorded and never assumed from visit counts: a client either holds a standing
+recurring slot on a cadence or books on demand (one-off or at-will), and the app models both
+distinctly. Bath is Stripe card-on-file plus a fixed bath duration; grooming and nails are
+in-person Square plus the client's real block time, seeded per client from years of appointment
+cycle-time history, so the scheduler blocks each client's actual time with no guesswork. Block
+time is on-site time (arrive to depart, the client's median cycle); the route engine calculates
+the actual inbound drive time to each stop separately and does not fold it into the client's
+block. Every existing legacy client is carried into the app; none are dropped in the migration. Legacy keeps paying in person via Square through the cutover; moving legacy
 to card-on-file is a deferred, separate decision and is not part of this work. Acuity's
 reminders are load-bearing, so reminders must exist in the app before Acuity is cancelled or
 clients no-show; n8n on the shared droplet is the reminder host. Because killing Squarespace

@@ -20,17 +20,25 @@ per-client schedule block when the app schedules legacy full-grooming clients
 - `avg_cycle_rate_per_hr` is revenue per hour, a strategic signal for
   `favor_high_hourly_work` (which clients clear high vs low per hour).
 
-## Data gaps (do not seed a block time until resolved)
+## Service type and recurrence
 
-- **Lisa Prater**: 11 visits but an 11-min cycle / 9-min groom and a $209/hr rate.
-  Implausible for a full groom; likely a nail-only / quick drop-in or a recording
-  artifact. Confirm the real service and duration before seeding.
-- **Short-cycle regulars** (Nancy Franklin 35, Patty Brown 45, Steve Crandall 53,
-  Garrett Little 64): many visits, so real, but short. Confirm whether these are
-  nail-only / small-dog quick service rather than full grooms.
-- **Single-visit clients** (visits_12mo_book = 1: Amanda Posner, Arlene Calbo, Becky
-  Swinford, Billye Mallory, Edely Abreu, Elijah Weber): one data point, low-confidence
-  duration. Seed but mark low confidence.
+- **Nails-only clients** (Paul confirmed 2026-06-07): the short-cycle entries are nails
+  service, not full grooms, so their block times are correct as recorded: Lisa Prater (11),
+  Nancy Franklin (35), Patty Brown (45), Steve Crandall (53), Garrett Little (64). Lisa
+  Prater's 11-min cycle and high per-hour rate are normal for a quick nail visit, not a data
+  artifact. Service type for the rest is full groom unless confirmed otherwise at load; a few
+  mid-length entries may need a service-type check.
+- **Recurring vs not is a recorded attribute, never inferred from visit count.** A high
+  `visits_12mo_book` is a signal, not the determiner. Each client is either a standing
+  recurring client on a cadence or books on demand (one-off / at-will); set this per client
+  from `legacy/data/clients.json` status (standing = recurring; one-off and at-will = not),
+  not from this sheet.
+- **Single-visit rows** (visits_12mo_book = 1: Amanda Posner, Arlene Calbo, Becky Swinford,
+  Billye Mallory, Edely Abreu, Elijah Weber) have one data point, so the block time is
+  low-confidence. Seed but mark low confidence. Single-visit does not by itself mean
+  non-recurring; resolve recurrence from the client record.
+
+All 51 clients are kept and carried into the app (`legacy_folds_into_v2`); none are dropped.
 
 ## Reconciliation note
 

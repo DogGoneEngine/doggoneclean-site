@@ -1539,3 +1539,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   historical per-client duration. Next steps: generalize the subscription/appointment schema,
   load the legacy book + durations, build the reminder job, fold the site and redirect the
   domain.
+- **Model refinements (Paul, 2026-06-07), folded into `legacy_folds_into_v2`:** (1) service
+  type is full groom / bath / **nails**, not just bath/groom; the short-cycle legacy entries
+  (Lisa Prater, Nancy Franklin, Patty Brown, Steve Crandall, Garrett Little) are nails clients
+  and their short blocks are correct. (2) **Recurring-versus-not is a real recorded per-client
+  attribute, never inferred from visit counts** (standing = recurring; one-off / at-will =
+  not). This corrects the prior session's lean that grooming clients are all recurring. (3)
+  Block time is on-site time (median cycle); the route engine calculates actual inbound drive
+  time per stop separately. (4) Every legacy client is kept and carried in; none dropped.
