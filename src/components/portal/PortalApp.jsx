@@ -105,6 +105,17 @@ export default function PortalApp() {
     }
   }, [authState, data, dataLoading, loadPortalData]);
 
+  // Re-fetch portal data in place (no spinner flash) after a client action
+  // changes server state (cancel, pause, restart, and the actions to come).
+  const refresh = useCallback(async () => {
+    try {
+      const payload = await withTimeout(getPortalData(), 8000, 'portal data');
+      if (!payload.error) setData(payload);
+    } catch (err) {
+      console.error('refresh:', err);
+    }
+  }, []);
+
   async function handleLogout() {
     await signOut();
     // SIGNED_OUT handler above clears the rest.
@@ -179,7 +190,7 @@ export default function PortalApp() {
           )}
 
           {!dataLoading && !dataError && data && data.subscriber && (
-            <PortalHome data={data} onLogout={handleLogout} />
+            <PortalHome data={data} onLogout={handleLogout} onChanged={refresh} toast={toast} />
           )}
         </>
       )}

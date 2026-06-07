@@ -11,7 +11,9 @@
 // RPC, because bath_subscriptions and bath_appointments expose no direct
 // write policy: the rule has to live in the database, not the page.
 
+import { useState } from 'react';
 import './portal.css';
+import { pauseSubscription, resumeSubscription, cancelSubscription } from './supabase.js';
 
 // ── Formatting helpers ─────────────────────────────────────────────────
 // Appointment times are timestamptz; render them in the city's wall clock
@@ -119,7 +121,7 @@ function StatusChip({ status }) {
 }
 
 // ── Home (the viewing spine) ───────────────────────────────────────────
-export function PortalHome({ data, onLogout }) {
+export function PortalHome({ data, onLogout, onChanged, toast }) {
   const { subscriber, subscription, city } = data;
   const dogs = (data.dogs || []).filter(d => d.active !== false);
   const appts = data.appointments || [];
@@ -220,6 +222,7 @@ export function PortalHome({ data, onLogout }) {
                 </div>
               )}
             </div>
+            <PlanActions subscription={subscription} onChanged={onChanged} toast={toast} />
           </section>
         )}
 
@@ -309,6 +312,106 @@ export function PortalHome({ data, onLogout }) {
       </div>
     </div>
   );
+}
+
+// ── Plan actions: pause, restart, cancel ───────────────────────────────
+// Active  -> Pause plan, Cancel plan (each with a confirm step: two taps).
+// Paused  -> Restart plan, Cancel plan.
+// Cancelled -> nothing (the banner up top already explains it).
+function PlanActions({ subscription, onChanged, toast }) {
+  const [mode, setMode] = useState('idle'); // 'idle' | 'confirmPause' | 'confirmCancel'
+  const [busy, setBusy] = useState(false);
+  const status = subscription.status;
+
+  if (status === 'cancelled') return null;
+
+  async function run(fn, successMsg) {
+    setBusy(true);
+    let res;
+    try {
+      res = await fn();
+    } catch {
+      res = { ok: false, error: 'network' };
+    }
+    setBusy(false);
+    if (res && res.ok) {
+      setMode('idle');
+      if (toast) toast(successMsg);
+      if (onChanged) await onChanged();
+    } else if (toast) {
+      toast(humanError(res), true);
+    }
+  }
+
+  if (mode === 'confirmCancel') {
+    return (
+      <div className="pt-confirm">
+        <div className="pt-confirm__text">
+          Cancel your plan? This takes any upcoming visit off the schedule.
+          You can book again any time.
+        </div>
+        <div className="pt-confirm__row">
+          <button className="pt-btn pt-btn-danger pt-btn-sm" disabled={busy}
+            onClick={() => run(cancelSubscription, 'Plan cancelled.')}>
+            {busy ? <span className="pt-spinner-sm" /> : 'Yes, cancel plan'}
+          </button>
+          <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy}
+            onClick={() => setMode('idle')}>
+            Keep plan
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'confirmPause') {
+    return (
+      <div className="pt-confirm">
+        <div className="pt-confirm__text">
+          Pause your plan? We hold your spot and take any upcoming visit off
+          the schedule until you restart. No visits, no charges while paused.
+        </div>
+        <div className="pt-confirm__row">
+          <button className="pt-btn pt-btn-primary pt-btn-sm" disabled={busy}
+            onClick={() => run(pauseSubscription, 'Plan paused.')}>
+            {busy ? <span className="pt-spinner-sm" /> : 'Yes, pause'}
+          </button>
+          <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy}
+            onClick={() => setMode('idle')}>
+            Keep active
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pt-plan-actions">
+      {status === 'paused' && (
+        <button className="pt-btn pt-btn-primary pt-btn-sm" disabled={busy}
+          onClick={() => run(resumeSubscription, 'Plan restarted.')}>
+          {busy ? <span className="pt-spinner-sm" /> : 'Restart plan'}
+        </button>
+      )}
+      {status === 'active' && (
+        <button className="pt-btn pt-btn-secondary pt-btn-sm"
+          onClick={() => setMode('confirmPause')}>
+          Pause plan
+        </button>
+      )}
+      <button className="pt-btn pt-btn-ghost pt-btn-sm"
+        onClick={() => setMode('confirmCancel')}>
+        Cancel plan
+      </button>
+    </div>
+  );
+}
+
+function humanError(res) {
+  const e = res && res.error;
+  if (e === 'no_active_subscription') return 'No active plan to change.';
+  if (e === 'no_paused_subscription') return 'Your plan is not paused.';
+  return 'Something went wrong. Please try again.';
 }
 
 // ── small shared helpers (kept local to the portal island) ─────────────

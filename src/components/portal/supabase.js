@@ -273,3 +273,28 @@ export async function lookupSubscriberByPhone(phoneE164) {
   if (error || !data) return { found: false };
   return { found: !!data.found, firstName: data.first_name || '' };
 }
+
+// ── Subscription lifecycle (portal self-service) ──────────────────────
+// Each calls a SECURITY DEFINER RPC that resolves the caller's own
+// subscription through auth.uid() and enforces the state change in the
+// database. The RPC also takes any future visit off the calendar on pause
+// and cancel. Returns { ok, status } or { ok:false, error }.
+async function callSubscriptionRpc(fnName) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc(fnName);
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}
+
+export function pauseSubscription() {
+  return callSubscriptionRpc('bath_pause_subscription');
+}
+
+export function resumeSubscription() {
+  return callSubscriptionRpc('bath_resume_subscription');
+}
+
+export function cancelSubscription() {
+  return callSubscriptionRpc('bath_cancel_subscription');
+}
