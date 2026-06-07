@@ -52,8 +52,9 @@ only on the exact wording.
 
 1. **CLAUDE.md** (this file) - operating manual. Permanent rules, stack, constraints.
 2. **CLEAN_SCROLL_OF_HEPHAESTUS.md** - build narrative + phase map. Read it fully before
-   doing work. Rebuild it only at end of session on Paul's explicit instruction, never
-   mid-session. If history and reality disagree, reality wins and history is corrected.
+   doing work. Follow the Scroll update policy below: append every capture as you go, rebuild
+   only at the end of a thread on Paul's explicit instruction, and rebuild incrementally. If
+   history and reality disagree, reality wins and history is corrected.
 3. **CLEAN_ORACLE.md** - every rule in "KEY (domain): Statement. Because <reason>."
 4. **CLEAN_BUSINESS_RULES.md** - the index: where each rule is enforced (four-layer map).
 5. **CLEAN_PARKING_LOT.md** - deferred work and forward-looking ideas, parked to survive
@@ -65,6 +66,27 @@ only on the exact wording.
 
 That read-order link is the only thing holding the set together. Keep the file names exact.
 These are Clean's own scrolls; never share or merge them with DGN's.
+
+## Scroll update policy (identical in Clean and DGN)
+
+Recording and rebuilding are two different operations and must never be conflated. The compute
+waste this policy exists to prevent comes from rebuilding, not from recording.
+
+1. Append as you go (cheap, every time, never gated). Every decision, answer, or shipped build
+   gets one short dated bullet appended to the Scroll's running decisions log, plus its durable
+   home: an Oracle rule, a database column or constraint, or the parking lot. Appending a bullet
+   costs almost nothing and is what actually prevents loss on a context reset, so it happens on
+   every capture without asking.
+2. Rebuild only on Paul's explicit instruction, at the end of a thread (rare). A rebuild folds
+   the running decisions log into the polished narrative and updates the Phase Map. Never rebuild
+   while a thread is still in progress or after a single task: that repeated full-document
+   regeneration is the compute drain this policy exists to stop.
+3. A rebuild is incremental. Absorb the new log bullets and revise only the sections that
+   changed; never regenerate untouched sections from scratch.
+
+If history and reality disagree, reality wins and the Scroll is corrected in place. A correction
+is not a rebuild and is allowed any time. The Oracle (the rulebook) and the database hold the
+actual teeth continuously, so a recorded decision is safe even before any rebuild.
 
 ## Recording ideas and decisions (lock it in)
 
