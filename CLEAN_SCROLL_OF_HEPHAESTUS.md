@@ -1615,3 +1615,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   existing Maps Cloud project (MAPS_BROWSER_KEY in maps.js), run a one-time geocode of the 31
   anchors into geo_lat/geo_lng, then wire the client-side drive-time check into the Ocala booking
   gate and verify in dev. Also still needed to open Ocala: bath pricing + slot minutes.
+- **Slot engine made duration-aware (2026-06-07, migration 0021).** bath_open_slots gained a 4th
+  arg p_duration_minutes: it reserves the requested per-client block on a 15-minute start grid,
+  falling back to the city bath slot when omitted (so the bath funnel's 3-arg call is unchanged).
+  Because block lengths now vary, the unique-on-start index was replaced with a gist no-overlap
+  exclusion constraint over live appointment time ranges (btree_gist). Verified against a
+  throwaway active city: a 45-min request returns 45-min blocks (90 slots), 179-min returns
+  179-min blocks (63 slots), no-duration returns the city 60-min slot (87 slots). The bath flow
+  is unaffected (Villages has no slot minutes or windows set, so it offered nothing before or
+  after). Next slice to make legacy clients bookable: generalize bath_start_subscription to take
+  service_type, payment_method, and the per-client duration (from clients.visit_minutes) so a
+  groom or nails appointment is created with its real length and in-person payment.
