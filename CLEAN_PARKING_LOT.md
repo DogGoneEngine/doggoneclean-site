@@ -26,10 +26,12 @@ survive a reset:
   2026-06-08, plus manual extra days and brief off-week trips. Build the recurring window generator
   plus a manual day add/remove control, so the slot engine offers only days Paul is in Ocala.
 - **Open Ocala for new bath signups (drive-time gate LIVE; remaining: perimeter + wire + flip).**
-  The `ocala-service-area` edge function is deployed and verified end to end (2026-06-07): it feeds
-  the 33 anchor addresses to Google Distance Matrix and returns { within, minutes }. Ocala center
-  reads within=true, Miami within=false, all 33 anchors resolved. The Google key is set (Distance
-  Matrix only; Geocoding NOT needed) and stored server-side in `public.app_secrets`. Remaining to
+  The `ocala-service-area` edge function is deployed and verified end to end (2026-06-07): it routes
+  on the 33 anchors' cached coordinates (addresses as fallback) via Google Distance Matrix and
+  returns { within, minutes }. Ocala center and Belleview read within=true (0 and 10 min), Miami
+  within=false (266 min), all 33 anchors resolved. Distance Matrix + Geocoding are both enabled; the
+  33 anchors are geocoded and cached on `clients.geo_lat/geo_lng`; the Google key is stored
+  server-side in `public.app_secrets`. Remaining to
   actually open Ocala: (1) draw the containment perimeter polygon (the fence new clients cannot
   cross, so edge anchors cannot breadcrumb the area outward) and AND it with the drive-time gate;
   (2) wire the booking funnel to call the function for an Ocala service address, and have

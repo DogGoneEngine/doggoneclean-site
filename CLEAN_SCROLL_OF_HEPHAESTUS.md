@@ -1621,6 +1621,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   resolved. Gate is LIVE and callable. Still parked before Ocala actually opens: the containment
   perimeter polygon (so edge anchors cannot breadcrumb the area outward) ANDed with the gate, wiring
   the booking funnel + bath_start_subscription, then flipping Ocala hb_active on.
+- 2026-06-07 (later, no-workarounds pass): Paul enabled the Geocoding API and we did it the clean
+  way. Geocoded the 33 anchors once and cached their real coordinates on `clients.geo_lat/geo_lng`,
+  so the function now routes on coordinates (it already preferred coords over addresses); all 33
+  resolved. Re-verified: "Ocala, FL" within=true (0 min), "Belleview, FL" within=true (10 min),
+  "Miami, FL" within=false (266 min). Addresses stay the fallback if coords are ever missing, so a
+  fresh DB rebuild still works before any re-geocode. Also enabled Places API (New) for the future
+  booking-form autocomplete.
 
 ### Legacy login mechanism built + Ocala availability captured (2026-06-07, migration 0024)
 - Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,
