@@ -13,12 +13,12 @@ survive a reset:
   reminders today, so a Supabase scheduled edge function (pg_cron + SMS/email, mirroring DGN
   send-notification) must exist before Acuity is cancelled or clients no-show
   (confirmations_and_reminders_via_supabase). n8n is deferred.
-- **Legacy client login: backfill the match targets.** The claim mechanism is built and verified
-  (`bath_claim_legacy_account`, migration 0024, wired into getPortalData). Remaining: backfill
-  `clients.phone_e164` + `clients.email` from the Acuity calendar feed so sign-in matches real
-  legacy clients (each calendar appointment carries the client's phone + email; match by name to
-  the clients row). Until then the mechanism is live but matches only clients whose contact info
-  is filled in.
+- **Legacy client login: finish the contact backfill.** Mechanism built + verified
+  (`bath_claim_legacy_account`, migration 0024, wired into getPortalData). Calendar backfill done
+  2026-06-07: 27 of 52 clients now have phone + email and are login-ready. Remaining: (a) the other
+  24 clients had no calendar contact, so pull phone/email from the Drive contact sheets (newest doc
+  per client); (b) reconcile the active Acuity roster into the book - some currently active clients
+  (e.g. Colleen Smith) are not in the curated 52 and have no `clients` row to claim.
 - **Enter Ocala availability + every-other-week generator.** Spec captured
   (`ocala_availability_every_other_week`): every other week Tue-Sat anchored on the week of
   2026-06-08, plus manual extra days and brief off-week trips. Build the recurring window generator

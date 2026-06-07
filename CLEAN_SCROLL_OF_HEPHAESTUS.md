@@ -1611,8 +1611,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the claim, then re-reads. Added `clients.phone_e164` + `clients.email` as the match targets.
   Verified end-to-end in a rolled-back transaction (seeded client + fake auth user + simulated
   JWT): phone match returned claimed with the linked row carrying the client's name, address, and
-  Ocala; a second call returned already_linked. Remaining (step 2): backfill clients contact info
-  from the Acuity calendar feed so it matches real clients.
+  Ocala; a second call returned already_linked.
+- Step 2 backfill done (2026-06-07): pulled contact info from the Acuity calendar feed (Jun to Aug
+  2026) and matched by name to the clients book. 27 of 52 clients now carry phone + email and are
+  login-ready; 24 still have no contact (legacy recurring clients whose phone/email lives in the
+  Drive contact sheets, not the calendar) and need a contact-sheet pass; 2 calendar names (Colleen
+  Smith, Kristin Nickerson) matched no clients row, a sign the active Acuity roster runs past the
+  curated book. Phone stored as +1 E164, email lowercased, both filled only where empty so nothing
+  was overwritten.
 - Ocala availability (number 2) captured, not yet built: every other week Tue-Sat anchored on the
   week of Monday June 8, 2026, plus manual extra days and brief off-week trips
   (`ocala_availability_every_other_week`). Confirmed against Paul's calendar: the week of June 8 is
