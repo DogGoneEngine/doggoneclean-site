@@ -1112,7 +1112,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **One-off list:** kept as-is, treated as conversion candidates; parked.
 - **From the original brief (baked):** evening/Saturday locks are real client constraints;
   Donna DiPasqua Tuesday; Cynthia Tieche Tuesday 3pm; Nancy Franklin + Lisa Prater + Patty
-  Brown Saturday nails cluster; Garrett Little at-will; Richard Vieira one-off; Bonnie
+  Brown Saturday nails cluster; Garret Little at-will; Richard Vieira one-off; Bonnie
   DiGraziano banned, excluded everywhere.
 
 ### Doc system and workflow
@@ -1541,7 +1541,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   domain.
 - **Model refinements (Paul, 2026-06-07), folded into `legacy_folds_into_v2`:** (1) service
   type is full groom / bath / **nails**, not just bath/groom; the short-cycle legacy entries
-  (Lisa Prater, Nancy Franklin, Patty Brown, Steve Crandall, Garrett Little) are nails clients
+  (Lisa Prater, Nancy Franklin, Patty Brown, Steve Crandall, Garret Little) are nails clients
   and their short blocks are correct. (2) **Recurring-versus-not is a real recorded per-client
   attribute, never inferred from visit counts** (standing = recurring; one-off / at-will =
   not). This corrects the prior session's lean that grooming clients are all recurring. (3)
@@ -1614,10 +1614,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Ocala; a second call returned already_linked.
 - Step 2 backfill done (2026-06-07): pulled contact info from the Acuity calendar feed and matched
   by name to the clients book. A first pass (Jun to Aug 2026) covered 27, then a wider pass (Jan
-  2025 to Dec 2026, searched per name) brought it to 43 of 51 active clients now login-ready (phone
-  or email on file). Also fixed Colleen Smith (book had the typo "Coleen", filled from calendar).
-  8 clients still have no contact at all in the calendar (Brooksley Sheehe, Chester Weber, Cynthia
-  Tieche, Garrett Little, Ligia Amyotte, Lisa Irwin, Mary Jane Hunt, Tonya Hunt) and need their
+  2025 to Dec 2026, searched per name) brought it to 44 of 51 active clients now login-ready (phone
+  or email on file). Also corrected two names the book had typo'd against the calendar and filled
+  their real contact: Colleen Smith (book had "Coleen") and Garret Little (book had "Garrett"; his
+  Acuity bookings and email garretllittle@gmail.com confirm one T, fixed in the DB, clients.json,
+  seed.sql, and the legacy data/source files). 7 clients still have no contact at all in the
+  calendar (Brooksley Sheehe, Chester Weber, Cynthia Tieche, Ligia Amyotte, Lisa Irwin, Mary Jane
+  Hunt, Tonya Hunt) and need their
   number from Paul's Google Contacts / Voice or the Drive contact sheets; Edely Abreu and Eric
   Shannon have email but no phone. Phone stored as +1 E164, email lowercased, both filled only
   where empty so nothing was overwritten. Kristin Nickerson was a test row (Paul's wife), ignored.
@@ -1675,7 +1678,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   The Villages (`ocala_prices_match_villages`). Nails stop durations answered from the cycle
   data: Franklin 35 (1 dog), Prater 11 (1 dog, floored to 30), Little 64 (2 dogs), Crandall 53
   (4 dogs); the data does not scale with dog count, so per-client history beats a dog-count
-  formula. Garrett Little's 2-dog count recorded (names/breeds still a gap). Ocala stays
+  formula. Garret Little's 2-dog count recorded (names/breeds still a gap). Ocala stays
   hb_active false until the anchor gate is wired; prices and durations are no longer gaps.
 - **Scheduling philosophy locked on Clean (2026-06-07): schedule by client history.** Verified
   the nails dispute against Paul's source sheet (Time is Money, full CSV, 1,214 rows): Lisa

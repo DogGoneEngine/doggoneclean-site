@@ -29,7 +29,7 @@ human-readable provenance.
 
 - **Nails-only clients** (Paul confirmed 2026-06-07): the short-cycle entries are nails
   service, not full grooms, so their block times are correct as recorded: Lisa Prater (11),
-  Nancy Franklin (35), Patty Brown (45), Steve Crandall (53), Garrett Little (64). Lisa
+  Nancy Franklin (35), Patty Brown (45), Steve Crandall (53), Garret Little (64). Lisa
   Prater's 11-min cycle and high per-hour rate are normal for a quick nail visit, not a data
   artifact. Service type for the rest is full groom unless confirmed otherwise at load; a few
   mid-length entries may need a service-type check.
@@ -76,7 +76,7 @@ one-offs; resolve any name that appears in one file but not the other.
 | Emily Walker | 3 | 2026-04-15 | 147 | 161 | 117 | 160 | 61 |  |
 | Eric Shannon | 21 | 2026-03-16 | 118 | 118 | 84 | 95 | 52 |  |
 | Erich Blunt | 17 | 2026-05-29 | 254 | 240 | 220 | 221 | 62 |  |
-| Garrett Little | 19 | 2026-01-24 | 64 | 62 | 33 | 45 | 54 |  |
+| Garret Little | 19 | 2026-01-24 | 64 | 62 | 33 | 45 | 54 |  |
 | Ginger Fink | 18 | 2026-05-11 | 76 | 77 | 52 | 77 | 79 |  |
 | Greta Custer | 10 | 2026-05-19 | 142 | 179 | 128 | 167 | 65 |  |
 | Harriet Woolf | 36 | 2026-05-27 | 147 | 149 | 130 | 126 | 60 |  |

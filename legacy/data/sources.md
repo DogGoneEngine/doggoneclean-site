@@ -63,7 +63,7 @@ clients have multiple files in the folder; always use the newest doc, not the sp
 | Client | Doc ID |
 |---|---|
 | Karen Evans (at-will) | 1HeOlgPBgsQb7UX00L1sm-hYqGh4utZVXGyArDseF_J0 |
-| Garrett Little (at-will) | no sheet (address in overrides) |
+| Garret Little (at-will) | no sheet (address in overrides) |
 | Bonnie DiGraziano (BANNED) | 1_3I_PAjH7dOD4ukszpG6LIutlEnMXC4Jklh3lUDLPqU |
 | Brooksley Sheehe (one-off) | 1tl5ozi9_ETWZflvNlYpY1Z6_bDQweuq1Ve5BDAgR7FU |
 | Eric Shannon (one-off) | 1EJ73pEC8hfsiehnOPOVJAXLBhineZdEowuE5n5KJ9Ek |

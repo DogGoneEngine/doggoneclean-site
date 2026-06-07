@@ -16,9 +16,9 @@ survive a reset:
 - **Legacy client login: finish the contact backfill.** Mechanism built + verified
   (`bath_claim_legacy_account`, migration 0024, wired into getPortalData). Calendar backfill done
   2026-06-07: a calendar pass (first Jun-Aug, then a wider per-name pass over 2025-2026) brought
-  43 of 51 active clients to login-ready (phone or email on file). Remaining: (a) 8 clients have no
-  contact anywhere in the calendar (Brooksley Sheehe, Chester Weber, Cynthia Tieche, Garrett
-  Little, Ligia Amyotte, Lisa Irwin, Mary Jane Hunt, Tonya Hunt) plus Edely Abreu / Eric Shannon
+  44 of 51 active clients to login-ready (phone or email on file). Remaining: (a) 7 clients have no
+  contact anywhere in the calendar (Brooksley Sheehe, Chester Weber, Cynthia Tieche, Ligia Amyotte,
+  Lisa Irwin, Mary Jane Hunt, Tonya Hunt) plus Edely Abreu / Eric Shannon
   who have email but no phone - get these from Paul's Google Contacts / Voice or the Drive contact
   sheets; (b) reconcile the active Acuity roster into the book - some currently active clients are
   not in the curated 51 and have no `clients` row to claim.

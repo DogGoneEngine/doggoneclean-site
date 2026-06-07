@@ -693,7 +693,7 @@
   ],
 
   "at_will": [
-    {"name": "Garrett Little", "status": "at_will", "service_type": "nails_only", "address": "3433 NE 13th St, Ocala 34470", "routed": false, "note": "Acuity name 'Garret' (one T); lapsed, last 2026-01-24; serve on request, not routed; 2 dogs per Paul 2026-06-07 (names/breeds still a gap)", "data_gaps": ["dog names and breeds (2 dogs)"]},
+    {"name": "Garret Little", "status": "at_will", "service_type": "nails_only", "address": "3433 NE 13th St, Ocala 34470", "routed": false, "note": "Acuity name 'Garret' (one T); lapsed, last 2026-01-24; serve on request, not routed; 2 dogs per Paul 2026-06-07 (names/breeds still a gap)", "data_gaps": ["dog names and breeds (2 dogs)"]},
     {"name": "Karen Evans", "status": "at_will_winddown", "zone": "Ocala-E", "address": "3712 E Fort King St, Ocala 34470", "routed": false, "note": "very old dog; groom as seldom as possible; Paul checks ~every 3 months; expects only 1-2 more grooms"}
   ],
 
