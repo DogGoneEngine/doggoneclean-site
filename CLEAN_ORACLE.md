@@ -834,6 +834,29 @@ clients on a held route, while Hurricane Bath sells a subscription-default produ
 clients where a card on file is what makes the 24-hour commitment loop work; one payment
 rule cannot serve both without breaking one of them.
 
+`legacy_folds_into_v2` (architecture):
+Legacy Ocala full-grooming clients are first-class clients inside the one Clean app, not a
+separate portal and not a reduced mode. They sign in, self-schedule, reschedule, skip, and
+manage their account exactly as a bath subscriber does. The doggoneclean.us domain redirects
+into the app; the Squarespace site and the Acuity scheduler are retired (target: within days
+of 2026-06-07). One generalized recurring-service model carries both surfaces: a service
+relationship has a service type (bath or full groom), a per-visit block duration, a cadence,
+and a payment method. Bath is Stripe card-on-file plus a fixed bath duration; grooming is
+in-person Square plus the client's real block time, seeded per client from years of
+appointment cycle-time history, so the scheduler blocks each grooming client's actual time
+with no guesswork. Legacy keeps paying in person via Square through the cutover; moving legacy
+to card-on-file is a deferred, separate decision and is not part of this work. Acuity's
+reminders are load-bearing, so reminders must exist in the app before Acuity is cancelled or
+clients no-show; n8n on the shared droplet is the reminder host. Because killing Squarespace
+and Acuity removes legacy's only operational home, so legacy needs that home in the app now,
+not at a later rebuild; one app with one login preserves the client relationship and full
+history through the Ocala-to-Villages, grooming-to-bath migration that is the core business
+motion, where a second portal would fracture that relationship and is also the slowest path to
+build under a deadline; and Acuity's death is not Square's death, so in-person payment keeps
+working and stays out of the cutover's critical path. This supersedes the 2026-05-26 "two URL
+surfaces, legacy rebuilt later" framing per reality_wins: the legacy rebuild is this, folded
+into the app.
+
 `if_payments_added_handle_money_safely` (money):
 If online payment is ever added, store all money in cents (convert to dollars only at the
 render boundary), fail loud rather than guess on a price lookup, and verify every payment

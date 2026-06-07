@@ -1509,3 +1509,33 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   capacity, which belongs in scheduling, not a count constraint. Oracle `three_dog_cap`
   and the index rewritten; key kept for sync. The legacy Ocala book (`clients`/`dogs`)
   was never capped and is untouched.
+
+### Squarespace + Acuity retired; legacy folds into Clean v2 (decision, 2026-06-07)
+- **Decision (Paul, 2026-06-07): kill the legacy doggoneclean.us Squarespace site and the
+  Acuity scheduler within days; legacy full-grooming clients become first-class clients
+  inside the one Clean app.** Same login, same self-scheduling and account management a bath
+  subscriber has, not a separate portal and not a reduced mode. doggoneclean.us redirects into
+  the app. Recorded as Oracle `legacy_folds_into_v2`; supersedes the 2026-05-26 "two URL
+  surfaces, legacy rebuilt later" framing per reality_wins.
+- **The unlock: per-client block time is known.** Paul has years of appointment data showing
+  the real cycle time for every client, so the scheduler can block each grooming client's
+  actual duration instead of a fixed bath slot. That is what lets full-groom clients
+  self-schedule in the same engine. Source of that data still to be wired (Calendar / Drive /
+  Acuity export); it is the gating input for grooming scheduling.
+- **Payment decoupled from the cutover.** Acuity's death is not Square's death. Legacy keeps
+  paying in person via Square through the cutover; card-on-file for legacy is a deferred,
+  separate decision. So the days-deadline scope is scheduling + self-management + reminders +
+  the website fold, not payment.
+- **Reminders are load-bearing and net-new.** Acuity sends the legacy appointment reminders
+  today, so reminders must exist in the app before Acuity is cancelled or clients no-show.
+  n8n on the shared droplet is the planned reminder host.
+- **Cutover safety: export before cancel.** Acuity holds the live forward schedule and any
+  intake data; that vanishes on cancellation. Pull the appointment-history / future-bookings
+  export before pulling the plug. The client roster itself is already reconstructed in
+  `legacy/data/clients.json`, so the gap is the forward schedule and durations, not the names.
+- **Planned model (to verify against the data):** one generalized recurring-service relation
+  with a service type (bath or full groom), a per-visit block duration, a cadence, and a
+  payment method; bath = Stripe card-on-file + fixed duration, grooming = in-person Square +
+  historical per-client duration. Next steps: generalize the subscription/appointment schema,
+  load the legacy book + durations, build the reminder job, fold the site and redirect the
+  domain.

@@ -60,6 +60,7 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | lock_in_timing | Scheduling | Oracle | scheduling engine; notifications code |
 | gated_community_hours | Routing | Oracle; `legacy/data/clients.json` access notes | scheduling engine |
 | bills_in_person_today | Money | Oracle; `legacy/data/clients.json` (per-dog prices) | n/a |
+| legacy_folds_into_v2 | Clean app: architecture | Oracle; one generalized service-relationship model (service type + per-visit duration + payment method) carries bath and grooming; doggoneclean.us redirects into the app, Squarespace + Acuity retired; legacy stays in-person Square (card-on-file deferred); Acuity reminders rebuilt on n8n before cutover. Enforcement lands in schema/RPC as the model is built. | (pending build: schema service_type / per_visit_minutes / payment_method + reminder job) |
 | if_payments_added_handle_money_safely | Money | Oracle (deferred) | pricing code; webhook fn |
 | grooming_vocab | Copy | CLAUDE.md; **`check.py`** (dog-qualified, over `src/`) | lint allowlist |
 | specialist_named_not_promised | Copy | Oracle; **`check.py`** asserts `class="specialist-card"` present + forbids "always Paul" / "will be Paul" / "only Paul" on the city page | additional lint patterns when more operators join (per-name) |
