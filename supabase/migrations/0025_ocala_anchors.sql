@@ -1,10 +1,12 @@
 -- 0025_ocala_anchors.sql
--- Anchor geo for the Ocala drive-time service area. A new Ocala bath client is
--- gated to within 15 minutes' DRIVE of an existing client (an "anchor"). The
--- drive time itself is computed by the ocala-service-area edge function, which
--- geocodes and caches anchor coordinates into these columns and reads them.
--- Anchors are the recurring backbone (standing + at-will); one-off clients are
--- not routing anchors.
+-- Anchors for the Ocala drive-time service area. A new Ocala bath client is
+-- gated to within 15 minutes' DRIVE of an existing client (an "anchor"); the
+-- drive time is computed by the ocala-service-area edge function, which feeds
+-- the anchor addresses straight to Google Distance Matrix (Google geocodes them
+-- internally, so no Geocoding API is needed). geo_lat/geo_lng are an OPTIONAL
+-- coordinate cache the function prefers when present; left null until any future
+-- caching pass populates them. Anchors are the recurring backbone (standing +
+-- at-will); one-off clients are not routing anchors.
 alter table public.clients
   add column if not exists geo_lat  double precision,
   add column if not exists geo_lng  double precision,

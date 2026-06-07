@@ -25,14 +25,16 @@ survive a reset:
   (`ocala_availability_every_other_week`): every other week Tue-Sat anchored on the week of
   2026-06-08, plus manual extra days and brief off-week trips. Build the recurring window generator
   plus a manual day add/remove control, so the slot engine offers only days Paul is in Ocala.
-- **Open Ocala for new bath signups (drive-time gate built; needs the Maps key).** The gate is
-  the `ocala-service-area` Supabase edge function: real Google Distance Matrix drive time,
-  server-side so anchor homes stay private, deployed and fail-closed. To activate: (1) enable the
-  Distance Matrix API + Geocoding API on Clean's Maps Cloud project and make a server key; (2) set
-  it as the `MAPS_SERVER_KEY` secret on dgc-prod; (3) the function then geocodes and caches anchor
-  coords on first call; (4) wire the booking funnel to call it for Ocala instead of the polygon
-  check, and have `bath_start_subscription` enforce it server-side; (5) flip Ocala `hb_active` on.
-  Prices, durations, and anchors (`clients.is_anchor`, outliers flagged out) already set.
+- **Open Ocala for new bath signups (drive-time gate LIVE; remaining: perimeter + wire + flip).**
+  The `ocala-service-area` edge function is deployed and verified end to end (2026-06-07): it feeds
+  the 33 anchor addresses to Google Distance Matrix and returns { within, minutes }. Ocala center
+  reads within=true, Miami within=false, all 33 anchors resolved. The Google key is set (Distance
+  Matrix only; Geocoding NOT needed) and stored server-side in `public.app_secrets`. Remaining to
+  actually open Ocala: (1) draw the containment perimeter polygon (the fence new clients cannot
+  cross, so edge anchors cannot breadcrumb the area outward) and AND it with the drive-time gate;
+  (2) wire the booking funnel to call the function for an Ocala service address, and have
+  `bath_start_subscription` enforce it server-side; (3) flip Ocala `hb_active` on. Prices,
+  durations, anchors (`clients.is_anchor`, outliers flagged out) already set.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is

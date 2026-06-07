@@ -1608,15 +1608,19 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   and his schedule. Reverted (the haversine + crow-flies function are dropped; `ocala_service_area_by_anchor`
   in the Oracle already specified drive time, so the Oracle was right and the code was the drift).
 - Built the real gate as the `ocala-service-area` Supabase edge function: real Google Distance
-  Matrix drive time, server-side so anchor homes never leak, bounding-box prefilter then driving
-  duration to the nearest anchor, returns only { within, minutes }. Deployed, fail-closed (returns
-  maps_not_configured until the key exists). Added `clients.geo_lat/geo_lng/is_anchor`; anchors are
+  Matrix drive time, server-side so anchor homes never leak, driving duration to the nearest
+  anchor, returns only { within, minutes }. Added `clients.geo_lat/geo_lng/is_anchor`; anchors are
   the recurring backbone (standing + at-will), with the favor/outlier clients (Tonya Hunt, Greta
   Custer) flagged out so they do not stretch the area: 33 anchors.
-- Cannot run until Clean's Maps project has the Distance Matrix + Geocoding APIs enabled and a
-  server key set as the `MAPS_SERVER_KEY` secret (the one genuinely external step). Then: function
-  auto-geocodes anchors, wire the booking funnel to call it for Ocala, enforce it in
-  bath_start_subscription, flip Ocala hb_active on. Parked with the full checklist.
+- Implementation simplified after testing: the function feeds the 33 anchor ADDRESSES straight to
+  Distance Matrix (Google geocodes them internally), so only the Distance Matrix API is needed, NOT
+  Geocoding. Paul made a Distance-Matrix-restricted server key; since this environment has no tool
+  to set a function env secret, the key is stored in `public.app_secrets` (RLS on, no policy, only
+  the service role reads it) and the function reads it there. Verified live end to end the same day:
+  "Ocala, FL" gives within=true (0 min), "Miami, FL" gives within=false (266 min), all 33 anchors
+  resolved. Gate is LIVE and callable. Still parked before Ocala actually opens: the containment
+  perimeter polygon (so edge anchors cannot breadcrumb the area outward) ANDed with the gate, wiring
+  the booking funnel + bath_start_subscription, then flipping Ocala hb_active on.
 
 ### Legacy login mechanism built + Ocala availability captured (2026-06-07, migration 0024)
 - Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,
