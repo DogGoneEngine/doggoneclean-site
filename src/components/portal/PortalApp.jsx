@@ -15,6 +15,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import './portal.css';
 import { sb, getPortalData, signOut, withTimeout } from './supabase.js';
 import AuthScreen from './AuthScreen.jsx';
+import { PortalHome } from './PortalViews.jsx';
 
 export default function PortalApp() {
   // 'checking' = evaluating session; 'anonymous' = no session;
@@ -178,7 +179,7 @@ export default function PortalApp() {
           )}
 
           {!dataLoading && !dataError && data && data.subscriber && (
-            <DashboardPlaceholder data={data} onLogout={handleLogout} />
+            <PortalHome data={data} onLogout={handleLogout} />
           )}
         </>
       )}
@@ -229,42 +230,6 @@ function EmptyStateNoSubscriber({ authUser, onLogout }) {
       </div>
     </div>
   );
-}
-
-// ── Placeholder dashboard: subscriber exists, real views ship later ───
-function DashboardPlaceholder({ data, onLogout }) {
-  const firstName = data.subscriber.first_name || pickFirstName(data.authUser);
-  return (
-    <div className="pt-content">
-      <div className="pt-dashboard">
-        <div className="pt-dashboard__greeting">{greetByTime()}</div>
-        <h1>{firstName ? `Hi, ${firstName}` : 'Hi there'}</h1>
-
-        <div className="pt-coming-soon">
-          <h2>Your dashboard is on the way</h2>
-          <p>
-            You are signed in and your subscription is recognized. The
-            dashboard, appointment list, pack management, and the two-tap
-            cancel are landing here in the next few sessions.
-          </p>
-          <div className="pt-empty__cta">
-            <a className="pt-btn pt-btn-secondary" href="/the-villages">View your city page</a>
-          </div>
-        </div>
-
-        <div className="pt-empty__signout">
-          <button onClick={onLogout}>Sign out</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function greetByTime() {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
 }
 
 function pickFirstName(authUser) {
