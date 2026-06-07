@@ -7,6 +7,11 @@ derived from ~12 months of his real appointment book. Captured into the repo on
 per-client schedule block when the app schedules legacy full-grooming clients
 (`legacy_folds_into_v2`).
 
+Machine-readable derivative: `legacy/data/block_times.json` carries `median_cycle_min`
+per client (keyed by canonical clients.json name, akas resolved) and is what
+`scripts/gen_seed_sql.py` uses to seed `clients.visit_minutes`. This file is the
+human-readable provenance.
+
 ## How these columns are used
 
 - `median_cycle_min` is the **block time** the scheduler reserves for that client

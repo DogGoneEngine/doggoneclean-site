@@ -1582,3 +1582,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   marketing pages) is left untouched, pending Paul's call on how Ocala is marketed. Still
   pending for the 5 added names and for scheduling: pull their contact sheets to fill the gaps,
   and attach per-client block times once a `visit_minutes` home is added.
+- **Per-client block times attached (2026-06-07, migration 0019).** Added
+  `clients.visit_minutes` + `visit_minutes_confidence`, seeded from the new
+  `legacy/data/block_times.json` (median on-site cycle per client, derived from
+  `cycle_times.md`; akas resolved, confidence by visit count, banned client null).
+  `gen_seed_sql.py` now emits both columns so a fresh load carries them. Prod updated:
+  51 of 52 clients have a block time (11 to 395 min), only banned Bonnie null. This is the
+  scheduling unlock from `legacy_folds_into_v2`: the engine can now reserve each client's real
+  minutes. Lisa Prater (11 min, mixed groom/nails) flagged low-confidence; her groom visits
+  need a per-visit override.
+- **Open idea, pending Paul's decision (raised 2026-06-07): gate new Ocala clients by drive-time
+  to an anchor instead of a polygon.** A new Ocala address qualifies if it is within a 15-minute
+  drive of an existing legacy anchor stop, excluding the exception clients Paul serves as favors
+  (Tonya Hunt in Williston, Greta Custer's Dunnellon outlier). This deletes the polygon data-gap
+  so Ocala can open now, and makes the service area a living function of route density that
+  auto-contracts as the book shifts to the Villages. Open decision before building: do new bath
+  clients also become anchors (organic growth, with each anchor toggleable, plus a manual
+  force-approve) or stay pinned to the legacy seed set? Recommended the former. Not yet captured
+  as a rule; build once Paul decides the anchor-growth question.
