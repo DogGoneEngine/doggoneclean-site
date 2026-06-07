@@ -4,6 +4,39 @@ Deferred work and forward-looking ideas, parked so they survive a context reset.
 here is committed work; it is the backlog. Move an item into CLEAN_SCROLL_OF_HEPHAESTUS.md's focus block
 when it becomes active.
 
+## Cutover follow-ons - legacy fold (2026-06-07)
+
+The legacy-fold cutover (legacy_folds_into_v2) is mid-build. Open threads, parked so they
+survive a reset:
+
+- **Reminders + confirmations on Supabase.** Net-new and load-bearing: Acuity sends the legacy
+  reminders today, so a Supabase scheduled edge function (pg_cron + SMS/email, mirroring DGN
+  send-notification) must exist before Acuity is cancelled or clients no-show
+  (confirmations_and_reminders_via_supabase). n8n is deferred.
+- **Legacy client login + accounts.** Legacy clients need to sign in and get a bath_subscribers
+  account linked to their clients record before they can self-schedule.
+- **Open Ocala for new bath signups.** Needs the anchor drive-time gate live
+  (ocala_service_area_by_anchor): enable Distance Matrix + Geocoding on Clean's Maps Cloud
+  project, geocode the 31 anchors into clients.geo_lat/geo_lng, wire the client-side drive-time
+  check into the booking gate, then flip Ocala hb_active on. Prices and durations already set.
+- **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
+  pinned to the legacy seed set? Recommended the former; build on Paul's call.
+- **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is
+  bimodal (full grooms 45-59 min at $75, nails 5-11 min at $30, per Time is Money). Mixed
+  groom/nails clients need a per-visit service type and duration, not one blended block.
+- **The 5 added one-off names.** Shane Smith, Jane Henrich, Amanda Posner, Billye Mallory, Edely
+  Abreu were added from cycle-time data with contact details as gaps; pull their contact sheets
+  for service address, dogs, service type, cadence, and one-off-vs-standing.
+- **Website fold + domain redirect.** Fold the doggoneclean.us content into the app and redirect
+  the domain; retire Squarespace.
+- **bath_ table rename.** Cosmetic: the bath_* tables now hold grooming and nails too; rename to a
+  neutral client/subscription/appointment model once the cutover is stable (teeth are in columns,
+  so deferrable).
+- **Recurring next-appointment generator.** When built, it must size each appointment via
+  clean_effective_duration_minutes (schedule_by_client_history), the way reschedule now does.
+- **Refine bath durations.** bath_starting_durations (30/60) are estimates; replace with real
+  bath cycle data once it exists.
+
 ## Website build
 
 The site is live at hurricanebath.com (staging), built and deployed from `main` via
