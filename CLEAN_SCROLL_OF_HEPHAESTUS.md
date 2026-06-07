@@ -1470,3 +1470,42 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   links 404 on the homepage CTAs (Client sign in + Book a visit); dead
   `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var in `deploy.yml`; unused CSS classes
   (`.chips`, `.chips li`, `.services`) in `index.astro`.
+
+## Decisions log (2026-06-07)
+
+### Endless-load on /portal traced to a paused project, plus a permanent guard
+- **Root cause: `dgc-prod` was paused (free-tier auto-pause).** A returning visitor
+  with a stored session triggers a token refresh on load; against a paused project that
+  call hangs, so `onAuthStateChange` never fired and the portal sat on its checking
+  spinner forever. Restored the project. Added a `withTimeout` reachability guard
+  (`supabase.js`) and a watchdog in `PortalApp` so an unreachable backend now shows a
+  retry card instead of an infinite spinner. Paul will move to Supabase Pro before the
+  first real client; until then the free tier keeps auto-pausing and the portal goes dark
+  when it does.
+
+### Client portal built out to full self-service (migrations 0011-0016)
+- The portal went from an auth shell + placeholder to a real account surface: Home
+  dashboard (next visit, plan, pack, details, history); pause / restart / cancel
+  (`0011`); reschedule + skip a visit against live open slots (`0012`); change cadence
+  4wk<->2wk at the same price (`0013`); pack management with the cap as a trigger
+  (`0014`, later lifted); edit contact details + a tightened subscriber-update path
+  that closed a broad self-update RLS hole (`0015`); and a verified service-address
+  change reusing the booking in-area gate (`0016`). Every action's teeth live in a
+  SECURITY DEFINER RPC or trigger scoped to `auth.uid()`, anon revoked. A test
+  subscriber (`is_test`) on Paul's login exercises every screen.
+- **Two real inputs still gate launch:** The Villages needs a published visit duration
+  (`hb_slot_minutes`) + availability windows before the reschedule picker and booking
+  funnel can offer slots; Stripe (card-on-file, payments) stays parked per Paul.
+
+### three_dog_cap lifted (decision, migration 0017)
+- **Decision (Paul, 2026-06-07): drop the hard 3-dog cap on the bath surface.** The 3
+  was the Villages residency limit borrowed as a default, never a Dog Gone rule. The
+  bath pivot starts in Ocala, where it does not apply, and real clients exceed it (one
+  with 5 dogs, one with 4, most one or two). Lifted in the three durable places: the
+  pack trigger (dropped), the `bath_appointments.dog_count` CHECK (now `>= 1`), and the
+  `bath_start_subscription` guard (now `>= 1`), plus the booking counter and portal Add
+  control. Pricing already computes per dog (each additional at the prior rate minus the
+  $20 decrement) and scales with no change. The real limit is visit time / route
+  capacity, which belongs in scheduling, not a count constraint. Oracle `three_dog_cap`
+  and the index rewritten; key kept for sync. The legacy Ocala book (`clients`/`dogs`)
+  was never capped and is untouched.

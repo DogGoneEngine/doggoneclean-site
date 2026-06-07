@@ -528,9 +528,10 @@ def check_rule_survival():
         "'non-refundable' (the within-24h payment status must be stated in terms)",
     )
 
-    # three_dog_cap: nothing to assert here. The cap is the Villages HOA limit
-    # (a data point, not a Dog Gone rule), enforced by the DB CHECK
-    # (dog_count 1-3) and the booking form counter, which stops at three.
+    # three_dog_cap: no cap to assert. The borrowed Villages-residency number
+    # was lifted 2026-06-07 (migration 0017); dog_count is bounded only by
+    # >= 1 (DB CHECK + RPC), and pricing scales per dog. Nothing customer-facing
+    # states a count limit.
 
     # ── friendly_dogs_only ────────────────────────────────────────────────
     # Safety boundary must be visible on the customer-facing site, not

@@ -614,7 +614,9 @@ function PackSection({ dogs, subscriberId, onChanged, toast }) {
     return false;
   }
 
-  const canAdd = dogs.length < 3;
+  // No hard cap on dog count: visit time and route capacity are the real
+  // limits (three_dog_cap was the borrowed Villages residency number, lifted).
+  const canAdd = true;
 
   return (
     <>

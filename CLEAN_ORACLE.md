@@ -517,13 +517,20 @@ rule gates the marketing copy. When Hurricane Bath expands to a second zone,
 update this rule and the copy together, not the copy alone.
 
 `three_dog_cap` (product):
-Maximum 3 dogs per appointment and per household. The per-dog price decrement
-is $20 (each additional dog priced at the prior dog's rate minus $20), within
-the tier. This cap is never stated to customers as a Dog Gone rule: it is the
-Villages HOA limit, not ours, so it is enforced silently in the DB and the
-booking form simply stops at three. Because The Villages caps households at 2 dogs with 3 grandfathered;
-capacity for a 4th dog does not exist in the target market, and the per-dog
-decrement matches the marginal labor of an additional dog at the same stop.
+No hard cap on the number of dogs per visit or per household. The key name is
+historical: 3 was the Villages residency limit (2 dogs, 3 grandfathered)
+borrowed as a convenient default, never a Dog Gone rule, and it was lifted on
+2026-06-07. The only count rule now is at least one dog (DB CHECK
+`dog_count >= 1` and the booking RPC guard); there is no upper wall in the
+database, the booking form, or the portal. Pricing is per dog and scales to any
+count: each additional dog is priced at the prior dog's rate minus the $20
+decrement, within the tier. Because the bath pivot starts in Ocala, where the
+Villages limit does not apply, and real clients exceed three (one with 5 dogs,
+one with 4, most one or two); a borrowed number that blocks a paying client is
+worse than no number, the count was never ours to enforce, and the per-dog
+decrement already prices each extra dog. The real limit is visit time and route
+capacity, which belongs in scheduling (slot length scaling with dog count), not
+in a count constraint.
 
 `premium_inclusive_no_addons` (product):
 Hurricane Bath sells one premium-inclusive bath at one price per tier. No

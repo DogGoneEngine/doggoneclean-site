@@ -303,7 +303,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 
   function updateDog(i, field, val) { setDogs((ds) => ds.map((d, idx) => (idx === i ? { ...d, [field]: val } : d))); }
   function setDogCount(n) {
-    const target = Math.max(1, Math.min(3, n));
+    const target = Math.max(1, n);
     setDogs((ds) => {
       const next = [...ds];
       while (next.length < target) next.push({ ...BLANK_DOG });
@@ -420,7 +420,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
           <div className="bk-counter">
             <button type="button" className="bk-counter__btn" onClick={() => setDogCount(dogs.length - 1)} disabled={dogs.length <= 1} aria-label="Fewer">−</button>
             <div className="bk-counter__num">{dogs.length}</div>
-            <button type="button" className="bk-counter__btn" onClick={() => setDogCount(dogs.length + 1)} disabled={dogs.length >= 3} aria-label="More">+</button>
+            <button type="button" className="bk-counter__btn" onClick={() => setDogCount(dogs.length + 1)} aria-label="More">+</button>
           </div>
 
           {dogs.map((d, i) => (
