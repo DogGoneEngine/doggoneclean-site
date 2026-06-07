@@ -15,10 +15,13 @@ survive a reset:
   (confirmations_and_reminders_via_supabase). n8n is deferred.
 - **Legacy client login: finish the contact backfill.** Mechanism built + verified
   (`bath_claim_legacy_account`, migration 0024, wired into getPortalData). Calendar backfill done
-  2026-06-07: 27 of 52 clients now have phone + email and are login-ready. Remaining: (a) the other
-  24 clients had no calendar contact, so pull phone/email from the Drive contact sheets (newest doc
-  per client); (b) reconcile the active Acuity roster into the book - some currently active clients
-  (e.g. Colleen Smith) are not in the curated 52 and have no `clients` row to claim.
+  2026-06-07: a calendar pass (first Jun-Aug, then a wider per-name pass over 2025-2026) brought
+  43 of 51 active clients to login-ready (phone or email on file). Remaining: (a) 8 clients have no
+  contact anywhere in the calendar (Brooksley Sheehe, Chester Weber, Cynthia Tieche, Garrett
+  Little, Ligia Amyotte, Lisa Irwin, Mary Jane Hunt, Tonya Hunt) plus Edely Abreu / Eric Shannon
+  who have email but no phone - get these from Paul's Google Contacts / Voice or the Drive contact
+  sheets; (b) reconcile the active Acuity roster into the book - some currently active clients are
+  not in the curated 51 and have no `clients` row to claim.
 - **Enter Ocala availability + every-other-week generator.** Spec captured
   (`ocala_availability_every_other_week`): every other week Tue-Sat anchored on the week of
   2026-06-08, plus manual extra days and brief off-week trips. Build the recurring window generator

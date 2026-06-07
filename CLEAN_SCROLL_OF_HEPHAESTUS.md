@@ -1612,13 +1612,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Verified end-to-end in a rolled-back transaction (seeded client + fake auth user + simulated
   JWT): phone match returned claimed with the linked row carrying the client's name, address, and
   Ocala; a second call returned already_linked.
-- Step 2 backfill done (2026-06-07): pulled contact info from the Acuity calendar feed (Jun to Aug
-  2026) and matched by name to the clients book. 27 of 52 clients now carry phone + email and are
-  login-ready; 24 still have no contact (legacy recurring clients whose phone/email lives in the
-  Drive contact sheets, not the calendar) and need a contact-sheet pass; 2 calendar names (Colleen
-  Smith, Kristin Nickerson) matched no clients row, a sign the active Acuity roster runs past the
-  curated book. Phone stored as +1 E164, email lowercased, both filled only where empty so nothing
-  was overwritten.
+- Step 2 backfill done (2026-06-07): pulled contact info from the Acuity calendar feed and matched
+  by name to the clients book. A first pass (Jun to Aug 2026) covered 27, then a wider pass (Jan
+  2025 to Dec 2026, searched per name) brought it to 43 of 51 active clients now login-ready (phone
+  or email on file). Also fixed Colleen Smith (book had the typo "Coleen", filled from calendar).
+  8 clients still have no contact at all in the calendar (Brooksley Sheehe, Chester Weber, Cynthia
+  Tieche, Garrett Little, Ligia Amyotte, Lisa Irwin, Mary Jane Hunt, Tonya Hunt) and need their
+  number from Paul's Google Contacts / Voice or the Drive contact sheets; Edely Abreu and Eric
+  Shannon have email but no phone. Phone stored as +1 E164, email lowercased, both filled only
+  where empty so nothing was overwritten. Kristin Nickerson was a test row (Paul's wife), ignored.
 - Ocala availability (number 2) captured, not yet built: every other week Tue-Sat anchored on the
   week of Monday June 8, 2026, plus manual extra days and brief off-week trips
   (`ocala_availability_every_other_week`). Confirmed against Paul's calendar: the week of June 8 is
