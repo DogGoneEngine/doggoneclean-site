@@ -309,6 +309,57 @@ export async function changeCadence(cadence) {
   return data || { ok: false, error: 'no_result' };
 }
 
+// ── Pack management (portal self-service) ─────────────────────────────
+// Ownership is enforced by the bath_dogs self RLS policies; the 3-active
+// household cap is enforced by the bath_dogs_cap trigger. These use the
+// supabase-js query builder (not raw fetch), which is the supported path.
+export async function addDog({ subscriberId, name, breed, coatTier, behaviorNotes }) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client
+    .from('bath_dogs')
+    .insert({
+      subscriber_id: subscriberId,
+      name,
+      breed: breed || null,
+      coat_tier: coatTier,
+      behavior_notes: behaviorNotes || null,
+      active: true,
+    })
+    .select('id')
+    .single();
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, id: data.id };
+}
+
+export async function updateDog(dogId, { name, breed, behaviorNotes }) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { error } = await client
+    .from('bath_dogs')
+    .update({
+      name,
+      breed: breed || null,
+      behavior_notes: behaviorNotes || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', dogId);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+// Soft delete: a removed dog goes inactive, so its history is preserved.
+export async function removeDog(dogId) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { error } = await client
+    .from('bath_dogs')
+    .update({ active: false, updated_at: new Date().toISOString() })
+    .eq('id', dogId);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 // ── Per-visit actions (portal self-service) ───────────────────────────
 // Skip one upcoming visit. Returns { ok, status } or { ok:false, error }.
 export async function skipAppointment(appointmentId) {

@@ -16,6 +16,7 @@ import './portal.css';
 import {
   pauseSubscription, resumeSubscription, cancelSubscription, changeCadence,
   skipAppointment, rescheduleAppointment, getOpenSlots,
+  addDog, updateDog, removeDog,
 } from './supabase.js';
 
 // ── Formatting helpers ─────────────────────────────────────────────────
@@ -236,23 +237,12 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
         {/* Pack */}
         <section className="pt-section">
           <h2 className="pt-section__title">Your pack</h2>
-          {dogs.length > 0 ? (
-            <div className="pt-card">
-              {dogs.map(d => {
-                const age = ageFromBirthDate(d.birth_date, d.dob_approximate);
-                const bits = [d.breed, coatLabel(d.coat_tier), age].filter(Boolean);
-                return (
-                  <div className="pt-dog" key={d.id}>
-                    <div className="pt-dog__name">{d.name}</div>
-                    {bits.length > 0 && <div className="pt-dog__meta">{bits.join(' · ')}</div>}
-                    {d.behavior_notes && <div className="pt-dog__notes">{d.behavior_notes}</div>}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="pt-card pt-card--muted">No dogs on file yet.</div>
-          )}
+          <PackSection
+            dogs={dogs}
+            subscriberId={subscriber.id}
+            onChanged={onChanged}
+            toast={toast}
+          />
         </section>
 
         {/* Profile */}
@@ -629,6 +619,185 @@ function SlotPicker({ city, busy, onPick, onCancel }) {
       </div>
     </div>
   );
+}
+
+// ── Pack section: view, add, edit, remove dogs ──────────────────────────
+// Add lets the client pick coat tier (same as booking, since it is a new
+// dog). Edit keeps coat tier read-only, because coat tier sets the price
+// tier and the in-person assessment owns that. The 3-dog cap is enforced by
+// the database trigger; here the Add control simply hides at 3.
+function PackSection({ dogs, subscriberId, onChanged, toast }) {
+  const [editing, setEditing] = useState(null); // null | dogId | 'new'
+  const [busy, setBusy] = useState(false);
+
+  async function run(fn, successMsg) {
+    setBusy(true);
+    let res;
+    try { res = await fn(); } catch { res = { ok: false, error: 'network' }; }
+    setBusy(false);
+    if (res && res.ok) {
+      setEditing(null);
+      if (toast) toast(successMsg);
+      if (onChanged) await onChanged();
+      return true;
+    }
+    if (toast) toast(packError(res), true);
+    return false;
+  }
+
+  const canAdd = dogs.length < 3;
+
+  return (
+    <>
+      {dogs.length > 0 ? (
+        <div className="pt-card">
+          {dogs.map(d => (
+            editing === d.id ? (
+              <DogForm
+                key={d.id}
+                mode="edit"
+                busy={busy}
+                initial={d}
+                onSave={(form) => run(() => updateDog(d.id, form), 'Saved.')}
+                onRemove={() => run(() => removeDog(d.id), `${d.name} removed.`)}
+                onCancel={() => setEditing(null)}
+              />
+            ) : (
+              <div className="pt-dog" key={d.id}>
+                <div className="pt-dog__head">
+                  <div className="pt-dog__name">{d.name}</div>
+                  <button className="pt-dog__edit" onClick={() => setEditing(d.id)}>Edit</button>
+                </div>
+                {(() => {
+                  const bits = [d.breed, coatLabel(d.coat_tier), ageFromBirthDate(d.birth_date, d.dob_approximate)].filter(Boolean);
+                  return bits.length > 0 ? <div className="pt-dog__meta">{bits.join(' · ')}</div> : null;
+                })()}
+                {d.behavior_notes && <div className="pt-dog__notes">{d.behavior_notes}</div>}
+              </div>
+            )
+          ))}
+        </div>
+      ) : (
+        editing !== 'new' && <div className="pt-card pt-card--muted">No dogs on file yet.</div>
+      )}
+
+      {editing === 'new' ? (
+        <div className="pt-card" style={{ marginTop: 'var(--space-sm)' }}>
+          <DogForm
+            mode="add"
+            busy={busy}
+            initial={{}}
+            onSave={(form) => run(() => addDog({ subscriberId, ...form }), `${form.name} added.`)}
+            onCancel={() => setEditing(null)}
+          />
+        </div>
+      ) : (
+        canAdd && (
+          <button
+            className="pt-btn pt-btn-secondary pt-btn-sm"
+            style={{ marginTop: 'var(--space-sm)' }}
+            onClick={() => setEditing('new')}
+          >
+            Add a dog
+          </button>
+        )
+      )}
+    </>
+  );
+}
+
+function DogForm({ mode, initial, busy, onSave, onCancel, onRemove }) {
+  const [name, setName] = useState(initial.name || '');
+  const [breed, setBreed] = useState(initial.breed || '');
+  const [coatTier, setCoatTier] = useState(initial.coat_tier || '');
+  const [behaviorNotes, setBehaviorNotes] = useState(initial.behavior_notes || '');
+  const [confirmRemove, setConfirmRemove] = useState(false);
+
+  const isAdd = mode === 'add';
+  const canSave = name.trim().length > 0 && (!isAdd || coatTier === 'smoothcoat' || coatTier === 'doublecoat');
+
+  function submit() {
+    if (!canSave) return;
+    const form = { name: name.trim(), breed: breed.trim(), behaviorNotes: behaviorNotes.trim() };
+    if (isAdd) form.coatTier = coatTier;
+    onSave(form);
+  }
+
+  return (
+    <div className="pt-dogform">
+      <div className="pt-field">
+        <label>Name</label>
+        <input className="pt-input" value={name} onChange={e => setName(e.target.value)} autoFocus />
+      </div>
+      <div className="pt-field">
+        <label>Breed</label>
+        <input className="pt-input" value={breed} onChange={e => setBreed(e.target.value)} placeholder="Optional" />
+      </div>
+      {isAdd ? (
+        <div className="pt-field">
+          <label>Coat</label>
+          <div className="pt-coat-choose">
+            {[['smoothcoat', 'Smooth coat'], ['doublecoat', 'Double coat']].map(([val, label]) => (
+              <button
+                key={val}
+                type="button"
+                className={`pt-coat-opt${coatTier === val ? ' pt-coat-opt--on' : ''}`}
+                onClick={() => setCoatTier(val)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        initial.coat_tier && (
+          <div className="pt-field">
+            <label>Coat</label>
+            <div className="pt-dog__meta" style={{ marginTop: 2 }}>{coatLabel(initial.coat_tier)}</div>
+          </div>
+        )
+      )}
+      <div className="pt-field">
+        <label>Behavior notes</label>
+        <textarea
+          className="pt-input"
+          rows={2}
+          value={behaviorNotes}
+          onChange={e => setBehaviorNotes(e.target.value)}
+          placeholder="Anything we should know"
+        />
+      </div>
+
+      <div className="pt-confirm__row">
+        <button className="pt-btn pt-btn-primary pt-btn-sm" disabled={!canSave || busy} onClick={submit}>
+          {busy ? <span className="pt-spinner-sm" /> : (isAdd ? 'Add dog' : 'Save')}
+        </button>
+        <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy} onClick={onCancel}>Cancel</button>
+      </div>
+
+      {!isAdd && onRemove && (
+        confirmRemove ? (
+          <div className="pt-confirm" style={{ marginTop: 'var(--space-sm)' }}>
+            <div className="pt-confirm__text">Remove {initial.name} from your pack?</div>
+            <div className="pt-confirm__row">
+              <button className="pt-btn pt-btn-danger pt-btn-sm" disabled={busy} onClick={onRemove}>
+                {busy ? <span className="pt-spinner-sm" /> : 'Yes, remove'}
+              </button>
+              <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy} onClick={() => setConfirmRemove(false)}>Keep</button>
+            </div>
+          </div>
+        ) : (
+          <button className="pt-dog__remove" onClick={() => setConfirmRemove(true)}>Remove dog</button>
+        )
+      )}
+    </div>
+  );
+}
+
+function packError(res) {
+  const e = (res && res.error) || '';
+  if (/dog_cap_exceeded/.test(e)) return 'You already have the maximum number of dogs.';
+  return 'Something went wrong. Please try again.';
 }
 
 // ── small shared helpers (kept local to the portal island) ─────────────

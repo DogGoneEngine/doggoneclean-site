@@ -712,6 +712,76 @@
   font-style: italic;
 }
 
+.pt-dog__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.pt-dog__edit {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pt-dog__edit:hover { text-decoration: underline; }
+
+.pt-dog__remove {
+  margin-top: var(--space-md);
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pt-dog__remove:hover { text-decoration: underline; }
+
+/* ── Dog form (add / edit) ──────────────────────────────────────────── */
+.pt-dogform {
+  padding: var(--space-sm) 0;
+}
+
+.pt-dogform textarea.pt-input {
+  resize: vertical;
+  min-height: 56px;
+  font-family: var(--font-body);
+}
+
+.pt-coat-choose {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.pt-coat-opt {
+  padding: 0.6rem 0.5rem;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--soft);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+}
+
+.pt-coat-opt--on {
+  border-color: var(--accent);
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent);
+}
+
 /* ── Status chip (appointment status) ───────────────────────────────── */
 .pt-chip {
   display: inline-block;
