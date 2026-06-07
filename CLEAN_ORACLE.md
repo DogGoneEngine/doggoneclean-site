@@ -502,7 +502,37 @@ Hurricane Bath's service area at launch is The Villages, FL, with the address
 polygon enforced at booking step 1. The schema keeps the zone abstraction so
 later cities can be added without rework. Because launching one zone densely
 beats spreading thin across Florida, and a Villages-shaped route is the operator
-load model the pricing is calibrated against.
+load model the pricing is calibrated against. Updated 2026-06-07: Ocala is now
+also a served city, the origin of the bath pivot (see `ocala_is_a_served_city`
+and `new_ocala_clients_are_v2_only`); The Villages remains the destination, but
+the service area is no longer Villages-only. The consumer-copy rule
+`villages_only_in_copy` is unchanged, pending Paul's direction on how Ocala is
+marketed.
+
+`ocala_is_a_served_city` (service area):
+Ocala and nearby Marion County (Williston, Dunnellon, Anthony) is a served Clean
+location, present in the cities model as slug 'ocala'. It is the home of the
+entire legacy book (every legacy client's service address is there) and the first
+city of the bath pivot, which deliberately starts in Ocala where Paul already
+works before migrating to The Villages. Ocala is added but not yet open for
+new-client v2 booking (hb_active false): opening it needs its real service-area
+polygon, bath pricing, and slot minutes, which are current data gaps. Because the
+legacy clients are all in Ocala and need a city to belong to, and the pivot
+begins where Paul works; but a city is not bookable for new clients until its real
+area and prices exist, so the row exists without going live.
+
+`new_ocala_clients_are_v2_only` (product):
+New clients acquired in Ocala may only become v2 clients (bath,
+subscription-default, Stripe card-on-file). Clean does not take new full-groom or
+nails clients in Ocala. The legacy full-groom and nails clients are grandfathered:
+kept, served, and carried into the app, but that book is closed to new entries.
+Enforced by the public booking funnel offering only bath and the booking RPC
+defaulting service_type to 'bath'; the legacy groom and nails service types are
+set only by the admin legacy load, never by public self-signup. Because the whole
+business motion is the pivot off labor-intensive low-hourly full grooming toward
+fast high-hourly bath work (`favor_high_hourly_work`, `core_is_no_haircut_dogs`),
+and taking new full-groom clients would regrow the exact book Clean is winding
+down.
 
 `villages_only_in_copy` (Hurricane Bath: copy):
 The Hurricane Bath surface mentions only The Villages in customer-facing copy:

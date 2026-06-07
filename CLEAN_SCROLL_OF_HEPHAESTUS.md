@@ -1564,3 +1564,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Next: generalize bath_start_subscription and the slot engine for per-client duration + nails/
   groom, load the legacy book + cycle-time durations, build the n8n reminder job, fold the site
   and redirect the domain.
+- **Legacy book loaded into prod + Ocala added as a city (2026-06-07).** Ran the seed from
+  `legacy/data/clients.json` into the empty `clients`/`dogs` tables: 47 authoritative records
+  (33 standing, 11 one-off, 2 at-will, 1 banned-with-exclude) + 61 dogs, verified by count. The
+  cycle-time sheet (51 names) reconciled cleanly against all 46 active roster records (banned
+  Bonnie correctly absent), surfacing 5 names in the sheet but not the roster: Shane Smith, Jane
+  Henrich, Amanda Posner, Billye Mallory, Edely Abreu. Asked Paul before reconciling (his
+  standing instruction); he said add all 5, so they went in as `one_off` records carrying their
+  cycle-time facts (visits, last visit, on-site block, avg charged) with explicit `data_gaps`
+  for service address / dogs / service type / cadence / one-off-vs-standing, since their contact
+  details are unverified. Roster now 52. Also established (data-confirmed) that the entire book
+  is Ocala and nearby Marion County, and added **Ocala** to `cities` (slug 'ocala', center set,
+  hb_active false until its polygon/pricing/slot exist). Two new rules: `ocala_is_a_served_city`
+  (pivot-origin city, updates `villages_only_at_launch`) and `new_ocala_clients_are_v2_only`
+  (new Ocala signups are bath-only; legacy groom/nails grandfathered, book closed to new
+  entries). The consumer-copy rule `villages_only_in_copy` (check.py bans "Ocala" on the
+  marketing pages) is left untouched, pending Paul's call on how Ocala is marketed. Still
+  pending for the 5 added names and for scheduling: pull their contact sheets to fill the gaps,
+  and attach per-client block times once a `visit_minutes` home is added.

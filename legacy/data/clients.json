@@ -4,7 +4,7 @@
     "area": "Ocala, FL and nearby (Williston, Dunnellon, Anthony)",
     "built": "2026-05-24",
     "source_priority": "contact sheets (folder 1oTHLDKe6ao-Q39OoudL058PezwXX8lQG) > Paul overrides > calendar history. Calendar extract (dgc_active_enriched) is cross-check only.",
-    "roster_count": "47 active: 33 standing, 11 one-off, 2 at-will, 1 banned",
+    "roster_count": "52: 33 standing, 16 one-off, 2 at-will, 1 banned (5 one-off added 2026-06-07 from cycle-time data; contact details unverified, see each record's data_gaps)",
     "cadence_units": "days",
     "cadence_confidence": "high = sheet states frequency; medium = sheet blank, inferred from roster/calendar; low = guess",
     "hardness_tags": "HARD=must respect; SOFT=preference; FLEX=movable; FLEX+=ultra-flex gap-filler",
@@ -682,7 +682,12 @@
     {"name": "Maria Arvanitis", "status": "one_off", "zone": "Ocala-SE", "address": "15320 SE 36th Ave, Ocala 34480", "routed": false, "note": "gate closes 4pm (construction); text/call to open"},
     {"name": "Martica Ewers", "status": "one_off", "zone": "Ocala-SE", "address": "1124 SE 7th St, Ocala 34471", "routed": false},
     {"name": "Richard Vieira", "status": "one_off_for_now", "zone": "Ocala-SE", "address": "3255 SE 55th Ct, Ocala 34480", "routed": false, "note": "regular ~5wk cadence; NO contact sheet; MAY convert to standing later"},
-    {"name": "Sally O'Laughlin", "status": "one_off", "zone": "Ocala-NW", "address": "5165 NW 20th Pl, Ocala 34482", "routed": false, "note": "moving to assisted living in Lake Wales (~90 min S); may leave service area; dog Mindie (shih tzu)"}
+    {"name": "Sally O'Laughlin", "status": "one_off", "zone": "Ocala-NW", "address": "5165 NW 20th Pl, Ocala 34482", "routed": false, "note": "moving to assisted living in Lake Wales (~90 min S); may leave service area; dog Mindie (shih tzu)"},
+    {"name": "Shane Smith", "status": "one_off", "service_type": null, "address": null, "zone": null, "routed": false, "note": "added 2026-06-07 from cycle-time data (was missing from the roster; Paul confirmed add); 3 visits, last 2026-05-29, ~264 min on-site block, avg charged $292; long cycle suggests full groom", "data_gaps": ["service address", "dogs", "service type", "cadence", "confirm one_off vs standing"]},
+    {"name": "Jane Henrich", "status": "one_off", "service_type": null, "address": null, "zone": null, "routed": false, "note": "added 2026-06-07 from cycle-time data; 6 visits, last 2025-12-27, ~269 min on-site block, avg charged $156; long cycle suggests full groom; may be lapsed", "data_gaps": ["service address", "dogs", "service type", "cadence", "confirm one_off vs standing"]},
+    {"name": "Amanda Posner", "status": "one_off", "service_type": null, "address": null, "zone": null, "routed": false, "note": "added 2026-06-07 from cycle-time data; 1 visit, last 2025-10-08, ~71 min on-site block, avg charged $75", "data_gaps": ["service address", "dogs", "service type", "cadence", "confirm one_off vs standing"]},
+    {"name": "Billye Mallory", "status": "one_off", "service_type": null, "address": null, "zone": null, "routed": false, "note": "added 2026-06-07 from cycle-time data; 1 visit, last 2025-08-24, ~189 min on-site block, avg charged $180", "data_gaps": ["service address", "dogs", "service type", "cadence", "confirm one_off vs standing"]},
+    {"name": "Edely Abreu", "status": "one_off", "service_type": null, "address": null, "zone": null, "routed": false, "note": "added 2026-06-07 from cycle-time data; 1 visit, last 2025-08-10, ~107 min on-site block, avg charged $75", "data_gaps": ["service address", "dogs", "service type", "cadence", "confirm one_off vs standing"]}
   ],
 
   "at_will": [
