@@ -1547,3 +1547,20 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   not). This corrects the prior session's lean that grooming clients are all recurring. (3)
   Block time is on-site time (median cycle); the route engine calculates actual inbound drive
   time per stop separately. (4) Every legacy client is kept and carried in; none dropped.
+- **Data-model fork resolved (Paul chose Option 1, 2026-06-07): generalize the live engine.**
+  The DB has two table families: the working bath_* operational stack (account/auth,
+  subscriptions, appointments, scheduler, portal RPCs, React islands) and the richer but
+  non-operational legacy `clients`/`dogs` book (already encodes roster_group = recurrence and a
+  service_type that lists groom/bath/nails, but empty in prod, no login or appointments). Paul
+  chose to widen the bath_* stack in place rather than rebuild on `clients`, because the
+  scheduler/portal machinery already works and the days deadline makes reuse the right call;
+  the bath_ table names are kept and a rename is a deferred cosmetic (teeth live in columns).
+  **Migration 0018 applied to dgc-prod and committed:** bath_subscriptions and bath_appointments
+  now carry service_type (full_groom/bath/nails), payment_method (stripe_card/square_in_person),
+  per-visit block minutes, cadence_days, and is_recurring; bath_subscribers gains client_id (FK
+  to the legacy CRM record) and is_legacy. Additive and non-destructive: the one live bath
+  subscription and its appointments back-filled to bath / stripe_card / recurring with cadence
+  preserved, so the booking flow is unaffected. get_advisors after the DDL showed no new issues.
+  Next: generalize bath_start_subscription and the slot engine for per-client duration + nails/
+  groom, load the legacy book + cycle-time durations, build the n8n reminder job, fold the site
+  and redirect the domain.
