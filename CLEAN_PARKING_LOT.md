@@ -13,15 +13,14 @@ survive a reset:
   reminders today, so a Supabase scheduled edge function (pg_cron + SMS/email, mirroring DGN
   send-notification) must exist before Acuity is cancelled or clients no-show
   (confirmations_and_reminders_via_supabase). n8n is deferred.
-- **Legacy client login: finish the contact backfill.** Mechanism built + verified
-  (`bath_claim_legacy_account`, migration 0024, wired into getPortalData). Calendar backfill done
-  2026-06-07: a calendar pass (first Jun-Aug, then a wider per-name pass over 2025-2026) brought
-  44 of 51 active clients to login-ready (phone or email on file). Remaining: (a) 7 clients have no
-  contact anywhere in the calendar (Brooksley Sheehe, Chester Weber, Cynthia Tieche, Ligia Amyotte,
-  Lisa Irwin, Mary Jane Hunt, Tonya Hunt) plus Edely Abreu / Eric Shannon
-  who have email but no phone - get these from Paul's Google Contacts / Voice or the Drive contact
-  sheets; (b) reconcile the active Acuity roster into the book - some currently active clients are
-  not in the curated 51 and have no `clients` row to claim.
+- **Legacy client login: done for who needs it; the rest are intentional.** Mechanism built +
+  verified (`bath_claim_legacy_account`, migration 0024). Calendar backfill (2026-06-07) brought
+  44 of 51 active clients to login-ready. The remaining no-contact clients are NOT a backfill TODO:
+  per `contact_omitted_is_intentional`, Paul left their phone/email off on purpose so the system
+  never auto-messages them; they run on his standing schedule and do not need the portal. Add a
+  client's contact only when a real need appears (they ask for the portal or go irregular). Edely
+  Abreu is going inactive; Eric Shannon gets a phone later only if needed. On-demand only: reconcile
+  the active Acuity roster (a few current clients are not in the book) if one needs to self-serve.
 - **Enter Ocala availability + every-other-week generator.** Spec captured
   (`ocala_availability_every_other_week`): every other week Tue-Sat anchored on the week of
   2026-06-08, plus manual extra days and brief off-week trips. Build the recurring window generator

@@ -609,6 +609,18 @@ not in `bath_subscribers`, so sign-in has to bridge the two by verified identity
 `clients.phone_e164` and `clients.email` are backfilled from the Acuity calendar feed, which
 carries each client's phone and email.
 
+`contact_omitted_is_intentional` (messaging):
+For an established legacy client on a fixed recurring schedule, a blank phone and email on the
+clients record is intentional, not a data gap. Paul has shown up on a standing cadence these
+clients have relied on for years; they neither need the portal nor want automated messages, so
+their contact was left off on purpose to keep the system from texting or emailing them. Treat
+absence of contact as do-not-auto-contact and portal-optional, and add a client's phone or email
+only when a real need appears (they ask for the portal, want to self-serve, or their schedule goes
+irregular). Because automated reminders and confirmations must reach only clients who have contact
+on file and want them; messaging or chasing contact for someone who runs on a standing schedule
+would bother a person who never asked and add work for no gain (prime directive: earn more, grind
+less).
+
 `villages_only_in_copy` (Hurricane Bath: copy):
 The Hurricane Bath surface mentions only The Villages in customer-facing copy:
 no other cities, no reference to the legacy Ocala full-grooming book (which

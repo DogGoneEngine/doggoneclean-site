@@ -1618,10 +1618,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   or email on file). Also corrected two names the book had typo'd against the calendar and filled
   their real contact: Colleen Smith (book had "Coleen") and Garret Little (book had "Garrett"; his
   Acuity bookings and email garretllittle@gmail.com confirm one T, fixed in the DB, clients.json,
-  seed.sql, and the legacy data/source files). 7 clients still have no contact at all in the
-  calendar (Brooksley Sheehe, Chester Weber, Cynthia Tieche, Ligia Amyotte, Lisa Irwin, Mary Jane
-  Hunt, Tonya Hunt) and need their
-  number from Paul's Google Contacts / Voice or the Drive contact sheets; Edely Abreu and Eric
+  seed.sql, the legacy data/source files, and the one mis-titled Google Calendar event). The 7
+  clients with no contact on file (Brooksley Sheehe, Chester Weber, Cynthia Tieche, Ligia Amyotte,
+  Lisa Irwin, Mary Jane Hunt, Tonya Hunt) are blank BY PAUL'S INTENT, not a gap: per
+  contact_omitted_is_intentional he left their phone/email off so the system never auto-messages
+  them, since they run on his standing schedule and do not need the portal; Edely Abreu and Eric
   Shannon have email but no phone. Phone stored as +1 E164, email lowercased, both filled only
   where empty so nothing was overwritten. Kristin Nickerson was a test row (Paul's wife), ignored.
 - Ocala availability (number 2) captured, not yet built: every other week Tue-Sat anchored on the
