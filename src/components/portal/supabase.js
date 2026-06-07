@@ -309,6 +309,25 @@ export async function changeCadence(cadence) {
   return data || { ok: false, error: 'no_result' };
 }
 
+// ── Profile (portal self-service) ─────────────────────────────────────
+// Updates contact details and preferences only. Service address is not
+// here: it needs the in-area verification flow and gets its own RPC.
+export async function updateProfile(fields) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc('bath_update_profile', {
+    p_first_name: fields.firstName,
+    p_last_name: fields.lastName ?? null,
+    p_phone_e164: fields.phoneE164 ?? null,
+    p_email: fields.email ?? null,
+    p_gate_code: fields.gateCode ?? null,
+    p_sms_opt_in: fields.smsOptIn,
+    p_email_opt_in: fields.emailOptIn,
+  });
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}
+
 // ── Pack management (portal self-service) ─────────────────────────────
 // Ownership is enforced by the bath_dogs self RLS policies; the 3-active
 // household cap is enforced by the bath_dogs_cap trigger. These use the

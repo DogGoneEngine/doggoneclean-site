@@ -845,6 +845,42 @@
   color: var(--ink);
 }
 
+/* ── Profile form ───────────────────────────────────────────────────── */
+.pt-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 460px) {
+  .pt-form-grid { grid-template-columns: 1fr; }
+}
+
+.pt-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.pt-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.pt-profile-addr-note {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--line);
+  font-size: var(--text-sm);
+  color: var(--soft);
+}
+
 /* ── Cadence control (segmented 4wk / 2wk) ──────────────────────────── */
 .pt-cadence {
   margin-top: var(--space-md);

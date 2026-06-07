@@ -17,6 +17,7 @@ import {
   pauseSubscription, resumeSubscription, cancelSubscription, changeCadence,
   skipAppointment, rescheduleAppointment, getOpenSlots,
   addDog, updateDog, removeDog,
+  updateProfile, toE164US,
 } from './supabase.js';
 
 // ── Formatting helpers ─────────────────────────────────────────────────
@@ -248,40 +249,7 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
         {/* Profile */}
         <section className="pt-section">
           <h2 className="pt-section__title">Your details</h2>
-          <div className="pt-card">
-            <div className="pt-card__row">
-              <span className="pt-card__label">Name</span>
-              <span className="pt-card__value">
-                {[subscriber.first_name, subscriber.last_name].filter(Boolean).join(' ') || '-'}
-              </span>
-            </div>
-            {subscriber.phone_e164 && (
-              <div className="pt-card__row">
-                <span className="pt-card__label">Phone</span>
-                <span className="pt-card__value">{formatPhone(subscriber.phone_e164)}</span>
-              </div>
-            )}
-            {subscriber.email && (
-              <div className="pt-card__row">
-                <span className="pt-card__label">Email</span>
-                <span className="pt-card__value">{subscriber.email}</span>
-              </div>
-            )}
-            <div className="pt-card__row">
-              <span className="pt-card__label">Service address</span>
-              <span className="pt-card__value">{formatAddress(subscriber)}</span>
-            </div>
-            {subscriber.gate_code && (
-              <div className="pt-card__row">
-                <span className="pt-card__label">Gate code</span>
-                <span className="pt-card__value">{subscriber.gate_code}</span>
-              </div>
-            )}
-            <div className="pt-card__row">
-              <span className="pt-card__label">Text reminders</span>
-              <span className="pt-card__value">{subscriber.sms_opt_in ? 'On' : 'Off'}</span>
-            </div>
-          </div>
+          <ProfileSection subscriber={subscriber} onChanged={onChanged} toast={toast} />
         </section>
 
         {/* History */}
@@ -798,6 +766,161 @@ function packError(res) {
   const e = (res && res.error) || '';
   if (/dog_cap_exceeded/.test(e)) return 'You already have the maximum number of dogs.';
   return 'Something went wrong. Please try again.';
+}
+
+// ── Profile section: view + edit contact details and preferences ────────
+// Service address is shown read-only here: changing it needs the in-area
+// verification flow and lands in its own slice. Everything else is editable.
+function ProfileSection({ subscriber, onChanged, toast }) {
+  const [editing, setEditing] = useState(false);
+
+  if (!editing) {
+    return (
+      <div className="pt-card">
+        <div className="pt-card__row">
+          <span className="pt-card__label">Name</span>
+          <span className="pt-card__value">
+            {[subscriber.first_name, subscriber.last_name].filter(Boolean).join(' ') || '-'}
+          </span>
+        </div>
+        {subscriber.phone_e164 && (
+          <div className="pt-card__row">
+            <span className="pt-card__label">Phone</span>
+            <span className="pt-card__value">{formatPhone(subscriber.phone_e164)}</span>
+          </div>
+        )}
+        {subscriber.email && (
+          <div className="pt-card__row">
+            <span className="pt-card__label">Email</span>
+            <span className="pt-card__value">{subscriber.email}</span>
+          </div>
+        )}
+        <div className="pt-card__row">
+          <span className="pt-card__label">Service address</span>
+          <span className="pt-card__value">{formatAddress(subscriber)}</span>
+        </div>
+        {subscriber.gate_code && (
+          <div className="pt-card__row">
+            <span className="pt-card__label">Gate code</span>
+            <span className="pt-card__value">{subscriber.gate_code}</span>
+          </div>
+        )}
+        <div className="pt-card__row">
+          <span className="pt-card__label">Text reminders</span>
+          <span className="pt-card__value">{subscriber.sms_opt_in ? 'On' : 'Off'}</span>
+        </div>
+        <div className="pt-card__row">
+          <span className="pt-card__label">Email updates</span>
+          <span className="pt-card__value">{subscriber.email_opt_in ? 'On' : 'Off'}</span>
+        </div>
+        <button className="pt-btn pt-btn-secondary pt-btn-sm" style={{ marginTop: 'var(--space-md)' }}
+          onClick={() => setEditing(true)}>
+          Edit details
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <ProfileForm
+      subscriber={subscriber}
+      onCancel={() => setEditing(false)}
+      onSaved={async () => { setEditing(false); if (onChanged) await onChanged(); }}
+      toast={toast}
+    />
+  );
+}
+
+function ProfileForm({ subscriber, onCancel, onSaved, toast }) {
+  const [firstName, setFirstName] = useState(subscriber.first_name || '');
+  const [lastName, setLastName] = useState(subscriber.last_name || '');
+  const [phone, setPhone] = useState(subscriber.phone_e164 ? formatPhone(subscriber.phone_e164) : '');
+  const [email, setEmail] = useState(subscriber.email || '');
+  const [gateCode, setGateCode] = useState(subscriber.gate_code || '');
+  const [smsOptIn, setSmsOptIn] = useState(subscriber.sms_opt_in !== false);
+  const [emailOptIn, setEmailOptIn] = useState(subscriber.email_opt_in !== false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
+  async function save() {
+    if (!firstName.trim()) { setErr('Please enter your name.'); return; }
+    let phoneE164 = null;
+    if (phone.trim()) {
+      phoneE164 = toE164US(phone);
+      if (!phoneE164) { setErr('Enter a valid US phone number, or leave it blank.'); return; }
+    }
+    if (email.trim() && !email.includes('@')) { setErr('Enter a valid email, or leave it blank.'); return; }
+    setErr('');
+    setBusy(true);
+    let res;
+    try {
+      res = await updateProfile({
+        firstName: firstName.trim(), lastName: lastName.trim(), phoneE164,
+        email: email.trim(), gateCode: gateCode.trim(), smsOptIn, emailOptIn,
+      });
+    } catch { res = { ok: false, error: 'network' }; }
+    setBusy(false);
+    if (res && res.ok) {
+      if (toast) toast('Details saved.');
+      await onSaved();
+    } else {
+      setErr(res && res.error === 'invalid_phone'
+        ? 'Enter a valid US phone number, or leave it blank.'
+        : 'Could not save. Please try again.');
+    }
+  }
+
+  return (
+    <div className="pt-card">
+      <div className="pt-form-grid">
+        <div className="pt-field">
+          <label>First name</label>
+          <input className="pt-input" value={firstName} onChange={e => setFirstName(e.target.value)} autoFocus />
+        </div>
+        <div className="pt-field">
+          <label>Last name</label>
+          <input className="pt-input" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Optional" />
+        </div>
+      </div>
+      <div className="pt-field">
+        <label>Phone</label>
+        <input className="pt-input" type="tel" inputMode="tel" value={phone}
+          onChange={e => setPhone(e.target.value)} placeholder="(352) 555-0100" />
+      </div>
+      <div className="pt-field">
+        <label>Email</label>
+        <input className="pt-input" type="email" value={email}
+          onChange={e => setEmail(e.target.value)} placeholder="you@example.com" />
+      </div>
+      <div className="pt-field">
+        <label>Gate code</label>
+        <input className="pt-input" value={gateCode}
+          onChange={e => setGateCode(e.target.value)} placeholder="Optional" />
+      </div>
+
+      <label className="pt-toggle">
+        <input type="checkbox" checked={smsOptIn} onChange={e => setSmsOptIn(e.target.checked)} />
+        <span>Text reminders before each visit</span>
+      </label>
+      <label className="pt-toggle">
+        <input type="checkbox" checked={emailOptIn} onChange={e => setEmailOptIn(e.target.checked)} />
+        <span>Email updates</span>
+      </label>
+
+      <div className="pt-profile-addr-note">
+        Service address: {formatAddress(subscriber)}
+      </div>
+
+      {err && <div className="pt-error-msg" style={{ marginTop: 'var(--space-sm)' }}>{err}</div>}
+
+      <div className="pt-confirm__row" style={{ marginTop: 'var(--space-md)' }}>
+        <button className="pt-btn pt-btn-primary pt-btn-sm" disabled={busy} onClick={save}>
+          {busy ? <span className="pt-spinner-sm" /> : 'Save details'}
+        </button>
+        <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy} onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
+  );
 }
 
 // ── small shared helpers (kept local to the portal island) ─────────────
