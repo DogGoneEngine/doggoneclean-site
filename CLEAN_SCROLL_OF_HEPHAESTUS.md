@@ -1626,3 +1626,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   after). Next slice to make legacy clients bookable: generalize bath_start_subscription to take
   service_type, payment_method, and the per-client duration (from clients.visit_minutes) so a
   groom or nails appointment is created with its real length and in-person payment.
+- **Bath prices/durations, min stop block, nails durations clarified (2026-06-07).** Confirmed
+  to Paul that all rules this session live in durable layers (DB columns, CHECK + exclusion
+  constraints, SECURITY DEFINER RPCs, seeded data files), not page code, so they survive a
+  website redesign; the Oracle is the rulebook and the index maps each rule to its DB home.
+  Paul's bath inputs, set durably (migration 0022 + city data): bath starting durations 30 min
+  smoothcoat / 60 doublecoat (`bath_starting_durations`), a 30-min minimum stop block
+  (`minimum_stop_block`, floors Lisa Prater's 11-min median), and Ocala bath prices copied from
+  The Villages (`ocala_prices_match_villages`). Nails stop durations answered from the cycle
+  data: Franklin 35 (1 dog), Prater 11 (1 dog, floored to 30), Little 64 (2 dogs), Crandall 53
+  (4 dogs); the data does not scale with dog count, so per-client history beats a dog-count
+  formula. Garrett Little's 2-dog count recorded (names/breeds still a gap). Ocala stays
+  hb_active false until the anchor gate is wired; prices and durations are no longer gaps.

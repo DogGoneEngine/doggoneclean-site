@@ -516,9 +516,10 @@ entire legacy book (every legacy client's service address is there) and the firs
 city of the bath pivot, which deliberately starts in Ocala where Paul already
 works before migrating to The Villages. Ocala is added but not yet open for
 new-client v2 booking (hb_active false): opening it needs the anchor drive-time
-gate live (`ocala_service_area_by_anchor`: Distance Matrix enabled on Clean's
-Maps key plus a one-time anchor geocode), bath pricing, and slot minutes, which
-are the current gaps. Ocala needs no drawn polygon. Because the
+gate live (`ocala_service_area_by_anchor`: Distance Matrix on Clean's Maps key
+plus a one-time anchor geocode), then hb_active flipped on. Bath prices and
+starting durations are already set, equal to The Villages
+(`ocala_prices_match_villages`, `bath_starting_durations`). Ocala needs no drawn polygon. Because the
 legacy clients are all in Ocala and need a city to belong to, and the pivot
 begins where Paul works; but a city is not bookable for new clients until its real
 area and prices exist, so the row exists without going live.
@@ -552,6 +553,29 @@ as the book shifts to The Villages and Ocala anchors thin out, so the geography 
 wind-down. Decided 2026-06-07 (new clients become anchors, per Paul). This replaces the
 polygon requirement for Ocala only; The Villages keeps its polygon (`villages_only_at_launch`)
 for now.
+
+`bath_starting_durations` (scheduling):
+To start, a bath visit is 30 minutes for a smoothcoat dog (quick) and 60 minutes for a
+doublecoat (longer), stored per city in `cities.hb_smoothcoat_minutes` and
+`hb_doublecoat_minutes`. These are starting estimates, not measured: refine them once real
+bath-only cycle data exists. A multi-dog bath takes the longer tier's minutes among the dogs
+for now. Because Paul has no reliable bath-only cycle times yet (the legacy book is grooming
+and nails), and a smoothcoat washes and dries faster than a doublecoat, so these blocks are
+sane starting points mapped to the coat tiers the pricing already uses.
+
+`minimum_stop_block` (scheduling):
+No scheduled stop reserves less than the city's minimum stop block (30 minutes,
+`cities.hb_min_stop_minutes`), even when a client's historical median is lower. The duration
+reserved is `greatest(the client or tier minutes, hb_min_stop_minutes)`; for example Lisa
+Prater's 11-minute mixed-nails median is floored to 30. Because a mobile stop has irreducible
+drive-up, setup, and teardown overhead, so a sub-30 block underbooks the route, and 30 is
+Paul's quick-stop baseline.
+
+`ocala_prices_match_villages` (pricing):
+Ocala's bath prices equal The Villages' bath prices: the smoothcoat and doublecoat recurring
+and single rates, the additional-dog decrement, and the founders rates and cap are all copied
+across. Because it is the same bath product and Paul set them equal to start; adjust a city's
+prices only if its economics later diverge.
 
 `villages_only_in_copy` (Hurricane Bath: copy):
 The Hurricane Bath surface mentions only The Villages in customer-facing copy:
