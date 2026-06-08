@@ -167,6 +167,19 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (photo redo: quality pass after Paul rejected the first cut)
+
+Paul rejected the first photo pass (specialist avatar cropped his face off, a generic 4-up grid
+"shoved to the bottom" of the homepage, a dim "sad" shepherd on the Ocala hero) and added a much
+better photo (PXL_20210220: him facing camera, white dog on his shoulder, well lit). Redone with
+care: (1) specialist avatar recropped from the new photo to cleanly frame Paul's face and enlarged
+96px -> 128px; (2) the homepage 4-up grid is deleted and replaced with one strong 16:9 feature image
+high on the page (right under the hero) with a caption, the bright white-Pyrenees shot; (3) the Ocala
+hero swapped from the dim shepherd to a bright, friendly black-Lab face. Removed the now-unused
+trailer-1..4 and the heavy new original from public/photos; only paul-specialist, home-feature,
+og-cover, ocala-hero remain (all referenced). Each crop was reviewed by eye before shipping. The
+homepage still cannot SSG-verify locally (the-villages egress abort) but compiles and builds in CI.
+
 ### 2026-06-08 (real photos wired in: Paul + dogs in the trailer)
 
 Paul uploaded 10 full-size phone photos (him with client dogs in the bath trailer) to the repo's

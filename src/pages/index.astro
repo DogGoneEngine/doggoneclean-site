@@ -65,6 +65,14 @@ const recurringSteps = [
     </div>
   </section>
 
+  <!-- FEATURE PHOTO -->
+  <section class="home-feature">
+    <div class="container">
+      <img class="home-feature__img" src="/photos/home-feature.jpg" loading="lazy" alt="Paul with a client's dog in the climate-controlled Hurricane Bath trailer" />
+      <p class="home-feature__cap">Every bath happens in the climate-controlled trailer, parked in your driveway. A calm dog, a genuinely clean dog, no trip to a salon.</p>
+    </div>
+  </section>
+
   <!-- FAST LANE -->
   <section class="fast-lane">
     <div class="container">
@@ -225,25 +233,6 @@ const recurringSteps = [
             </svg>
           </div>
         </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- REAL DOGS, REAL TRAILER -->
-  <section class="section trailer-strip">
-    <div class="container">
-      <div class="text-center">
-        <p class="section-label">In the trailer</p>
-        <h2 class="section-title">Real dogs, real driveways.</h2>
-        <p class="section-subtitle section-subtitle--center">
-          Every bath happens in the climate controlled trailer, parked at your home.
-        </p>
-      </div>
-      <div class="trailer-grid">
-        <img src="/photos/trailer-1.jpg" loading="lazy" alt="A calm black Lab resting against the tub in the Hurricane Bath trailer" />
-        <img src="/photos/trailer-2.jpg" loading="lazy" alt="A Bernese Mountain Dog standing in the bright, clean Hurricane Bath trailer" />
-        <img src="/photos/trailer-3.jpg" loading="lazy" alt="Paul with a relaxed yellow Lab in the trailer" />
-        <img src="/photos/trailer-4.jpg" loading="lazy" alt="Paul holding a happy little terrier mix, small dogs welcome too" />
       </div>
     </div>
   </section>
@@ -596,23 +585,24 @@ const recurringSteps = [
   }
   .friendly__card p:last-child { margin-bottom: 0; }
 
-  /* REAL DOGS, REAL TRAILER */
-  .trailer-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
-    max-width: 900px;
-    margin: var(--space-2xl) auto 0;
-  }
-  .trailer-grid img {
+  /* FEATURE PHOTO */
+  .home-feature { padding-top: var(--space-3xl); }
+  .home-feature__img {
+    display: block;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    max-width: 920px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: var(--radius-lg);
-    display: block;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
   }
-  @media (min-width: 800px) {
-    .trailer-grid { grid-template-columns: repeat(4, 1fr); }
+  .home-feature__cap {
+    max-width: 580px;
+    margin: var(--space-lg) auto 0;
+    text-align: center;
+    color: var(--soft);
+    font-size: var(--text-base);
+    line-height: 1.6;
   }
 </style>
