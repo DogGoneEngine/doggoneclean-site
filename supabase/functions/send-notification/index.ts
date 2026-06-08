@@ -1,24 +1,19 @@
 // supabase/functions/send-notification/index.ts
 //
 // Clean's confirmations + reminders dispatcher (the Acuity replacement),
-// mirrored from DGN's send-notification and retargeted to Clean's tables and
-// the legacy full-grooming reality: email only, in-person payment (no card /
-// charge language), and the templates in legacy/notifications/email_templates.md.
+// mirrored from DGN's send-notification, retargeted to Clean's tables and the
+// legacy full-grooming reality: email + (dormant) text, in-person payment, the
+// templates in legacy/notifications/email_templates.md.
 //
-// Given { kind, appointment_id } it loads the appointment context
-// (bath_appointments -> bath_subscribers -> bath_subscriptions -> bath_dogs),
-// renders the matching template, and sends via Resend, writing a notification_log
-// row keyed by dedup_key so nothing ever double-sends. Fail-closed: with no
-// Resend key it logs 'skipped: resend_not_configured' and sends nothing, so it
-// stays dormant until cutover (no double reminders against Acuity).
+// Given { kind, appointment_id } it loads the appointment context, resolves
+// which channels to send on (transactional kinds always email; reminders follow
+// the client's notification_preferences), renders the template, and sends via
+// Resend, writing a notification_log row per channel keyed by dedup_key so
+// nothing double-sends. Fail-closed: no Resend key => 'skipped'. Text is a
+// configured channel that no-ops ('twilio_not_configured') until Twilio is wired.
 //
-// Secrets live in app_secrets (this environment cannot set function env vars):
-//   notifications_secret  caller auth (the cron pastes it as x-notifications-secret)
-//   resend_api_key        Resend send key (Paul's Dog Gone Clean Resend account)
-//   resend_from           optional From; defaults to service@doggoneclean.us
-//
-// Kinds: booking_confirmation, reminder_3d, reminder_26h, reminder_day,
-//        cancellation, reschedule.
+// Secrets in app_secrets: notifications_secret (caller auth), resend_api_key,
+// resend_from (optional).
 
 import { Resend } from 'npm:resend@4';
 import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2';
@@ -26,7 +21,10 @@ import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const TZ = 'America/New_York';
-const PORTAL = 'https://doggoneclean.us/portal';
+
+const TRANSACTIONAL = new Set(['booking_confirmation', 'cancellation', 'reschedule']);
+const REMINDER_KEYS = new Set(['reminder_3d', 'reminder_26h', 'reminder_day']);
+const PREF_DEFAULT = { email: true, sms: false };
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -44,7 +42,6 @@ async function secret(sb: SupabaseClient, name: string): Promise<string | null> 
   return (data?.value as string) ?? null;
 }
 
-// ── formatting ────────────────────────────────────────────────────────
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: TZ });
 }
@@ -74,10 +71,21 @@ async function loadCtx(sb: SupabaseClient, appointmentId: string): Promise<Ctx |
   return { appt, sub, dogNames: joinNames((dogs ?? []).map((d) => d.name)) };
 }
 
-// ── templates ─────────────────────────────────────────────────────────
+// Reminders follow the client's per-kind toggles (default email on); the
+// transactional kinds always go by email regardless of preferences.
+async function resolveChannels(sb: SupabaseClient, kind: string, subscriberId: string): Promise<Array<'email' | 'sms'>> {
+  if (TRANSACTIONAL.has(kind)) return ['email'];
+  if (!REMINDER_KEYS.has(kind)) return ['email'];
+  const { data } = await sb.from('notification_preferences').select('prefs').eq('subscriber_id', subscriberId).maybeSingle();
+  const pref = (data?.prefs as Record<string, any>)?.[kind] ?? PREF_DEFAULT;
+  const out: Array<'email' | 'sms'> = [];
+  if (pref.email) out.push('email');
+  if (pref.sms) out.push('sms');
+  return out;
+}
+
 const SIG = 'Paul Nickerson\nDog Gone Clean\nMobile Dog Grooming\nOcala, Florida';
 const PAY = 'Payment is easy. We take cash, Visa, Mastercard, American Express, Discover, Apple Pay, Google Pay, and Samsung Pay.';
-const CANCEL = 'Appointments canceled or rescheduled within 24 hours are billed in full; once inside 24 hours that time is reserved just for you.';
 const HEADSUP = "We'll send a heads-up with your exact arrival time before we roll your way. You will know we are coming.";
 const TRAILER = "Inside the trailer, it's cool, dry, and comfortable no matter what Florida is doing outside. Thunder at home is one thing. Once dogs are in with us, the weather fades into the background.";
 
@@ -88,8 +96,6 @@ function block(ctx: Ctx) {
 function render(kind: string, ctx: Ctx): { subject: string; text: string } {
   const first = ctx.sub.first_name || 'there';
   const day = fmtDate(ctx.appt.scheduled_start);
-  const addr = ctx.sub.address_line_1 || '';
-  const svc = ctx.appt.service_type === 'nails' ? 'nail' : ctx.appt.service_type === 'bath' ? 'bath' : 'grooming';
   let subject = '', body = '';
   switch (kind) {
     case 'booking_confirmation':
@@ -102,7 +108,7 @@ function render(kind: string, ctx: Ctx): { subject: string; text: string } {
       break;
     case 'reminder_26h':
       subject = `Tomorrow is the day`;
-      body = `${first},\n\nTomorrow is the day! Your block runs ${block(ctx)}. The block is when the work gets done, not a wait-around arrival window. We usually get started within an hour of the opening and finish before it ends.\n\n${CANCEL}\n\nWe'll send you a reminder tomorrow, a few hours before the appointment, and as we get closer, we'll do our best to keep you updated on our ETA.\n\n${PAY}\n\nThank you,\n\n${SIG}`;
+      body = `${first},\n\nTomorrow is the day! Your block runs ${block(ctx)}. The block is when the work gets done, not a wait-around arrival window. We usually get started within an hour of the opening and finish before it ends.\n\nAppointments canceled or rescheduled within 24 hours are billed in full; once inside 24 hours that time is reserved just for you.\n\nWe'll send you a reminder tomorrow, a few hours before the appointment, and as we get closer, we'll do our best to keep you updated on our ETA.\n\n${PAY}\n\nThank you,\n\n${SIG}`;
       break;
     case 'reminder_day':
       subject = `Today is the day`;
@@ -119,8 +125,6 @@ function render(kind: string, ctx: Ctx): { subject: string; text: string } {
     default:
       throw new Error('unknown_kind:' + kind);
   }
-  // svc and addr are available for future per-service / address lines; addr kept out of the body per the templates.
-  void svc; void addr;
   return { subject, text: body };
 }
 
@@ -129,7 +133,6 @@ function html(text: string): string {
   return `<!doctype html><html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1f2937;max-width:560px;margin:0 auto;padding:24px;line-height:1.6;">${paras}</body></html>`;
 }
 
-// ── dispatch ──────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
@@ -146,38 +149,52 @@ Deno.serve(async (req) => {
   const ctx = await loadCtx(sb, body.appointment_id);
   if (!ctx) return json({ error: 'appointment_not_found' }, 404);
 
-  const channel = 'email';
-  const dedup = `${body.kind}:${ctx.appt.id}:${channel}`;
-
-  const { data: already } = await sb.from('notification_log')
-    .select('id').eq('dedup_key', dedup).eq('status', 'sent').maybeSingle();
-  if (already) return json({ kind: body.kind, status: 'already_sent' });
-
-  async function log(status: string, opts: Record<string, unknown> = {}) {
-    await sb.from('notification_log').insert({
-      subscriber_id: ctx!.sub.id, appointment_id: ctx!.appt.id, kind: body.kind, channel,
-      status, dedup_key: dedup, recipient: ctx!.sub.email ?? null, ...opts,
-    });
-  }
-
-  const recipient = ctx.sub.email;
-  if (!recipient) { await log('skipped', { skip_reason: 'no_recipient_on_file' }); return json({ kind: body.kind, status: 'skipped', reason: 'no_recipient_on_file' }); }
-
   let rendered;
   try { rendered = render(body.kind, ctx); }
-  catch (e) { await log('failed', { error: String(e) }); return json({ kind: body.kind, status: 'failed', error: 'render_failed' }); }
+  catch (e) { return json({ kind: body.kind, status: 'failed', error: String(e) }, 400); }
 
-  const apiKey = await secret(sb, 'resend_api_key');
-  if (!apiKey) { await log('skipped', { skip_reason: 'resend_not_configured', subject: rendered.subject }); return json({ kind: body.kind, status: 'skipped', reason: 'resend_not_configured', subject: rendered.subject }); }
+  const channels = await resolveChannels(sb, body.kind, ctx.sub.id);
+  if (channels.length === 0) return json({ kind: body.kind, status: 'skipped', reason: 'all_channels_off' });
 
+  const resendKey = await secret(sb, 'resend_api_key');
   const from = (await secret(sb, 'resend_from')) || 'Dog Gone Clean <service@doggoneclean.us>';
-  try {
-    const r = await new Resend(apiKey).emails.send({ from, to: recipient, subject: rendered.subject, text: rendered.text, html: html(rendered.text) });
-    if ((r as any).error) { await log('failed', { subject: rendered.subject, error: JSON.stringify((r as any).error) }); return json({ kind: body.kind, status: 'failed' }); }
-    await log('sent', { subject: rendered.subject, provider_id: (r as any).data?.id ?? null });
-    return json({ kind: body.kind, status: 'sent' });
-  } catch (e) {
-    await log('failed', { subject: rendered.subject, error: String(e) });
-    return json({ kind: body.kind, status: 'failed' });
+  const results: any[] = [];
+
+  for (const channel of channels) {
+    const dedup = `${body.kind}:${ctx.appt.id}:${channel}`;
+
+    async function logRow(status: string, opts: Record<string, unknown> = {}) {
+      await sb.from('notification_log').insert({
+        subscriber_id: ctx!.sub.id, appointment_id: ctx!.appt.id, kind: body.kind, channel,
+        status, dedup_key: dedup, subject: rendered!.subject, ...opts,
+      });
+    }
+
+    const { data: already } = await sb.from('notification_log')
+      .select('id').eq('dedup_key', dedup).eq('status', 'sent').maybeSingle();
+    if (already) { results.push({ channel, status: 'already_sent' }); continue; }
+
+    if (channel === 'sms') {
+      // Text channel is dormant until Twilio / A2P 10DLC is wired.
+      await logRow('skipped', { skip_reason: 'twilio_not_configured', recipient: ctx.sub.phone_e164 ?? null });
+      results.push({ channel, status: 'skipped', reason: 'twilio_not_configured' });
+      continue;
+    }
+
+    const recipient = ctx.sub.email;
+    if (!recipient) { await logRow('skipped', { skip_reason: 'no_recipient_on_file' }); results.push({ channel, status: 'skipped', reason: 'no_recipient_on_file' }); continue; }
+    if (!resendKey) { await logRow('skipped', { skip_reason: 'resend_not_configured', recipient }); results.push({ channel, status: 'skipped', reason: 'resend_not_configured', subject: rendered.subject, preview: rendered.text }); continue; }
+
+    try {
+      const r = await new Resend(resendKey).emails.send({ from, to: recipient, subject: rendered.subject, text: rendered.text, html: html(rendered.text) });
+      if ((r as any).error) { await logRow('failed', { recipient, error: JSON.stringify((r as any).error) }); results.push({ channel, status: 'failed' }); continue; }
+      await logRow('sent', { recipient, provider_id: (r as any).data?.id ?? null });
+      results.push({ channel, status: 'sent' });
+    } catch (e) {
+      await logRow('failed', { recipient, error: String(e) });
+      results.push({ channel, status: 'failed' });
+    }
   }
+
+  return json({ kind: body.kind, results });
 });
