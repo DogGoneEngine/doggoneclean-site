@@ -152,3 +152,13 @@ export async function listAgents() {
   const data = await rpc('admin_list_agents');
   return Array.isArray(data) ? data : [];
 }
+
+// Finance + Reports -----------------------------------------------------------
+
+export async function financeSummary(windowDays = 90) {
+  return rpc('admin_finance_summary', { p_window_days: windowDays });
+}
+
+export async function reportsSummary() {
+  return rpc('admin_reports_summary');
+}

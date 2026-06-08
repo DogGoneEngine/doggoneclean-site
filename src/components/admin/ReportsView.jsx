@@ -1,0 +1,98 @@
+// src/components/admin/ReportsView.jsx
+//
+// The Reports department: the business on one page. A rollup across the book and
+// the full archive of every briefing your department heads have written.
+
+import { useCallback, useEffect, useState } from 'react';
+import { reportsSummary, listBriefings } from './supabase.js';
+
+function money(cents) {
+  if (cents === null || cents === undefined) return '$0';
+  return '$' + Math.round(cents / 100).toLocaleString('en-US');
+}
+function fmtDate(ts) {
+  try { return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch { return ts; }
+}
+
+export default function ReportsView() {
+  const [sum, setSum] = useState(null);
+  const [briefs, setBriefs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const load = useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const [s, b] = await Promise.all([reportsSummary(), listBriefings()]);
+      setSum(s); setBriefs(b);
+    } catch (e) { setError(e.message || 'load_failed'); }
+    finally { setLoading(false); }
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  if (error) return <><h1>Reports</h1><div className="ad-error">{error}</div></>;
+  if (loading || !sum) return <><h1>Reports</h1><div className="ad-panel">Pulling the numbers…</div></>;
+
+  const monthDelta = sum.this_month_cents - sum.last_month_cents;
+  const groups = sum.clients_by_group || {};
+  const totalClients = Object.values(groups).reduce((a, b) => a + b, 0);
+
+  return (
+    <>
+      <h1>Reports</h1>
+      <p className="ad-sub">The whole business at a glance, plus every briefing on the record.</p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 16 }}>
+        <Stat label="Clients" value={String(totalClients)} sub={Object.entries(groups).map(([k, v]) => `${v} ${k}`).join(' · ')} />
+        <Stat label="Visits on record" value={sum.total_visits.toLocaleString('en-US')} sub={`${money(sum.alltime_cents)} all time`} />
+        <Stat label="This month" value={money(sum.this_month_cents)} sub={`${monthDelta >= 0 ? '+' : ''}${money(monthDelta)} vs last month`} tone={monthDelta >= 0 ? 'good' : 'bad'} />
+        <Stat label="Next 7 days" value={String(sum.upcoming_7d)} sub={`${sum.active_subscriptions} active plans`} />
+      </div>
+
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <Cap>Department heads</Cap>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+          {(sum.agents || []).map((a) => (
+            <span key={a.label} className="ad-mono" style={{ fontSize: 12, padding: '3px 9px', borderRadius: 8,
+              background: a.is_active ? 'var(--ad-primary-container, #e6edfc)' : 'var(--ad-surface-container, #f5f4f1)', opacity: a.is_active ? 1 : 0.55 }}>
+              {a.label}{a.is_active ? '' : ' · dormant'}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="ad-panel">
+        <Cap>Briefing archive · {briefs.length}</Cap>
+        {briefs.length === 0 ? (
+          <div style={{ opacity: 0.6, marginTop: 8 }}>No briefings yet.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+            {briefs.map((b) => (
+              <div key={b.id} style={{ borderLeft: '3px solid var(--ad-primary, #2563d8)', paddingLeft: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+                  <strong style={{ fontSize: 14 }}>{b.title}</strong>
+                  <span className="ad-mono" style={{ fontSize: 11, opacity: 0.6 }}>{b.agent_key.toUpperCase()} · {fmtDate(b.created_at)} · {b.status}</span>
+                </div>
+                {b.body && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 2 }}>{b.body}</div>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function Stat({ label, value, sub, tone = 'flat' }) {
+  const color = tone === 'good' ? 'var(--ad-good, #1f8a4b)' : tone === 'bad' ? 'var(--ad-bad, #dc2626)' : 'var(--ad-text-dim, #565b6c)';
+  return (
+    <div className="ad-panel" style={{ padding: '14px 16px' }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>{label}</div>
+      <div style={{ fontSize: 22, fontWeight: 700, marginTop: 4 }}>{value}</div>
+      {sub && <div style={{ fontSize: 12, marginTop: 2, color }}>{sub}</div>}
+    </div>
+  );
+}
+function Cap({ children }) {
+  return <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>{children}</div>;
+}

@@ -12,6 +12,8 @@ import { sb, signInWithGoogle, signOut, getSession, adminSelf } from './supabase
 import ClientsView from './ClientsView.jsx';
 import ScheduleView from './ScheduleView.jsx';
 import TodayView from './TodayView.jsx';
+import FinanceView from './FinanceView.jsx';
+import ReportsView from './ReportsView.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
@@ -29,7 +31,7 @@ const SECTIONS = [
     what: 'Service polygons, plus-code zones, and the drive-time perimeter that gates new signups.' },
   { key: 'operations', label: 'Operations',    ready: false,
     what: 'The trailer, wash system, generators, climate, and maintenance intervals. Pre-trip checklist and maintenance-due alerts.' },
-  { key: 'finance',   label: 'Finance',        ready: false,
+  { key: 'finance',   label: 'Finance',        ready: true,
     what: 'Revenue per visit and per hour, who owes you, the Square and Stripe split, and the expense ledger. Home of the CFO.' },
   { key: 'pricing',   label: 'Pricing',        ready: false,
     what: 'The locked price grid per city and coat tier, and the founders-spot counter.' },
@@ -43,7 +45,7 @@ const SECTIONS = [
     what: 'Suppliers, reorder points, and the running-low tracker for shampoo, water, and parts.' },
   { key: 'knowledge', label: 'Knowledge base', ready: false,
     what: 'The Field Manual and the rulebook, read-only inside Orbit, so the console is the operating manual a buyer inherits.' },
-  { key: 'reports',   label: 'Reports',        ready: false,
+  { key: 'reports',   label: 'Reports',        ready: true,
     what: 'Cross-department rollups: the weekly business review, the revenue-per-hour trend, and the briefing archive.' },
   { key: 'audit',     label: 'Audit log',      ready: false,
     what: 'Every owner action and every AI recommendation, append-only.' },
@@ -205,6 +207,8 @@ export default function AdminApp() {
         {section === 'today' && <TodayView />}
         {section === 'clients' && <ClientsView />}
         {section === 'schedule' && <ScheduleView />}
+        {section === 'finance' && <FinanceView />}
+        {section === 'reports' && <ReportsView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
     </div>
