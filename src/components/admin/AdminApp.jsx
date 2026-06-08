@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { sb, signInWithGoogle, signOut, getSession, adminSelf } from './supabase.js';
 import ClientsView from './ClientsView.jsx';
+import ScheduleView from './ScheduleView.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
@@ -19,7 +20,7 @@ const SECTIONS = [
     what: 'The crystal ball. Today’s route and next stop, money in motion, and the briefing feed from your AI department heads.' },
   { key: 'calendar',  label: 'Calendar',       ready: false,
     what: 'Every appointment across the bath book and the legacy book, month and week, with a Google Calendar import overlay.' },
-  { key: 'schedule',  label: 'Schedule',       ready: false,
+  { key: 'schedule',  label: 'Schedule',       ready: true,
     what: 'Set your work days and work hours, block a date, open a Saturday. Your real availability per city.' },
   { key: 'clients',   label: 'Clients',        ready: true,
     what: 'The contact-sheet database. Each client’s semi-permanent header over a growing visit history.' },
@@ -201,6 +202,7 @@ export default function AdminApp() {
 
       <main className="ad-main">
         {section === 'clients' && <ClientsView />}
+        {section === 'schedule' && <ScheduleView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
     </div>

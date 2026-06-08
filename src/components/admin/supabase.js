@@ -98,6 +98,43 @@ export async function completeAppointment(appointmentId, v = {}) {
   });
 }
 
+// Schedule (work days, work hours, exceptions) -----------------------------
+
+export async function listSchedule() {
+  const data = await rpc('admin_list_schedule');
+  return Array.isArray(data) ? data : [];
+}
+
+export async function setWindow(w) {
+  return rpc('admin_set_window', {
+    p_id: w.id ?? null,
+    p_city_id: w.cityId,
+    p_weekday: w.weekday,
+    p_start: w.start,
+    p_end: w.end,
+    p_active: w.active ?? true,
+  });
+}
+
+export async function deleteWindow(id) {
+  return rpc('admin_delete_window', { p_id: id });
+}
+
+export async function addException(e) {
+  return rpc('admin_add_exception', {
+    p_city_id: e.cityId,
+    p_date: e.date,
+    p_is_closed: e.isClosed,
+    p_start: e.start ?? null,
+    p_end: e.end ?? null,
+    p_note: e.note ?? null,
+  });
+}
+
+export async function deleteException(id) {
+  return rpc('admin_delete_exception', { p_id: id });
+}
+
 // AI department heads (briefings) ------------------------------------------
 
 export async function listBriefings(department = null, status = null) {
