@@ -193,8 +193,18 @@ dispatched 0 (dedup/throttle holds). The confirmation trigger was checked with a
 insert+self-rollback: app-native queued exactly 1, imported queued 0, nothing left
 behind. New config key `edge_base_url` added to `app_secrets`. Advisor regression
 from the new trigger function (externally executable SECURITY DEFINER) was closed by
-revoking EXECUTE. The ONLY thing now between this and live legacy reminders is Paul's
-Resend sender key (then verify one real client end to end, then cancel Acuity).
+revoking EXECUTE.
+
+Then added the cutover kill-switch (migration 0036) after Paul flagged the
+double-send risk: the legacy appointments are already on Acuity's reminder schedule,
+so our pipeline must stay silent until Acuity is off. `notify_appointment` (the one
+chokepoint both the cron and the trigger pass through) now checks
+`app_secrets.notifications_live`; default OFF, so even with the Resend key in place
+nothing fires. Verified both ways with rolled-back tests: switch off queues 0,
+switch on queues 1. Corrected cutover order: Resend key in -> CANCEL ACUITY ->
+flip `notifications_live='true'` -> next hourly cron sends the first real reminders.
+Pre-flip verification uses a test appointment (is_test, Paul's email, source NULL,
+never in Acuity), never a real Acuity client.
 
 ### 2026-05-27 (`post_appointment_show_someone_nudge` captured)
 

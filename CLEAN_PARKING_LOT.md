@@ -60,10 +60,18 @@ survive a reset:
   once (OAuth, or share it with a Clean service account) -> the live two-way sync turns on so Paul
   never runs two systems; (3) point doggoneclean.us DNS at the droplet -> add the Caddy redirect;
   (4) cancel Acuity, then Squarespace, once one real client is verified end to end.
-  **CUTOVER ORDER:** Resend key (emails on) -> connect calendar (sync on) -> cron + confirmation
-  wiring live -> verify one real client end to end (login, sees real visits, gets a reminder) -> flip
-  doggoneclean.us DNS + Caddy redirect -> cancel Acuity, then Squarespace. SMS/Twilio stays off this
-  path: Acuity emailed reminders only, so email fully replaces it; text is a later bonus.
+  **CUTOVER ORDER:** Resend key (emails CAN send, but stay gated off) -> connect calendar (sync on)
+  -> cron + confirmation wiring live (DONE 2026-06-08, migration 0035) -> CANCEL ACUITY -> flip the
+  master switch `app_secrets.notifications_live = 'true'` (migration 0036) -> the next hourly cron
+  sends our first real reminders -> verify one real client got it -> flip doggoneclean.us DNS + Caddy
+  redirect -> cancel Squarespace. SMS/Twilio stays off this path: Acuity emailed reminders only, so
+  email fully replaces it; text is a later bonus.
+  **DOUBLE-SEND GUARD (why the switch exists):** the existing legacy appointments are ALREADY on
+  Acuity's reminder schedule, so our pipeline must stay silent until Acuity is off or every client is
+  reminded twice. `notifications_live` defaults OFF; even with the Resend key in place nothing fires.
+  Acuity is cancelled FIRST, then the switch is flipped. Pre-flip verification uses a test
+  appointment (is_test subscriber, Paul's own email, source NULL so it was never in Acuity), never a
+  real Acuity client.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is
