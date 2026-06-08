@@ -4,7 +4,8 @@
 // people at /the-villages (the city page where the offer lives) and
 // /process (the work explained). The deep detail does not live here.
 //
-// Service area copy stays The Villages only per `villages_only_in_copy`.
+// Service area names Clean's served cities, The Villages and Ocala
+// (`ocala_is_a_served_city`); unserved cities stay off the copy.
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const valueProps = [
@@ -39,8 +40,8 @@ const recurringSteps = [
 ---
 
 <BaseLayout
-  title="Dog Gone Clean | Mobile dog baths in The Villages, Florida"
-  description="A genuinely clean dog in your driveway, powered by the Hurricane Bath. Recurring or one off, in The Villages, Florida."
+  title="Dog Gone Clean | Mobile dog baths in The Villages and Ocala, Florida"
+  description="A genuinely clean dog in your driveway, powered by the Hurricane Bath. Recurring or one off, in The Villages and Ocala, Florida."
 >
 
   <!-- HERO -->
@@ -195,10 +196,10 @@ const recurringSteps = [
     <div class="container">
       <div class="text-center">
         <p class="section-label">Service area</p>
-        <h2 class="section-title">We are in The Villages.</h2>
+        <h2 class="section-title">We serve The Villages and Ocala.</h2>
         <p class="section-subtitle section-subtitle--center">
-          Hurricane Bath service launches in The Villages, Florida.
-          Check your address and lock in the founders rate.
+          The Hurricane Bath launches in The Villages, Florida, and rolls out in
+          Ocala, where Dog Gone Clean has worked for two decades.
         </p>
       </div>
       <div class="city-grid">
@@ -206,6 +207,17 @@ const recurringSteps = [
           <div class="city-card__state">Florida</div>
           <h3>The Villages</h3>
           <p>Mobile dog baths in The Villages. Recurring or one off, on a schedule you keep.</p>
+          <div class="city-card__cta">
+            See the offer
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </a>
+        <a href="/ocala" class="city-card">
+          <div class="city-card__state">Florida</div>
+          <h3>Ocala</h3>
+          <p>Where Dog Gone Clean began. The Hurricane Bath for new clients, full-groom service grandfathered for our legacy clients.</p>
           <div class="city-card__cta">
             See the offer
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">

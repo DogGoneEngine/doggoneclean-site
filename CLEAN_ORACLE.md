@@ -536,9 +536,10 @@ beats spreading thin across Florida, and a Villages-shaped route is the operator
 load model the pricing is calibrated against. Updated 2026-06-07: Ocala is now
 also a served city, the origin of the bath pivot (see `ocala_is_a_served_city`
 and `new_ocala_clients_are_v2_only`); The Villages remains the destination, but
-the service area is no longer Villages-only. The consumer-copy rule
-`villages_only_in_copy` is unchanged, pending Paul's direction on how Ocala is
-marketed.
+the service area is no longer Villages-only. RESOLVED 2026-06-08: Paul directed
+that Ocala be presented as a location, so `villages_only_in_copy` now means
+served-cities-only (The Villages and Ocala) and Ocala has its own `/ocala` page;
+new Ocala clients are bath-only, legacy full-groom clients are grandfathered.
 
 `ocala_is_a_served_city` (service area):
 Ocala and nearby Marion County (Williston, Dunnellon, Anthony) is a served Clean
@@ -660,16 +661,20 @@ would bother a person who never asked and add work for no gain (prime directive:
 less).
 
 `villages_only_in_copy` (Hurricane Bath: copy):
-The Hurricane Bath surface mentions only The Villages in customer-facing copy:
-no other cities, no reference to the legacy Ocala full-grooming book (which
-folds into the same app per `legacy_folds_into_v2`), no speculative
-future locations, no "coming soon" placeholders. Because the bath surface stays
-focused on one product in one place (`favor_high_hourly_work`,
-`core_is_no_haircut_dogs`), and any mention of other surfaces invites support
-questions you would have to say no to ("do you also do Ocala?" "not for baths").
-Pairs with `villages_only_at_launch`, which gates the booking polygon; this
-rule gates the marketing copy. When Hurricane Bath expands to a second zone,
-update this rule and the copy together, not the copy alone.
+(Name kept for continuity; the rule now means served-cities-only.) The Hurricane
+Bath surface names only Clean's served cities, The Villages and Ocala, in
+customer-facing copy: no cities Clean does not serve (those are Dog Gone Nails
+territory), no speculative future locations. Updated 2026-06-08 on Paul's
+direction to fold the legacy Ocala surface in and present Ocala as a location:
+The Villages is the live booking surface; Ocala has its own `/ocala` page and is
+surfaced in the nav, footer, and homepage service area, marketed bath-only for
+new clients (`new_ocala_clients_are_v2_only`) with legacy full-groom clients
+grandfathered, and with new-client booking shown as opening soon until Ocala's
+anchor drive-time gate is wired and `hb_active` is flipped (`ocala_is_a_served_city`).
+Because the surface stays focused on the bath product in the places Clean
+actually serves, and naming a city Clean cannot serve invites support questions
+you would have to say no to. Pairs with `villages_only_at_launch` (the booking
+polygon). When a third zone is added, update this rule and the copy together.
 
 `three_dog_cap` (product):
 No hard cap on the number of dogs per visit or per household. The key name is

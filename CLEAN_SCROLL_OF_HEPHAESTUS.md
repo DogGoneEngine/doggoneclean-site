@@ -167,6 +167,26 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (Ocala folded in as a served location; blocker list captured)
+
+Two things from Paul. (1) Captured the launch-blocker list (his external setup that gates the v2.0
+online path and the cutover) in the parking lot under "Launch blockers": iPostal1 address, Sunbiz
+fictitious name, IRS EIN, Relay bank accounts, Twilio, Stripe, with the dependency chain and what
+each unblocks. (2) Folded Ocala into the site as a served location, on Paul's direction that the
+website reflect Ocala (the legacy site folds into v2.0, like a Pizza Hut that still has a dining
+room). New Ocala clients are bath v2.0 only; legacy full-groom clients are grandfathered
+(`new_ocala_clients_are_v2_only`). The cities DB row for 'ocala' already existed (polygon, center,
+pricing equal to The Villages, hb_active false). Built `src/pages/ocala.astro` (a Clean city page
+mirroring the the-villages format, pricing hydrated from the 'ocala' row), surfaced Ocala in the
+nav, footer, and homepage service area, and updated the homepage title/meta. Honored the Oracle
+gate: Ocala is NOT flipped live for booking (hb_active stays false until the anchor drive-time gate
+is wired), so the page presents the offer with new-client booking "opening soon" and routes existing
+clients to the portal, rather than a live /book CTA that would dead-end. Resolved the long-open
+`villages_only_in_copy` question: it now means served-cities-only (The Villages and Ocala), updated
+in the Oracle and the audit (check.py no longer forbids "Ocala"; still forbids the Nails-only cities).
+Audit green; ocala.astro builds in CI (it fails the local SSG only on the egress-blocked cities
+fetch, exactly like the-villages).
+
 ### 2026-06-08 (portal parity with Nails, slice 5: returning-client welcome flow)
 
 Built the returning-client welcome gate (parity with Nails' WelcomeBack). A lapsed client signing

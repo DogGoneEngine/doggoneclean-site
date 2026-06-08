@@ -4,6 +4,30 @@ Deferred work and forward-looking ideas, parked so they survive a context reset.
 here is committed work; it is the backlog. Move an item into CLEAN_SCROLL_OF_HEPHAESTUS.md's focus block
 when it becomes active.
 
+## Launch blockers - Paul's external setup (2026-06-08)
+
+These gate the v2.0 online path and the Acuity/Squarespace cutover. Only Paul can do them
+(credentials, legal entity, physical-world); none are tool-accessible. Rough dependency order:
+
+1. **iPostal1 mailing address.** A real business mailing address. Feeds the Resend sender
+   verification, the address drop-in on the privacy + terms pages, and the bank / Stripe / Twilio
+   registrations that all want a business address. Paul is going in person (week of 2026-06-08).
+2. **Fictitious name (DBA) from Florida Sunbiz.** Register the trade name(s) ("Dog Gone Clean" /
+   "Hurricane Bath" as needed). Precedes the bank and processor accounts.
+3. **EIN from the IRS.** Needed by the bank, Stripe, and the Twilio A2P 10DLC registration.
+4. **Business bank accounts from Relay.** Clean's OWN accounts, never Paul's personal or DGN's
+   (`clean_stays_saleable`). Stripe payouts and Square settle here.
+5. **Twilio.** Number + A2P 10DLC registration for SMS reminders. Email reminders already work
+   without it; text is the later bonus (`notification_email_first`).
+6. **Stripe (Dog Gone Clean account).** New Clean Stripe account (not DGN's, not personal) + keys.
+   Unlocks the portal payment surface (card management), card-on-file billing, in-portal booking,
+   and tipping (the gated portal-parity slices).
+
+What they unblock: the Resend key (item 1) is the last wall before cancelling Acuity; Stripe (item 6)
+is the wall before the v2.0 online-payment surface and the remaining portal-parity slices; Twilio
+(item 5) turns on text reminders. The bank/EIN/DBA (2-4) are the legal-entity spine Stripe and the
+bank sit on.
+
 ## Cutover follow-ons - legacy fold (2026-06-07)
 
 The legacy-fold cutover (legacy_folds_into_v2) is mid-build. Open threads, parked so they

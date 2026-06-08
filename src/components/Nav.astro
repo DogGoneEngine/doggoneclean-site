@@ -10,8 +10,8 @@
 // Background uses solid rgba per the `nav_no_backdrop_filter` rule (the
 // other approach causes a dashed-line artifact on Android/Chrome).
 //
-// Simpler than DGN's nav: Clean serves only The Villages today
-// (`villages_only_in_copy`), so there is no city dropdown.
+// Clean serves The Villages and Ocala (`ocala_is_a_served_city`), shown as
+// two flat links; if more cities are added this becomes a dropdown.
 ---
 
 <header
@@ -92,6 +92,17 @@
         "
       >The Villages</a>
 
+      <a
+        href="/ocala"
+        style="
+          font-size: 15px;
+          font-weight: 600;
+          color: #41506a;
+          text-decoration: none;
+          font-family: system-ui, -apple-system, sans-serif;
+        "
+      >Ocala</a>
+
       <span aria-hidden="true" style="display:block; width:1px; height:20px; background:#cbd5e8;"></span>
 
       <a
@@ -162,6 +173,9 @@
       </a>
       <a href="/the-villages" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; font-size:18px; font-weight:700; color:#0c1322; text-decoration:none; border-bottom:1px solid #e3e8f4;">
         The Villages
+      </a>
+      <a href="/ocala" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; font-size:18px; font-weight:700; color:#0c1322; text-decoration:none; border-bottom:1px solid #e3e8f4;">
+        Ocala
       </a>
     </div>
 

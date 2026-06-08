@@ -382,13 +382,15 @@ def check_rule_survival():
                 f"'{rule_key}': {label}"
             )
 
-    # ── villages_only_in_copy ──────────────────────────────────────────────
-    # Marketing pages on the Hurricane Bath surface must not name other Florida
-    # cities. Ocala is the legacy doggoneclean.us surface; mentioning it here
-    # invites questions we cannot answer.
+    # ── villages_only_in_copy (served cities only) ────────────────────────
+    # Marketing pages may name Clean's served cities (The Villages and Ocala,
+    # per ocala_is_a_served_city + Paul's 2026-06-08 direction to present Ocala
+    # as a location). They must still not name cities Clean does not serve
+    # (those are Dog Gone Nails territory); naming them invites questions we
+    # cannot answer.
     for page in (home, villages, process_page):
         body = _strip_frontmatter_and_comments(_read(page))
-        for forbidden in ("Ocala", "Fernandina", "St. Simons", "Saint Simons"):
+        for forbidden in ("Fernandina", "St. Simons", "Saint Simons"):
             if forbidden in body:
                 failures.append(
                     f"{page.relative_to(REPO)}: customer-facing copy mentions "

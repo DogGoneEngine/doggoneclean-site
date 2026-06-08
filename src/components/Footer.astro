@@ -2,7 +2,7 @@
 // src/components/Footer.astro
 //
 // Marketing-pages footer. Sits at the bottom of every BaseLayout page.
-// Single-city site (`villages_only_in_copy`), so no Cities column.
+// Served cities (The Villages and Ocala) live under About, not a Cities column.
 const year = new Date().getFullYear();
 ---
 
@@ -26,6 +26,7 @@ const year = new Date().getFullYear();
         <ul>
           <li><a href="/process" class="footer__link">The Process</a></li>
           <li><a href="/the-villages" class="footer__link">The Villages</a></li>
+          <li><a href="/ocala" class="footer__link">Ocala</a></li>
         </ul>
       </div>
 
