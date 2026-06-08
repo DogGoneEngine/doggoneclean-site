@@ -361,6 +361,26 @@ export async function updateServiceAddress(fields) {
   return data || { ok: false, error: 'no_result' };
 }
 
+// ── Reminder preferences (portal self-service) ────────────────────────
+// Read/save which reminders the client wants and on which channel. Both
+// resolve the caller's own subscriber server-side through auth.uid().
+// Returns { ok, prefs } or { ok:false, error }.
+export async function getNotificationPrefs() {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc('bath_get_notification_prefs');
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}
+
+export async function setNotificationPrefs(prefs) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc('bath_set_notification_prefs', { p_prefs: prefs });
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}
+
 // ── Pack management (portal self-service) ─────────────────────────────
 // Ownership is enforced by the bath_dogs self RLS policies; the 3-active
 // household cap is enforced by the bath_dogs_cap trigger. These use the

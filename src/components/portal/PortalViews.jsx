@@ -18,6 +18,7 @@ import {
   skipAppointment, rescheduleAppointment, getOpenSlots,
   addDog, updateDog, removeDog,
   updateProfile, updateServiceAddress, toE164US,
+  getNotificationPrefs, setNotificationPrefs,
 } from './supabase.js';
 import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds } from './maps.js';
 
@@ -127,6 +128,78 @@ function StatusChip({ status }) {
 }
 
 // ── Home (the viewing spine) ───────────────────────────────────────────
+// ── Reminders: per-client reminder opt-in/out, by channel ───────────────
+// Only the reminders are opt-out-able. Confirmations, cancellations, and
+// reschedules always send by email. Text saves the choice but stays dormant
+// until texting is turned on (Twilio).
+const REMINDER_ROWS = [
+  { key: 'reminder_3d', label: '3 days before' },
+  { key: 'reminder_26h', label: 'The day before' },
+  { key: 'reminder_day', label: 'Day of' },
+];
+
+function NotificationsSection({ toast }) {
+  const [prefs, setPrefs] = useState(null);
+  const [state, setState] = useState('loading'); // 'loading' | 'ready' | 'error'
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const res = await getNotificationPrefs();
+      if (!alive) return;
+      if (res && res.ok && res.prefs) { setPrefs(res.prefs); setState('ready'); }
+      else setState('error');
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  async function toggle(key, channel) {
+    const next = { ...prefs, [key]: { ...prefs[key], [channel]: !(prefs[key] && prefs[key][channel]) } };
+    setPrefs(next);
+    setSaving(true);
+    const res = await setNotificationPrefs(next);
+    setSaving(false);
+    if (toast) toast(res && res.ok ? 'Saved.' : 'Could not save. Try again.');
+  }
+
+  if (state === 'loading') return <div className="pt-card"><div className="pt-card__value">Loading...</div></div>;
+  if (state !== 'ready' || !prefs) return <div className="pt-card"><div className="pt-card__value">Could not load your reminder settings.</div></div>;
+
+  const cell = { width: 56, textAlign: 'center', display: 'inline-block' };
+  const head = { ...cell, fontSize: '0.8rem', color: '#6b7280' };
+
+  return (
+    <div className="pt-card">
+      <div className="pt-card__row">
+        <span className="pt-card__label">Send me</span>
+        <span>
+          <span style={head}>Email</span>
+          <span style={head}>Text</span>
+        </span>
+      </div>
+      {REMINDER_ROWS.map(({ key, label }) => (
+        <div className="pt-card__row" key={key}>
+          <span className="pt-card__label">{label}</span>
+          <span>
+            <span style={cell}>
+              <input type="checkbox" checked={!!(prefs[key] && prefs[key].email)} disabled={saving}
+                onChange={() => toggle(key, 'email')} aria-label={`${label} by email`} style={{ width: 18, height: 18 }} />
+            </span>
+            <span style={cell}>
+              <input type="checkbox" checked={!!(prefs[key] && prefs[key].sms)} disabled={saving}
+                onChange={() => toggle(key, 'sms')} aria-label={`${label} by text`} style={{ width: 18, height: 18 }} />
+            </span>
+          </span>
+        </div>
+      ))}
+      <p style={{ marginTop: 'var(--space-md)', fontSize: '0.85rem', color: '#6b7280' }}>
+        Confirmations and cancellation notices always come by email. Text reminders save your choice now and start once we turn on texting; until then we reach you by email.
+      </p>
+    </div>
+  );
+}
+
 export function PortalHome({ data, onLogout, onChanged, toast }) {
   const { subscriber, subscription, city } = data;
   const dogs = (data.dogs || []).filter(d => d.active !== false);
@@ -251,6 +324,12 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
         <section className="pt-section">
           <h2 className="pt-section__title">Your details</h2>
           <ProfileSection subscriber={subscriber} city={city} onChanged={onChanged} toast={toast} />
+        </section>
+
+        {/* Reminders */}
+        <section className="pt-section">
+          <h2 className="pt-section__title">Reminders</h2>
+          <NotificationsSection toast={toast} />
         </section>
 
         {/* History */}
