@@ -1672,6 +1672,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   cadence_days authoritative, add `bath_dogs.price_cents` for per-dog legacy prices, then migrate
   the standing/at-will book from `clients.json` (cadence, per-dog price, service_type, dogs,
   payment_method=square_in_person), flagging the ~5 clients the route template marks pending.
+- 2026-06-07 (legacy book loaded into the app): the move that makes Acuity droppable. Migration 0029
+  fit the schema (cadence nullable so `cadence_days` is authoritative; added `bath_dogs.price_cents`
+  for legacy per-dog prices). Migration 0030 loaded all 33 standing clients straight from
+  `public.clients`/`public.dogs` (real client_id links, no name-matching): one `bath_subscribers`
+  row each (unclaimed, so the 0024 claim flow ADOPTS it on login), one active recurring
+  `bath_subscriptions` with real `cadence_days`, in-person payment, and per-visit price, plus 61
+  `bath_dogs` with per-dog prices. Verified: 33 subscribers, 33 subscriptions, 61 dogs, none priced
+  at $0; service split full_groom 29 / nails 3 (Steve, Nancy, Patty) / bath 1 (Debra); Lisa Prater's
+  mixed mapped to full_groom; Steve ($65 for four) and Patty ($45 for two) set as bundle totals.
+  at_will (Karen, Garret) and one_offs intentionally left out (not the recurring book). Next: generate
+  upcoming appointments on the Tue-Sat grid so a logged-in client sees real visits.
 - Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,
   so a sign-in dead-ended at the empty portal. Built `bath_claim_legacy_account()`: matches the
   verified sign-in identity (phone last ten digits from the JWT, or email) to a clients row and
