@@ -10,8 +10,9 @@
 // Background uses solid rgba per the `nav_no_backdrop_filter` rule (the
 // other approach causes a dashed-line artifact on Android/Chrome).
 //
-// Clean serves The Villages and Ocala (`ocala_is_a_served_city`), shown as
-// two flat links; if more cities are added this becomes a dropdown.
+// Clean serves The Villages and Ocala (`ocala_is_a_served_city`), shown in a
+// Cities dropdown (desktop) + accordion (mobile), mirroring the Nails nav. The
+// live city is plain; a not-yet-open city carries a "Coming soon" pill.
 ---
 
 <header
@@ -81,27 +82,54 @@
         "
       >The Process</a>
 
-      <a
-        href="/the-villages"
-        style="
-          font-size: 15px;
-          font-weight: 600;
-          color: #41506a;
-          text-decoration: none;
-          font-family: system-ui, -apple-system, sans-serif;
-        "
-      >The Villages</a>
-
-      <a
-        href="/ocala"
-        style="
-          font-size: 15px;
-          font-weight: 600;
-          color: #41506a;
-          text-decoration: none;
-          font-family: system-ui, -apple-system, sans-serif;
-        "
-      >Ocala</a>
+      <div style="position: relative;">
+        <button
+          id="cityDropdownBtn"
+          aria-haspopup="true"
+          aria-expanded="false"
+          style="
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #41506a;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+          "
+        >
+          Cities
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div
+          id="cityDropdownMenu"
+          role="menu"
+          style="
+            position: absolute;
+            top: calc(100% + 14px);
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            min-width: 230px;
+            background: #ffffff;
+            border: 1px solid #e3e8f4;
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(13, 30, 70, 0.12);
+            padding: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 120ms ease, transform 120ms ease;
+            font-family: system-ui, -apple-system, sans-serif;
+          "
+        >
+          <a href="/the-villages" role="menuitem" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:600; color:#0c1322; text-decoration:none;">The Villages, FL</a>
+          <a href="/ocala" role="menuitem" style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:600; color:#5a6b7d; text-decoration:none;">Ocala, FL <span style="font-size:10px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:#5a6b7d; background:#eef2fb; border:1px solid #dbe3f4; border-radius:9999px; padding:2px 8px;">Coming soon</span></a>
+        </div>
+      </div>
 
       <span aria-hidden="true" style="display:block; width:1px; height:20px; background:#cbd5e8;"></span>
 
@@ -171,12 +199,16 @@
       <a href="/process" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; font-size:18px; font-weight:700; color:#0c1322; text-decoration:none; border-bottom:1px solid #e3e8f4;">
         The Process
       </a>
-      <a href="/the-villages" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; font-size:18px; font-weight:700; color:#0c1322; text-decoration:none; border-bottom:1px solid #e3e8f4;">
-        The Villages
-      </a>
-      <a href="/ocala" style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; font-size:18px; font-weight:700; color:#0c1322; text-decoration:none; border-bottom:1px solid #e3e8f4;">
-        Ocala
-      </a>
+      <button id="mobCitiesBtn" aria-expanded="false" style="display:flex; align-items:center; justify-content:space-between; width:100%; padding:16px 0; font-size:18px; font-weight:700; color:#0c1322; background:none; border:none; border-bottom:1px solid #e3e8f4; cursor:pointer; font-family:system-ui,-apple-system,sans-serif;">
+        Cities
+        <svg id="mobCitiesCaret" width="16" height="16" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="transition: transform 150ms ease;">
+          <path d="M2 4l4 4 4-4" stroke="#0c1322" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div id="mobCitiesPanel" style="display:none; padding-left:12px;">
+        <a href="/the-villages" style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; font-size:16px; font-weight:600; color:#0c1322; text-decoration:none; border-bottom:1px solid #eef2fb;">The Villages, FL</a>
+        <a href="/ocala" style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 0; font-size:16px; font-weight:600; color:#5a6b7d; text-decoration:none; border-bottom:1px solid #eef2fb;">Ocala, FL <span style="font-size:10px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:#5a6b7d; background:#eef2fb; border:1px solid #dbe3f4; border-radius:9999px; padding:2px 8px;">Coming soon</span></a>
+      </div>
     </div>
 
     <div style="border-top: 1px solid #e3e8f4; margin-top: 24px; padding-top: 16px;">
@@ -216,6 +248,8 @@
     var desk = document.getElementById('nav-desktop');
     var mob  = document.getElementById('navMobile');
     var prog = document.getElementById('scrollProgress');
+    var ddBtn  = document.getElementById('cityDropdownBtn');
+    var ddMenu = document.getElementById('cityDropdownMenu');
 
     function applyLayout() {
       var isMobile = window.matchMedia('(max-width: 768px)').matches;
@@ -249,5 +283,38 @@
       mob.setAttribute('aria-hidden', String(isOpen));
       document.body.style.overflow = isOpen ? '' : 'hidden';
     });
+
+    // Desktop city dropdown: tap to open, tap outside to close.
+    if (ddBtn && ddMenu) {
+      ddBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = ddMenu.style.opacity === '1';
+        ddMenu.style.opacity = open ? '0' : '1';
+        ddMenu.style.pointerEvents = open ? 'none' : 'all';
+        ddMenu.style.transform = open
+          ? 'translateX(-50%) translateY(-8px)'
+          : 'translateX(-50%) translateY(0)';
+        ddBtn.setAttribute('aria-expanded', String(!open));
+      });
+      document.addEventListener('click', function () {
+        ddMenu.style.opacity = '0';
+        ddMenu.style.pointerEvents = 'none';
+        ddMenu.style.transform = 'translateX(-50%) translateY(-8px)';
+        ddBtn.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    // Mobile cities accordion: tap "Cities" to expand/collapse the list.
+    var citiesBtn   = document.getElementById('mobCitiesBtn');
+    var citiesPanel = document.getElementById('mobCitiesPanel');
+    var citiesCaret = document.getElementById('mobCitiesCaret');
+    if (citiesBtn && citiesPanel && citiesCaret) {
+      citiesBtn.addEventListener('click', function () {
+        var open = citiesPanel.style.display === 'block';
+        citiesPanel.style.display = open ? 'none' : 'block';
+        citiesCaret.style.transform = open ? '' : 'rotate(180deg)';
+        citiesBtn.setAttribute('aria-expanded', String(!open));
+      });
+    }
   })();
 </script>

@@ -167,6 +167,19 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (Ocala redone to the real Nails format: cities dropdown, coming-soon page, waitlist)
+
+Corrected the first Ocala pass per Paul. Three fixes: (1) the nav is now a Cities DROPDOWN (desktop)
++ accordion (mobile) mirroring the Nails nav, not two flat links; The Villages is plain, Ocala carries
+a "Coming soon" pill. (2) The homepage no longer leads with one city: the hero eyebrow is "Mobile dog
+baths, in your driveway" and the service area reads "live in The Villages, coming soon to Ocala". (3)
+The Ocala page is rebuilt to the Nails coming-soon city format (hero + waitlist), with ALL full-groom /
+legacy / grandfather copy removed; new Ocala clients are bath only and Paul notifies legacy clients
+about the new site himself, so that policy stays off public pages. Net-new: a real `waitlist` table
+(migration 0039: anon can insert, cannot read; verified via the anon role) backing the Ocala waitlist
+form, mirroring the Nails waitlist. The earlier Ocala page (bath offer + a legacy-grandfather section)
+is superseded by this coming-soon version.
+
 ### 2026-06-08 (Ocala folded in as a served location; blocker list captured)
 
 Two things from Paul. (1) Captured the launch-blocker list (his external setup that gates the v2.0

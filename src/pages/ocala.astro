@@ -1,176 +1,196 @@
 ---
 // src/pages/ocala.astro
-// Hurricane Bath city page for Ocala, the origin of the bath pivot and the
-// home of the entire legacy book. Presents Ocala as a served Clean location
-// (ocala_is_a_served_city) per Paul's 2026-06-08 direction to reflect Ocala
-// on the site.
-//
-// Posture honors the Oracle gate: Ocala is NOT yet open for new-client v2
-// booking (cities.hb_active = false until the anchor drive-time gate is wired
-// and flipped on). So this page presents the offer and the location but routes
-// new clients to a "booking opens soon" state rather than a live /book CTA that
-// would dead-end. Existing clients go to the portal.
-//
-// new_ocala_clients_are_v2_only: new Ocala clients may only be v2 bath clients.
-// Legacy full-groom and nails clients are grandfathered (kept and served), but
-// that book is closed to new entries, so this page markets bath only.
-//
-// Pricing hydrates at build time from the 'ocala' cities row (single source of
-// truth, equal to The Villages per ocala_prices_match_villages).
+// Coming-soon city page for Ocala, mirroring the Dog Gone Nails coming-soon
+// city format (hero + waitlist). Ocala is a served Clean location
+// (ocala_is_a_served_city) but not yet open for new-client v2 booking
+// (hb_active false until the anchor drive-time gate is wired). New Ocala
+// clients are Hurricane Bath clients (new_ocala_clients_are_v2_only); this is a
+// bath page, no legacy full-groom copy. The waitlist captures interest so Paul
+// can notify them when Ocala opens.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCityBySlug, cityTiers } from '../lib/cities.js';
-
-const city = await getCityBySlug('ocala');
-const tiers = cityTiers(city);
 ---
 
 <BaseLayout
-  title="Dog Gone Clean | Mobile dog baths in Ocala, Florida"
-  description="The Hurricane Bath, a genuinely clean dog in your driveway, coming to Ocala, Florida. Bath only, recurring or one off."
+  title="Ocala, Florida, coming soon | Dog Gone Clean"
+  description="The Hurricane Bath, a genuinely clean dog in your driveway, is coming to Ocala, Florida. Join the waitlist and be first in line when we open."
 >
-  <section class="ocala-hero">
+  <section class="cs-hero">
     <div class="container">
-      <span class="eyebrow">Where Dog Gone Clean began</span>
-      <h1>The Hurricane Bath,<br /><span class="grad">now in Ocala.</span></h1>
-      <p class="ocala-hero__sub">
-        A genuinely clean dog in your own driveway. The same mobile bath that
-        serves The Villages, in the town where Dog Gone Clean has groomed dogs
-        for two decades.
+      <span class="cs-hero__tag">Ocala, Florida</span>
+      <div class="cs-hero__badge">Coming soon</div>
+      <h1>The Hurricane Bath<br /><span class="grad">is coming to Ocala.</span></h1>
+      <p class="cs-hero__lede">
+        A genuinely clean dog in your own driveway, no haircut, no stress. The
+        same mobile bath that serves The Villages is rolling out in Ocala.
       </p>
-      <div class="ocala-hero__cta">
-        <a class="button button--primary button--lg" href="/portal">Existing client sign in</a>
-        <a class="button button--ghost button--lg" href="/process">How the bath works</a>
-      </div>
+      <p class="cs-hero__sub">
+        We are building the route now. Join the waitlist to be first in line when
+        Ocala opens for booking.
+      </p>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section cs-waitlist-section">
     <div class="container">
-      <div class="text-center">
-        <p class="section-label">The bath</p>
-        <h2 class="section-title">One inclusive price, by coat.</h2>
-        <p class="section-subtitle section-subtitle--center">
-          No add-ons, no surprise fees. Each additional dog is $25 less than the
-          one before it.
-        </p>
-      </div>
-      <div class="ocala-tiers">
-        {tiers.map((t) => (
-          <div class="ocala-tier">
-            <div class="ocala-tier__label">{t.label}</div>
-            <div class="ocala-tier__sub">{t.sub}</div>
-            <div class="ocala-tier__price">
-              <span class="ocala-tier__dollar">$</span>{t.recurring}
-              <span class="ocala-tier__per">per visit, recurring</span>
-            </div>
-            <div class="ocala-tier__single">or ${t.single} for a single visit</div>
+      <div class="cs-card">
+        <h2>Join the Ocala waitlist</h2>
+        <p>We will email you the moment Ocala opens for booking.</p>
+
+        <form id="waitlist-form" class="cs-form" novalidate data-city-slug="ocala">
+          <div class="cs-field">
+            <label class="cs-label" for="wl-email">Your email address</label>
+            <input class="cs-input" id="wl-email" name="email" type="email" autocomplete="email" required inputmode="email" placeholder="you@example.com" />
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
 
-  <section class="section ocala-eligibility">
-    <div class="container">
-      <div class="text-center">
-        <p class="section-label">Eligibility</p>
-        <h2 class="section-title">Bath dogs, friendly dogs.</h2>
-      </div>
-      <div class="ocala-elig__card">
-        <p>The Hurricane Bath is for dogs that get a bath, not a haircut: coats
-          that clean up fast and dry well.</p>
-        <p>A dog that shows aggression toward people is not eligible for this
-          service. Normal wiggling is fine.</p>
-      </div>
-    </div>
-  </section>
+          <div class="cs-field">
+            <label class="cs-label" for="wl-zip">ZIP code (optional)</label>
+            <input class="cs-input" id="wl-zip" name="zip_code" type="text" autocomplete="postal-code" inputmode="numeric" maxlength="10" />
+          </div>
 
-  <section class="section ocala-legacy">
-    <div class="container">
-      <div class="ocala-legacy__card">
-        <p class="section-label">For our Ocala clients</p>
-        <h2 class="section-title">Legacy full-groom clients are grandfathered.</h2>
-        <p>
-          If we already groom your dog in Ocala, nothing changes. You keep your
-          full-groom service and your spot on the route. Sign in to your portal
-          to see your visits, manage reminders, and update your details.
-        </p>
-        <a class="button button--primary" href="/portal">Open your portal</a>
-        <p class="ocala-legacy__new">
-          New to Dog Gone Clean in Ocala? New clients join as Hurricane Bath
-          clients. Ocala bath booking opens soon.
-        </p>
+          <div class="cs-field">
+            <label class="cs-label" for="wl-dogs">How many dogs? (optional)</label>
+            <select class="cs-input" id="wl-dogs" name="dog_count">
+              <option value="">Select</option>
+              <option value="1">1 dog</option>
+              <option value="2">2 dogs</option>
+              <option value="3">3 dogs</option>
+              <option value="4">4 or more</option>
+            </select>
+          </div>
+
+          <button type="submit" class="button button--primary button--lg button--block">Notify me when you launch</button>
+          <p class="cs-form__note" id="cs-form-msg" hidden></p>
+        </form>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .ocala-hero {
-    padding: var(--space-5xl) 0 var(--space-4xl);
+  .cs-hero {
+    padding: var(--space-5xl) 0 var(--space-2xl);
     background:
       radial-gradient(60% 80% at 20% 0%, rgba(56, 132, 255, 0.16), transparent 70%),
       radial-gradient(50% 70% at 90% 20%, rgba(120, 80, 255, 0.12), transparent 70%);
     text-align: center;
   }
-  .ocala-hero h1 {
-    font-size: clamp(2.4rem, 8vw, 4.2rem);
-    line-height: 1.05;
-    margin: var(--space-sm) 0 var(--space-lg);
-    letter-spacing: -0.02em;
+  .cs-hero__tag {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent, #2563eb);
+    margin-bottom: var(--space-sm);
   }
-  .ocala-hero__sub {
+  .cs-hero__badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #2563eb, #06b6d4);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 var(--space-lg) var(--space-sm);
+  }
+  .cs-hero h1 {
+    font-size: clamp(2.2rem, 7vw, 3.8rem);
+    line-height: 1.07;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-lg);
+  }
+  .cs-hero__lede {
     max-width: 38rem;
-    margin: 0 auto var(--space-2xl);
+    margin: 0 auto var(--space-md);
     font-size: var(--text-lg);
     color: var(--color-text-secondary, #475569);
     line-height: 1.7;
   }
-  .ocala-hero__cta {
-    display: flex;
-    gap: var(--space-md);
-    justify-content: center;
-    flex-wrap: wrap;
+  .cs-hero__sub {
+    max-width: 34rem;
+    margin: 0 auto;
+    font-size: var(--text-base);
+    color: #64748b;
+    line-height: 1.6;
   }
 
-  .ocala-tiers {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: var(--space-lg);
-    max-width: 720px;
-    margin: var(--space-2xl) auto 0;
-  }
-  .ocala-tier {
-    border: 1px solid var(--line, #e3e8f4);
-    border-radius: var(--radius-lg, 18px);
-    padding: var(--space-xl);
+  .cs-waitlist-section { padding-top: var(--space-2xl); }
+  .cs-card {
+    max-width: 480px;
+    margin: 0 auto;
     background: var(--card, #fff);
-    text-align: center;
-  }
-  .ocala-tier__label { font-size: var(--text-xl); font-weight: 800; }
-  .ocala-tier__sub { font-size: var(--text-sm); color: #64748b; margin: 6px 0 var(--space-lg); line-height: 1.5; }
-  .ocala-tier__price { font-size: 3rem; font-weight: 800; line-height: 1; }
-  .ocala-tier__dollar { font-size: 1.5rem; vertical-align: super; font-weight: 700; }
-  .ocala-tier__per { display: block; font-size: var(--text-xs); font-weight: 600; color: #64748b; margin-top: 8px; }
-  .ocala-tier__single { font-size: var(--text-sm); color: #475569; margin-top: var(--space-md); }
-
-  .ocala-elig__card,
-  .ocala-legacy__card {
-    max-width: 640px;
-    margin: var(--space-xl) auto 0;
     border: 1px solid var(--line, #e3e8f4);
     border-radius: var(--radius-lg, 18px);
     padding: var(--space-2xl);
-    background: var(--card, #fff);
+    text-align: center;
   }
-  .ocala-elig__card p { margin: 0 0 var(--space-md); line-height: 1.7; }
-  .ocala-legacy__card { text-align: center; }
-  .ocala-legacy__card p { line-height: 1.7; }
-  .ocala-legacy__card h2 { margin-bottom: var(--space-md); }
-  .ocala-legacy__card .button { margin-top: var(--space-lg); }
-  .ocala-legacy__new {
-    margin-top: var(--space-xl);
-    font-size: var(--text-sm);
-    color: #64748b;
+  .cs-card h2 { font-size: var(--text-2xl); margin-bottom: var(--space-sm); }
+  .cs-card > p { color: #475569; margin-bottom: var(--space-xl); }
+  .cs-form { display: flex; flex-direction: column; gap: var(--space-md); text-align: left; }
+  .cs-field { display: flex; flex-direction: column; gap: 6px; }
+  .cs-label { font-size: var(--text-sm); font-weight: 600; color: #334155; }
+  .cs-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line, #cbd5e8);
+    border-radius: var(--radius-md, 12px);
+    font-size: var(--text-base);
+    font-family: inherit;
+    background: #fff;
   }
+  .cs-input:focus { outline: 2px solid var(--accent, #2563eb); outline-offset: 1px; }
+  .button--block { width: 100%; margin-top: var(--space-sm); }
+  .cs-form__note { margin-top: var(--space-sm); text-align: center; font-size: var(--text-sm); padding: var(--space-md); border-radius: var(--radius-md, 12px); }
+  .cs-form__note--success { background: rgba(37, 99, 235, 0.08); color: #1d4ed8; }
+  .cs-form__note--error { background: rgba(180, 40, 40, 0.08); color: #b42828; }
 </style>
+
+<script>
+  const SUPABASE_URL = 'https://urebdrosrxejhubpbxsa.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_3y18WUvZCuW-fiuPywR6nw_BLQyx1h6';
+
+  const form = document.getElementById('waitlist-form') as HTMLFormElement | null;
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('cs-form-msg')!;
+      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      msg.hidden = false;
+      msg.className = 'cs-form__note';
+      msg.textContent = 'Adding you to the list...';
+      submitBtn.disabled = true;
+
+      const fd = new FormData(form);
+      const dogVal = fd.get('dog_count') as string;
+      const payload = {
+        email: ((fd.get('email') as string) || '').trim().toLowerCase(),
+        city_slug: form.dataset.citySlug,
+        zip_code: ((fd.get('zip_code') as string) || '').trim() || null,
+        dog_count: dogVal ? parseInt(dogVal, 10) : null,
+      };
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        msg.classList.add('cs-form__note--success');
+        msg.textContent = "You're on the list. We'll be in touch the moment Ocala opens.";
+        form.reset();
+      } catch {
+        msg.classList.add('cs-form__note--error');
+        msg.textContent = 'Something went wrong. Please try again in a moment.';
+        submitBtn.disabled = false;
+      }
+    });
+  }
+</script>
