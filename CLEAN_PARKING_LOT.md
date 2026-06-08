@@ -326,8 +326,10 @@ are not routed until converted. Verify against the real sheet at conversion time
 - **Business architecture (RESOLVED 2026-05-24, refined 2026-05-25 and 2026-05-26).** Two
   businesses in Paul's portfolio: DGN (Dog Gone Nails, new, nails only in the Villages, fully
   separate) and Clean (this repo, one evolving business, a fork of the DGN platform). Clean
-  has TWO URL surfaces during the transition. **Legacy** (doggoneclean.us) keeps serving
-  legacy Ocala full-grooming clients on Squarespace + Square + Acuity until its own rebuild.
+  has TWO URL surfaces during the transition. **Legacy** (doggoneclean.us) served legacy Ocala
+  full-grooming clients on Squarespace + Square + Acuity. (SUPERSEDED 2026-06-07 by
+  `legacy_folds_into_v2`: the legacy book folds into the one Clean app, doggoneclean.us redirects
+  in, and Squarespace + Acuity are being retired, with no separate rebuild.)
   **Hurricane Bath v2.0** (hurricanebath.com) is Clean's new bath-only, subscription-default
   surface: launches in The Villages with Stripe card-on-file at signup, the locked v2.0 rule
   pack (founders rate, breed tiers, three-dog cap, free-skip allowance, no-show pause,

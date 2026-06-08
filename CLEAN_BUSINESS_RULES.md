@@ -4,11 +4,13 @@ The map of where each rule in `CLEAN_ORACLE.md` is enforced. The Oracle holds th
 this file holds the map. A rule that lives in only one place is a rule waiting to be lost.
 
 The target is four layers of defense, mirroring DGN: **Oracle (rationale) -> `business_rules`
-DB row -> code mirror -> lint pattern.** Clean has no database or app yet, and per
-`no_database_until_rules_agreed` the DB layer stays empty until the rules are locked, so
-today the live layers are: the Oracle, the data files, the local check script
-(`scripts/check.py`), and convention. The two right-hand columns fill in as the site is
-built. This is normal: even DGN has many rules sitting in only one or two layers.
+DB row -> code mirror -> lint pattern.** Clean now has a real database and app (Supabase
+`dgc-prod` plus the Astro site), so the DB and code layers are filling in (tables, RLS, RPCs,
+edge functions); only the `business_rules` DB-row layer stays deferred, because Clean keeps its
+rules in this index and the Oracle, not a `business_rules` table. The live layers today are: the
+Oracle, the data files, the database (tables / RPCs / edge functions), the Astro app, and the
+local check script (`scripts/check.py`). The columns fill in as more is built. This is normal:
+even DGN has many rules sitting in only one or two layers.
 
 | Rule | Oracle domain | Enforced today | Deferred layer (when built) |
 |------|---------------|----------------|------------------------------|

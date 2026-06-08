@@ -651,7 +651,7 @@ less).
 `villages_only_in_copy` (Hurricane Bath: copy):
 The Hurricane Bath surface mentions only The Villages in customer-facing copy:
 no other cities, no reference to the legacy Ocala full-grooming book (which
-keeps its own surface at doggoneclean.us until its own rebuild), no speculative
+folds into the same app per `legacy_folds_into_v2`), no speculative
 future locations, no "coming soon" placeholders. Because the bath surface stays
 focused on one product in one place (`favor_high_hourly_work`,
 `core_is_no_haircut_dogs`), and any mention of other surfaces invites support

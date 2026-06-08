@@ -171,10 +171,12 @@ See `lock_it_in_capture` in the Oracle.
   on a PR is worth watching. Just ship and report what shipped.
 - **State today:** `main` is the trunk, and the deploy workflow (`.github/workflows/deploy.yml`)
   fires on push to `main`, builds the Astro site, and publishes it to the droplet at
-  hurricanebath.com, which is live serving a single-page placeholder. hurricanebath.com is the
-  Dog Gone Clean v2.0 surface (bath-only, subscription-default, The Villages); doggoneclean.us
-  keeps serving the legacy Squarespace site for full-grooming clients indefinitely, until its
-  own separate rebuild. The deploy is now gated on the audit: `.github/workflows/deploy.yml`
+  hurricanebath.com, which serves the deployed Astro site (the marketing pages, the `/book` booking
+  funnel, and the `/portal` client portal all build and publish on push). hurricanebath.com is the
+  Dog Gone Clean v2.0 surface (bath, plus the legacy full-grooming book folded in). Per
+  `legacy_folds_into_v2`, doggoneclean.us is being retired and redirected into this one app rather
+  than given a separate rebuild, and the Squarespace site and Acuity are being torn down (see the
+  parking-lot teardown). The deploy is now gated on the audit: `.github/workflows/deploy.yml`
   runs `scripts/check.py` as a required `audit` job and the publish step `needs` it, so a push
   to `main` that fails the audit never reaches the droplet (wired 2026-05-29). A failing audit
   therefore cannot become a live deploy: live means it passed.
@@ -214,9 +216,10 @@ existing DogGoneClean.us content into this look; do not reinvent the copy. See
   one-off + 2 at-will + 1 banned. Fields per client: name, aka/account, status, service
   type, cadence (value + confidence), dogs, location, access, availability
   (hard/soft/not-days/seasonal), hardness tag, flags, relationships, explicit `data_gaps`.
-  Moved from `data/` to `legacy/data/` on 2026-05-26 because these records belong to the
-  legacy doggoneclean.us surface, not Hurricane Bath; the legacy site uses them when it is
-  eventually rebuilt.
+  Moved from `data/` to `legacy/data/` on 2026-05-26. They are the authoritative seed for the
+  legacy full-grooming book, which was loaded into the recurring-service tables (migrations
+  0029-0030) so legacy clients run inside this one app per `legacy_folds_into_v2`. (The earlier
+  "separate legacy-site rebuild" framing is superseded.)
 - **`legacy/data/route_template.md`** - the recurring zone-day route template for legacy
   standing clients.
 - **`legacy/data/sources.md`** - source priority and the corrected contact-sheet doc-ID
@@ -229,13 +232,17 @@ existing DogGoneClean.us content into this look; do not reinvent the copy. See
 
 ## Stack and commands
 
-**Current state.** A minimal Astro site is scaffolded (a homepage that builds) and the
-database layer exists. Clean's own Supabase project `dgc-prod` (ref `urebdrosrxejhubpbxsa`,
-us-east-1, in the shared "Mount Olympus" org) holds the client book: `public.clients` + `public.dogs`, seeded from
-`legacy/data/clients.json`, RLS-locked. Schema-as-code lives in `supabase/migrations/`. The rest of
-the working stack is Markdown + JSON + git + `python3`, with the Drive MCP tools as the
-upstream reader and the Supabase MCP tools for the database. `legacy/data/clients.json` stays the
-authoritative client file until the app writes back to Supabase.
+**Current state.** The Astro site builds and deploys (marketing pages, the `/book` booking funnel,
+the `/portal` client portal). Clean's own Supabase project `dgc-prod` (ref `urebdrosrxejhubpbxsa`,
+us-east-1, in the shared "Mount Olympus" org) holds a real app database: the legacy book in
+`public.clients` + `public.dogs` (seeded from `legacy/data/clients.json`), the recurring-service
+tables it was loaded into (`bath_subscribers`, `bath_subscriptions`, `bath_appointments`,
+`bath_dogs`), plus `cities`, `service_perimeters`, `app_secrets`, `notification_log`, and
+`notification_preferences`, all RLS-locked. Edge functions: `ocala-service-area` (drive-time +
+perimeter service-area gate) and `send-notification` (reminder/confirmation dispatcher).
+Schema-as-code lives in `supabase/migrations/`, with the Drive MCP tools as the upstream reader and
+the Supabase MCP tools for the database. `legacy/data/clients.json` remains the authoritative seed
+for the legacy book.
 
 - Validate + lint locally: `python3 scripts/check.py` (full structural audit: data,
   copy, Oracle/index sync, conflict markers, stale paths, workflows). Pre-commit hook
