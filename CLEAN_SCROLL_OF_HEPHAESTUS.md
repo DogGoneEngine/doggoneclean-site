@@ -1662,6 +1662,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   legacy 26h reminder keep the cancellation line; second-person vs canon third-person tail; and
   an on-my-way/ETA and a review-ask message still to come from Paul. Nothing sends until
   `service@doggoneclean.us` is a verified Resend sender.
+- 2026-06-07 (client reminder preferences, migration 0034 + portal UI, Paul's idea): a portal screen
+  where a client picks which reminders they want and on which channel. Three layers, all shipped:
+  (1) `notification_preferences` table + two SECURITY DEFINER RPCs (`bath_get/set_notification_prefs`,
+  scoped to the caller via auth.uid(), whitelisting the three reminder keys); (2) the dispatcher
+  (send-notification v2) now resolves channels from prefs (reminders follow the toggles, default email
+  on; confirmations/cancellations/reschedules always email), with the SMS channel logging
+  twilio_not_configured until Twilio; (3) a Reminders card in the portal home (PortalViews
+  `NotificationsSection`) with Email/Text checkboxes per reminder (3 days before, the day before, day
+  of), saved on each toggle. Verified: RPC merge/whitelist logic, dispatcher resolves the email
+  default and returns the per-channel result, and the site builds with /portal compiling. SMS is
+  captured but dormant. The full logged-in render still wants an in-browser check.
 - 2026-06-07 (notification dispatcher built + verified, migration 0033): the Acuity reminder
   replacement. Ported DGN's `send-notification` to Clean: retargeted to the `bath_*` tables,
   email-only, in-person (no card/charge language), rendering the legacy templates (booking
