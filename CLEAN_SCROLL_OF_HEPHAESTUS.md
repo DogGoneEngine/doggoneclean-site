@@ -167,6 +167,24 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (portal parity with Nails, slice 2: gated payment section)
+
+Added the Payment section to the Account tab, gated by how the client actually pays so a legacy
+client is never shown a card field (Paul's hard requirement). Logic: payment_method !== 'stripe_card'
+(legacy square_in_person and any unknown) renders the in-person note ("You pay in person: card, cash,
+or mobile wallet via Square. There is no card on file and nothing is charged online."); stripe_card
+renders the honest card-on-file state ("On file" charged the day before, or "None yet"). Verified
+against the real book: 33 of 34 subscriptions are square_in_person and hit the in-person branch; the
+lone stripe_card test sub hits the card branch with "None yet". Builds clean, audit green.
+
+HONEST SCOPE on the rest of the Nails payment surface (see card brand/last4/expiry, update card,
+failed-charge + card-expiry banners): NOT buildable as real work yet, and not faked (no_mockups).
+Confirmed Clean has no card-detail columns (only stripe_customer_id + stripe_payment_method_id), zero
+stored payment methods, and no Stripe edge functions. The full card-management flow is gated on Clean's
+own Stripe account (Paul action: create the Dog Gone Clean Stripe account + keys, per clean_stays_saleable)
+plus the Stripe wiring (create-setup-intent edge fn, webhook, card columns, Stripe Elements). Parked.
+Same Stripe dependency blocks in-portal tipping (parity slice 4); legacy clients tip in person anyway.
+
 ### 2026-06-08 (portal parity with Nails, slice 1: tabbed app shell)
 
 Paul's call: the Clean portal should match the Dog Gone Nails portal so Nails has nothing to flex.

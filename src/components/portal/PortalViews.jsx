@@ -473,6 +473,11 @@ function AccountView({ ctx, onLogout }) {
       )}
 
       <section className="pt-section">
+        <h2 className="pt-section__title">Payment</h2>
+        <PaymentSection subscription={subscription} />
+      </section>
+
+      <section className="pt-section">
         <h2 className="pt-section__title">Your details</h2>
         <ProfileSection subscriber={subscriber} city={city} onChanged={onChanged} toast={toast} />
       </section>
@@ -485,6 +490,50 @@ function AccountView({ ctx, onLogout }) {
       <div className="pt-home__foot">
         <button className="pt-signout-link" onClick={onLogout}>Sign out</button>
       </div>
+    </div>
+  );
+}
+
+// ── Payment section (gated by how the client actually pays) ────────────
+// Legacy clients pay in person via Square and must NEVER be shown a card
+// field. Only Hurricane Bath clients (payment_method = 'stripe_card') have a
+// card on file. The full card-management surface (see brand/last4/expiry,
+// update card, failed-charge + expiry banners, mirroring the Nails portal)
+// requires Clean's own Stripe account to be wired first (create-setup-intent
+// edge function + card-detail columns + Stripe Elements); until then this shows
+// the honest real state and never fakes a card. No mockups.
+function PaymentSection({ subscription }) {
+  const method = subscription && subscription.payment_method;
+
+  // Anything that is not an explicit card-on-file plan is treated as in person,
+  // so a legacy or unknown client is never prompted for a card.
+  if (method !== 'stripe_card') {
+    return (
+      <div className="pt-card">
+        <div className="pt-card__row">
+          <span className="pt-card__label">How you pay</span>
+          <span className="pt-card__value">In person</span>
+        </div>
+        <p className="pt-glance-hint">
+          You pay in person at your appointment: card, cash, or mobile wallet via Square.
+          There is no card on file and nothing is charged online.
+        </p>
+      </div>
+    );
+  }
+
+  const hasCard = !!subscription.stripe_payment_method_id;
+  return (
+    <div className="pt-card">
+      <div className="pt-card__row">
+        <span className="pt-card__label">Card on file</span>
+        <span className="pt-card__value">{hasCard ? 'On file' : 'None yet'}</span>
+      </div>
+      <p className="pt-glance-hint">
+        {hasCard
+          ? 'Your card on file is charged the day before each visit, never sooner.'
+          : 'You will add a card when you book. It is charged the day before each visit, never sooner.'}
+      </p>
     </div>
   );
 }

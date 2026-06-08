@@ -84,12 +84,17 @@ survive a reset:
   a known low-priority item, not an open question.
 - **Portal parity with Nails (in progress).** Goal: the Clean portal matches the Dog Gone Nails
   portal so Nails has nothing to flex. Slice 1 DONE 2026-06-08: tabbed app shell (Home / Visits /
-  Pack / Account bottom nav). REMAINING slices, in order: (2) payment surface, GATED so legacy
-  square_in_person clients see only a short "you pay in person via Square" note and NEVER a card
-  field; only stripe_card (bath) clients get see-card / update-card / failed-charge + expiry banners;
-  (3) book-a-visit from inside the portal (not just reschedule/skip); (4) tipping after a completed
-  visit; (5) returning-client welcome flow (Nails' WelcomeBack.jsx). Nails reference lives in
-  doggonenails-site/src/components/portal/.
+  Pack / Account bottom nav). Slice 2 (payment section) PARTIALLY DONE
+  2026-06-08: the gated section is live and the legacy in-person note ships (square_in_person and any
+  unknown method never see a card field). REMAINING on slice 2, BLOCKED on Clean's own Stripe account
+  (Paul action) + Stripe wiring (create-setup-intent edge fn, webhook, card-detail columns, Stripe
+  Elements): see card brand/last4/expiry, update card, failed-charge + card-expiry banners. Today Clean
+  has no card columns, zero stored payment methods, and no Stripe edge functions, so this half cannot be
+  built as real (non-mockup) work yet. REMAINING slices: (3) book-a-visit from inside the portal (not
+  just reschedule/skip) -- buildable now for the in-person reality (slot pick + appointment, no card);
+  (4) tipping after a completed visit -- also Stripe-blocked for online tips, and legacy clients tip in
+  person, so largely N/A until Stripe; (5) returning-client welcome flow (Nails' WelcomeBack.jsx).
+  Nails reference lives in doggonenails-site/src/components/portal/.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is
