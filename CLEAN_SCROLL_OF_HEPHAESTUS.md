@@ -1662,6 +1662,20 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   legacy 26h reminder keep the cancellation line; second-person vs canon third-person tail; and
   an on-my-way/ETA and a review-ask message still to come from Paul. Nothing sends until
   `service@doggoneclean.us` is a verified Resend sender.
+- 2026-06-07 (notification dispatcher built + verified, migration 0033): the Acuity reminder
+  replacement. Ported DGN's `send-notification` to Clean: retargeted to the `bath_*` tables,
+  email-only, in-person (no card/charge language), rendering the legacy templates (booking
+  confirmation, 3-day / 26-hour / day-of reminders, cancellation, reschedule) with the block as a
+  start-to-end span and the "not a wait-around arrival window" clarifier. 0033 added
+  `notification_log` (idempotency: partial unique index on dedup_key where status=sent, so a double
+  send is impossible). Secrets (`notifications_secret`, `resend_api_key`) live in `app_secrets` since
+  this env cannot set function env vars. Fail-closed: with no Resend key it logs
+  "skipped: resend_not_configured" and sends nothing, so it stays dormant until cutover and cannot
+  double-send against Acuity. Verified live against Barbara Lape's real Fri 6/12 4-6pm appointment:
+  rendered the full legacy confirmation correctly and skipped the send. Remaining notification work:
+  the hourly cron watcher (mirror DGN `notifications-cron`, but for Clean's 3d/26h/6h timings) to
+  trigger reminders, wiring confirmations to the booking/reschedule/cancel paths, and Paul's Resend
+  sender + key (`service@doggoneclean.us`) to switch sending on.
 - 2026-06-07 (first calendar backfill, migrations 0031 + 0032): proved the calendar-to-app import on
   real data. 0031 added `bath_appointments.source` + `external_id` with a partial unique index, so an
   imported appointment is keyed by its upstream id (Acuity id, or the gcal event id for Paul's manual
