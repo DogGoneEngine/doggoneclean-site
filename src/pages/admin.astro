@@ -1,0 +1,11 @@
+---
+// src/pages/admin.astro
+// Alias for Orbit at /admin, kept for bookmarks. Same console as /orbit.
+
+import AdminLayout from '../layouts/AdminLayout.astro';
+import AdminApp from '../components/admin/AdminApp.jsx';
+---
+
+<AdminLayout>
+  <AdminApp client:load />
+</AdminLayout>

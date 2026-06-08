@@ -1,0 +1,966 @@
+/* src/components/admin/admin.css
+   Orbit admin console.
+
+   Neural Expressive (the Google Gemini language Paul set for the apps):
+   a calm light palette with one colorful focal accent, a refined deep-ink
+   ombre for display type, the rotating live brand gradient driven by a
+   single root keyframe, soft tonal surfaces with gentle elevation, fully
+   rounded pill shapes, conic-gradient hairline accents, a subtle page
+   aura, and spring easings. This intentionally matches String of Pearls
+   so both apps read as one Google-neural-expressive family (the earlier
+   dark-cosmic counterpoint from Scroll 1.23 is retired by Paul's call to
+   unify the look).
+
+   Readability rule (carried from SoP): the colorful brand gradient is an
+   accent only (hairlines, rings, the brand glyph, the one focal action).
+   Display type uses the deep-ink ombre; operational text stays solid.
+
+   All existing class names and CSS variable names are preserved so the
+   JSX renders without per-component edits. Inline styles in JSX that read
+   var(--ad-text-faint), var(--ad-border), var(--ad-good), var(--ad-bad),
+   var(--ad-text-dim), var(--ad-bg-sunken) still resolve to readable
+   values on the light surface. */
+
+@property --ad-ne-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+:root {
+  /* Surface ladder. Sunken to raised. Warm off-white base, white cards. */
+  --ad-bg-deepest:               #f1f0ec;
+  --ad-surface:                  #faf9f6;
+  --ad-surface-container-low:    #ffffff;
+  --ad-surface-container:        #f5f4f1;
+  --ad-surface-container-high:   #eef1fb;
+  --ad-surface-container-highest:#e6e9f7;
+
+  /* Accent palette. The focal accent is the calm brand blue (shared with
+     SoP); teal and rose are quiet supporting tones. */
+  --ad-primary:           #2563d8;            /* brand blue (focal) */
+  --ad-primary-strong:    #1d50b8;
+  --ad-primary-container: #e6edfc;
+  --ad-on-primary:        #ffffff;
+  --ad-on-primary-container: #14346e;
+
+  --ad-secondary:           #0e7490;          /* calm teal */
+  --ad-secondary-container: #d7eef3;
+  --ad-on-secondary-container: #0a3947;
+
+  --ad-tertiary:           #d6336c;           /* rose */
+  --ad-tertiary-container: #fbe0ea;
+  --ad-on-tertiary-container: #6b0f33;
+
+  /* Legacy aliases so JSX inline-styles still resolve. */
+  --ad-bg:         var(--ad-surface);
+  --ad-panel:      var(--ad-surface-container-low);
+  --ad-panel-alt:  var(--ad-surface-container);
+  --ad-line:       #e6e3dc;
+  --ad-text:       #1a1d28;
+  --ad-text-dim:   #565b6c;
+  --ad-text-faint: #8b8f9e;
+  --ad-accent:     var(--ad-primary);
+  --ad-good:       #1f8a4b;
+  --ad-warn:       #b9770a;
+  --ad-bad:        #dc2626;
+  --ad-lock:       #b9770a;
+  --ad-border:     var(--ad-line);
+  --ad-bg-sunken:  var(--ad-bg-deepest);
+
+  /* Soft, light-theme elevation. */
+  --ad-elev-1: 0 1px 2px rgba(26, 29, 40, 0.06),  0 1px 3px rgba(26, 29, 40, 0.04);
+  --ad-elev-2: 0 8px 24px rgba(26, 29, 40, 0.09), 0 2px 8px rgba(26, 29, 40, 0.05);
+  --ad-elev-3: 0 20px 48px rgba(26, 29, 40, 0.14),0 6px 16px rgba(26, 29, 40, 0.08);
+
+  /* ----- Neural Expressive tokens (mirrors SoP) ----- */
+  /* Calm single-hue brand-blue gradient, rotated by --ad-ne-angle. */
+  --ad-ne-c1: #2563d8;
+  --ad-ne-c2: #3f7fe4;
+  --ad-ne-c3: #5a93ea;
+  --ad-ne-c4: #2f6fdc;
+  --ad-ne-gradient: linear-gradient(
+    var(--ad-ne-angle, 90deg),
+    var(--ad-ne-c1) 0%,
+    var(--ad-ne-c2) 33%,
+    var(--ad-ne-c3) 66%,
+    var(--ad-ne-c4) 100%
+  );
+  --ad-ne-conic: conic-gradient(
+    from var(--ad-ne-angle, 0deg),
+    var(--ad-ne-c1),
+    var(--ad-ne-c2),
+    var(--ad-ne-c3),
+    var(--ad-ne-c4),
+    var(--ad-ne-c1)
+  );
+  /* Refined deep-ink display ombre. Sophisticated, high-contrast, no
+     rainbow. Used for headings and the wordmark. */
+  --ad-ne-ombre: linear-gradient(168deg, #161a27 0%, #303a51 58%, #45516c 100%);
+  /* Page-level aura strength behind the warm base. */
+  --ad-ne-aura: 0.05;
+
+  /* Brand gradient alias (kept for existing references) maps to the NE
+     gradient so every accent stays cohesive. */
+  --ad-brand-gradient: var(--ad-ne-gradient);
+  --ad-brand-glow: 0 10px 30px rgba(37, 99, 216, 0.20),
+                   0 0 0 1px rgba(37, 99, 216, 0.06);
+  --ad-active-glow: inset 0 0 0 1px rgba(37, 99, 216, 0.32),
+                    0 6px 18px rgba(37, 99, 216, 0.16);
+
+  /* Shape scale (M3 Expressive corner taxonomy). */
+  --ad-r-xs: 6px;
+  --ad-r-sm: 12px;
+  --ad-r-md: 18px;
+  --ad-r-lg: 24px;
+  --ad-r-xl: 9999px;
+
+  /* Easings + durations. */
+  --ad-ease:     cubic-bezier(0.2, 0, 0, 1);
+  --ad-ease-emp: cubic-bezier(0.4, 0, 0, 1);
+  --ad-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ad-dur:      240ms;
+  --ad-dur-fast: 140ms;
+
+  /* Single root keyframe drives the gradient angle for every surface
+     that references --ad-ne-angle. Free where unused. */
+  animation: ad-ne-spin 22s linear infinite;
+}
+
+@keyframes ad-ne-spin {
+  to { --ad-ne-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { animation: none; }
+}
+
+html, body {
+  background: var(--ad-surface) !important;
+  color: var(--ad-text);
+}
+
+/* ---------------- Shell ---------------- */
+
+.ad-app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 272px 1fr;
+  color: var(--ad-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  position: relative;
+  background:
+    /* Soft color washes: blue from top-left, teal from bottom-right,
+       a whisper of rose in the middle. Calm, never loud. */
+    radial-gradient(900px 620px at 4% -12%,  rgba(37, 99, 216, 0.07), transparent 60%),
+    radial-gradient(820px 600px at 112% 112%, rgba(14, 116, 144, 0.06), transparent 60%),
+    radial-gradient(680px 540px at 60% 46%,  rgba(214, 51, 108, 0.03), transparent 60%),
+    var(--ad-surface);
+}
+/* Rotating gradient aura: the "app is alive" sheen behind the content.
+   pointer-events none + low opacity; shell children are lifted above it
+   with their own z-index so this can never capture taps or cover UI. */
+.ad-app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--ad-ne-gradient);
+  opacity: var(--ad-ne-aura);
+}
+.ad-side,
+.ad-main,
+.ad-mobilebar { position: relative; z-index: 1; }
+
+.ad-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* ---------------- Sign-in gate ---------------- */
+
+.ad-center {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 24px; text-align: center;
+  position: relative;
+  background:
+    radial-gradient(900px 700px at 50% -20%, rgba(37, 99, 216, 0.10), transparent 60%),
+    radial-gradient(800px 600px at 90% 110%, rgba(14, 116, 144, 0.07), transparent 60%),
+    radial-gradient(700px 500px at 0% 80%,  rgba(214, 51, 108, 0.05), transparent 60%),
+    var(--ad-surface);
+  color: var(--ad-text);
+}
+.ad-gate {
+  max-width: 480px;
+  padding: 40px 36px;
+  background:
+    linear-gradient(180deg, rgba(37, 99, 216, 0.04), rgba(37, 99, 216, 0)),
+    var(--ad-surface-container-low);
+  border: 1px solid var(--ad-line);
+  border-radius: 28px;
+  box-shadow: var(--ad-elev-3);
+  position: relative;
+}
+.ad-gate::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border-radius: 28px;
+  padding: 1px;
+  background: var(--ad-ne-conic);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.ad-gate h1 {
+  margin: 0 0 12px;
+  font-size: 30px; font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ad-text);
+  background-image: var(--ad-ne-ombre);
+  background-clip: text; -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ad-gate p {
+  margin: 0 0 24px;
+  color: var(--ad-text-dim);
+  line-height: 1.55;
+  font-size: 14.5px;
+}
+
+/* ---------------- Buttons ---------------- */
+
+.ad-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px;
+  padding: 0 22px; min-height: 44px;
+  background-image: var(--ad-ne-gradient);
+  color: var(--ad-on-primary);
+  border: 0; border-radius: var(--ad-r-xl);
+  font-weight: 700; font-size: 14px; letter-spacing: 0.01em;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: var(--ad-elev-1), var(--ad-brand-glow);
+  transition:
+    box-shadow var(--ad-dur) var(--ad-ease),
+    transform var(--ad-dur-fast) var(--ad-ease),
+    filter var(--ad-dur) var(--ad-ease);
+}
+.ad-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: var(--ad-elev-2), 0 14px 38px rgba(37, 99, 216, 0.30);
+}
+.ad-btn:active:not(:disabled) { transform: scale(0.97); }
+.ad-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 216, 0.32), var(--ad-elev-2);
+}
+.ad-btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; filter: grayscale(0.3); }
+
+.ad-btn--ghost {
+  background: var(--ad-surface-container-low);
+  background-image: none;
+  color: var(--ad-text);
+  border: 1px solid var(--ad-line);
+  box-shadow: var(--ad-elev-1);
+}
+.ad-btn--ghost:hover:not(:disabled) {
+  background: var(--ad-primary-container);
+  border-color: var(--ad-primary);
+  color: var(--ad-primary-strong);
+  filter: none;
+  transform: translateY(-1px);
+  box-shadow: var(--ad-elev-2);
+}
+
+.ad-btn--danger {
+  background-image: none;
+  background: var(--ad-bad);
+  color: #ffffff;
+  box-shadow: var(--ad-elev-1), 0 10px 28px rgba(220, 38, 38, 0.26);
+}
+.ad-btn--danger:hover:not(:disabled) {
+  filter: brightness(1.04);
+  box-shadow: var(--ad-elev-2), 0 14px 38px rgba(220, 38, 38, 0.36);
+}
+
+.ad-btn--full { width: 100%; }
+.ad-btn--sm   { min-height: 34px; padding: 0 14px; font-size: 12.5px; }
+
+/* ---------------- Navigation rail ---------------- */
+
+.ad-side {
+  background:
+    linear-gradient(180deg, rgba(37, 99, 216, 0.03), rgba(37, 99, 216, 0)),
+    var(--ad-surface-container-low);
+  border-right: 1px solid var(--ad-line);
+  padding: 24px 14px 18px;
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  box-shadow: var(--ad-elev-1);
+}
+
+.ad-side__brand {
+  padding: 6px 10px 18px;
+  border-bottom: 1px solid var(--ad-line);
+  margin-bottom: 14px;
+  position: relative;
+}
+.ad-side__brand::before {
+  /* Orbiting glyph: a spinning conic brand ring with a soft inner dot.
+     Purely decorative focal accent. */
+  content: '';
+  display: block;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  margin: 0 0 12px;
+  background:
+    radial-gradient(circle at 50% 50%, #ffffff 0 5px, transparent 6px),
+    conic-gradient(from 0deg, var(--ad-ne-c1), var(--ad-ne-c3), var(--ad-secondary), var(--ad-ne-c1));
+  box-shadow:
+    0 6px 18px rgba(37, 99, 216, 0.30),
+    0 0 0 1px rgba(37, 99, 216, 0.10);
+  animation: ad-orbit-spin 16s linear infinite;
+}
+.ad-side__brand {
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.01em;
+  background-image: var(--ad-ne-ombre);
+  background-clip: text; -webkit-background-clip: text;
+  color: var(--ad-text);
+  -webkit-text-fill-color: transparent;
+}
+.ad-side__brand small {
+  display: block;
+  color: var(--ad-text-faint);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 6px;
+  -webkit-text-fill-color: var(--ad-text-faint);
+}
+
+@keyframes ad-orbit-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-side__brand::before { animation: none; }
+}
+
+.ad-side__nav { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+
+.ad-side__item {
+  position: relative;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 16px;
+  border-radius: var(--ad-r-xl);
+  color: var(--ad-text-dim);
+  font-size: 14px; font-weight: 500;
+  background: transparent; border: 0;
+  cursor: pointer; text-align: left;
+  font-family: inherit;
+  min-height: 42px;
+  transition:
+    background-color var(--ad-dur) var(--ad-ease),
+    color var(--ad-dur) var(--ad-ease),
+    box-shadow var(--ad-dur) var(--ad-ease),
+    transform var(--ad-dur-fast) var(--ad-ease);
+}
+.ad-side__item:hover {
+  background: var(--ad-surface-container-high);
+  color: var(--ad-text);
+}
+.ad-side__item:active { transform: scale(0.98); }
+.ad-side__item--on {
+  background: linear-gradient(95deg, rgba(37, 99, 216, 0.16), rgba(14, 116, 144, 0.08));
+  color: var(--ad-on-primary-container);
+  font-weight: 700;
+  box-shadow: var(--ad-active-glow);
+}
+.ad-side__item--disabled { color: var(--ad-text-faint); cursor: not-allowed; }
+.ad-side__item--disabled:hover { background: transparent; color: var(--ad-text-faint); }
+
+.ad-side__badge {
+  font-size: 9.5px; padding: 3px 9px; border-radius: 999px;
+  background: var(--ad-surface-container-high);
+  color: var(--ad-text-faint);
+  border: 1px solid var(--ad-line);
+  font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+.ad-side__foot {
+  border-top: 1px solid var(--ad-line);
+  padding-top: 14px; margin-top: 14px;
+  font-size: 12px; color: var(--ad-text-dim);
+  line-height: 1.45;
+}
+
+/* ---------------- Main column ---------------- */
+
+.ad-main {
+  padding: 36px 40px 96px;
+  min-width: 0;
+}
+.ad-main h1 {
+  margin: 0 0 10px;
+  font-size: 34px; font-weight: 800;
+  letter-spacing: -0.022em;
+  color: var(--ad-text);
+  background-image: var(--ad-ne-ombre);
+  background-clip: text; -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ad-main .ad-sub {
+  color: var(--ad-text-dim);
+  margin: 0 0 28px;
+  font-size: 14.5px; line-height: 1.6;
+  max-width: 74ch;
+}
+.ad-main h2 {
+  margin: 0 0 14px;
+  font-size: 16px; font-weight: 700;
+  color: var(--ad-text);
+}
+
+/* Ombre fallback where background-clip:text is unsupported. */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .ad-gate h1, .ad-side__brand, .ad-main h1, .ad-mobilebar__title {
+    -webkit-text-fill-color: var(--ad-text);
+    color: var(--ad-text);
+  }
+}
+
+/* ---------------- Panels (cards) ---------------- */
+
+.ad-panel {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(37, 99, 216, 0.025), rgba(37, 99, 216, 0)),
+    var(--ad-panel);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-lg);
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  box-shadow: var(--ad-elev-1);
+  transition:
+    box-shadow var(--ad-dur) var(--ad-ease),
+    border-color var(--ad-dur) var(--ad-ease),
+    transform var(--ad-dur) var(--ad-ease);
+}
+.ad-panel:hover {
+  border-color: rgba(37, 99, 216, 0.24);
+  box-shadow: var(--ad-elev-2);
+}
+.ad-panel h2 { margin: 0 0 14px; font-size: 16px; font-weight: 700; color: var(--ad-text); }
+
+/* ---------------- Rows / Inputs ---------------- */
+
+.ad-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.ad-row + .ad-row { margin-top: 12px; }
+.ad-row label {
+  min-width: 140px;
+  color: var(--ad-text-dim);
+  font-size: 13px; font-weight: 500;
+}
+
+.ad-input, .ad-textarea, .ad-select,
+.ad-app input[type='date'],
+.ad-app input[type='text'],
+.ad-app input[type='email'],
+.ad-app input[type='number'],
+.ad-app select {
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-sm);
+  padding: 11px 13px;
+  font: inherit;
+  background: var(--ad-surface-container-low);
+  color: var(--ad-text);
+  width: 100%;
+  transition:
+    border-color var(--ad-dur) var(--ad-ease),
+    box-shadow var(--ad-dur) var(--ad-ease),
+    background-color var(--ad-dur) var(--ad-ease);
+}
+.ad-input:focus, .ad-textarea:focus, .ad-select:focus,
+.ad-app input[type='date']:focus,
+.ad-app input[type='text']:focus,
+.ad-app input[type='email']:focus,
+.ad-app input[type='number']:focus,
+.ad-app select:focus {
+  outline: none;
+  border-color: var(--ad-primary);
+  background: var(--ad-primary-container);
+  box-shadow: 0 0 0 3px rgba(37, 99, 216, 0.18);
+}
+.ad-textarea {
+  min-height: 96px; resize: vertical;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px; line-height: 1.55;
+}
+
+/* Native date / select chevron coloring. */
+.ad-app input[type='date'] {
+  color-scheme: light;
+}
+
+/* ---------------- Map ---------------- */
+
+.ad-map {
+  width: 100%; height: 560px;
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-lg);
+  box-shadow: var(--ad-elev-2);
+  overflow: hidden;
+}
+
+/* ---------------- Tables ---------------- */
+
+.ad-table { width: 100%; border-collapse: collapse; font-size: 13.5px; color: var(--ad-text); }
+.ad-table th, .ad-table td {
+  text-align: left; padding: 14px 16px;
+  border-bottom: 1px solid var(--ad-line);
+  vertical-align: top;
+}
+.ad-table th {
+  background: var(--ad-surface-container-high);
+  color: var(--ad-text-dim);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.ad-table tr:last-child td { border-bottom: 0; }
+.ad-table tbody tr { transition: background-color var(--ad-dur-fast) var(--ad-ease); }
+.ad-table tbody tr:hover { background: rgba(37, 99, 216, 0.05); }
+
+/* Several views render inline-styled tables inside .ad-panel rather
+   than using .ad-table. Lift those too via parent-scoped rules. */
+.ad-panel table {
+  width: 100%; border-collapse: collapse;
+  color: var(--ad-text);
+}
+.ad-panel table thead tr {
+  background: var(--ad-surface-container-high);
+}
+.ad-panel table thead th {
+  color: var(--ad-text-dim) !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--ad-line) !important;
+}
+.ad-panel table tbody td {
+  border-bottom: 1px solid var(--ad-line) !important;
+}
+.ad-panel table tbody tr {
+  transition: background-color var(--ad-dur-fast) var(--ad-ease);
+}
+.ad-panel table tbody tr:hover {
+  background: rgba(37, 99, 216, 0.05);
+}
+
+/* ---------------- Chips ---------------- */
+
+.ad-domain {
+  display: inline-block;
+  font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--ad-primary-strong);
+  background: var(--ad-primary-container);
+  border: 1px solid rgba(37, 99, 216, 0.28);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.ad-locked {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 11px; border-radius: 999px;
+  background: rgba(185, 119, 10, 0.14);
+  color: #8a5908;
+  border: 1px solid rgba(185, 119, 10, 0.30);
+}
+.ad-unlocked {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 11px; border-radius: 999px;
+  background: rgba(31, 138, 75, 0.14);
+  color: #1f8a4b;
+  border: 1px solid rgba(31, 138, 75, 0.30);
+}
+
+/* ---------------- Status banners ---------------- */
+
+.ad-error {
+  background: rgba(220, 38, 38, 0.08);
+  color: #9b1c1c;
+  border: 1px solid rgba(220, 38, 38, 0.32);
+  padding: 14px 16px;
+  border-radius: var(--ad-r-sm);
+  font-size: 13.5px;
+  margin-bottom: 14px;
+}
+.ad-success {
+  background: rgba(31, 138, 75, 0.10);
+  color: #146c39;
+  border: 1px solid rgba(31, 138, 75, 0.30);
+  padding: 14px 16px;
+  border-radius: var(--ad-r-sm);
+  font-size: 13.5px;
+  margin-bottom: 14px;
+}
+
+/* ---------------- Rule cards ---------------- */
+
+.ad-rule-card {
+  position: relative;
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-md);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  background:
+    linear-gradient(180deg, rgba(37, 99, 216, 0.025), rgba(37, 99, 216, 0)),
+    var(--ad-panel);
+  box-shadow: var(--ad-elev-1);
+  transition:
+    box-shadow var(--ad-dur) var(--ad-ease),
+    border-color var(--ad-dur) var(--ad-ease);
+}
+.ad-rule-card:hover {
+  border-color: rgba(14, 116, 144, 0.32);
+  box-shadow: var(--ad-elev-2);
+}
+.ad-rule-card__head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; margin-bottom: 10px;
+}
+.ad-rule-card__key {
+  font-weight: 800;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--ad-secondary);
+}
+.ad-rule-card__because {
+  color: var(--ad-text-dim);
+  font-size: 13.5px; line-height: 1.6;
+}
+.ad-rule-card__value {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  background: var(--ad-surface-container-high);
+  border: 1px solid var(--ad-line);
+  padding: 12px 14px;
+  border-radius: var(--ad-r-sm);
+  white-space: pre-wrap;
+  margin-top: 12px;
+  color: #2c3346;
+}
+
+/* ---------------- Calendar grid ---------------- */
+
+.ad-cal__head {
+  display: flex; align-items: center; gap: 8px;
+  margin: 20px 0 14px;
+}
+.ad-cal__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.ad-cal__wd {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ad-text-faint);
+  padding: 8px 0;
+  text-align: center;
+}
+.ad-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.ad-cal__cell {
+  appearance: none;
+  background:
+    linear-gradient(180deg, rgba(37, 99, 216, 0.02), rgba(37, 99, 216, 0)),
+    var(--ad-panel);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-md);
+  padding: 10px 12px;
+  min-height: 112px;
+  display: flex; flex-direction: column; align-items: stretch;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: var(--ad-text);
+  position: relative;
+  transition:
+    border-color var(--ad-dur) var(--ad-ease),
+    box-shadow var(--ad-dur) var(--ad-ease),
+    transform var(--ad-dur) var(--ad-ease),
+    background-color var(--ad-dur) var(--ad-ease);
+}
+.ad-cal__cell:hover {
+  border-color: var(--ad-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--ad-elev-2);
+}
+.ad-cal__cell--out {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ad-text-faint);
+}
+.ad-cal__cell--out:hover {
+  background: var(--ad-surface-container);
+  transform: none;
+  box-shadow: none;
+}
+.ad-cal__cell--today {
+  border-color: var(--ad-primary);
+  box-shadow:
+    inset 0 0 0 2px rgba(37, 99, 216, 0.28),
+    var(--ad-elev-1);
+}
+.ad-cal__cell--blocked {
+  background:
+    linear-gradient(180deg, rgba(214, 51, 108, 0.12), rgba(214, 51, 108, 0.05)),
+    var(--ad-panel);
+  border-color: rgba(214, 51, 108, 0.34);
+}
+.ad-cal__cell--past-done {
+  background:
+    linear-gradient(180deg, rgba(31, 138, 75, 0.12), rgba(31, 138, 75, 0.05)),
+    var(--ad-panel);
+  border-color: rgba(31, 138, 75, 0.30);
+}
+.ad-cal__head-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ad-cal__day {
+  font-size: 14px; font-weight: 800;
+  color: var(--ad-text);
+}
+.ad-cal__cell--out .ad-cal__day { color: var(--ad-text-faint); }
+.ad-cal__count {
+  font-size: 11px; font-weight: 800;
+  background-image: var(--ad-ne-gradient);
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(37, 99, 216, 0.28);
+}
+.ad-cal__cell--past-done .ad-cal__count {
+  background-image: none;
+  background: linear-gradient(120deg, #1f8a4b, #0e7490);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(31, 138, 75, 0.28);
+}
+.ad-cal__blocked-tag {
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #b02a55;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+.ad-cal__gcal {
+  margin-top: 8px;
+  display: flex; flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--ad-text-dim);
+  overflow: hidden;
+}
+.ad-cal__gcal-row {
+  display: flex; gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--ad-secondary-container);
+  border: 1px solid rgba(14, 116, 144, 0.22);
+  padding: 3px 8px;
+  border-radius: 8px;
+  min-width: 0;
+  color: var(--ad-on-secondary-container);
+}
+.ad-cal__gcal-t {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--ad-secondary);
+}
+.ad-cal__gcal-s {
+  overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  color: var(--ad-text-dim);
+}
+.ad-cal__gcal-more {
+  font-size: 10px;
+  color: var(--ad-text-faint);
+  padding-left: 6px;
+}
+
+/* ---------------- Misc ---------------- */
+
+a { color: var(--ad-secondary); }
+a:hover { color: #0a4f63; }
+
+::selection { background: rgba(37, 99, 216, 0.20); color: var(--ad-text); }
+
+/* ---------------- Mobile bar + hamburger + drawer scrim ----------------
+   Hidden by default; the responsive block below switches them on. */
+
+.ad-mobilebar {
+  display: none;
+  position: sticky; top: 0; z-index: 80;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background:
+    linear-gradient(180deg, rgba(37, 99, 216, 0.04), rgba(37, 99, 216, 0)),
+    var(--ad-surface-container-low);
+  border-bottom: 1px solid var(--ad-line);
+  box-shadow: var(--ad-elev-1);
+}
+/* Gradient hairline accent under the mobile bar. */
+.ad-mobilebar::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: var(--ad-ne-gradient);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ad-mobilebar__title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  background-image: var(--ad-ne-ombre);
+  background-clip: text; -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ad-hamburger {
+  appearance: none;
+  background: var(--ad-surface-container-low);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-r-sm);
+  width: 42px; height: 42px;
+  display: inline-flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  color: var(--ad-text);
+  transition:
+    background-color var(--ad-dur) var(--ad-ease),
+    border-color var(--ad-dur) var(--ad-ease),
+    box-shadow var(--ad-dur) var(--ad-ease),
+    transform var(--ad-dur-fast) var(--ad-ease);
+}
+.ad-hamburger span {
+  display: block;
+  width: 18px; height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+}
+.ad-hamburger:hover {
+  border-color: var(--ad-primary);
+  background: var(--ad-primary-container);
+  color: var(--ad-primary-strong);
+  box-shadow: var(--ad-elev-1);
+}
+.ad-hamburger:active { transform: scale(0.95); }
+
+.ad-scrim {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(26, 29, 40, 0.34);
+  z-index: 90;
+  opacity: 0;
+  /* Critical (Oracle scrim_opacity_pointer_events): when the scrim is not
+     open it must NOT capture taps, or the mobile bar (and the hamburger
+     inside it) becomes unclickable even though the scrim is visually
+     invisible. */
+  pointer-events: none;
+  transition: opacity var(--ad-dur) var(--ad-ease);
+}
+.ad-scrim--on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ad-side__close {
+  display: none;
+  position: absolute;
+  top: 8px; right: 10px;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--ad-text-dim);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 999px;
+  transition: background-color var(--ad-dur) var(--ad-ease), color var(--ad-dur) var(--ad-ease);
+  -webkit-text-fill-color: var(--ad-text-dim);
+}
+.ad-side__close:hover {
+  background: var(--ad-surface-container-high);
+  color: var(--ad-text);
+  -webkit-text-fill-color: var(--ad-text);
+}
+
+/* Drawer-open state. Effects only apply at the mobile breakpoint
+   inside the media query below, so a leftover state on desktop is
+   harmless. */
+
+/* ---------------- Responsive ---------------- */
+
+@media (max-width: 900px) {
+  .ad-app {
+    grid-template-columns: 1fr;
+  }
+
+  .ad-mobilebar { display: flex; }
+  .ad-scrim     { display: block; }
+
+  .ad-side {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    height: 100dvh;
+    width: 280px;
+    z-index: 100;
+    border-right: 1px solid var(--ad-line);
+    border-bottom: 0;
+    transform: translateX(-105%);
+    transition: transform 320ms var(--ad-ease-emp);
+    box-shadow: 18px 0 50px rgba(26, 29, 40, 0.20);
+    overflow-y: auto;
+  }
+  .ad-side--open { transform: translateX(0); }
+
+  .ad-side__brand { padding-right: 44px; }
+  .ad-side__close { display: block; }
+
+  .ad-main { padding: 22px 18px 72px; }
+  .ad-main h1 { font-size: 26px; }
+
+  /* Reset any of the prior horizontal-scroll mobile rules. */
+  .ad-side__nav { flex-direction: column; overflow-x: visible; }
+  .ad-side__item { flex: 1 1 auto; }
+  .ad-side__foot { display: block; }
+
+  /* Lock main from accidental taps when drawer is open. */
+  .ad-app--drawer-open .ad-main { pointer-events: none; }
+}
+
+/* When motion is reduced, skip the slide transition. */
+@media (prefers-reduced-motion: reduce) {
+  .ad-side { transition: none; }
+  .ad-scrim { transition: none; }
+}

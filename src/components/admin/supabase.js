@@ -1,0 +1,117 @@
+// src/components/admin/supabase.js
+//
+// Supabase client and RPC wrappers for Orbit, the Dog Gone Clean admin console.
+// Points at Clean's own project (dgc-prod). This file shares no data with Dog
+// Gone Nails: separate project, separate anon key, separate admins table.
+
+import { createClient } from '@supabase/supabase-js';
+
+export const SUPABASE_URL  = 'https://urebdrosrxejhubpbxsa.supabase.co';
+export const SUPABASE_ANON =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZWJkcm9zcnhlamh1YnBieHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NTE5NDMsImV4cCI6MjA5NTIyNzk0M30.CoxYUJ3GLQbLKtcvHMovYoXb76XFx8CGrnP6Sg3q94c';
+
+let _client = null;
+export function sb() {
+  if (typeof window === 'undefined') return null;
+  if (!_client) {
+    _client = createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { persistSession: true, autoRefreshToken: true },
+    });
+  }
+  return _client;
+}
+
+async function rpc(fnName, params = {}) {
+  const { data, error } = await sb().rpc(fnName, params);
+  if (error) throw new Error(error.message || error.code || 'rpc_error');
+  return data;
+}
+
+// Auth ---------------------------------------------------------------------
+
+export async function signInWithGoogle() {
+  const { error } = await sb().auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/orbit`,
+      queryParams: { prompt: 'select_account' },
+    },
+  });
+  if (error) throw new Error(error.message);
+}
+
+export async function signOut() {
+  return sb().auth.signOut();
+}
+
+export async function getSession() {
+  const { data } = await sb().auth.getSession();
+  return data?.session || null;
+}
+
+export async function adminSelf() {
+  const rows = await rpc('admin_self');
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+}
+
+// Clients (the contact-sheet database) -------------------------------------
+
+export async function listClients() {
+  const data = await rpc('admin_list_clients');
+  return Array.isArray(data) ? data : [];
+}
+
+export async function getClient(clientId) {
+  return rpc('admin_get_client', { p_client_id: clientId });
+}
+
+export async function logVisit(v) {
+  return rpc('admin_log_visit', {
+    p_client_id:             v.clientId ?? null,
+    p_subscriber_id:         v.subscriberId ?? null,
+    p_appointment_id:        v.appointmentId ?? null,
+    p_visited_at:            v.visitedAt ?? null,
+    p_service_type:          v.serviceType ?? null,
+    p_dog_ids:               v.dogIds ?? null,
+    p_work_done:             v.workDone ?? null,
+    p_visit_notes:           v.visitNotes ?? null,
+    p_condition_flags:       v.conditionFlags ?? null,
+    p_actual_minutes:        v.actualMinutes ?? null,
+    p_amount_collected_cents: v.amountCollectedCents ?? null,
+    p_tip_cents:             v.tipCents ?? null,
+    p_payment_method:        v.paymentMethod ?? null,
+    p_source:                v.source ?? 'manual',
+  });
+}
+
+export async function completeAppointment(appointmentId, v = {}) {
+  return rpc('admin_complete_appointment', {
+    p_appointment_id:        appointmentId,
+    p_work_done:             v.workDone ?? null,
+    p_visit_notes:           v.visitNotes ?? null,
+    p_actual_minutes:        v.actualMinutes ?? null,
+    p_amount_collected_cents: v.amountCollectedCents ?? null,
+    p_tip_cents:             v.tipCents ?? null,
+    p_payment_method:        v.paymentMethod ?? null,
+    p_condition_flags:       v.conditionFlags ?? null,
+    p_dog_ids:               v.dogIds ?? null,
+  });
+}
+
+// AI department heads (briefings) ------------------------------------------
+
+export async function listBriefings(department = null, status = null) {
+  const data = await rpc('admin_list_briefings', {
+    p_department: department, p_status: status,
+  });
+  return Array.isArray(data) ? data : [];
+}
+
+export async function setBriefingStatus(id, status) {
+  return rpc('admin_set_briefing_status', { p_id: id, p_status: status });
+}
+
+export async function listAgents() {
+  const data = await rpc('admin_list_agents');
+  return Array.isArray(data) ? data : [];
+}

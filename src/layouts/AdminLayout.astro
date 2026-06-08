@@ -1,0 +1,35 @@
+---
+// src/layouts/AdminLayout.astro
+// Orbit console shell for Dog Gone Clean. No marketing nav, no footer.
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Orbit | Dog Gone Clean',
+  description = 'Dog Gone Clean admin console.',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content={description} />
+  <title>{title}</title>
+  <link rel="icon" type="image/png" href="/favicon.png?v=2" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body style="margin: 0; background: #faf9f6; color: #1a1d28;">
+  <slot />
+</body>
+</html>

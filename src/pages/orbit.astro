@@ -1,0 +1,13 @@
+---
+// src/pages/orbit.astro
+// Orbit, the Dog Gone Clean admin console, at /orbit. Mounts AdminApp as a
+// React island under AdminLayout (no marketing chrome). /admin is a working
+// alias for the same console.
+
+import AdminLayout from '../layouts/AdminLayout.astro';
+import AdminApp from '../components/admin/AdminApp.jsx';
+---
+
+<AdminLayout>
+  <AdminApp client:load />
+</AdminLayout>
