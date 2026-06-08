@@ -167,6 +167,35 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (reminder cron + confirmation trigger: the Acuity gate closed on our side)
+
+Built the hourly reminder engine and the transactional confirmation trigger that
+replace what Acuity does, the last build-side gate before Acuity can be cancelled
+(migration 0035). pg_cron and pg_net are now enabled on `dgc-prod`. A pg_cron job
+`bath-reminders` runs `public.bath_dispatch_reminders()` at the top of every hour;
+it sweeps `bath_appointments` in three non-overlapping time bands (reminder_3d at
+30-78h out, reminder_26h at 14-30h, reminder_day same Eastern calendar day) and
+calls the `send-notification` edge function via `notify_appointment()` (pg_net
+http_post, secret + edge URL read from `app_secrets`). The edge function's
+unique-on-sent index plus a 6h retry throttle make double-sends impossible. A
+trigger `bath_appointment_notify_trg` fires booking_confirmation on insert,
+reschedule on a scheduled_start change, and cancellation on a move to
+cancelled/skipped. The guard that matters: it fires ONLY for app-native rows
+(`source IS NULL`), so a calendar backfill (source 'acuity'/'gcal') can never blast
+historical clients; imported rows still get reminders, which is the point.
+
+Verified live against the 13 real upcoming appointments: a manual dispatch fired 7
+reminders, the edge function returned 200 for all, rendered the real legacy copy
+(client names, dates, time blocks), logged 4 as `resend_not_configured` (clients
+with email, ready the instant the Resend key lands) and 3 as `no_recipient_on_file`
+(the contact-omitted-intentional clients, gracefully skipped); an immediate re-run
+dispatched 0 (dedup/throttle holds). The confirmation trigger was checked with an
+insert+self-rollback: app-native queued exactly 1, imported queued 0, nothing left
+behind. New config key `edge_base_url` added to `app_secrets`. Advisor regression
+from the new trigger function (externally executable SECURITY DEFINER) was closed by
+revoking EXECUTE. The ONLY thing now between this and live legacy reminders is Paul's
+Resend sender key (then verify one real client end to end, then cancel Acuity).
+
 ### 2026-05-27 (`post_appointment_show_someone_nudge` captured)
 
 Locked the standard post-appointment SMS nudge for both businesses

@@ -46,12 +46,14 @@ survive a reset:
   import proven (dedup key + overlap scoping, 0031-0032, this week backfilled); the notification
   dispatcher (`send-notification`, legacy templates, fail-closed) + `notification_log` (0033); the
   client reminder-preferences screen (0034 + portal UI).
-  **REMAINING, mine (no Paul needed):** (a) the hourly reminder cron that fires the reminder_3d /
-  reminder_26h / reminder_day windows (mirror DGN `notifications-cron`, via pg_cron); (b) wire
-  confirmations to fire on booking / reschedule / cancel; (c) extend the calendar backfill to the
-  full horizon + the one-off clients + per-visit service type (interim until the live sync);
-  (d) verify a logged-in legacy client renders correctly in the portal and fix any bath-only
-  assumptions.
+  **REMAINING, mine (no Paul needed):** (a) DONE 2026-06-08: the hourly reminder cron fires the
+  reminder_3d / reminder_26h / reminder_day windows via pg_cron job `bath-reminders` ->
+  `bath_dispatch_reminders()` -> `send-notification` (migration 0035), verified against the real
+  upcoming book; (b) DONE 2026-06-08: confirmations fire on booking / reschedule / cancel via the
+  `bath_appointment_notify_trg` trigger, app-native (source IS NULL) only so a backfill cannot blast
+  imports (migration 0035); (c) extend the calendar backfill to the full horizon + the one-off
+  clients + per-visit service type (interim until the live sync); (d) verify a logged-in legacy
+  client renders correctly in the portal and fix any bath-only assumptions.
   **PAUL ACTIONS (credentials/physical, no tool reaches them; the Chromebook is far smoother than
   the phone for the Google Cloud bits):** (1) verify `service@doggoneclean.us` as a Resend sender and
   hand over the API key -> stored in `app_secrets`, email turns on; (2) connect Paul's Google Calendar
