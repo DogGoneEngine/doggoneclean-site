@@ -1662,6 +1662,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   legacy 26h reminder keep the cancellation line; second-person vs canon third-person tail; and
   an on-my-way/ETA and a review-ask message still to come from Paul. Nothing sends until
   `service@doggoneclean.us` is a verified Resend sender.
+- 2026-06-07 (scheduling model + terminology locked, per Paul): two Oracle rules added.
+  `schedule_mirrors_real_bookings`: the app shows the REAL booked appointments imported from Paul's
+  calendar (keyed by Acuity ID), never appointments synthesized from cadence; `cadence_days` is only
+  a due/overdue signal that assists the next rolling booking. Because auto-booking everyone by
+  frequency manufactures the collisions Paul avoids by booking one ahead and only far out when it
+  fits. Confirmed by reading his Google Calendar: it carries every real booking with Acuity IDs,
+  times, dogs, and prices, plus one-offs and his own manual recurring entries; so "generate
+  appointments" becomes "import from the calendar" and merges with the Google Calendar sync (calendar
+  is the source before cutover, the app writes back after). `clients_not_subscribers`: legacy clients
+  are clients with a recurring schedule, not subscribers (they pay in person, subscribe to nothing);
+  the `bath_*` table names are a DGN-fork artifact pending rename; never surface "subscriber" in copy
+  or UI.
 - 2026-06-07 (Ocala availability loaded): first build move of the Acuity teardown, done with no
   input needed. Loaded the real working grid into `bath_availability_windows` for Ocala: Tue-Sat,
   noon to 8pm (weekday 2-6, 12:00-20:00), days addable, migration 0028, verified 5 rows. Grounding

@@ -472,6 +472,26 @@ cancellation line feeling fair rather than blindsided, while a countdown-styled 
 manufacture cancellations that otherwise would not happen. The buffer is never mentioned in the
 message itself.
 
+`schedule_mirrors_real_bookings` (scheduling):
+The app's schedule is the real booked appointments, imported from the calendar (keyed by the
+Acuity appointment ID so re-imports never duplicate), never appointments synthesized from a
+client's cadence. `cadence_days` is a due/overdue signal that helps place the next booking, not
+an instruction to auto-create future appointments. After cutover the app becomes the source and
+writes bookings back to the calendar; before cutover it reads from the calendar. Because blindly
+booking every client out by frequency manufactures collisions, which is exactly why Paul books
+one ahead and only books far out when it genuinely fits; the app assists that judgment, it does
+not replace it. Pairs with `clients_not_subscribers`.
+
+`clients_not_subscribers` (data model):
+Legacy full-grooming people are clients with a recurring schedule, not "subscribers": they pay in
+person and subscribe to nothing. The `bath_subscribers` / `bath_subscriptions` tables are a
+DGN-fork naming artifact (the bath product genuinely is a subscription with a card on file),
+pending rename now that they also hold grooming, nails, and legacy clients; for a legacy client
+the "subscription" row carries only the recurring cadence and per-visit price, no billing and no
+auto-charge. Never surface "subscriber" or "subscription" in any client-facing or Paul-facing copy
+or UI; say "client" and "recurring schedule." Because the word misrepresents the relationship, and
+Paul flagged it directly.
+
 `gated_community_hours` (routing):
 Some gated communities restrict the hours service vehicles may enter (for example no service
 entry after 5pm); treat those windows as real access constraints when sequencing a day.

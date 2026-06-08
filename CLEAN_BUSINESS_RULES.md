@@ -134,6 +134,8 @@ built. This is normal: even DGN has many rules sitting in only one or two layers
 | video_audio_only_when_visible | UX | Oracle; inline script on `process.astro` (muted-autoplay markup + tap-to-unmute, one-at-a-time, IntersectionObserver mute on scroll-away, visibilitychange mute on tab-hide) | shared helper or lint once a second video page exists |
 | single_visit_as_own_path | Hurricane Bath: ux | Oracle; `/the-villages` "Other ways in" section (single-visit card with its own CTA `/book?plan=single`, alongside standard recurring); **`check.py`** asserts `/book?plan=single` CTA href present on `the-villages.astro` | booking-flow plan picker (top-level choice before card entry) |
 | string_of_pearls_is_a_service | Hurricane Bath: engineering | Oracle | `get-available-slots` / `create-booking` / `reschedule-appointment` / `skip-appointment` / `stop-subscription` CORS-locked edge functions; `/schedule-widget` iframe route; service-type query param |
+| schedule_mirrors_real_bookings | Clean: scheduling | Oracle; calendar-to-app import keyed by Acuity ID (the app shows real bookings, never cadence-synthesized ones); `clients.cadence_days` used only as a due/overdue signal | calendar sync job; `bath_appointments` sourced from the calendar; portal "due soon" view |
+| clients_not_subscribers | Clean: data model | Oracle; convention (never surface "subscriber"/"subscription" in copy or UI); the `bath_*` table rename is parked in `CLEAN_PARKING_LOT.md` | `bath_*` table rename; portal/admin labels say "client" + "recurring schedule" |
 
 ## How to add a row
 
