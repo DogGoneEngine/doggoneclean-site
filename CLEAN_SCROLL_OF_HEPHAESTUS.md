@@ -1649,6 +1649,19 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   EMAIL only to match Acuity (which only emails); SMS/Twilio deferred and NOT on the teardown path
   (do not keep raising it). Build list + Paul-action checklist parked under "Acuity + Squarespace
   teardown"; the immediate Paul action is verifying `service@doggoneclean.us` as a Resend sender.
+- 2026-06-07 (legacy email templates drafted + saved): worked the legacy full-grooming
+  notification emails from their real source, not from scratch. Found DGN's built
+  `send-notification` (the canonical template set) and started from Paul's actual Acuity copy
+  rather than inventing. Saved to `legacy/notifications/email_templates.md` (DRAFT): booking
+  confirmation, 72h / 26h / 6h reminders, cancellation, reschedule. Standards locked: in-person
+  payment, `cancellation_24h` "billed in full" (NOT the bath "non-refundable"), the time is a
+  "block" (`appointment_block_not_window`) expressed as a real `{start_time} to {end_time}` span
+  now that the system stores `scheduled_end`, a "the block is when the work gets done, not a
+  wait-around arrival window" clarifier on every block mention, and the old Acuity breathing-room
+  line dropped. Open and flagged in the file: whether `lock_in_timing` (bath rule) lets the
+  legacy 26h reminder keep the cancellation line; second-person vs canon third-person tail; and
+  an on-my-way/ETA and a review-ask message still to come from Paul. Nothing sends until
+  `service@doggoneclean.us` is a verified Resend sender.
 
 ### Legacy login mechanism built + Ocala availability captured (2026-06-07, migration 0024)
 - Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,
