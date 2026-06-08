@@ -1662,6 +1662,20 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   legacy 26h reminder keep the cancellation line; second-person vs canon third-person tail; and
   an on-my-way/ETA and a review-ask message still to come from Paul. Nothing sends until
   `service@doggoneclean.us` is a verified Resend sender.
+- 2026-06-07 (first calendar backfill, migrations 0031 + 0032): proved the calendar-to-app import on
+  real data. 0031 added `bath_appointments.source` + `external_id` with a partial unique index, so an
+  imported appointment is keyed by its upstream id (Acuity id, or the gcal event id for Paul's manual
+  recurring entries) and re-imports never duplicate. The import then hit `bath_appointments_no_overlap`,
+  a global no-overlap exclusion (a bath-model assumption) that rejected Ginger Fink 5-7pm overlapping
+  Michelle Reiners 6-9pm, real padded blocks. 0032 scoped that guard to app-native bookings only
+  (`source is null`); imported legacy blocks are exempt because their overlap is real and the app
+  mirrors it (`schedule_mirrors_real_bookings`). Backfilled this week's 13 standing-client appointments
+  from Paul's Google Calendar, matched by name to clients, prices pulled from each client's real
+  per-dog book (Lisa Irwin 2 dogs $180, etc.), service types correct, both overlapping NE-evening
+  appointments preserved. Follows: extend to the full 28-day horizon, add the one-off clients (their
+  client rows exist, need subscriber rows), capture per-visit service_type from the calendar title
+  (Lisa Prater's nails-vs-groom visit), and build the durable automated sync, which needs Paul's
+  one-time Google Calendar connection (OAuth or calendar-share-with-service-account).
 - 2026-06-07 (scheduling model + terminology locked, per Paul): two Oracle rules added.
   `schedule_mirrors_real_bookings`: the app shows the REAL booked appointments imported from Paul's
   calendar (keyed by Acuity ID), never appointments synthesized from cadence; `cadence_days` is only
