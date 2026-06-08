@@ -167,6 +167,26 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (real photos wired in: Paul + dogs in the trailer)
+
+Paul uploaded 10 full-size phone photos (him with client dogs in the bath trailer) to the repo's
+public/ via GitHub web (the chat-attached images can't transfer as files; the GitHub upload was the
+bridge, then the local mirror fast-forwarded to his commit). Pulled them locally, installed sharp
+(local only, --no-save, NOT a project dep), generated small previews to view all 10, and chose
+placements. Optimized the keepers with sharp (32 MB of originals -> 392 KB of web JPEGs) into
+public/photos/, then removed the 10 heavy originals from public/ so they do not deploy. Wired:
+paul-specialist.jpg into the Villages specialist card (replacing the "P" initial); og-cover.jpg as
+the site-wide Open Graph / Twitter share image (BaseLayout default ogImage, now an absolute URL);
+trailer-1..4 into a new "Real dogs, real trailer" strip on the homepage; ocala-hero.jpg into the
+Ocala coming-soon hero. Left 3 photos unplaced (dryer shot, rotary-tool pit bull, one yellow Lab)
+per Paul's "don't force them". Verified the two key crops by eye (specialist square frames Paul's
+face, og cover is bright and landscape) and that the optimized files land in dist/photos. The
+homepage HTML can't be SSG-verified locally (the-villages cities fetch aborts the build on the
+sandbox egress allowlist, as all session) but all pages compiled and it builds in CI. Note for
+later: Clean 2.0 is bath-PLUS (no haircuts), not bath-only, so grooming/nail tools in photos are
+fine; the earlier "skip the rotary tool" instinct was from a prior-session misunderstanding Paul
+is still sorting out.
+
 ### 2026-06-08 (Ocala redone to the real Nails format: cities dropdown, coming-soon page, waitlist)
 
 Corrected the first Ocala pass per Paul. Three fixes: (1) the nav is now a Cities DROPDOWN (desktop)

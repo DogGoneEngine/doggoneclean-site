@@ -27,6 +27,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         We are building the route now. Join the waitlist to be first in line when
         Ocala opens for booking.
       </p>
+      <img class="cs-hero__photo" src="/photos/ocala-hero.jpg" loading="lazy" alt="Paul with a calm German Shepherd in the Hurricane Bath trailer" />
     </div>
   </section>
 
@@ -114,6 +115,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: var(--text-base);
     color: #64748b;
     line-height: 1.6;
+  }
+  .cs-hero__photo {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    margin: var(--space-2xl) auto 0;
+    border-radius: var(--radius-lg, 18px);
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    box-shadow: 0 8px 32px rgba(13, 30, 70, 0.12);
   }
 
   .cs-waitlist-section { padding-top: var(--space-2xl); }

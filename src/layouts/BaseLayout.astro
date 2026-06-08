@@ -19,11 +19,12 @@ interface Props {
 const {
   title = 'Dog Gone Clean | Mobile dog baths in The Villages, Florida',
   description = 'Dog Gone Clean is a mobile dog bath service in The Villages, Florida, powered by the Hurricane Bath. A genuinely clean dog in your driveway, on a schedule you keep.',
-  ogImage = '/logo.png',
+  ogImage = '/photos/og-cover.jpg',
   noIndex = false,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
 ---
 
 <!doctype html>
@@ -41,9 +42,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content={ogImageURL} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImageURL} />
 
     <link rel="icon" type="image/png" href="/favicon.png?v=2" />
   </head>

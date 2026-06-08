@@ -229,6 +229,25 @@ const recurringSteps = [
     </div>
   </section>
 
+  <!-- REAL DOGS, REAL TRAILER -->
+  <section class="section trailer-strip">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">In the trailer</p>
+        <h2 class="section-title">Real dogs, real driveways.</h2>
+        <p class="section-subtitle section-subtitle--center">
+          Every bath happens in the climate controlled trailer, parked at your home.
+        </p>
+      </div>
+      <div class="trailer-grid">
+        <img src="/photos/trailer-1.jpg" loading="lazy" alt="A calm black Lab resting against the tub in the Hurricane Bath trailer" />
+        <img src="/photos/trailer-2.jpg" loading="lazy" alt="A Bernese Mountain Dog standing in the bright, clean Hurricane Bath trailer" />
+        <img src="/photos/trailer-3.jpg" loading="lazy" alt="Paul with a relaxed yellow Lab in the trailer" />
+        <img src="/photos/trailer-4.jpg" loading="lazy" alt="Paul holding a happy little terrier mix, small dogs welcome too" />
+      </div>
+    </div>
+  </section>
+
   <!-- FRIENDLY DOGS -->
   <section class="section friendly-section">
     <div class="container">
@@ -576,4 +595,24 @@ const recurringSteps = [
     font-size: var(--text-lg);
   }
   .friendly__card p:last-child { margin-bottom: 0; }
+
+  /* REAL DOGS, REAL TRAILER */
+  .trailer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    max-width: 900px;
+    margin: var(--space-2xl) auto 0;
+  }
+  .trailer-grid img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    display: block;
+    box-shadow: var(--shadow-sm);
+  }
+  @media (min-width: 800px) {
+    .trailer-grid { grid-template-columns: repeat(4, 1fr); }
+  }
 </style>
