@@ -65,14 +65,6 @@ const recurringSteps = [
     </div>
   </section>
 
-  <!-- FEATURE PHOTO -->
-  <section class="home-feature">
-    <div class="container">
-      <img class="home-feature__img" src="/photos/home-feature.jpg" loading="lazy" alt="Paul with a client's dog in the climate-controlled Hurricane Bath trailer" />
-      <p class="home-feature__cap">Every bath happens in the climate-controlled trailer, parked in your driveway. A calm dog, a genuinely clean dog, no trip to a salon.</p>
-    </div>
-  </section>
-
   <!-- FAST LANE -->
   <section class="fast-lane">
     <div class="container">
@@ -123,6 +115,25 @@ const recurringSteps = [
             <p>{v.body}</p>
           </article>
         ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="section gallery-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">In the trailer</p>
+        <h2 class="section-title">Real dogs, real driveways.</h2>
+        <p class="section-subtitle section-subtitle--center">
+          Every bath happens in the climate controlled trailer, parked at your
+          home. Calm dogs, clean dogs, no trip to a salon.
+        </p>
+      </div>
+      <div class="gallery">
+        <img src="/photos/gallery-1.jpg" loading="lazy" alt="Paul with a calm black Lab in the Hurricane Bath trailer" />
+        <img src="/photos/gallery-2.jpg" loading="lazy" alt="Paul with a relaxed yellow Lab in the trailer" />
+        <img src="/photos/gallery-3.jpg" loading="lazy" alt="Paul with a happy Bernese Mountain Dog in the bright trailer" />
       </div>
     </div>
   </section>
@@ -585,24 +596,23 @@ const recurringSteps = [
   }
   .friendly__card p:last-child { margin-bottom: 0; }
 
-  /* FEATURE PHOTO */
-  .home-feature { padding-top: var(--space-3xl); }
-  .home-feature__img {
-    display: block;
+  /* GALLERY */
+  .gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    max-width: 980px;
+    margin: var(--space-2xl) auto 0;
+  }
+  .gallery img {
     width: 100%;
-    max-width: 920px;
-    margin: 0 auto;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: var(--radius-lg);
+    display: block;
     box-shadow: var(--shadow-md);
   }
-  .home-feature__cap {
-    max-width: 580px;
-    margin: var(--space-lg) auto 0;
-    text-align: center;
-    color: var(--soft);
-    font-size: var(--text-base);
-    line-height: 1.6;
+  @media (min-width: 760px) {
+    .gallery { grid-template-columns: repeat(3, 1fr); }
   }
 </style>

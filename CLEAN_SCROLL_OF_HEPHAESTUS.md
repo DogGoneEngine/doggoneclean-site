@@ -167,6 +167,17 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (photo redo v2: clean 3-up gallery, dropped the awkward single hero band)
+
+Paul: the single big feature selfie looked awkward, the specialist circle ridiculous. Root cause
+named honestly: this env has no browser and cannot install one (egress), so visual layout cannot be
+seen here, only the cropped images in isolation; Paul's screenshots are the only working eyes.
+Replaced the single 16:9 hero band with a clean, well-spaced 3-up gallery ("Real dogs, real
+driveways", Paul + black Lab / yellow Lab / Bernese, uniform 4:3) placed mid-page after the value
+props, not crammed at the bottom. Kept the recropped specialist headshot and the bright Ocala Lab.
+Only 6 photos remain, all referenced. Casual phone selfies read well small/in-context, badly when
+blown up as a hero; design accordingly.
+
 ### 2026-06-08 (photo redo: quality pass after Paul rejected the first cut)
 
 Paul rejected the first photo pass (specialist avatar cropped his face off, a generic 4-up grid
