@@ -32,6 +32,7 @@ even DGN has many rules sitting in only one or two layers.
 | persistent_status_update | Process | Oracle; convention | `business_rules` row |
 | dates_use_local_eastern | Process | Oracle; Scroll header mandate; CLAUDE.md | `business_rules` row |
 | lock_it_in_capture | Process | CLAUDE.md; Scroll header mandate; Oracle | `business_rules` row |
+| no_unilateral_deviation | Process | CLAUDE.md "How Paul works"; Oracle; convention | `business_rules` row |
 | clean_stays_saleable | Build | CLAUDE.md "Hard constraints"; Oracle | n/a (guardrail, not feature) |
 | no_database_until_rules_agreed | Build | CLAUDE.md "Hard constraints"; Oracle | lifts once rules agreed |
 | own_infrastructure | Build | CLAUDE.md "Hard constraints" | infra config |

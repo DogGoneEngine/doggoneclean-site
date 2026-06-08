@@ -163,6 +163,17 @@ decision to git the moment it lands is the only thing that guarantees it survive
 uncommitted note can be lost with the session. The end-of-session scroll rebuild then becomes a
 polish-and-reconcile pass, not a rescue.
 
+`no_unilateral_deviation` (process):
+Never change anything Paul has already decided on your own: locked copy, locked timing, settled
+scope, a standing business rule. If a decision that is already made looks wrong or improvable,
+stop and bring it to Paul first with the exact change and your reason, and do nothing until he
+says yes. Building new work where nothing was decided yet is yours; reversing or quietly drifting
+from a standing decision is not, and "it reads better my way" is never license to change a settled
+choice without asking. Because Paul has years of deliberate decisions baked into this business
+that can look arbitrary out of context but are not (the 26-hour reminder's wording, for one, is
+tuned to warn a client fairly without encouraging a cancellation), and a silent deviation can
+undo a careful choice before anyone notices, after it has already cost real money or trust.
+
 `ship_to_completion` (process):
 When a branch is committed and builds clean, open the PR and squash-merge it (same turn);
 do not stop at the PR step. This is Paul's durable authorization to open and merge routine

@@ -130,6 +130,11 @@ See `lock_it_in_capture` in the Oracle.
   credentials/dashboards no tool exposes.
 - **Read before redesign.** Before any redesign, read CLEAN_SCROLL_OF_HEPHAESTUS.md and
   CLEAN_ORACLE.md in full. A redesign that drops an existing rule is rejected.
+- **No unilateral deviation from what is decided.** Never change a settled decision (locked copy,
+  locked timing, settled scope, a standing rule) on your own. If something already decided looks
+  wrong or improvable, stop and bring it to Paul first with the exact change and your reason, and
+  do nothing until he says yes. New work where nothing was decided is yours; drifting from a
+  standing decision is not. See `no_unilateral_deviation` in the Oracle.
 - **Elon's algorithm (run every build/scope call through it).** In order: make the requirement
   less dumb (tie each to a real reason and a real person, never "because DGN had it"), delete the
   part or step, simplify what survives, accelerate cycle time, then automate last. Never optimize

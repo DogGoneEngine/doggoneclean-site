@@ -22,11 +22,12 @@ key is set. Reminders are EMAIL only (Acuity sent email only); SMS deferred.
   clarifier plus the exact-ETA heads-up cover it without planting doubt.
 
 ## Open decisions (not yet locked)
-- `lock_in_timing` says the ~26-hour reminder should read like a normal reminder, never a
-  countdown, and that the 24-hour buffer is "never mentioned in the message itself." Paul's
-  legacy 26-hour reminder has always stated the policy. OPEN: does `lock_in_timing` apply only
-  to the bath surface, with legacy stating the policy, or does the cancellation line come out of
-  the legacy 26-hour reminder too? The line is marked [OPEN] below.
+- RESOLVED 2026-06-08: the legacy 26-hour reminder DOES state the policy (`lock_in_timing`'s
+  no-mention rule applies only to the bath surface). The line is reworded to lead with the
+  commitment ("that time is reserved just for you") and demote "canceled or rescheduled" to a
+  trailing clause, so it gives fair warning of the 24-hour billing lock without reading as a
+  last-chance prompt that would invite cancellations. The 26-hour timing (not on the 24-hour
+  mark) exists to give a client who genuinely needs to cancel one fair, unhurried chance.
 - Cancellation tail: canon is third-person ("the slot is reserved for that client"); these
   emails use second-person ("that time is reserved just for you"). The "billed in full" phrase
   is verbatim either way.
@@ -119,8 +120,8 @@ Tomorrow is the day! Your {service_type} block runs {start_time} to {end_time}. 
 when the work gets done, not a wait-around arrival window. We usually get started within an
 hour of the opening and finish before it ends.
 
-[OPEN, pending lock_in_timing decision] Appointments canceled or rescheduled within 24 hours
-are billed in full; once inside 24 hours that time is reserved just for you.
+Once your appointment is inside 24 hours, that time is reserved just for you, and is billed in
+full even if canceled or rescheduled.
 
 We'll send you a reminder tomorrow, a few hours before the appointment, and as we get closer,
 we'll do our best to keep you updated on our ETA.

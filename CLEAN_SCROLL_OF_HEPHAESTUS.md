@@ -167,6 +167,29 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (reminder cadence corrected to 72/26/6 + 26h wording + a governance rule)
+
+Two corrections and a new rule. (1) The reminder timing was wrong: 0035 fired the three
+reminders at ~78h / ~30h / ~14h, but the locked legacy cadence in
+`legacy/notifications/email_templates.md` is 72h / 26h / 6h. The day-of reminder ("Today is
+the day") is the 6-hours-before message, not 14h. Migration 0037 retimes all three bands onto
+72 / 26 / 6 (key names unchanged, so templates and prefs keep working). (2) The 26-hour
+reminder's cancellation-policy line was marked [OPEN] in the template doc. Paul settled it: the
+legacy 26h reminder DOES state the policy (`lock_in_timing`'s no-mention rule is bath-surface
+only), and the line is reworded to lead with the commitment and demote "canceled or
+rescheduled" to a trailing clause, so it gives fair warning of the 24h billing lock without
+reading as a last-chance prompt that invites cancellations. New copy: "Once your appointment is
+inside 24 hours, that time is reserved just for you, and is billed in full even if canceled or
+rescheduled." Updated in the deployed `send-notification` (version 3, verified live) and the
+template doc; the [OPEN] note is marked RESOLVED.
+
+(3) Captured a governance rule Paul set: `no_unilateral_deviation`. I am never to change an
+already-decided thing (locked copy, timing, scope, a standing rule) on my own; if a settled
+decision looks wrong, I stop, bring it to Paul with the exact change and my reason, and do
+nothing until he says yes. The trigger was my reflex to "improve" his years-settled reminder
+copy. Filed in CLEAN_ORACLE.md, indexed in CLEAN_BUSINESS_RULES.md, and added to CLAUDE.md
+"How Paul works".
+
 ### 2026-06-08 (reminder cron + confirmation trigger: the Acuity gate closed on our side)
 
 Built the hourly reminder engine and the transactional confirmation trigger that

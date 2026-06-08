@@ -108,7 +108,7 @@ function render(kind: string, ctx: Ctx): { subject: string; text: string } {
       break;
     case 'reminder_26h':
       subject = `Tomorrow is the day`;
-      body = `${first},\n\nTomorrow is the day! Your block runs ${block(ctx)}. The block is when the work gets done, not a wait-around arrival window. We usually get started within an hour of the opening and finish before it ends.\n\nAppointments canceled or rescheduled within 24 hours are billed in full; once inside 24 hours that time is reserved just for you.\n\nWe'll send you a reminder tomorrow, a few hours before the appointment, and as we get closer, we'll do our best to keep you updated on our ETA.\n\n${PAY}\n\nThank you,\n\n${SIG}`;
+      body = `${first},\n\nTomorrow is the day! Your block runs ${block(ctx)}. The block is when the work gets done, not a wait-around arrival window. We usually get started within an hour of the opening and finish before it ends.\n\nOnce your appointment is inside 24 hours, that time is reserved just for you, and is billed in full even if canceled or rescheduled.\n\nWe'll send you a reminder tomorrow, a few hours before the appointment, and as we get closer, we'll do our best to keep you updated on our ETA.\n\n${PAY}\n\nThank you,\n\n${SIG}`;
       break;
     case 'reminder_day':
       subject = `Today is the day`;
