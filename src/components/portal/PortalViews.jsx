@@ -74,10 +74,26 @@ function dollars(cents) {
   return Number.isInteger(d) ? `$${d}` : `$${d.toFixed(2)}`;
 }
 
-function cadenceLabel(cadence) {
+// The Hurricane Bath plan uses the cadence enum (4wk/2wk/oneoff); the legacy
+// full-groom book carries no enum and keeps the real interval in cadence_days
+// (e.g. 21 = every 3 weeks). Read the enum first, then fall back to cadence_days
+// so a legacy client sees their true cadence instead of a blank.
+function cadenceLabel(subscription) {
+  const cadence = subscription && typeof subscription === 'object' ? subscription.cadence : subscription;
   if (cadence === '4wk') return 'Every 4 weeks';
   if (cadence === '2wk') return 'Every 2 weeks';
   if (cadence === 'oneoff') return 'Single visit';
+  const days = subscription && typeof subscription === 'object' ? subscription.cadence_days : null;
+  if (Number.isInteger(days) && days > 0) {
+    if (days % 7 === 0) {
+      const weeks = days / 7;
+      return weeks === 1 ? 'Every week' : `Every ${weeks} weeks`;
+    }
+    return `Every ${days} days`;
+  }
+  if (subscription && typeof subscription === 'object' && subscription.is_recurring === false) {
+    return 'Single visit';
+  }
   return cadence || '';
 }
 
@@ -281,7 +297,7 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
             <div className="pt-card">
               <div className="pt-card__row">
                 <span className="pt-card__label">Cadence</span>
-                <span className="pt-card__value">{cadenceLabel(subscription.cadence)}</span>
+                <span className="pt-card__value">{cadenceLabel(subscription)}</span>
               </div>
               <div className="pt-card__row">
                 <span className="pt-card__label">Price per visit</span>

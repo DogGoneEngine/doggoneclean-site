@@ -167,6 +167,22 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (portal verified for legacy clients: cadence render fix)
+
+Verified item (d) of the teardown checklist: a logged-in legacy client renders correctly in the
+portal. Traced the real getPortalData payload for actual legacy subscribers (all 33 are full-groom
+or nails, square_in_person, cadence enum null with the real interval in cadence_days). Found one
+bath-only defect: the Plan card "Cadence" row called `cadenceLabel(subscription.cadence)`, which is
+null for legacy, so it rendered blank. Fixed `cadenceLabel` to take the subscription and fall back
+to cadence_days (21 -> "Every 3 weeks", 14 -> "Every 2 weeks"), still backward-compatible with the
+bath enum. The rest of the home view is coherent for a full-groom, pay-in-person client: real price
+($80 etc.), status, dogs, next visit, history all correct; the founders-rate row and the 4wk/2wk
+cadence switcher correctly stay hidden (their guards already handle the legacy case). Data check
+across the book: 0 of 33 clients missing a price or cadence, so no $0 or blank rows. Portal island
+bundles clean (vite, 77 modules) and the audit passes; the only local build error is the
+the-villages SSG cities fetch hitting the sandbox egress allowlist, which is environmental and
+unrelated (CI has network).
+
 ### 2026-06-08 (reminder cadence corrected to 72/26/6 + 26h wording + a governance rule)
 
 Two corrections and a new rule. (1) The reminder timing was wrong: 0035 fired the three

@@ -52,8 +52,13 @@ survive a reset:
   upcoming book; (b) DONE 2026-06-08: confirmations fire on booking / reschedule / cancel via the
   `bath_appointment_notify_trg` trigger, app-native (source IS NULL) only so a backfill cannot blast
   imports (migration 0035); (c) extend the calendar backfill to the full horizon + the one-off
-  clients + per-visit service type (interim until the live sync); (d) verify a logged-in legacy
-  client renders correctly in the portal and fix any bath-only assumptions.
+  clients + per-visit service type (interim until the live sync); (d) DONE 2026-06-08: verified a
+  logged-in legacy client renders correctly in the portal. Found and fixed the one bath-only
+  defect: the Plan card "Cadence" row read the bath cadence enum (null for legacy) and rendered
+  blank; `cadenceLabel` now falls back to `cadence_days` (21 -> "Every 3 weeks"). Rest of the view
+  renders coherently for a full-groom, pay-in-person client (real price, status, dogs, next visit,
+  history); founders row and the 4wk/2wk cadence switcher correctly stay hidden. Verified against
+  real data: 0 of 33 clients have a missing price or cadence.
   **PAUL ACTIONS (credentials/physical, no tool reaches them; the Chromebook is far smoother than
   the phone for the Google Cloud bits):** (1) verify `service@doggoneclean.us` as a Resend sender and
   hand over the API key -> stored in `app_secrets`, email turns on; (2) connect Paul's Google Calendar
