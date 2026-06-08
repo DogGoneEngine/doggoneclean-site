@@ -167,6 +167,23 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (legal docs rewritten to match Nails, real, no draft hand-waving)
+
+Rewrote privacy.astro, terms.astro, and sms.astro to mirror the Dog Gone Nails legal pages
+exactly, stripping the prior session's lazy "this is a draft, final attorney-reviewed copy lands
+before launch / contact details land before launch" hand-waving. Differences from Nails are
+context-only: dog grooming service (not nails, terminology kept correct per grooming_vocab),
+Stripe plus Square in Third Parties (Clean's legacy clients pay in person via Square), the terms
+Payment section states both the Hurricane Bath card-on-file model (card on file, charged the day
+before at the 24-hour mark, non-refundable inside 24 hours, two-tap cancel, all required by the
+audit) and the legacy in-person Square reality, and Clean's domain/contact (service@doggoneclean.us).
+Business mailing address is a single labeled drop-in ("[mailing address added after iPostal1
+setup]") in both privacy and terms, pending Paul's iPostal1 box next week. This also clears the
+real privacy-policy prerequisite for Resend sender verification. Audit passes (the legal-copy
+guards: two taps, the day before, 24-hour, non-refundable, card on file, no DGN nail vocab, no
+jargon, dog-grooming terminology). One judgment call to confirm: the terms describe payment by
+both surfaces rather than Hurricane-Bath-only; flag raised to Paul.
+
 ### 2026-06-08 (portal verified for legacy clients: cadence render fix)
 
 Verified item (d) of the teardown checklist: a logged-in legacy client renders correctly in the

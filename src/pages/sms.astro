@@ -1,66 +1,52 @@
 ---
 // src/pages/sms.astro
-// SMS terms stub. A2P 10DLC carrier-mandated boilerplate plus our own.
-// Final wording confirmed alongside the Twilio + A2P registration.
+// Mirrors the Dog Gone Nails SMS terms structure, adapted to Clean's context:
+// dog grooming (not nails), Clean's domain, and Clean's contact email.
 import Legal from '../layouts/Legal.astro';
 ---
 
-<Legal title="SMS Terms" updatedAt="May 2026" description="How Dog Gone Clean uses SMS notifications.">
+<Legal title="SMS Terms" updatedAt="June 2026" description="How Dog Gone Clean uses SMS notifications.">
+  <h2>Program Description</h2>
   <p>
-    <em>This document is a draft. Final wording lands when the Twilio
-    number and A2P 10DLC registration go live.</em>
-  </p>
-
-  <h2>What we send</h2>
-  <p>
-    If you opt in, Dog Gone Clean sends text messages tied to your
-    Hurricane Bath service: appointment reminders three days out, one
-    day out, and the morning of, a heads up text when we are on the
-    way (with a live tracker link), and occasional service notices
-    (card on file expiring, route changes that affect your visit).
+    Dog Gone Clean is a mobile dog grooming service. We send text messages to
+    clients about their appointments and account.
   </p>
 
   <h2>Consent</h2>
   <p>
-    By providing your mobile number during booking, you agree to
-    receive these service related text messages. Consent is not a
-    condition of any purchase.
+    Consent is obtained at booking on doggoneclean.us via a checkbox that is
+    not pre-checked. Consent can also be managed from the client portal.
   </p>
 
-  <h2>Frequency</h2>
+  <h2>Message Categories</h2>
   <p>
-    Message frequency varies with your service schedule. Recurring
-    clients on a four week cadence will typically receive four to five
-    messages per visit cycle.
+    Messages include appointment confirmations, reminders, status updates, and
+    account-related alerts. Optional marketing messages require explicit opt-in.
   </p>
 
-  <h2>Costs</h2>
+  <h2>Message Frequency</h2>
   <p>
-    Message and data rates may apply, set by your carrier. Dog Gone
-    Clean does not charge for the messages.
+    Message frequency varies depending on your bookings and account preferences.
   </p>
 
-  <h2>HELP and STOP</h2>
+  <h2>STOP and HELP Instructions</h2>
   <p>
-    Reply <strong>HELP</strong> at any time for help. Reply
-    <strong>STOP</strong> at any time to opt out; you will receive a
-    single confirmation message and no further messages from this
-    number. You can opt back in later from the client portal.
+    Reply <strong>STOP</strong> at any time to unsubscribe from all text messages.
+    After you send STOP, we will send a confirmation that you have been
+    unsubscribed. Reply <strong>HELP</strong> for help, or contact us directly
+    at <a href="mailto:service@doggoneclean.us">service@doggoneclean.us</a>.
   </p>
 
-  <h2>Carriers</h2>
+  <h2>Carrier Disclaimer</h2>
   <p>
-    Carriers are not liable for delayed or undelivered messages.
+    Message and data rates may apply. Carriers are not liable for delayed or
+    undelivered messages.
   </p>
 
-  <h2>Privacy</h2>
+  <h2>Privacy &amp; Third-Party Disclosure</h2>
   <p>
-    Your mobile number, SMS consent, and text message content are
-    never shared with third parties for marketing.
-  </p>
-
-  <h2>Contact</h2>
-  <p>
-    Questions about SMS: contact details land before launch.
+    Mobile phone numbers, SMS consent, and text message content are never shared
+    with third parties or affiliates for marketing purposes. For more details,
+    see our <a href="/privacy">Privacy Policy</a>.
   </p>
 </Legal>

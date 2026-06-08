@@ -1,61 +1,50 @@
 ---
 // src/pages/privacy.astro
-// Privacy stub. Real attorney-reviewed copy lands before public launch.
-// The third party list reflects Clean's actual stack today.
+// Mirrors the Dog Gone Nails privacy policy structure, adapted to Clean's
+// context: dog grooming (not nails), Stripe plus Square (in-person legacy
+// payments), and Clean's own domain and contact. Business mailing address is
+// a single drop-in pending the iPostal1 box.
 import Legal from '../layouts/Legal.astro';
 ---
 
-<Legal title="Privacy Policy" updatedAt="May 2026" description="How Dog Gone Clean handles your information.">
+<Legal title="Privacy Policy" updatedAt="June 2026" description="How Dog Gone Clean handles your information.">
+  <h2>Identity of the Business</h2>
   <p>
-    <em>This document is a draft. Final attorney-reviewed copy lands
-    before the Hurricane Bath service opens to bookings in The Villages.</em>
+    Dog Gone Clean<br />
+    [mailing address added after iPostal1 setup]<br />
+    service@doggoneclean.us
   </p>
 
-  <h2>What we collect</h2>
+  <h2>Information We Collect</h2>
   <p>
-    When you book a Hurricane Bath visit, we collect your name, the
-    service address inside The Villages, contact details (phone and
-    email), your dog's name, breed, and coat notes, and payment
-    information processed by our payment provider. When you visit this
-    site, your browser sends standard technical information (IP address,
-    browser type, pages viewed).
+    We collect contact and service-related information you provide when booking,
+    payment information processed by our payment processors, and standard technical
+    information your browser sends when visiting our website.
   </p>
 
-  <h2>What we do with it</h2>
+  <h2>Purpose of Collection</h2>
   <p>
-    We use this information to schedule and provide the service, process
-    payments, send service related communications, and meet our legal
-    obligations. We do not sell your data, and we do not share it with
-    third parties for marketing.
+    We use this information strictly to schedule and provide dog grooming service,
+    process payments, send service-related communications, and comply with legal
+    obligations.
   </p>
 
-  <h2>Third parties we use</h2>
+  <h2>Third Parties</h2>
   <p>
-    Dog Gone Clean uses the following services to operate: Stripe
-    (payments), Twilio (SMS), Resend (email), Google (sign in and
-    business email), Supabase (data storage), DigitalOcean (hosting).
+    We utilize the following third-party services to operate: Stripe and Square
+    (payments), Twilio (SMS), Resend (email), Google (business email), Supabase
+    (data storage), and DigitalOcean (hosting).
   </p>
   <p>
-    <strong>Mobile phone numbers, SMS consent, and text message content
-    are never shared with third parties for marketing purposes.</strong>
-  </p>
-
-  <h2>Your card on file</h2>
-  <p>
-    Card details are stored with Stripe, never on our servers. We retain
-    only the tokenized reference Stripe gives us so we can charge for
-    your scheduled visits. You can update or remove your card on file
-    from the client portal at any time.
+    <strong
+      >Mobile phone numbers, SMS consent, and text message content are never
+      shared with third parties or affiliates for marketing purposes.</strong
+    >
   </p>
 
   <h2>Security</h2>
   <p>
-    We take reasonable measures to protect the information we hold. No
-    system is perfectly secure.
-  </p>
-
-  <h2>Contact</h2>
-  <p>
-    Questions about this policy: contact details land before launch.
+    We take reasonable measures to protect the information we hold. No system
+    is perfectly secure.
   </p>
 </Legal>
