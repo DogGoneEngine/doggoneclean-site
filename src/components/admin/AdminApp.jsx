@@ -11,12 +11,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { sb, signInWithGoogle, signOut, getSession, adminSelf } from './supabase.js';
 import ClientsView from './ClientsView.jsx';
 import ScheduleView from './ScheduleView.jsx';
+import TodayView from './TodayView.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
 // until the department is built; it is the to-do list in plain sight.
 const SECTIONS = [
-  { key: 'today',     label: 'Today',          ready: false,
+  { key: 'today',     label: 'Today',          ready: true,
     what: 'The crystal ball. Today’s route and next stop, money in motion, and the briefing feed from your AI department heads.' },
   { key: 'calendar',  label: 'Calendar',       ready: false,
     what: 'Every appointment across the bath book and the legacy book, month and week, with a Google Calendar import overlay.' },
@@ -58,11 +59,11 @@ export default function AdminApp() {
   const [me, setMe] = useState(null);
   const [error, setError] = useState(null);
   const [section, setSection] = useState(() => {
-    if (typeof window === 'undefined') return 'clients';
+    if (typeof window === 'undefined') return 'today';
     const params = new URLSearchParams(window.location.search);
     const s = params.get('section');
     if (s && SECTIONS.some((x) => x.key === s)) return s;
-    return 'clients';
+    return 'today';
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const closeDrawer = () => setDrawerOpen(false);
@@ -201,6 +202,7 @@ export default function AdminApp() {
       </aside>
 
       <main className="ad-main">
+        {section === 'today' && <TodayView />}
         {section === 'clients' && <ClientsView />}
         {section === 'schedule' && <ScheduleView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
