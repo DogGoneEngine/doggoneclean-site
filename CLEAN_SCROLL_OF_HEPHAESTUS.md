@@ -167,6 +167,10 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (renamed the /process page to "The Hurricane Bath")
+
+Paul: "The Process" is no good as a menu item and page title; it is "The Hurricane Bath" on both. Renamed the nav (desktop + mobile), footer, the <title>, and the H1 to "The Hurricane Bath", keeping the URL at /process so links do not break. Leaned the H1 into the Neural Expressive style: gradient fill on the key words (The <grad>Hurricane Bath</grad>), bigger and bolder. Verified in the rendered /process HTML (this page builds locally; it does not hit the blocked cities fetch).
+
 ### 2026-06-08 (photo redo v2: clean 3-up gallery, dropped the awkward single hero band)
 
 Paul: the single big feature selfie looked awkward, the specialist circle ridiculous. Root cause

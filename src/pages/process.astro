@@ -36,7 +36,7 @@ const beats = [
 ---
 
 <BaseLayout
-  title="The Process | Dog Gone Clean Hurricane Bath"
+  title="The Hurricane Bath | Dog Gone Clean"
   description="How a Hurricane Bath unfolds, start to finish. Six steps. Same sequence, every dog. Built around the bath the way the bath was built around the dog."
 >
 
@@ -45,7 +45,7 @@ const beats = [
     <div class="glow glow-a"></div>
     <div class="container">
       <p class="eyebrow">How we work</p>
-      <h1>The Process</h1>
+      <h1>The <span class="grad">Hurricane Bath</span></h1>
       <p class="process-hero__sub">
         Your dog needs a bath. That is the job. Here is what happens
         while we are doing it.
@@ -250,9 +250,18 @@ const beats = [
     color: var(--accent2);
   }
   .process-hero h1 {
-    font-size: clamp(2.8rem, 7vw, 4.4rem);
+    font-size: clamp(3rem, 8.5vw, 5.25rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.03;
     color: var(--ink);
     margin: 0 0 var(--space-lg);
+  }
+  .process-hero h1 .grad {
+    background: linear-gradient(100deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .process-hero__sub {
     font-size: var(--text-lg);
