@@ -167,6 +167,21 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (portal legacy landmine sweep: clean after the cadence fix)
+
+Swept the whole logged-in legacy experience for bath-only assumptions beyond the cadence one
+already fixed. Result: the portal renders correctly and safely for a full-groom, pay-in-person
+client. Verified the data-level safety directly: all 61 legacy dogs have coat_tier null and no
+birth_date, and coatLabel(null)/ageFromBirthDate(null) both return empty and get filtered out, so
+a legacy dog shows just name + breed + notes (no broken or bath-labeled row). Plan/visit actions,
+the 24-hour lock, reminder labels (3 days / day before / day of), price, status, and history all
+render right. Found one genuine bath-ism that does not break anything: the Add-a-dog form forces a
+bath coat tier (smooth/double) to save, which is a bath pricing concept inert for full groom. Left
+it unchanged because how legacy clients add dogs (and whether coat tier should be optional for them)
+is a design call for Paul, not a blind fix; parked it. The empty-state "no Hurricane Bath
+subscription / founders rate" copy is bath-only but unreachable for a claimed legacy client (they
+have a subscriber row), so it is not a live landmine.
+
 ### 2026-06-08 (legal docs rewritten to match Nails, real, no draft hand-waving)
 
 Rewrote privacy.astro, terms.astro, and sms.astro to mirror the Dog Gone Nails legal pages

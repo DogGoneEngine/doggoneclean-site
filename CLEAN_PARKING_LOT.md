@@ -77,6 +77,11 @@ survive a reset:
   Acuity is cancelled FIRST, then the switch is flipped. Pre-flip verification uses a test
   appointment (is_test subscriber, Paul's own email, source NULL so it was never in Acuity), never a
   real Acuity client.
+- **Portal add-a-dog coat tier for legacy clients.** The Add-a-dog form requires a bath coat tier
+  (smooth/double) to save, which is a bath pricing concept that is inert for a full-groom client.
+  It does not break anything (it just asks an odd question and stores harmless metadata), so it was
+  left as-is during the legacy portal sweep (2026-06-08). Decision for Paul: make coat tier optional
+  for legacy/full-groom clients, drop it from the legacy add form, or leave it. Low priority.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is
