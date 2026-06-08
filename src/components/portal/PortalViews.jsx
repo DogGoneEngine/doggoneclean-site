@@ -216,7 +216,19 @@ function NotificationsSection({ toast }) {
   );
 }
 
+// The portal is a four-tab app (Home / Appointments / Pack / Account),
+// mirroring the Dog Gone Nails portal so the two surfaces match. The shell
+// only routes between tabs; every tab reuses the existing section components.
+const PORTAL_TABS = [
+  { key: 'home', label: 'Home', Icon: IconHome },
+  { key: 'appts', label: 'Visits', Icon: IconCalendar },
+  { key: 'pack', label: 'Pack', Icon: IconPaw },
+  { key: 'account', label: 'Account', Icon: IconPerson },
+];
+
 export function PortalHome({ data, onLogout, onChanged, toast }) {
+  const [view, setView] = useState('home');
+
   const { subscriber, subscription, city } = data;
   const dogs = (data.dogs || []).filter(d => d.active !== false);
   const appts = data.appointments || [];
@@ -235,143 +247,276 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
   const firstName = subscriber.first_name || pickFirstName(data.authUser);
   const planStatus = subscription ? subscription.status : null;
 
+  const ctx = {
+    subscriber, subscription, city, dogs, appts,
+    upcoming, nextAppt, history, planStatus, firstName, onChanged, toast,
+  };
+
   return (
-    <div className="pt-content">
-      <div className="pt-home">
-        <header className="pt-home__head">
+    <div className="pt-app">
+      <header className="pt-topbar">
+        <div className="pt-topbar__inner">
           <div>
-            <div className="pt-home__greeting">{greetByTime()}</div>
-            <h1 className="pt-home__name">{firstName ? `Hi, ${firstName}` : 'Hi there'}</h1>
+            <div className="pt-topbar__greeting">{greetByTime()}</div>
+            <div className="pt-topbar__name">{firstName ? `Hi, ${firstName}` : 'Hi there'}</div>
           </div>
-          <button className="pt-signout-link" onClick={onLogout}>Sign out</button>
-        </header>
-
-        {planStatus === 'paused' && (
-          <div className="pt-banner pt-banner--warn">
-            Your plan is paused. No visits are scheduled until you restart it.
-          </div>
-        )}
-        {planStatus === 'cancelled' && (
-          <div className="pt-banner pt-banner--muted">
-            Your plan is cancelled. Book again any time to come back on the route.
-          </div>
-        )}
-
-        {/* Next visit */}
-        <section className="pt-section">
-          <h2 className="pt-section__title">Next visit</h2>
-          {nextAppt ? (
-            <div className="pt-hero">
-              <div className="pt-hero__top">
-                <StatusChip status={nextAppt.status} />
-                {nextAppt.amount_cents > 0 && (
-                  <span className="pt-hero__price">{dollars(nextAppt.amount_cents)}</span>
-                )}
-              </div>
-              <div className="pt-hero__date">{fmtDate(nextAppt.scheduled_start, city)}</div>
-              <div className="pt-hero__time">{fmtTimeRange(nextAppt.scheduled_start, nextAppt.scheduled_end, city)}</div>
-              <div className="pt-hero__meta">
-                {nextAppt.dog_count} {nextAppt.dog_count === 1 ? 'dog' : 'dogs'}
-                {dogs.length > 0 && ` · ${dogs.map(d => d.name).join(', ')}`}
-              </div>
-            </div>
-          ) : (
-            <div className="pt-hero pt-hero--empty">
-              <div className="pt-hero__date">No upcoming visit</div>
-              <div className="pt-hero__meta">
-                {planStatus === 'active'
-                  ? 'Your next visit will appear here once it is scheduled.'
-                  : 'Book a visit to get back on the route.'}
-              </div>
-            </div>
-          )}
-          {nextAppt && (
-            <VisitActions appt={nextAppt} city={city} onChanged={onChanged} toast={toast} />
-          )}
-        </section>
-
-        {/* Plan */}
-        {subscription && (
-          <section className="pt-section">
-            <h2 className="pt-section__title">Your plan</h2>
-            <div className="pt-card">
-              <div className="pt-card__row">
-                <span className="pt-card__label">Cadence</span>
-                <span className="pt-card__value">{cadenceLabel(subscription)}</span>
-              </div>
-              <div className="pt-card__row">
-                <span className="pt-card__label">Price per visit</span>
-                <span className="pt-card__value">{dollars(subscription.base_price_cents)}</span>
-              </div>
-              <div className="pt-card__row">
-                <span className="pt-card__label">Status</span>
-                <span className="pt-card__value pt-status-pill" data-status={subscription.status}>
-                  {subscription.status}
-                </span>
-              </div>
-              {subscription.is_founders && (
-                <div className="pt-card__row">
-                  <span className="pt-card__label">Founders rate</span>
-                  <span className="pt-card__value">
-                    {subscription.founders_locked_until
-                      ? `Locked through ${fmtPlainDate(subscription.founders_locked_until)}`
-                      : 'Yes'}
-                  </span>
-                </div>
-              )}
-            </div>
-            <CadenceControl subscription={subscription} onChanged={onChanged} toast={toast} />
-            <PlanActions subscription={subscription} onChanged={onChanged} toast={toast} />
-          </section>
-        )}
-
-        {/* Pack */}
-        <section className="pt-section">
-          <h2 className="pt-section__title">Your pack</h2>
-          <PackSection
-            dogs={dogs}
-            subscriberId={subscriber.id}
-            onChanged={onChanged}
-            toast={toast}
-          />
-        </section>
-
-        {/* Profile */}
-        <section className="pt-section">
-          <h2 className="pt-section__title">Your details</h2>
-          <ProfileSection subscriber={subscriber} city={city} onChanged={onChanged} toast={toast} />
-        </section>
-
-        {/* Reminders */}
-        <section className="pt-section">
-          <h2 className="pt-section__title">Reminders</h2>
-          <NotificationsSection toast={toast} />
-        </section>
-
-        {/* History */}
-        {history.length > 0 && (
-          <section className="pt-section">
-            <h2 className="pt-section__title">Visit history</h2>
-            <div className="pt-appt-list">
-              {history.map(a => (
-                <div className="pt-appt" key={a.id}>
-                  <div className="pt-appt__date">
-                    <div className="pt-appt__date-main">{fmtDateShort(a.scheduled_start, city)}</div>
-                    <div className="pt-appt__date-time">{fmtTime(a.scheduled_start, city)}</div>
-                  </div>
-                  <StatusChip status={a.status} />
-                  {a.amount_cents > 0 && <span className="pt-appt__price">{dollars(a.amount_cents)}</span>}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        <div className="pt-home__foot">
           <button className="pt-signout-link" onClick={onLogout}>Sign out</button>
         </div>
+      </header>
+
+      <main className="pt-app__body">
+        {view === 'home' && <HomeView ctx={ctx} />}
+        {view === 'appts' && <ApptsView ctx={ctx} />}
+        {view === 'pack' && <PackView ctx={ctx} />}
+        {view === 'account' && <AccountView ctx={ctx} onLogout={onLogout} />}
+      </main>
+
+      <nav className="pt-bottomnav" role="tablist" aria-label="Portal sections">
+        {PORTAL_TABS.map(({ key, label, Icon }) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={view === key}
+            className={`pt-bottomnav__item${view === key ? ' pt-bottomnav__item--on' : ''}`}
+            onClick={() => setView(key)}
+          >
+            <Icon />
+            <span className="pt-bottomnav__label">{label}</span>
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+// ── Reusable: the next-visit hero card ─────────────────────────────────
+function NextVisitHero({ ctx, withActions }) {
+  const { nextAppt, planStatus, city, dogs, onChanged, toast } = ctx;
+  if (!nextAppt) {
+    return (
+      <div className="pt-hero pt-hero--empty">
+        <div className="pt-hero__date">No upcoming visit</div>
+        <div className="pt-hero__meta">
+          {planStatus === 'active'
+            ? 'Your next visit will appear here once it is scheduled.'
+            : 'Book a visit to get back on the route.'}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <>
+      <div className="pt-hero">
+        <div className="pt-hero__top">
+          <StatusChip status={nextAppt.status} />
+          {nextAppt.amount_cents > 0 && (
+            <span className="pt-hero__price">{dollars(nextAppt.amount_cents)}</span>
+          )}
+        </div>
+        <div className="pt-hero__date">{fmtDate(nextAppt.scheduled_start, city)}</div>
+        <div className="pt-hero__time">{fmtTimeRange(nextAppt.scheduled_start, nextAppt.scheduled_end, city)}</div>
+        <div className="pt-hero__meta">
+          {nextAppt.dog_count} {nextAppt.dog_count === 1 ? 'dog' : 'dogs'}
+          {dogs.length > 0 && ` · ${dogs.map(d => d.name).join(', ')}`}
+        </div>
+      </div>
+      {withActions && (
+        <VisitActions appt={nextAppt} city={city} onChanged={onChanged} toast={toast} />
+      )}
+    </>
+  );
+}
+
+function PlanBanners({ planStatus }) {
+  if (planStatus === 'paused') {
+    return (
+      <div className="pt-banner pt-banner--warn">
+        Your plan is paused. No visits are scheduled until you restart it.
+      </div>
+    );
+  }
+  if (planStatus === 'cancelled') {
+    return (
+      <div className="pt-banner pt-banner--muted">
+        Your plan is cancelled. Book again any time to come back on the route.
+      </div>
+    );
+  }
+  return null;
+}
+
+function ApptRow({ a, city }) {
+  return (
+    <div className="pt-appt">
+      <div className="pt-appt__date">
+        <div className="pt-appt__date-main">{fmtDateShort(a.scheduled_start, city)}</div>
+        <div className="pt-appt__date-time">{fmtTime(a.scheduled_start, city)}</div>
+      </div>
+      <StatusChip status={a.status} />
+      {a.amount_cents > 0 && <span className="pt-appt__price">{dollars(a.amount_cents)}</span>}
+    </div>
+  );
+}
+
+// ── Tab: Home (the next thing, plus a plan glance) ─────────────────────
+function HomeView({ ctx }) {
+  const { subscription, planStatus } = ctx;
+  return (
+    <div className="pt-content">
+      <PlanBanners planStatus={planStatus} />
+      <section className="pt-section">
+        <h2 className="pt-section__title">Next visit</h2>
+        <NextVisitHero ctx={ctx} withActions />
+      </section>
+
+      {subscription && (
+        <section className="pt-section">
+          <h2 className="pt-section__title">Your plan</h2>
+          <div className="pt-card">
+            <div className="pt-card__row">
+              <span className="pt-card__label">Cadence</span>
+              <span className="pt-card__value">{cadenceLabel(subscription)}</span>
+            </div>
+            <div className="pt-card__row">
+              <span className="pt-card__label">Status</span>
+              <span className="pt-card__value pt-status-pill" data-status={subscription.status}>
+                {subscription.status}
+              </span>
+            </div>
+          </div>
+          <p className="pt-glance-hint">Manage your plan, details, and reminders in the Account tab.</p>
+        </section>
+      )}
+    </div>
+  );
+}
+
+// ── Tab: Visits (the full ledger) ──────────────────────────────────────
+function ApptsView({ ctx }) {
+  const { upcoming, history, city, nextAppt } = ctx;
+  const laterUpcoming = upcoming.filter(a => !nextAppt || a.id !== nextAppt.id);
+  return (
+    <div className="pt-content">
+      <section className="pt-section">
+        <h2 className="pt-section__title">Upcoming</h2>
+        <NextVisitHero ctx={ctx} withActions />
+        {laterUpcoming.length > 0 && (
+          <div className="pt-appt-list" style={{ marginTop: 'var(--space-md)' }}>
+            {laterUpcoming.map(a => <ApptRow key={a.id} a={a} city={city} />)}
+          </div>
+        )}
+      </section>
+
+      {history.length > 0 && (
+        <section className="pt-section">
+          <h2 className="pt-section__title">Visit history</h2>
+          <div className="pt-appt-list">
+            {history.map(a => <ApptRow key={a.id} a={a} city={city} />)}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+// ── Tab: Pack ──────────────────────────────────────────────────────────
+function PackView({ ctx }) {
+  const { dogs, subscriber, onChanged, toast } = ctx;
+  return (
+    <div className="pt-content">
+      <section className="pt-section">
+        <h2 className="pt-section__title">Your pack</h2>
+        <PackSection dogs={dogs} subscriberId={subscriber.id} onChanged={onChanged} toast={toast} />
+      </section>
+    </div>
+  );
+}
+
+// ── Tab: Account (plan controls, details, reminders) ───────────────────
+function AccountView({ ctx, onLogout }) {
+  const { subscription, subscriber, city, onChanged, toast } = ctx;
+  return (
+    <div className="pt-content">
+      {subscription && (
+        <section className="pt-section">
+          <h2 className="pt-section__title">Your plan</h2>
+          <div className="pt-card">
+            <div className="pt-card__row">
+              <span className="pt-card__label">Cadence</span>
+              <span className="pt-card__value">{cadenceLabel(subscription)}</span>
+            </div>
+            <div className="pt-card__row">
+              <span className="pt-card__label">Price per visit</span>
+              <span className="pt-card__value">{dollars(subscription.base_price_cents)}</span>
+            </div>
+            <div className="pt-card__row">
+              <span className="pt-card__label">Status</span>
+              <span className="pt-card__value pt-status-pill" data-status={subscription.status}>
+                {subscription.status}
+              </span>
+            </div>
+            {subscription.is_founders && (
+              <div className="pt-card__row">
+                <span className="pt-card__label">Founders rate</span>
+                <span className="pt-card__value">
+                  {subscription.founders_locked_until
+                    ? `Locked through ${fmtPlainDate(subscription.founders_locked_until)}`
+                    : 'Yes'}
+                </span>
+              </div>
+            )}
+          </div>
+          <CadenceControl subscription={subscription} onChanged={onChanged} toast={toast} />
+          <PlanActions subscription={subscription} onChanged={onChanged} toast={toast} />
+        </section>
+      )}
+
+      <section className="pt-section">
+        <h2 className="pt-section__title">Your details</h2>
+        <ProfileSection subscriber={subscriber} city={city} onChanged={onChanged} toast={toast} />
+      </section>
+
+      <section className="pt-section">
+        <h2 className="pt-section__title">Reminders</h2>
+        <NotificationsSection toast={toast} />
+      </section>
+
+      <div className="pt-home__foot">
+        <button className="pt-signout-link" onClick={onLogout}>Sign out</button>
       </div>
     </div>
+  );
+}
+
+// ── Bottom-nav icons (inline SVG, currentColor) ────────────────────────
+function IconHome() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" />
+    </svg>
+  );
+}
+function IconCalendar() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" />
+    </svg>
+  );
+}
+function IconPaw() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="6" cy="11" r="2" /><circle cx="10.5" cy="6.5" r="2" /><circle cx="15.5" cy="6.5" r="2" /><circle cx="19" cy="11" r="2" />
+      <path d="M12.5 12c2.2 0 4 1.6 4 3.6 0 1.6-1.3 2.4-2.7 2.4-.9 0-1-.3-1.8-.3s-.9.3-1.8.3c-1.4 0-2.7-.8-2.7-2.4 0-2 1.8-3.6 4-3.6z" />
+    </svg>
+  );
+}
+function IconPerson() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" />
+    </svg>
   );
 }
 

@@ -82,6 +82,14 @@ survive a reset:
   It does not break anything (it just asks an odd question and stores harmless metadata). DECIDED
   2026-06-08: leave it for now (Paul's call); revisit only if it annoys a real client. Kept here as
   a known low-priority item, not an open question.
+- **Portal parity with Nails (in progress).** Goal: the Clean portal matches the Dog Gone Nails
+  portal so Nails has nothing to flex. Slice 1 DONE 2026-06-08: tabbed app shell (Home / Visits /
+  Pack / Account bottom nav). REMAINING slices, in order: (2) payment surface, GATED so legacy
+  square_in_person clients see only a short "you pay in person via Square" note and NEVER a card
+  field; only stripe_card (bath) clients get see-card / update-card / failed-charge + expiry banners;
+  (3) book-a-visit from inside the portal (not just reschedule/skip); (4) tipping after a completed
+  visit; (5) returning-client welcome flow (Nails' WelcomeBack.jsx). Nails reference lives in
+  doggonenails-site/src/components/portal/.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is

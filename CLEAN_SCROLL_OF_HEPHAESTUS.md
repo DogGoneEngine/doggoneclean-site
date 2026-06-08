@@ -167,6 +167,25 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (portal parity with Nails, slice 1: tabbed app shell)
+
+Paul's call: the Clean portal should match the Dog Gone Nails portal so Nails has nothing to flex.
+Compared the two: Nails is a four-tab app (bottom nav: Home / Appointments / Pack / Account) with a
+payment surface (see/update card, failed-charge + expiry banners), tipping, book-a-visit-from-portal,
+and a returning-client welcome flow; Clean was a single scrolling page with none of those. Decided to
+match fully, in order, starting with the shell. KEY GATING DECISION on payment (Paul raised it): no
+legacy client is ever shown a card field. The payment surface gates on payment_method (stripe_card =
+bath gets full card management; square_in_person = legacy gets only a short "you pay in person via
+Square" note). Slice 1 shipped: restructured PortalHome into a tabbed app (pt-app shell, sticky
+pt-topbar, fixed pt-bottomnav with Home/Visits/Pack/Account, inline SVG icons), reusing every existing
+section component (VisitActions, CadenceControl, PlanActions, PackSection, ProfileSection,
+NotificationsSection) rehomed into tabs. Home = next visit + plan glance; Visits = upcoming + history;
+Pack = dogs; Account = plan controls + details + reminders. "two taps" stays in PortalApp.jsx
+(audit guard) and the legacy cadence fix is preserved. Verified by clean vite build + reference review;
+full visual check needs Paul's device (this env cannot render the authed island). REMAINING parity
+slices (in order): payment surface (gated as above), book-a-visit from portal, tipping, returning-client
+welcome flow. Tracked in the parking lot.
+
 ### 2026-06-08 (portal legacy landmine sweep: clean after the cadence fix)
 
 Swept the whole logged-in legacy experience for bath-only assumptions beyond the cadence one
