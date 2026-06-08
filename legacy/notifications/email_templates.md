@@ -62,8 +62,8 @@ Thunder at home is one thing. Once dogs are in with us, the weather fades into t
 Payment is easy. We take cash, Visa, Mastercard, American Express, Discover, Apple Pay,
 Google Pay, and Samsung Pay.
 
-Once an appointment is within 24 hours, that time is reserved just for you. Appointments
-canceled or rescheduled within 24 hours are billed in full.
+Once your appointment is inside 24 hours, that time is reserved just for you, and is billed in
+full even if canceled or rescheduled.
 
 Thank you,
 

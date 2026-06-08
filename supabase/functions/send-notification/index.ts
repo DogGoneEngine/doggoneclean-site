@@ -100,7 +100,7 @@ function render(kind: string, ctx: Ctx): { subject: string; text: string } {
   switch (kind) {
     case 'booking_confirmation':
       subject = `You're booked for ${day}`;
-      body = `Hi ${first},\n\nYou're booked for ${day}.\n\nYour appointment block runs ${block(ctx)}. The block is when the work gets done, not a wait-around arrival window. We usually get started within an hour of the opening and finish before it ends, and we'll text your exact arrival time before we roll your way.\n\n${TRAILER}\n\n${PAY}\n\nOnce an appointment is within 24 hours, that time is reserved just for you. Appointments canceled or rescheduled within 24 hours are billed in full.\n\nThank you,\n\n${SIG}`;
+      body = `Hi ${first},\n\nYou're booked for ${day}.\n\nYour appointment block runs ${block(ctx)}. The block is when the work gets done, not a wait-around arrival window. We usually get started within an hour of the opening and finish before it ends, and we'll text your exact arrival time before we roll your way.\n\n${TRAILER}\n\n${PAY}\n\nOnce your appointment is inside 24 hours, that time is reserved just for you, and is billed in full even if canceled or rescheduled.\n\nThank you,\n\n${SIG}`;
       break;
     case 'reminder_3d':
       subject = `Heads up, your appointment is ${day}`;

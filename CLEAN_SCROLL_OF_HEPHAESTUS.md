@@ -181,7 +181,8 @@ rescheduled" to a trailing clause, so it gives fair warning of the 24h billing l
 reading as a last-chance prompt that invites cancellations. New copy: "Once your appointment is
 inside 24 hours, that time is reserved just for you, and is billed in full even if canceled or
 rescheduled." Updated in the deployed `send-notification` (version 3, verified live) and the
-template doc; the [OPEN] note is marked RESOLVED.
+template doc; the [OPEN] note is marked RESOLVED. On Paul's call the same reorder was then
+applied to the booking confirmation's sister sentence for consistency (deployed version 4).
 
 (3) Captured a governance rule Paul set: `no_unilateral_deviation`. I am never to change an
 already-decided thing (locked copy, timing, scope, a standing rule) on my own; if a settled
