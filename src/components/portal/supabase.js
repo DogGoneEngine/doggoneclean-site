@@ -361,6 +361,18 @@ export async function updateServiceAddress(fields) {
   return data || { ok: false, error: 'no_result' };
 }
 
+// ── Profile confirmation (returning-client welcome flow) ──────────────
+// Stamps last_profile_confirmed_at so the welcome gate stops showing until
+// the client lapses again. Address and pack edits use their own RPCs; this
+// only records that the client looked everything over and confirmed it.
+export async function confirmProfile() {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { data, error } = await client.rpc('bath_confirm_profile');
+  if (error) return { ok: false, error: error.message };
+  return data || { ok: false, error: 'no_result' };
+}
+
 // ── Reminder preferences (portal self-service) ────────────────────────
 // Read/save which reminders the client wants and on which channel. Both
 // resolve the caller's own subscriber server-side through auth.uid().

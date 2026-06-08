@@ -15,7 +15,27 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import './portal.css';
 import { sb, getPortalData, signOut, withTimeout } from './supabase.js';
 import AuthScreen from './AuthScreen.jsx';
-import { PortalHome } from './PortalViews.jsx';
+import { PortalHome, WelcomeBack } from './PortalViews.jsx';
+
+// A lapsed returning client (no visit within ~a year and no recent profile
+// confirmation) is gated through the welcome flow before the portal. A client
+// with an upcoming or recent visit, or who confirmed recently, skips it.
+function isStaleReturner(data) {
+  if (!data || !data.subscriber) return false;
+  const yearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+  const conf = data.subscriber.last_profile_confirmed_at;
+  if (conf && new Date(conf).getTime() > yearAgo) return false;
+  const appts = data.appointments || [];
+  const latest = appts.reduce(
+    (m, a) => Math.max(m, new Date(a.scheduled_start).getTime()), 0
+  );
+  // No appointment data loaded for this client means we cannot tell whether
+  // they are lapsed or just not backfilled yet, so do NOT gate them. Only a
+  // client with a real loaded visit that is over a year old is treated as
+  // a returning lapsed client.
+  if (latest === 0) return false;
+  return latest <= yearAgo;
+}
 
 export default function PortalApp() {
   // 'checking' = evaluating session; 'anonymous' = no session;
@@ -28,6 +48,9 @@ export default function PortalApp() {
   // unreachable backend). Lets us show a retry card instead of spinning
   // forever on the "checking" state.
   const [bootStuck, setBootStuck] = useState(false);
+  // Set true once a returning client confirms their details, so the welcome
+  // gate drops immediately even before the refreshed data lands.
+  const [welcomeDone, setWelcomeDone] = useState(false);
 
   const loadingInProgress = useRef(false);
   const [toastState, setToastState] = useState(null);
@@ -190,7 +213,17 @@ export default function PortalApp() {
           )}
 
           {!dataLoading && !dataError && data && data.subscriber && (
-            <PortalHome data={data} onLogout={handleLogout} onChanged={refresh} toast={toast} />
+            isStaleReturner(data) && !welcomeDone ? (
+              <WelcomeBack
+                data={data}
+                onConfirmed={() => { setWelcomeDone(true); refresh(); }}
+                onLogout={handleLogout}
+                onChanged={refresh}
+                toast={toast}
+              />
+            ) : (
+              <PortalHome data={data} onLogout={handleLogout} onChanged={refresh} toast={toast} />
+            )
           )}
         </>
       )}

@@ -167,6 +167,24 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-08 (portal parity with Nails, slice 5: returning-client welcome flow)
+
+Built the returning-client welcome gate (parity with Nails' WelcomeBack). A lapsed client signing
+in confirms their service address and pack, then one tap stamps last_profile_confirmed_at and drops
+them into the portal. New bath_confirm_profile() RPC (migration 0038, applied + verified, advisor
+shows the same intended authenticated-RPC pattern as the other portal RPCs, revoked from anon). New
+exported WelcomeBack component in PortalViews reusing the existing AddressEditor and PackSection (one
+home per edit), plus confirmProfile() in supabase.js and a staleness gate in PortalApp. CAUGHT a
+false-positive while verifying against real data: a naive "no service in a year" check flagged 20 of
+33 clients, because their appointment history is not backfilled yet (only this week is loaded) and
+last_profile_confirmed_at is null. Fixed the heuristic to NOT gate a client who has zero loaded
+appointments (we cannot tell lapsed from un-backfilled), so only a client with a real loaded visit
+over a year old is treated as lapsed. With current data 0 clients see the gate (correct: the 13 with
+upcoming visits are active, the 20 with no loaded history are not gated); it activates correctly once
+appointment history exists. This closes the unblocked portal-parity work: slices 1 (shell), 2-legacy
+(payment note), and 5 (welcome) shipped; slices 2-card, 3 (book-a-visit), 4 (tipping) remain gated on
+Clean's Stripe account + the live calendar sync.
+
 ### 2026-06-08 (portal parity with Nails, slice 2: gated payment section)
 
 Added the Payment section to the Account tab, gated by how the client actually pays so a legacy

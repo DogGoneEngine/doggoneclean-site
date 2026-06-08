@@ -91,10 +91,16 @@ survive a reset:
   Elements): see card brand/last4/expiry, update card, failed-charge + card-expiry banners. Today Clean
   has no card columns, zero stored payment methods, and no Stripe edge functions, so this half cannot be
   built as real (non-mockup) work yet. REMAINING slices: (3) book-a-visit from inside the portal (not
-  just reschedule/skip) -- buildable now for the in-person reality (slot pick + appointment, no card);
-  (4) tipping after a completed visit -- also Stripe-blocked for online tips, and legacy clients tip in
-  person, so largely N/A until Stripe; (5) returning-client welcome flow (Nails' WelcomeBack.jsx).
-  Nails reference lives in doggonenails-site/src/components/portal/.
+  just reschedule/skip) -- BLOCKED: a portal booking creates an appointment Paul cannot see (not on
+  his Google Calendar, no Clean admin), a no-show risk until the live calendar sync is up; bath
+  bookings also need a card (Stripe); (4) tipping after a completed visit -- Stripe-blocked for online
+  tips, and legacy clients tip in person, so N/A until Stripe; (5) returning-client welcome flow DONE
+  2026-06-08 (migration 0038 bath_confirm_profile + WelcomeBack component). Welcome gate is conservative:
+  it does NOT trigger for a client with zero loaded appointments (cannot tell lapsed from un-backfilled),
+  so with today's partial backfill it shows for nobody and activates once history exists. NET: the
+  unblocked parity work is complete; the remaining gaps (card management, book-a-visit, tipping) all wait
+  on Clean's own Stripe account (Paul) and the live calendar sync. Nails reference lives in
+  doggonenails-site/src/components/portal/.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is

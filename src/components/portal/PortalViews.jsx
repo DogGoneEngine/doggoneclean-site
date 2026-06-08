@@ -19,6 +19,7 @@ import {
   addDog, updateDog, removeDog,
   updateProfile, updateServiceAddress, toE164US,
   getNotificationPrefs, setNotificationPrefs,
+  confirmProfile,
 } from './supabase.js';
 import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds } from './maps.js';
 
@@ -286,6 +287,78 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
           </button>
         ))}
       </nav>
+    </div>
+  );
+}
+
+// ── Returning-client welcome gate (parity with Nails' WelcomeBack) ─────
+// Shown to a lapsed client (no service in roughly a year and no recent profile
+// confirmation) before they enter the portal: confirm the service address and
+// the pack, then one tap stamps the confirmation and drops them into the app.
+// Reuses the existing AddressEditor and PackSection so each edit has one home.
+export function WelcomeBack({ data, onConfirmed, onLogout, onChanged, toast }) {
+  const { subscriber, city } = data;
+  const dogs = (data.dogs || []).filter(d => d.active !== false);
+  const first = subscriber.first_name || pickFirstName(data.authUser);
+  const [editingAddr, setEditingAddr] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function confirm() {
+    if (submitting) return;
+    setSubmitting(true);
+    let res;
+    try { res = await confirmProfile(); } catch { res = { ok: false }; }
+    setSubmitting(false);
+    if (res && res.ok) {
+      onConfirmed();
+    } else if (toast) {
+      toast('Something went wrong. Try again.', true);
+    }
+  }
+
+  return (
+    <div className="pt-content" style={{ maxWidth: 560 }}>
+      <div className="pt-wb-head">
+        <div className="pt-wb-eyebrow">{city ? `${city.name}, ${city.state || 'FL'}` : 'Dog Gone Clean'}</div>
+        <h1 className="pt-wb-title">Welcome back, {first || 'there'}.</h1>
+        <p className="pt-wb-sub">
+          It has been a while. Let us make sure everything is still current before we get you back on the schedule.
+        </p>
+      </div>
+
+      <section className="pt-section">
+        <h2 className="pt-section__title">Your service address</h2>
+        {editingAddr ? (
+          <AddressEditor
+            subscriber={subscriber}
+            city={city}
+            onCancel={() => setEditingAddr(false)}
+            onSaved={async () => { setEditingAddr(false); if (onChanged) await onChanged(); }}
+            toast={toast}
+          />
+        ) : (
+          <div className="pt-card">
+            <div className="pt-card__row">
+              <span className="pt-card__value">{formatAddress(subscriber)}</span>
+            </div>
+            <button className="pt-btn pt-btn-ghost pt-btn-sm" onClick={() => setEditingAddr(true)}>
+              This has changed
+            </button>
+          </div>
+        )}
+      </section>
+
+      <section className="pt-section">
+        <h2 className="pt-section__title">Your pack</h2>
+        <PackSection dogs={dogs} subscriberId={subscriber.id} onChanged={onChanged} toast={toast} />
+      </section>
+
+      <button className="pt-btn pt-btn-primary pt-wb-confirm" disabled={submitting} onClick={confirm}>
+        {submitting ? 'Saving...' : "Everything's current, take me in"}
+      </button>
+      <div className="pt-home__foot">
+        <button className="pt-signout-link" onClick={onLogout}>Sign out</button>
+      </div>
     </div>
   );
 }
