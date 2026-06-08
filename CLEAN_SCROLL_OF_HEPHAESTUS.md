@@ -1662,8 +1662,16 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   legacy 26h reminder keep the cancellation line; second-person vs canon third-person tail; and
   an on-my-way/ETA and a review-ask message still to come from Paul. Nothing sends until
   `service@doggoneclean.us` is a verified Resend sender.
-
-### Legacy login mechanism built + Ocala availability captured (2026-06-07, migration 0024)
+- 2026-06-07 (Ocala availability loaded): first build move of the Acuity teardown, done with no
+  input needed. Loaded the real working grid into `bath_availability_windows` for Ocala: Tue-Sat,
+  noon to 8pm (weekday 2-6, 12:00-20:00), days addable, migration 0028, verified 5 rows. Grounding
+  the book migration surfaced that it needs a small SCHEMA change first, not just a data load:
+  `bath_subscriptions.cadence` only allows 4wk/2wk/oneoff while the book runs q14-q98 (so the real
+  value must live in `cadence_days`), and the base-price-plus-decrement model cannot hold legacy
+  per-dog full-groom prices (`bath_dogs` has no price column). Plan: make cadence nullable with
+  cadence_days authoritative, add `bath_dogs.price_cents` for per-dog legacy prices, then migrate
+  the standing/at-will book from `clients.json` (cadence, per-dog price, service_type, dogs,
+  payment_method=square_in_person), flagging the ~5 clients the route template marks pending.
 - Paul: "go for number 1" (legacy login). Legacy clients live in `clients`, not `bath_subscribers`,
   so a sign-in dead-ended at the empty portal. Built `bath_claim_legacy_account()`: matches the
   verified sign-in identity (phone last ten digits from the JWT, or email) to a clients row and
