@@ -265,7 +265,7 @@ function EmptyStateNoSubscriber({ authUser, onLogout }) {
 
         <div className="pt-empty__cta">
           <a className="pt-btn pt-btn-primary" href="/the-villages">See the founders offer</a>
-          <a className="pt-btn pt-btn-ghost" href="/process">How a bath works</a>
+          <a className="pt-btn pt-btn-ghost" href="/hurricane-bath">How a bath works</a>
         </div>
 
         <div className="pt-empty__signout">

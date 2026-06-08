@@ -335,7 +335,7 @@ def check_rule_survival():
     forward rule: every new rule lands with its enforcement layer."""
     home = PAGES / "index.astro"
     villages = PAGES / "the-villages.astro"
-    process_page = PAGES / "process.astro"
+    process_page = PAGES / "hurricane-bath.astro"
     book = PAGES / "book.astro"
     portal = PAGES / "portal.astro"
     terms = PAGES / "terms.astro"

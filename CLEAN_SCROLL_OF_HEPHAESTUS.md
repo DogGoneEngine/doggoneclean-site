@@ -169,7 +169,7 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ### 2026-06-08 (renamed the /process page to "The Hurricane Bath")
 
-Paul: "The Process" is no good as a menu item and page title; it is "The Hurricane Bath" on both. Renamed the nav (desktop + mobile), footer, the <title>, and the H1 to "The Hurricane Bath", keeping the URL at /process so links do not break. Leaned the H1 into the Neural Expressive style: gradient fill on the key words (The <grad>Hurricane Bath</grad>), bigger and bolder. Verified in the rendered /process HTML (this page builds locally; it does not hit the blocked cities fetch).
+Paul: "The Process" is no good as a menu item and page title; it is "The Hurricane Bath" on both. Renamed the page to "The Hurricane Bath" across the nav (desktop + mobile), footer, the <title>, and the H1. Then (Paul: what links break?) renamed the URL too: the page moved /process -> /hurricane-bath, all five internal links updated, an Astro redirect added (/process -> /hurricane-bath) so old links still land, and the audit script path (check.py process_page) repointed. The "keep /process to avoid breaking links" caution was overstated: internal links are ours to update and the site is pre-launch with no real external links. Leaned the H1 into the Neural Expressive style: gradient fill on the key words (The <grad>Hurricane Bath</grad>), bigger and bolder. Verified in the rendered /process HTML (this page builds locally; it does not hit the blocked cities fetch).
 
 ### 2026-06-08 (photo redo v2: clean 3-up gallery, dropped the awkward single hero band)
 

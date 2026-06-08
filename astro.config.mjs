@@ -13,5 +13,10 @@ export default defineConfig({
   build: {
     format: 'directory',
   },
+  // The /process page was renamed to /hurricane-bath; keep the old URL
+  // alive so any existing link or bookmark still lands.
+  redirects: {
+    '/process': '/hurricane-bath',
+  },
   integrations: [react()],
 });
