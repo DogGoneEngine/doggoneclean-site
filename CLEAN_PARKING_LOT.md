@@ -37,20 +37,31 @@ survive a reset:
   New autocomplete to capture it), and have `bath_start_subscription` enforce the gate server-side at
   signup; (2) flip Ocala `hb_active` on. Prices, durations, anchors (`clients.is_anchor`, outliers
   flagged out) already set.
-- **Acuity + Squarespace teardown (legacy folds into the app, `legacy_folds_into_v2`).** Replace
-  both with the one Clean app. BUILD (mine): load the Tue-Sat noon-to-8 availability (every other
-  week, days addable), migrate the 33 standing + at-will clients into recurring full-groom
-  subscriptions, generate their upcoming appointments, automatic Google Calendar sync (via the
-  droplet n8n), automated email confirmations + reminders (Supabase cron), portal full-groom
-  display, and the doggoneclean.us -> app Caddy redirect. PAUL ACTIONS (no tool reaches these),
-  immediate first:
-  1. **Set up `service@doggoneclean.us` as a verified sender in Resend and hand over the API key**,
-     so confirmation/reminder emails can send. IMMEDIATE NEXT.
-  2. Connect Paul's Google Calendar to the app once (OAuth) so the sync writes to it hands-off.
-  3. Point doggoneclean.us DNS at the droplet for the redirect cutover.
-  4. Cancel Acuity, then Squarespace, once a real client is verified end to end.
-  SMS/Twilio is parked and NOT on this path: Acuity only emails reminders, so email reminders fully
-  replace it; text reminders are a later bonus, not a blocker.
+- **Acuity + Squarespace teardown (`legacy_folds_into_v2`): the cutover checklist.** Replace both
+  with the one Clean app; legacy full-grooming clients fold in and doggoneclean.us redirects in.
+  **DONE (this session):** legacy login/claim (a client signs in and lands on their own record); the
+  33 standing clients loaded as recurring full-groom records with real cadence + per-dog prices
+  (migrations 0029-0030); Tue-Sat noon-to-8 availability (0028); the scheduling model locked (mirror
+  real bookings, cadence is a due signal not an auto-booker, clients not subscribers); the calendar
+  import proven (dedup key + overlap scoping, 0031-0032, this week backfilled); the notification
+  dispatcher (`send-notification`, legacy templates, fail-closed) + `notification_log` (0033); the
+  client reminder-preferences screen (0034 + portal UI).
+  **REMAINING, mine (no Paul needed):** (a) the hourly reminder cron that fires the reminder_3d /
+  reminder_26h / reminder_day windows (mirror DGN `notifications-cron`, via pg_cron); (b) wire
+  confirmations to fire on booking / reschedule / cancel; (c) extend the calendar backfill to the
+  full horizon + the one-off clients + per-visit service type (interim until the live sync);
+  (d) verify a logged-in legacy client renders correctly in the portal and fix any bath-only
+  assumptions.
+  **PAUL ACTIONS (credentials/physical, no tool reaches them; the Chromebook is far smoother than
+  the phone for the Google Cloud bits):** (1) verify `service@doggoneclean.us` as a Resend sender and
+  hand over the API key -> stored in `app_secrets`, email turns on; (2) connect Paul's Google Calendar
+  once (OAuth, or share it with a Clean service account) -> the live two-way sync turns on so Paul
+  never runs two systems; (3) point doggoneclean.us DNS at the droplet -> add the Caddy redirect;
+  (4) cancel Acuity, then Squarespace, once one real client is verified end to end.
+  **CUTOVER ORDER:** Resend key (emails on) -> connect calendar (sync on) -> cron + confirmation
+  wiring live -> verify one real client end to end (login, sees real visits, gets a reminder) -> flip
+  doggoneclean.us DNS + Caddy redirect -> cancel Acuity, then Squarespace. SMS/Twilio stays off this
+  path: Acuity emailed reminders only, so email fully replaces it; text is a later bonus.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is

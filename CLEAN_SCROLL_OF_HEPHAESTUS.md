@@ -143,21 +143,23 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   CLEAN_ORACLE.md + CLEAN_BUSINESS_RULES.md + CLEAN_PARKING_LOT.md + CLEAN_FIELD_MANUAL.md +
   `scripts/check.py`, plus the prime directive, the two decision lenses, and the
   idea-capture workflow.
-- **Phase 4 - Clean website + ops app (fork of the DGN platform).** IN PROGRESS. The
-  database foundation is DONE (`dgc-prod` live, client book seeded, RLS-locked). Branches
-  reconciled into `main`. The homepage placeholder is DONE: rebuilt in the Neural
-  Expressive look with the master logo and bath-forward content, live at hurricanebath.com.
-  The Hurricane Bath v2.0 rule pack is locked in the Oracle (24 rules covering pricing,
-  skip, reschedule, UX, money). Next: build the v2.0 booking surface against those rules
-  (Stripe SetupIntent signup, octane cadence picker, three-dog cap selector, two-tap stop
-  sign, calendar-shows-price-per-date), then fork the DGN site structure
-  (`doggonenails-site`) into a multi-page shell, then a real copy pass, then the client
-  portal + String of Pearls scheduling + operator app with photos + pizza tracker + SMS +
-  Resend email. Surface-scoped payments: Hurricane Bath uses Stripe card-on-file (new Dog
-  Gone Clean Stripe account); legacy doggoneclean.us continues in person via Square. The
-  scheduler is built as a service callable from both the new Astro app and the legacy
-  Squarespace site (per `string_of_pearls_is_a_service`) so Acuity can be dropped before
-  the legacy rebuild. Build details stay in CLEAN_FIELD_MANUAL.md and off the public page.
+- **Phase 4 - Clean website + ops app (fork of the DGN platform).** IN PROGRESS, well underway.
+  `dgc-prod` is a real app database: the legacy book in `clients`/`dogs` plus the recurring-service
+  tables it was loaded into (`bath_subscribers/subscriptions/appointments/dogs`), `cities`,
+  `service_perimeters`, `app_secrets`, `notification_log`, `notification_preferences`, all
+  RLS-locked. The Astro site builds and deploys the marketing pages, the `/book` funnel, and the
+  `/portal` client portal. Built so far: the Ocala service-area gate (a hand-drawn perimeter ANDed
+  with a real Google drive-time check, `ocala-service-area` edge function); the legacy full-grooming
+  book loaded into the recurring-service model with real cadence + per-dog prices (migrations
+  0029-0030); the Tue-Sat noon-to-8 availability grid (0028); the notification dispatcher
+  (`send-notification`, reminders + confirmations in Paul's voice, fail-closed) + `notification_log`
+  (0033); and the client reminder-preferences screen (0034 + portal UI). The Hurricane Bath v2.0
+  rule pack stays locked in the Oracle. The ACTIVE work is the Acuity + Squarespace teardown
+  (`legacy_folds_into_v2`): legacy clients fold into this one app, the calendar is the schedule
+  source (import now, two-way sync at cutover), and doggoneclean.us redirects in. The remaining
+  build and the cutover order live in CLEAN_PARKING_LOT.md under "Acuity + Squarespace teardown".
+  Surface-scoped payments hold: legacy bills in person via Square, Hurricane Bath uses Stripe
+  card-on-file. Build details stay in CLEAN_FIELD_MANUAL.md and off the public page.
 - **Phase 5 - Later.** Villages bath expansion; route automation and true drive-time as
   density grows; multi-specialist routing (apprentice Jake).
 
