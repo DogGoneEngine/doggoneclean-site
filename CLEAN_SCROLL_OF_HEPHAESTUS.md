@@ -2137,3 +2137,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the Operations floor shows live load against each generator's 3900W capacity and the headroom
   before adding equipment (migration 0058; captured in CLEAN_FIELD_MANUAL.md power section).
   Bathing generator's physical side still to confirm.
+- **Maintenance agent extended to filters + watts asks (Paul's idea, 2026-06-08).** Bathing
+  generator confirmed driver side (both roll out the back doors and run side by side behind the
+  trailer; captured in the Field Manual). The maintenance watcher now also reminds Paul to clean
+  the appliance filters (high-velocity dryer every 14 days, air conditioner and dehumidifier every
+  30; tunable) and, as a routine low-frequency ask, prompts him to enter any missing appliance
+  watt draws so the load/headroom stays accurate. A `maintenance_tasks` list + a Done button on
+  the Operations floor lets him reset a task's cycle (migration 0059). This is the pattern Paul
+  named: let the agent surface the small recurring asks (hours, watts, filter cleanings) as part
+  of its routine rather than making him remember.

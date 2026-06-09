@@ -173,6 +173,11 @@ two Predator 5000s). Because if one fails you can limp through the rest of the d
 instead of losing the day. Predator 5000s have been reliable and quiet where other generators
 were not.
 
+**Placement: rolled out the back, side by side.** In use, both generators are rolled out the
+back doors and run side by side behind the trailer: the Infrastructure generator on the passenger
+side, the Bathing generator on the driver side. Because running them outside behind the trailer
+keeps the exhaust and noise out and puts both within reach for refueling and reading the hours.
+
 **Generators named by function, tracked by hours.** The two Predator 5000s are split by load and
 named for it in Orbit: the Infrastructure generator (passenger side) runs the air conditioner,
 main vacuum, clippers, and lights; the Bathing generator runs the high-velocity dryer, water

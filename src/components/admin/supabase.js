@@ -289,3 +289,12 @@ export async function updateEquipmentHours(id, hours) {
 export async function setPower(id, { watts = null, ratedWatts = null }) {
   return rpc('admin_set_power', { p_id: id, p_watts: watts, p_rated_watts: ratedWatts });
 }
+
+export async function listMaintenanceTasks() {
+  const data = await rpc('admin_list_maintenance_tasks');
+  return Array.isArray(data) ? data : [];
+}
+
+export async function markTaskDone(taskId) {
+  return rpc('admin_mark_task_done', { p_task_id: taskId, p_done_date: null, p_done_hours: null });
+}
