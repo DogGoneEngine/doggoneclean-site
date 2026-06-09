@@ -171,6 +171,27 @@ export async function setWisdomStatus(id, status) {
   return rpc('admin_set_wisdom_status', { p_id: id, p_status: status });
 }
 
+// Vendors / supplies ----------------------------------------------------------
+
+export async function listSupplies() {
+  return rpc('admin_list_supplies');
+}
+
+export async function upsertSupply(s) {
+  return rpc('admin_upsert_supply', {
+    p_id: s.id ?? null, p_name: s.name, p_category: s.category ?? 'other', p_vendor: s.vendor ?? null,
+    p_reorder_url: s.reorderUrl ?? null, p_interval_days: s.intervalDays ?? null, p_notes: s.notes ?? null, p_active: s.active ?? true,
+  });
+}
+
+export async function supplyAction(id, action) {
+  return rpc('admin_supply_action', { p_id: id, p_action: action });
+}
+
+export async function runReorderCheck() {
+  return rpc('admin_reorder_check');
+}
+
 export async function listAgents() {
   const data = await rpc('admin_list_agents');
   return Array.isArray(data) ? data : [];

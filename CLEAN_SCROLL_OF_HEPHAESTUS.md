@@ -2173,3 +2173,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   fixed-income pricing note to a client_note and a two-generator rule to an oracle_rule, both
   cleanly reworded (migration 0062). The actual write into the repo Oracle still happens in a
   thread/PR by Claude; the Archivist does the triage and the polish.
+- **Vendors floor + reorder watcher (2026-06-08).** Twelfth floor: the `supplies` table (what you
+  buy + vendor + reorder cadence + a manual low flag) with a ninth agent, the reorder watcher
+  (deterministic, daily), which flags anything marked low or due on its cadence before you run out
+  on a route, and respects 'intentional'. Mark Ordered to reset the clock. Seeded with the known
+  consumables (shampoo, towels, #7 blades, oil, rotary bands, sanitizer, cologne); vendor + cadence
+  blank for Paul (migration 0063). Twelve floors live, nine agents.

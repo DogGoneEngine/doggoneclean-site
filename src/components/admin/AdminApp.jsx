@@ -20,6 +20,7 @@ import AuditView from './AuditView.jsx';
 import PricingView from './PricingView.jsx';
 import OperationsView from './OperationsView.jsx';
 import KnowledgeView from './KnowledgeView.jsx';
+import VendorsView from './VendorsView.jsx';
 import QuickCapture from './QuickCapture.jsx';
 import './admin.css';
 
@@ -48,7 +49,7 @@ const SECTIONS = [
     what: 'The lead funnel, the waitlist, referrals, retention, and a churn watch.' },
   { key: 'compliance', label: 'Compliance',    ready: true,
     what: 'Insurance and license renewals, A2P registration, payment-processor verification, and tax dates.' },
-  { key: 'vendors',   label: 'Vendors',        ready: false,
+  { key: 'vendors',   label: 'Vendors',        ready: true,
     what: 'Suppliers, reorder points, and the running-low tracker for shampoo, water, and parts.' },
   { key: 'knowledge', label: 'Knowledge base', ready: true,
     what: 'The wisdom inbox: reasons captured by the speed dial or by replying to an agent, on their way into the Oracle or a client record.' },
@@ -222,6 +223,7 @@ export default function AdminApp() {
         {section === 'pricing' && <PricingView />}
         {section === 'operations' && <OperationsView />}
         {section === 'knowledge' && <KnowledgeView />}
+        {section === 'vendors' && <VendorsView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
 
