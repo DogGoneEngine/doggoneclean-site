@@ -24,6 +24,7 @@ import VendorsView from './VendorsView.jsx';
 import GrowthView from './GrowthView.jsx';
 import CalendarView from './CalendarView.jsx';
 import HRView from './HRView.jsx';
+import GeographyView from './GeographyView.jsx';
 import QuickCapture from './QuickCapture.jsx';
 import './admin.css';
 
@@ -38,7 +39,7 @@ const SECTIONS = [
     what: 'Set your work days and work hours, block a date, open a Saturday. Your real availability per city.' },
   { key: 'clients',   label: 'Clients',        ready: true,
     what: 'The contact-sheet database. Each client’s semi-permanent header over a growing visit history.' },
-  { key: 'geography', label: 'Geography',      ready: false,
+  { key: 'geography', label: 'Geography',      ready: true,
     what: 'Service polygons, plus-code zones, and the drive-time perimeter that gates new signups.' },
   { key: 'operations', label: 'Operations',    ready: true,
     what: 'The trailer, wash system, generators, climate, and maintenance intervals. Pre-trip checklist and maintenance-due alerts.' },
@@ -230,6 +231,7 @@ export default function AdminApp() {
         {section === 'growth' && <GrowthView />}
         {section === 'calendar' && <CalendarView />}
         {section === 'hr' && <HRView />}
+        {section === 'geography' && <GeographyView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
 

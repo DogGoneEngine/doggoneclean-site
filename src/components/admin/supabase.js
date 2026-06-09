@@ -204,6 +204,10 @@ export async function hrSummary(windowDays = 30) {
   return rpc('admin_hr_summary', { p_window_days: windowDays });
 }
 
+export async function geographySummary() {
+  return rpc('admin_geography_summary');
+}
+
 export async function runWinbackCheck() {
   return rpc('admin_winback_check');
 }

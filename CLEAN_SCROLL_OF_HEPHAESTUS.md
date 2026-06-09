@@ -2247,3 +2247,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   work day, revenue, and the hardest day, over a window. Shows Paul as sole owner-operator and a
   "when to hire" note; scales into a team roster / commission split when he hires. Fifteen of
   sixteen floors live; only Geography remains.
+- **Geography floor; all 16 Orbit floors now live (2026-06-08).** Sixteenth and final floor: the
+  service cities (live status + whether a service-area perimeter is set) and the client distribution
+  by zone (`admin_geography_summary`, migration 0070). Data view now; the interactive Google Map (JS
+  API + polygon overlay + a pin per geocoded client) is the enhancement that sits on the same data.
+  With this, every floor of Clean's Orbit console is live: Today, Clients, Schedule, Finance,
+  Reports, Compliance, Settings, Audit, Pricing, Operations, Knowledge base, Vendors, Growth,
+  Calendar, HR, Geography. Ten agents on the clock (CFO, Compliance, Retention, Pricing, Bookkeeper,
+  Chief of Staff, Maintenance, Archivist, Reorder, Win-back). Remaining beyond the console: the
+  per-floor enhancements (the live map, the opt-in win-back email send, a one-step merge tool), the
+  other AI heads as data accrues (COO route optimizer is post-launch), and Mount Olympus (its own
+  repo + subdomain, the one piece needing Paul).
