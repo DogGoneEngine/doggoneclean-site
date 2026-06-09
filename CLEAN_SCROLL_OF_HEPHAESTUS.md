@@ -2213,3 +2213,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   'Donna Rodriguez' spelling variant recorded). Note: the legacy seed `legacy/data/clients.json`
   still holds these duplicates; the authoritative fix is in the live DB and these are flagged on
   the surviving records for Paul. Open: the duplicate Maggie/Mia dog rows and Chris's subscriber.
+- **Household merges fully resolved (2026-06-08, per Paul).** Lisa Irwin: Bella and Piper removed
+  (went to Paul's granddaughter), duplicate Mia removed; current dogs are Mia and Tao. Votos/Rodriguez:
+  the household subscriber was filed under Chris (an import artifact, 0 appointments), so it was moved
+  to Donna (account holder), the two Maggie rows combined into one (grooming specs + health history:
+  tumor removed, aging/unstable, handle gently), and Chris's empty record deleted. One clean household
+  record under Donna with one Maggie. Confirmed: banned and no-fly are a single list (the `nofly` flag);
+  `exclude_from_everything` was only ever plumbing for these merges, and the merged duplicates are now
+  deleted outright rather than left as excluded husks.
