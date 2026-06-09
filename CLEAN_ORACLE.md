@@ -1581,3 +1581,26 @@ calendar event for the field. No step starts until Paul says go. Because the cal
 live working tool and a half-done switch would silently drop appointments out of his view, and
 the calendar is also the durable Nails/Clean separation boundary that serves
 `clean_stays_saleable`. Full procedure parked in CLEAN_PARKING_LOT.md. Decided 2026-06-09.
+
+`client_dispositions_are_migrations` (Clean: clients):
+Operational client dispositions (no-fly bans, household merges, deceased / moved-away / test-account
+exclusions, archive, win-back suppression) are encoded as replayable migrations keyed by the
+client name, never left as manual one-off edits to the live database. The first such migration is
+`0077_client_cleanup.sql`. Because a prior round of exactly this cleanup (current-roster trimming
+and household merges) was done as manual database edits and was lost, almost certainly wiped when
+the database was reseeded from `legacy/data/clients.json`; migrations run after any seed, so a
+disposition written as a migration survives a reseed, a rebuild, and a context reset, while a
+manual edit does not. Keying by name (stable across reseeds) rather than id makes the migration
+re-apply correctly even when ids are regenerated. Decided 2026-06-09.
+
+`client_no_winback_flag` (Clean: clients):
+`clients.suppress_winback` leaves a client in the active book but out of the win-back agent, the
+lever for an active client who self-manages: a seasonal regular who rebooks on their own, a VIP, a
+client who is away part of the year. It is distinct from `exclude_from_everything` (which hides the
+record entirely) and from `archived_at` (dormant, auto-restored). `_winback_due_view` excludes
+suppressed clients. Mary Jane Hunt is the first: she is away roughly half the year and books her
+own block starting in October, so she should never be auto win-backed; once her future appointments
+are on the books the existing future-appointment guard also suppresses win-back on its own, but the
+flag holds regardless of how far out those appointments are or whether they have synced yet. Because
+nudging a client who manages their own cadence is noise that erodes the relationship, and the right
+control is a quiet per-client suppression, not a ban and not removal from the book. Decided 2026-06-09.
