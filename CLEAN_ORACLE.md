@@ -1683,6 +1683,18 @@ field on the sheet, transcribed as written; the dated visit history is not folde
 instructions (that would be interpretive), but the history itself is migrated separately as visit
 records, see `visit_history_migration`. Decided 2026-06-09.
 
+`time_is_money_is_source_of_truth` (Clean: clients):
+For DATES, TIMES, and DOLLAR AMOUNTS, the `time_is_money` import is the absolute source of truth, ranked
+above every other source (Google Calendar, the contact sheets, Acuity). On any conflict about when a
+visit happened or what was charged/paid, time_is_money wins. The contact sheets remain authoritative
+only for content time_is_money never captured: the per-dog vibe scores and Paul's per-visit notes. So
+the visit-history migration ENRICHES the existing time_is_money visits (keeping their dates and amounts)
+with the sheet's scores and notes; it never overwrites a date or an amount from a sheet, and when a
+sheet entry's date does not line up it is reconciled toward the time_is_money record rather than
+trusted over it. Because time_is_money is the system Paul actually ran the money and the schedule on, so
+it is the ledger of record; the sheets are his field notebook, trustworthy for observations, looser on
+exact dates and figures. Decided 2026-06-09.
+
 `visit_history_migration` (Clean: clients):
 The old contact-sheet visit history is MIGRATED into the new system, not abandoned. Paul's whole
 purpose in switching systems was to carry his data forward, and an earlier import had captured only the
