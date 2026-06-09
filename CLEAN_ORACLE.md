@@ -1490,3 +1490,24 @@ SMS-marketing consent rules, while a defined email category earns deliverability
 retention mechanism framed as genuine care for the dog serves the prime directive
 (leave everyone better off) and the moat, where a "we want you back" blast erodes
 both. Exact selling copy still to finalize with Paul. Decided 2026-06-08.
+
+---
+
+## Clients
+
+`no_fly_list` (Clean: clients):
+Clients on the no-fly list (`clients.nofly = true`, which also sets
+`exclude_from_everything` and `roster_group = 'banned'`, with a `nofly_reason`)
+receive no outreach of any kind and are excluded from every agent and every comms
+category. Paul manages the list himself from the Clients floor: a per-client "Put
+on no-fly list" control with a reason, plus a No-fly list panel to review and
+remove. It is kept distinct from `exclude_from_everything` alone, which also
+covers merged-alias records that should not surface but are not bans (a former
+name like Lisa Midgett -> Lisa Irwin, or a household duplicate like Chris Votos
+under Donna Rodriquez's account). Because some clients must never be contacted or
+served, and with outbound win-back email now in play a single missed exclusion
+could send an unwanted message to someone Paul has cut off; keeping the
+human-managed ban (with its reason) separate from data-hygiene exclusions keeps
+both correct, and putting the control in Paul's hands means he never has to ask
+to get someone off the list. The opt-in email send, when built, must also honor
+`exclude_from_everything`. Decided 2026-06-08.

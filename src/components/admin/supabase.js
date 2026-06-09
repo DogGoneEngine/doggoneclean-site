@@ -65,6 +65,15 @@ export async function getClient(clientId) {
   return rpc('admin_get_client', { p_client_id: clientId });
 }
 
+export async function setClientNofly(clientId, banned, reason = null) {
+  return rpc('admin_set_client_nofly', { p_client_id: clientId, p_banned: banned, p_reason: reason });
+}
+
+export async function listNofly() {
+  const data = await rpc('admin_list_nofly');
+  return Array.isArray(data) ? data : [];
+}
+
 export async function logVisit(v) {
   return rpc('admin_log_visit', {
     p_client_id:             v.clientId ?? null,

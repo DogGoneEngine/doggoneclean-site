@@ -2201,3 +2201,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   out, Lisa Midgett 14d 56d), not the 3-year-old archaeology the naive version hit (migration 0065).
   The Growth floor shows the candidate list + the calendar-room status. Capacity and max-window are
   tunable via app_secrets.
+- **No-fly list + client-record reconciliations (2026-06-08).** Built the self-serve no-fly/banned
+  list (Oracle `no_fly_list`, migration 0066): `clients.nofly` + `nofly_reason`, managed on the
+  Clients floor (per-client "Put on no-fly list" + a No-fly panel), kept distinct from
+  `exclude_from_everything` (which also covers merged aliases). Bonnie DiGraziano confirmed banned;
+  Lynne Bottomley added (no-fly per Paul; pulled from the win-back feed before any email could go
+  out). Live-DB record fixes (corrections, not schema): merged the duplicate "Lisa Midgett" into
+  "Lisa Irwin" (divorce name change; 59 visits consolidated, aka set), and merged Chris Votos's
+  visits into Donna Rodriquez (same household, shared account, dog Maggie; Chris kept excluded as a
+  household alias because of an active subscriber + duplicate Maggie dog still to reconcile, aka
+  'Donna Rodriguez' spelling variant recorded). Note: the legacy seed `legacy/data/clients.json`
+  still holds these duplicates; the authoritative fix is in the live DB and these are flagged on
+  the surviving records for Paul. Open: the duplicate Maggie/Mia dog rows and Chris's subscriber.

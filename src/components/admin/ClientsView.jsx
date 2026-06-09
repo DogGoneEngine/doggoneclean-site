@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit } from './supabase.js';
+import { listClients, getClient, logVisit, setClientNofly, listNofly } from './supabase.js';
 
 const SERVICE_LABELS = {
   full_groom: 'Full groom',
@@ -61,6 +61,8 @@ export default function ClientsView() {
     <>
       <h1>Clients</h1>
       <p className="ad-sub">The contact-sheet book. {clients.length} clients. Pick one to open its sheet.</p>
+
+      <NoFlyPanel onChanged={load} />
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 320px', minWidth: 280, maxWidth: 460 }}>
@@ -155,6 +157,7 @@ function ClientSheet({ clientId, onChanged }) {
           <h2 style={{ margin: 0 }}>{c.name}{c.aka ? <span className="ad-mono" style={{ marginLeft: 8, opacity: 0.6, fontSize: 14 }}>{c.aka}</span> : null}</h2>
           <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{c.roster_group} · {c.status}</span>
         </div>
+        <NoFlyControl client={c} onChanged={() => { load(); onChanged?.(); }} />
         <dl style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: '4px 14px', margin: '12px 0 0' }}>
           <Field label="Service" value={SERVICE_LABELS[c.service_type] || c.service_type} />
           <Field label="Frequency" value={c.cadence_days ? `every ${c.cadence_days} days${c.cadence_confidence ? ` (${c.cadence_confidence})` : ''}` : c.cadence_note} />
@@ -354,5 +357,80 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
         <button className="ad-btn ad-btn--ghost" type="button" onClick={() => setOpen(false)}>Cancel</button>
       </div>
     </form>
+  );
+}
+
+function NoFlyPanel({ onChanged }) {
+  const [list, setList] = useState(null);
+  const [open, setOpen] = useState(false);
+  const load = useCallback(async () => { try { setList(await listNofly()); } catch { setList([]); } }, []);
+  useEffect(() => { load(); }, [load]);
+  if (!list) return null;
+
+  async function remove(id) {
+    try { await setClientNofly(id, false); await load(); onChanged?.(); } catch { /* noop */ }
+  }
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16, borderLeft: '4px solid var(--ad-bad, #dc2626)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen((o) => !o)}>
+        <strong style={{ fontSize: 14 }}>No-fly list · {list.length}</strong>
+        <span style={{ fontSize: 12, opacity: 0.6 }}>{open ? 'hide' : 'show'}</span>
+      </div>
+      {open && (
+        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {list.length === 0 && <div style={{ opacity: 0.6, fontSize: 13 }}>No one is on the no-fly list. Open a client and use "Put on no-fly list".</div>}
+          {list.map((c) => (
+            <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, borderBottom: '1px solid var(--ad-outline, #ececf1)', paddingBottom: 4 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <strong>{c.name}</strong>{c.aka ? <span className="ad-mono" style={{ opacity: 0.55, marginLeft: 6 }}>{c.aka}</span> : null}
+                {c.reason ? <div style={{ fontSize: 12, opacity: 0.7 }}>{c.reason}</div> : null}
+              </div>
+              <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => remove(c.id)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NoFlyControl({ client, onChanged }) {
+  const [adding, setAdding] = useState(false);
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  async function ban() {
+    setBusy(true);
+    try { await setClientNofly(client.id, true, reason.trim() || null); setAdding(false); setReason(''); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+  async function unban() {
+    setBusy(true);
+    try { await setClientNofly(client.id, false); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+
+  if (client.nofly) {
+    return (
+      <div style={{ marginTop: 10, padding: '8px 10px', borderRadius: 8, background: 'rgba(220,38,38,0.08)', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <strong style={{ color: 'var(--ad-bad, #dc2626)', fontSize: 13 }}>ON NO-FLY LIST</strong>
+        {client.nofly_reason && <span style={{ fontSize: 13, opacity: 0.8, flex: 1 }}>{client.nofly_reason}</span>}
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={unban} disabled={busy}>Remove</button>
+      </div>
+    );
+  }
+  if (adding) {
+    return (
+      <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <input className="ad-input" placeholder="reason (do not serve / contact)" value={reason} onChange={(e) => setReason(e.target.value)} style={{ flex: '1 1 220px' }} autoFocus />
+        <button className="ad-btn ad-btn--sm" onClick={ban} disabled={busy}>Add to no-fly</button>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(false)}>Cancel</button>
+      </div>
+    );
+  }
+  return (
+    <div style={{ marginTop: 10 }}>
+      <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(true)}>Put on no-fly list</button>
+    </div>
   );
 }
