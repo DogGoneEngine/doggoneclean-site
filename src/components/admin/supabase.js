@@ -94,6 +94,27 @@ export async function getClient(clientId) {
   return rpc('admin_get_client', { p_client_id: clientId });
 }
 
+// Visit photos: upload straight from the phone (the Android picker reaches Google
+// Photos), into the private visit-photos bucket, viewed via short-lived signed URLs.
+const PHOTO_BUCKET = 'visit-photos';
+export async function uploadVisitPhoto(visitId, clientId, kind, file) {
+  const ext = (file.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `${clientId}/${visitId}/${kind}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, file, { contentType: file.type || 'image/jpeg', upsert: false });
+  if (error) throw new Error(error.message);
+  await rpc('admin_add_visit_photo', { p_visit_id: visitId, p_kind: kind, p_path: path });
+  return path;
+}
+export async function signedPhotoUrl(path, expirySeconds = 3600) {
+  const { data, error } = await sb().storage.from(PHOTO_BUCKET).createSignedUrl(path, expirySeconds);
+  if (error) throw new Error(error.message);
+  return data.signedUrl;
+}
+export async function deleteVisitPhoto(id, path) {
+  try { await sb().storage.from(PHOTO_BUCKET).remove([path]); } catch { /* row delete still proceeds */ }
+  return rpc('admin_delete_visit_photo', { p_id: id });
+}
+
 export async function setClientNofly(clientId, banned, reason = null) {
   return rpc('admin_set_client_nofly', { p_client_id: clientId, p_banned: banned, p_reason: reason });
 }

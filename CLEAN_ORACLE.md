@@ -1651,3 +1651,20 @@ Because the moat is the proprietary per-client knowledge Paul carries, and the w
 make capturing it as cheap as talking: the goal is that Paul interacts with the contact sheet the way
 he interacts with his GitHub, constantly but through an agent, never by hand. The voice-to-text is the
 phone's job; Riker takes no audio. The name is provisional. Decided 2026-06-09.
+Note: the `riker` edge function runs with verify_jwt off and handles CORS itself (the browser preflight
+fails under verify_jwt); auth is still enforced inside via `admin_riker_context` (raises for non-admins)
+and the apply RPC is independently admin-gated, so security is unchanged.
+
+`visit_photos_capture` (Clean: clients):
+Photos attach to a visit: a before, an after, a with-the-dog shot, and any extras. They are picked
+straight from Paul's phone (the Android picker reaches Google Photos; the input is `accept="image/*"`
+with no `capture`, so the gallery is offered, not just the camera) and uploaded to a PRIVATE Supabase
+Storage bucket `visit-photos`, recorded in `visit_photos` (visit_id, kind, storage_path), and viewed
+through short-lived signed URLs. Read and write are admin-only via storage RLS keyed on `_is_admin()`
+plus admin-gated RPCs (`admin_add_visit_photo`, `admin_delete_visit_photo`); `admin_get_client` returns
+each visit's photo rows and the client signs them. Labeled thumbnails show on each visit in the history.
+Because the photos are client property and a real part of the record Paul keeps, and the bucket must
+stay private and inside Clean's own project so the business stays sellable (`clean_stays_saleable`); the
+simplest intake that works on his Pixel (direct pick-and-upload) beats a Google Photos integration that
+would add a dependency to untangle at sale. Per-dog tagging and a Riker "add the photos?" handoff are
+later passes. Decided 2026-06-09.

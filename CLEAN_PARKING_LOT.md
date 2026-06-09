@@ -87,7 +87,14 @@ Build on top of the vibe score (done) and the visit model. Open choices for Paul
 one-tap confirm; how to pick the client when none is open (say the name); and the name (he said not
 "Riker"). Next build after he picks a direction.
 
-## Photos per dog per visit (2026-06-09)
+## Photos per visit: BUILT v1 2026-06-09 (visit_photos_capture)
+
+Shipped option 1 (direct pick-and-upload from the phone): before / after / with-dog slots + extras per
+visit, private bucket, signed URLs, thumbnails on each visit. Still open: per-dog tagging (v1 is
+visit-level), a Riker "add the photos?" handoff, and the fancier Google Photos API pull only if the
+direct picker proves annoying in the field. Original spec kept below.
+
+### Original spec / next passes
 
 Paul's real practice: for each dog-grooming appointment he takes three photos on his phone, a BEFORE,
 an AFTER, and an AFTERWARD shot of him with the dog, plus the option for extra photos (something he

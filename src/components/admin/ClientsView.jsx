@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { listClients, getClient, logVisit, setClientNofly, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
+import VisitPhotos from './VisitPhotos.jsx';
 
 const SERVICE_LABELS = {
   full_groom: 'Full groom',
@@ -283,6 +284,7 @@ function ClientSheet({ clientId, onChanged }) {
                     ))}
                   </div>
                 )}
+                <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} onChanged={load} />
               </div>
             ))}
           </div>
