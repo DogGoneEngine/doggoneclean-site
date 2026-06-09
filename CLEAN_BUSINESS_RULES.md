@@ -145,6 +145,7 @@ even DGN has many rules sitting in only one or two layers.
 | agent_when_value_beats_cost | Clean: engineering | Oracle; the `agents` registry + cheap edge-function/SQL agent pattern (CFO + Compliance live); new agents proposed to Paul before building | bookkeeper, retention, and pricing watcher agents |
 | talk_back_with_because | Clean: knowledge | Oracle; `briefing_notes` (two-way thread) + `wisdom` inbox (RLS-locked, admin-only); replies + intentional resolutions + the speed-dial quick-capture write wisdom; pricing/retention respect 'intentional'; the Archivist agent assigns home + scope | absorb wisdom into Oracle/client records; feed notes to the LLM agents |
 | winback_is_cadence_and_calendar_aware | Clean: growth | Oracle; the win-back agent (Growth floor) times off cadence+2wk (or ~90d for one-offs), flexes by calendar openness, surfaces only when there is room, and alerts when it is time but the calendar is full | win-back agent build against `bath_appointments` capacity |
+| winback_contact_email_opt_in | Clean: growth | Oracle; win-back sends email via Resend (never SMS) as a registered notification category; portal per-category preference (email or off); reuses `notification_log` + `notification_preferences` | win-back send wired into send-notification; portal preferences screen; final selling copy |
 
 ## How to add a row
 

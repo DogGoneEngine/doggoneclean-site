@@ -1472,3 +1472,21 @@ than silently lose the window. Because re-engagement timed to the client's own
 rhythm and to real available capacity converts, while an arbitrary ninety-day
 blast into a full calendar does not, and a quietly missed win-back window is lost
 revenue. Decided 2026-06-08.
+
+`winback_contact_email_opt_in` (Clean: growth):
+Win-back contact goes to the client by email, never SMS, and is a first-class
+registered communication type, not an ad-hoc send. It is sent through Resend
+(email; Twilio and SMS stay reserved for time-sensitive transactional messages
+like reminders and confirmations), logged like any official notification in
+`notification_log`, and governed by per-category preferences the client controls
+in the portal: for this category the choices are email or off, so a
+re-engagement nudge can never arrive as an intrusive text. It is presented to the
+client as an opt-in care feature, not a sales blast: framed around the dog's
+wellbeing first (a dog that goes too long between baths sheds and mats more and
+gets itchy skin), with the cleaner-home benefit second, and an easy unsubscribe.
+Because re-engagement by SMS reads as spam and pulls Clean into stricter
+SMS-marketing consent rules, while a defined email category earns deliverability
+(SPF/DKIM/DMARC through Resend) and a clean consent and opt-out story; and a
+retention mechanism framed as genuine care for the dog serves the prime directive
+(leave everyone better off) and the moat, where a "we want you back" blast erodes
+both. Exact selling copy still to finalize with Paul. Decided 2026-06-08.
