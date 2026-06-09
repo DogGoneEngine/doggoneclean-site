@@ -2115,3 +2115,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   test data per the existing caveat; the agents flag real patterns (e.g. retention caught Chester
   Weber 39 days out on a 21-day rhythm; pricing flagged four below-rate clients), which Paul
   reviews rather than treats as final truth.
+- **Pricing floor (10th... ) and Operations floor + maintenance watcher added.** Pricing is a
+  read-only view of the locked city price grid (`admin_pricing_grid`, migration 0056); prices are
+  a settled decision so it does not expose a casual editor. Operations/Field is the trailer and
+  gear with service intervals (`equipment` table, migration 0057), plus a seventh agent, the
+  maintenance watcher (deterministic, daily), which flags gear overdue for service before it
+  fails on a route. Seeded with the real Field Manual equipment (two redundant generators, dual
+  submersible bath pumps, high-velocity dryer, clippers + blades, rotary tool, water system,
+  trailer, tow vehicle); intervals left blank for Paul. Nine floors of the console now live.
+- **Doc-discipline correction:** decisions were landing in the Oracle but the build narrative was
+  not being appended to this log as it happened. Caught and corrected mid-thread; now appending a
+  bullet per shipped floor/agent per the Scroll update policy.
