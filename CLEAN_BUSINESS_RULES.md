@@ -147,6 +147,7 @@ even DGN has many rules sitting in only one or two layers.
 | winback_is_cadence_and_calendar_aware | Clean: growth | Oracle; the win-back agent (Growth floor) times off cadence+2wk (or ~90d for one-offs), flexes by calendar openness, surfaces only when there is room, and alerts when it is time but the calendar is full | win-back agent build against `bath_appointments` capacity |
 | winback_contact_email_opt_in | Clean: growth | Oracle; win-back sends email via Resend (never SMS) as a registered notification category; portal per-category preference (email or off); reuses `notification_log` + `notification_preferences` | win-back send wired into send-notification; portal preferences screen; final selling copy |
 | no_fly_list | Clean: clients | Oracle; `clients.nofly` + `nofly_reason` (sets `exclude_from_everything`); `admin_set_client_nofly` / `admin_list_nofly`; managed on the Clients floor; every agent + the win-back filter honor `exclude_from_everything` | the opt-in email send must also honor it |
+| households_search_by_any_name | Clean: clients | Oracle; `client_aliases` table + `admin_add_alias`/`admin_remove_alias`/`admin_list_aliases`; Clients-floor search matches name + aka + every alias; managed on the client sheet | one-step merge tool to fold a duplicate into a household |
 
 ## How to add a row
 

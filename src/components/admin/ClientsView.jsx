@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientNofly, listNofly } from './supabase.js';
+import { listClients, getClient, logVisit, setClientNofly, listNofly, listAliases, addAlias, removeAlias } from './supabase.js';
 
 const SERVICE_LABELS = {
   full_groom: 'Full groom',
@@ -54,7 +54,8 @@ export default function ClientsView() {
     return clients.filter((c) =>
       (c.name || '').toLowerCase().includes(q) ||
       (c.aka || '').toLowerCase().includes(q) ||
-      (c.location_zone || '').toLowerCase().includes(q));
+      (c.location_zone || '').toLowerCase().includes(q) ||
+      (c.aliases || []).some((a) => (a || '').toLowerCase().includes(q)));
   }, [clients, query]);
 
   return (
@@ -158,6 +159,7 @@ function ClientSheet({ clientId, onChanged }) {
           <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{c.roster_group} · {c.status}</span>
         </div>
         <NoFlyControl client={c} onChanged={() => { load(); onChanged?.(); }} />
+        <AliasManager clientId={clientId} onChanged={onChanged} />
         <dl style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: '4px 14px', margin: '12px 0 0' }}>
           <Field label="Service" value={SERVICE_LABELS[c.service_type] || c.service_type} />
           <Field label="Frequency" value={c.cadence_days ? `every ${c.cadence_days} days${c.cadence_confidence ? ` (${c.cadence_confidence})` : ''}` : c.cadence_note} />
@@ -390,6 +392,55 @@ function NoFlyPanel({ onChanged }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function AliasManager({ clientId, onChanged }) {
+  const [aliases, setAliases] = useState([]);
+  const [adding, setAdding] = useState(false);
+  const [val, setVal] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async () => { try { setAliases(await listAliases(clientId)); } catch { setAliases([]); } }, [clientId]);
+  useEffect(() => { load(); }, [load]);
+
+  async function add() {
+    if (!val.trim()) return;
+    setBusy(true);
+    try { await addAlias(clientId, val.trim()); setVal(''); setAdding(false); await load(); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+  async function remove(id) {
+    setBusy(true);
+    try { await removeAlias(id); await load(); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55, marginBottom: 4 }}>
+        Also known as / household names
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+        {aliases.map((a) => (
+          <span key={a.id} className="ad-mono" style={{ fontSize: 12, padding: '3px 8px', borderRadius: 8, background: 'var(--ad-surface-container-high, #eef1fb)', display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+            {a.alias}
+            <button onClick={() => remove(a.id)} disabled={busy} title="remove" style={{ border: 'none', background: 'none', cursor: 'pointer', opacity: 0.5, fontSize: 13, lineHeight: 1, padding: 0 }}>×</button>
+          </span>
+        ))}
+        {adding ? (
+          <span style={{ display: 'inline-flex', gap: 4 }}>
+            <input className="ad-input" autoFocus value={val} onChange={(e) => setVal(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && add()} placeholder="another name or spelling" style={{ width: 180, fontSize: 13, padding: '3px 6px' }} />
+            <button className="ad-btn ad-btn--sm" onClick={add} disabled={busy}>Add</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setAdding(false); setVal(''); }}>Cancel</button>
+          </span>
+        ) : (
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(true)}>+ name</button>
+        )}
+      </div>
+      <div style={{ fontSize: 11, opacity: 0.5, marginTop: 3 }}>Searching any of these names opens this household.</div>
     </div>
   );
 }

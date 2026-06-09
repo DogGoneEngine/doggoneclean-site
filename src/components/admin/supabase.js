@@ -74,6 +74,19 @@ export async function listNofly() {
   return Array.isArray(data) ? data : [];
 }
 
+export async function listAliases(clientId) {
+  const data = await rpc('admin_list_aliases', { p_client_id: clientId });
+  return Array.isArray(data) ? data : [];
+}
+
+export async function addAlias(clientId, alias) {
+  return rpc('admin_add_alias', { p_client_id: clientId, p_alias: alias });
+}
+
+export async function removeAlias(aliasId) {
+  return rpc('admin_remove_alias', { p_alias_id: aliasId });
+}
+
 export async function logVisit(v) {
   return rpc('admin_log_visit', {
     p_client_id:             v.clientId ?? null,

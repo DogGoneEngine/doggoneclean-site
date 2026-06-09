@@ -1511,3 +1511,16 @@ human-managed ban (with its reason) separate from data-hygiene exclusions keeps
 both correct, and putting the control in Paul's hands means he never has to ask
 to get someone off the list. The opt-in email send, when built, must also honor
 `exclude_from_everything`. Decided 2026-06-08.
+
+`households_search_by_any_name` (Clean: clients):
+A household is one client record that can carry any number of alternate names, and
+searching any of them opens the same household. The names come from spouses, former
+names (divorce), spelling variants, and other household members; they live in the
+`client_aliases` table, and the Clients-floor search matches the name, the aka, and
+every alias. Paul manages them on the client sheet ("Also known as / household
+names"). Because real households go by many names over the years (a maiden and a
+married name, a husband who books, a misspelled surname), and Paul must be able to
+type any one of them and land on the same record rather than create or chase a
+duplicate; a household split into two records is how visit history, cadence, and
+win-back timing all go wrong, which is exactly what happened with Chris Votos /
+Donna Rodriquez and Lisa Midgett / Lisa Irwin. Decided 2026-06-08.
