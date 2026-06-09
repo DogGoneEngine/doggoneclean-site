@@ -59,22 +59,31 @@ export default function TodayView({ onOpenClient }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {appts.map((a) => {
               const clickable = !!a.client_id;
+              const followups = a.followups || [];
               return (
-                <div
-                  key={a.id}
-                  onClick={clickable ? () => onOpenClient?.(a.client_id) : undefined}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, padding: '7px 6px', borderBottom: '1px solid var(--ad-outline, #ececf1)', cursor: clickable ? 'pointer' : 'default', borderRadius: 8 }}
-                  title={clickable ? 'Open contact sheet' : 'Unmatched import'}
-                >
-                  <span className="ad-mono" style={{ width: 72, opacity: 0.75 }}>{apptTime(a.scheduled_start)}</span>
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    {a.client
-                      ? <strong>{a.client}</strong>
-                      : <strong style={{ color: 'var(--ad-warn,#b9770a)' }}>{a.fallback ? `${a.fallback} (unmatched)` : 'Unmatched import'}</strong>}
-                    <span style={{ opacity: 0.6, fontSize: 12 }}> · {SERVICE_LABEL[a.service_type] || a.service_type || ''}{a.dog_count ? ` · ${a.dog_count} dog${a.dog_count === 1 ? '' : 's'}` : ''}{a.status === 'tentative' ? ' · pencilled' : ''}</span>
-                  </span>
-                  {a.amount_cents != null && a.amount_cents > 0 && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
-                  <span className="ad-mono" style={{ fontSize: 11, color: STATUS_TINT[a.status] || 'var(--ad-text-dim,#565b6c)' }}>{clickable ? '›' : ''}</span>
+                <div key={a.id} style={{ borderBottom: '1px solid var(--ad-outline, #ececf1)', padding: '7px 6px' }}>
+                  <div
+                    onClick={clickable ? () => onOpenClient?.(a.client_id) : undefined}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: clickable ? 'pointer' : 'default', borderRadius: 8 }}
+                    title={clickable ? 'Open contact sheet' : 'Unmatched import'}
+                  >
+                    <span className="ad-mono" style={{ width: 72, opacity: 0.75 }}>{apptTime(a.scheduled_start)}</span>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      {a.client
+                        ? <strong>{a.client}</strong>
+                        : <strong style={{ color: 'var(--ad-warn,#b9770a)' }}>{a.fallback ? `${a.fallback} (unmatched)` : 'Unmatched import'}</strong>}
+                      <span style={{ opacity: 0.6, fontSize: 12 }}> · {SERVICE_LABEL[a.service_type] || a.service_type || ''}{a.dog_count ? ` · ${a.dog_count} dog${a.dog_count === 1 ? '' : 's'}` : ''}{a.status === 'tentative' ? ' · pencilled' : ''}</span>
+                    </span>
+                    {a.amount_cents != null && a.amount_cents > 0 && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
+                    <span className="ad-mono" style={{ fontSize: 11, color: STATUS_TINT[a.status] || 'var(--ad-text-dim,#565b6c)' }}>{clickable ? '›' : ''}</span>
+                  </div>
+                  {followups.length > 0 && (
+                    <div style={{ marginTop: 4, marginLeft: 82, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {followups.map((f, i) => (
+                        <div key={i} style={{ fontSize: 12, color: 'var(--ad-warn, #b9770a)' }}>↳ ask{f.dog ? ` (${f.dog})` : ''}: {f.body}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}

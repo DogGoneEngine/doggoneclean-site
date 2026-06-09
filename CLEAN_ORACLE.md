@@ -1712,14 +1712,20 @@ those too. The live funnel's Confirm button is currently disabled pending Stripe
 waiting gate; mapping the message into a friendly funnel panel and an early in-funnel check are parked
 with the Stripe launch step. Decided 2026-06-09.
 
-`dog_follow_up` (Clean: clients):
-Each dog has a "ask / check next time" follow-up (`dogs.follow_up`), kept SEPARATE from
-`standing_instructions`. A standing instruction is how to groom the dog every time (8mm comb, hates the
-dryer); a follow-up is a one-time thing to check or ask on the next visit (ask about her belly, recheck
-the left ear). They were getting mingled (Donna's Fledge "ask about her belly" had landed in the
-instructions and was moved here). `admin_set_dog_followup`; both fields shown and editable per dog on
-the sheet. Because conflating a permanent instruction with a transient reminder makes both less
-trustworthy. Decided 2026-06-09.
+`dog_followup_lifecycle` (Clean: clients):
+A dog's "ask / check next time" follow-up is an OPEN LOOP, not a permanent field. Paul's point: it
+cannot just live there forever; he sees it at the next visit, asks, records the answer, and it closes
+into history. So it is a per-dog record in `dog_followups` (body, status open|resolved, resolution,
+created_at, resolved_at), not a text column (the earlier `dogs.follow_up` field from 0086 was migrated
+into open records and dropped in 0088). Open follow-ups show highlighted on the dog and surface on the
+Today stop (`admin_today_appointments` returns them) so he is reminded before he walks up; resolving one
+(`admin_resolve_dog_followup`, with what he found) moves it to the dog's collapsible past-follow-up
+history and off the open list. RPCs: `admin_add_dog_followup`, `admin_resolve_dog_followup`,
+`admin_drop_dog_followup`, `admin_list_dog_followups`. It is kept SEPARATE from `standing_instructions`
+(a permanent grooming instruction vs a transient reminder; Donna's Fledge "ask about her belly" was
+moved out of the instructions into a follow-up). Because a reminder with no resolution loop either nags
+forever or gets ignored, and the answer belongs in the history once he has it. Supersedes the
+field-only `dog_follow_up`. Decided 2026-06-09.
 
 `dog_birthday` (Clean: clients):
 Each dog has a birthday (`dogs.birth_date`) with an exact-or-estimated flag (`dogs.dob_approximate`),

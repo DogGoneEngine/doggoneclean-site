@@ -144,8 +144,19 @@ export async function setClientThoughts(clientId, text) {
   return rpc('admin_set_client_thoughts', { p_client_id: clientId, p_text: text });
 }
 
-export async function setDogFollowup(dogId, text) {
-  return rpc('admin_set_dog_followup', { p_dog_id: dogId, p_text: text });
+// Dog follow-ups (open -> resolved lifecycle).
+export async function listDogFollowups(dogId) {
+  const data = await rpc('admin_list_dog_followups', { p_dog_id: dogId });
+  return Array.isArray(data) ? data : [];
+}
+export async function addDogFollowup(dogId, body) {
+  return rpc('admin_add_dog_followup', { p_dog_id: dogId, p_body: body });
+}
+export async function resolveDogFollowup(id, resolution) {
+  return rpc('admin_resolve_dog_followup', { p_id: id, p_resolution: resolution });
+}
+export async function dropDogFollowup(id) {
+  return rpc('admin_drop_dog_followup', { p_id: id });
 }
 
 export async function setDogBirthday(dogId, birthDate, approximate) {

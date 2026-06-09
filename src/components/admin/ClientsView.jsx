@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setClientAccess, setClientOnsite, setClientPlus, setClientThoughts, setDogFollowup, setDogBirthday, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setClientAccess, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -814,9 +814,97 @@ function DogCard({ dog, onChanged }) {
       <DogField label="Standing instructions" value={dog.standing_instructions}
         placeholder="How to handle this dog every time (e.g. 8mm comb on body, hates the dryer, do nails first)"
         onSave={async (v) => { await setDogStanding(dog.id, v); onChanged?.(); }} />
-      <DogField label="Ask / check next time" value={dog.follow_up}
-        placeholder="A one-time follow-up for next visit (e.g. ask about her belly, recheck the left ear)"
-        onSave={async (v) => { await setDogFollowup(dog.id, v); onChanged?.(); }} />
+      <DogFollowups dogId={dog.id} />
+    </div>
+  );
+}
+
+// "Ask / check next time" as an open->resolved loop. Open items show highlighted
+// until Paul resolves one (records what he found), which moves it to a collapsible
+// past-follow-up history. Loads its own list so it stays fresh on each action.
+function DogFollowups({ dogId }) {
+  const [items, setItems] = useState(null);
+  const [adding, setAdding] = useState(false);
+  const [newBody, setNewBody] = useState('');
+  const [resolvingId, setResolvingId] = useState(null);
+  const [resolutionText, setResolutionText] = useState('');
+  const [showPast, setShowPast] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async () => { try { setItems(await listDogFollowups(dogId)); } catch { setItems([]); } }, [dogId]);
+  useEffect(() => { load(); }, [load]);
+
+  const open = (items || []).filter((f) => f.status === 'open');
+  const past = (items || []).filter((f) => f.status === 'resolved');
+
+  async function add() {
+    if (!newBody.trim()) return;
+    setBusy(true);
+    try { await addDogFollowup(dogId, newBody.trim()); setNewBody(''); setAdding(false); await load(); }
+    finally { setBusy(false); }
+  }
+  async function resolve(id) {
+    setBusy(true);
+    try { await resolveDogFollowup(id, resolutionText.trim() || null); setResolvingId(null); setResolutionText(''); await load(); }
+    finally { setBusy(false); }
+  }
+  async function drop(id) {
+    setBusy(true);
+    try { await dropDogFollowup(id); await load(); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ marginTop: 6 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5 }}>Ask / check next time</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+        {open.map((f) => (
+          <div key={f.id} style={{ padding: '6px 8px', borderRadius: 8, background: 'rgba(185,119,10,0.10)', borderLeft: '3px solid var(--ad-warn, #b9770a)' }}>
+            <div style={{ fontSize: 13 }}>{f.body}</div>
+            {resolvingId === f.id ? (
+              <div style={{ marginTop: 4 }}>
+                <input className="ad-input" autoFocus value={resolutionText} onChange={(e) => setResolutionText(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && resolve(f.id)} placeholder="What did you find / what's the answer?" style={{ width: '100%' }} />
+                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                  <button className="ad-btn ad-btn--sm" onClick={() => resolve(f.id)} disabled={busy}>Done</button>
+                  <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setResolvingId(null); setResolutionText(''); }}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                <button className="ad-btn ad-btn--sm" onClick={() => { setResolvingId(f.id); setResolutionText(''); }} disabled={busy}>Resolve</button>
+                <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => drop(f.id)} disabled={busy} title="Remove without recording">Drop</button>
+              </div>
+            )}
+          </div>
+        ))}
+        {adding ? (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <input className="ad-input" autoFocus value={newBody} onChange={(e) => setNewBody(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && add()} placeholder="e.g. ask about her belly, recheck the left ear" style={{ flex: '1 1 220px' }} />
+            <button className="ad-btn ad-btn--sm" onClick={add} disabled={busy}>Add</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setAdding(false); setNewBody(''); }}>Cancel</button>
+          </div>
+        ) : (
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ alignSelf: 'flex-start' }} onClick={() => setAdding(true)}>+ Add follow-up</button>
+        )}
+        {past.length > 0 && (
+          <div style={{ marginTop: 2 }}>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setShowPast((s) => !s)}>{showPast ? 'Hide' : 'Show'} past follow-ups · {past.length}</button>
+            {showPast && (
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {past.map((f) => (
+                  <div key={f.id} style={{ fontSize: 12, opacity: 0.75, borderLeft: '3px solid var(--ad-outline, #d9dbe6)', paddingLeft: 8 }}>
+                    <span style={{ textDecoration: 'line-through', opacity: 0.7 }}>{f.body}</span>
+                    {f.resolution ? <span> → {f.resolution}</span> : null}
+                    {f.resolved_at ? <span className="ad-mono" style={{ fontSize: 10, opacity: 0.6 }}> · {fmtDate(f.resolved_at)}</span> : null}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
