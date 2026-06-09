@@ -218,3 +218,25 @@ export async function exportExpenses(from = null, to = null) {
   const data = await rpc('admin_export_expenses', { p_from: from, p_to: to });
   return Array.isArray(data) ? data : [];
 }
+
+// Compliance ------------------------------------------------------------------
+
+export async function listCompliance() {
+  return rpc('admin_list_compliance');
+}
+
+export async function upsertComplianceItem(c) {
+  return rpc('admin_upsert_compliance_item', {
+    p_id: c.id ?? null, p_name: c.name, p_category: c.category ?? 'other', p_status: c.status ?? 'pending',
+    p_renewal_date: c.renewalDate ?? null, p_provider: c.provider ?? null, p_reference: c.reference ?? null,
+    p_amount_cents: c.amountCents ?? null, p_notes: c.notes ?? null, p_active: c.active ?? true,
+  });
+}
+
+export async function deleteComplianceItem(id) {
+  return rpc('admin_delete_compliance_item', { p_id: id });
+}
+
+export async function runComplianceCheck() {
+  return rpc('admin_compliance_check');
+}

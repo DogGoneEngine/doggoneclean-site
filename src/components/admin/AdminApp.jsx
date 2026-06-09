@@ -14,6 +14,7 @@ import ScheduleView from './ScheduleView.jsx';
 import TodayView from './TodayView.jsx';
 import FinanceView from './FinanceView.jsx';
 import ReportsView from './ReportsView.jsx';
+import ComplianceView from './ComplianceView.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
@@ -39,7 +40,7 @@ const SECTIONS = [
     what: 'You today, your specialists later. Roles, hours, pay, commission tiers, and onboarding.' },
   { key: 'growth',    label: 'Growth',         ready: false,
     what: 'The lead funnel, the waitlist, referrals, retention, and a churn watch.' },
-  { key: 'compliance', label: 'Compliance',    ready: false,
+  { key: 'compliance', label: 'Compliance',    ready: true,
     what: 'Insurance and license renewals, A2P registration, payment-processor verification, and tax dates.' },
   { key: 'vendors',   label: 'Vendors',        ready: false,
     what: 'Suppliers, reorder points, and the running-low tracker for shampoo, water, and parts.' },
@@ -209,6 +210,7 @@ export default function AdminApp() {
         {section === 'schedule' && <ScheduleView />}
         {section === 'finance' && <FinanceView />}
         {section === 'reports' && <ReportsView />}
+        {section === 'compliance' && <ComplianceView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
     </div>
