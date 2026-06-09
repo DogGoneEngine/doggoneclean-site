@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setClientAccess, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -216,7 +216,7 @@ function ClientSheet({ clientId, onChanged }) {
           // Regular roster (regular + occasional) shows up top; past/other dogs
           // (former + deceased) are kept but tucked into a collapsed section so the
           // name is always findable without cluttering the working roster.
-          const isPast = (d) => d.roster_status === 'former' || d.roster_status === 'deceased';
+          const isPast = (d) => d.roster_status === 'former' || d.roster_status === 'deceased' || d.roster_status === 'moved';
           const active = dogs.filter((d) => !isPast(d));
           const past = dogs.filter(isPast);
           const reload = () => { load(); onChanged?.(); };
@@ -439,7 +439,7 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
             1 unsafe / aggression, not eligible · 2 poor, conditional · 3 average · 4 cooperative · 5 a joy, anticipates you
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
-            {dogs.filter((d) => d.roster_status !== 'former' && d.roster_status !== 'deceased').map((d) => (
+            {dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status)).map((d) => (
               <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 14, minWidth: 90 }}>{d.name}</span>
                 <div style={{ display: 'flex', gap: 4 }}>
@@ -861,6 +861,7 @@ function DogStatusChip({ status }) {
   if (!status || status === 'regular') return null;
   const map = {
     occasional: { label: 'sometimes', bg: '#eef2ff', fg: '#3a44b0' },
+    moved: { label: 'moved', bg: '#fdf0e1', fg: '#9a5b1a' },
     former: { label: 'former', bg: '#f1f1f4', fg: '#666' },
     deceased: { label: 'deceased', bg: '#f1f1f4', fg: '#888' },
   };
@@ -880,13 +881,50 @@ function DogCard({ dog, onChanged }) {
         <strong>{dog.name}</strong>{dog.breed ? ` · ${dog.breed}` : ''}{dog.price_cents != null ? ` · ${money(dog.price_cents)}` : ''}
         <DogStatusChip status={dog.roster_status} />
       </div>
-      {dog.notes ? <div style={{ opacity: 0.7, marginTop: 2, fontSize: 12 }}>{dog.notes}</div> : null}
+      <DogField label="Notes" value={dog.notes}
+        placeholder="Anything about this dog (e.g. moved to Tampa, on psych meds, sister's dog)"
+        onSave={async (v) => { await setDogNote(dog.id, v); onChanged?.(); }} />
       <DogBirthday dog={dog} onChanged={onChanged} />
       <DogField label="Standing instructions" value={dog.standing_instructions}
         placeholder="How to handle this dog every time (e.g. 8mm comb on body, hates the dryer, do nails first)"
         onSave={async (v) => { await setDogStanding(dog.id, v); onChanged?.(); }} />
       <DogFollowups dogId={dog.id} />
+      <DogRosterControl dog={dog} onChanged={onChanged} />
     </div>
+  );
+}
+
+// The archive control: set a dog's standing on the roster (or restore it). Setting
+// it to moved/former/deceased takes the dog off the working roster (it folds into
+// "Past and other dogs") without ever deleting its record or history; setting it
+// back to regular restores it. Collapsed by default so it does not crowd the card.
+function DogRosterControl({ dog, onChanged }) {
+  const [busy, setBusy] = useState(false);
+  const status = dog.roster_status || 'regular';
+  const OPTIONS = [
+    ['regular', 'Regular'],
+    ['occasional', 'Sometimes'],
+    ['moved', 'Moved away'],
+    ['former', 'Former'],
+    ['deceased', 'Deceased'],
+  ];
+  async function change(v) {
+    if (v === status) return;
+    setBusy(true);
+    try { await setDogStatus(dog.id, v); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+  return (
+    <details style={{ marginTop: 6 }}>
+      <summary style={{ cursor: 'pointer', fontSize: 11, opacity: 0.55 }}>Roster status</summary>
+      <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <select value={status} disabled={busy} onChange={(e) => change(e.target.value)}
+          style={{ fontSize: 12, padding: '3px 6px', borderRadius: 6, border: '1px solid var(--ad-outline, #d9dbe6)' }}>
+          {OPTIONS.map(([v, label]) => (<option key={v} value={v}>{label}</option>))}
+        </select>
+        <span style={{ fontSize: 11, opacity: 0.5 }}>archive without losing the record</span>
+      </div>
+    </details>
   );
 }
 

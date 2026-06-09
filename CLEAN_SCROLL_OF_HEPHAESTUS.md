@@ -167,6 +167,10 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-09 (archive dogs: a reversible way to take a dog off the roster)
+
+Kevin Cummings's Ace and Kage moved to Tampa and may or may not return, which surfaced that there has to be a way to archive a dog. Built it as the natural extension of roster_status (0107): added a 'moved' status (relocated, may return), an `admin_set_dog_status` RPC and an `admin_set_dog_note` RPC, and a "Roster status" control on each dog card (a small selector: Regular / Sometimes / Moved away / Former / Deceased) plus an editable Notes field. Archiving is just setting the status to moved/former/deceased: the dog folds into "Past and other dogs", drops out of the visit-logging vibe selector, and is never deleted; restoring is the same control back to Regular. Ace and Kage set to moved with a "Moved to Tampa" note. Archiving is reversible and lose-nothing by construction.
+
 ### 2026-06-09 (dog roster status: keep every dog, separate the regular working roster)
 
 Follow-on to lose-nothing: Andy died, and Tonya's real working roster is Kai and Lydia with Koa and Ruthie sometimes. So `dogs` gained a `roster_status` (regular / occasional / former / deceased, default regular; migration 0106). The contact sheet now shows the regular roster up top, each dog carrying a quiet status chip ("sometimes" for occasional), and folds former/deceased dogs into a collapsed "Past and other dogs" section, so a name Paul hears is always findable without cluttering the working roster ("so if she mentions a dog's name I won't be like who the fuck was that"). The visit-logging vibe-score selector only offers current dogs (regular + occasional), never the deceased. Andy marked deceased; Chloe's Whiskey and Skout deceased, Louie regular. Flows to the UI for free through `admin_get_client`'s `to_jsonb(d.*)`.
