@@ -167,6 +167,10 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-09 (visit-history migration progress: 19 clients)
+
+Running tally of the visit-history migration (all on main, migrations 0090-0109). Done with full or near-full history: Jane Henrich, Willie, Ginger Fink, Michelle Reiners, Cynthia Tieche, Lisa Irwin, Barbara Lape, Chester Weber, Ray Russell, Donna DiPasqua, Harriet Woolf, Marilyn Jamison, Mary Beth Anderson, Nancy Franklin, Amy Blessing, Tonya Hunt, Chloe Castellano, Kevin Cummings (recent only; older tail pending), Heather Albinson. Steve Crandall confirmed empty (nail-only). Remaining with dogs (~30): Erich Blunt (3 poodles, only Koby in DB so far), Ligia Amyotte, Mary Jane Hunt, Greta Custer, Jeanne Leuenberger, Patricia Angelucci, Hope Brooks, Lisa Prater, Bradley Johnson, Linda Giza, Sally O'Laughlin, Peter Moran, Debra Koerner, Donna Rodriquez/Chris Votos, and the lighter one-offs. Carry-forward cleanup: Kevin's pre-Oct-2024 tail; fold Cynthia's guest dog Stella and Mary Beth's guest Benji into visit_notes to match the lose-nothing standard.
+
 ### 2026-06-09 (archive dogs: a reversible way to take a dog off the roster)
 
 Kevin Cummings's Ace and Kage moved to Tampa and may or may not return, which surfaced that there has to be a way to archive a dog. Built it as the natural extension of roster_status (0107): added a 'moved' status (relocated, may return), an `admin_set_dog_status` RPC and an `admin_set_dog_note` RPC, and a "Roster status" control on each dog card (a small selector: Regular / Sometimes / Moved away / Former / Deceased) plus an editable Notes field. Archiving is just setting the status to moved/former/deceased: the dog folds into "Past and other dogs", drops out of the visit-logging vibe selector, and is never deleted; restoring is the same control back to Regular. Ace and Kage set to moved with a "Moved to Tampa" note. Archiving is reversible and lose-nothing by construction.
