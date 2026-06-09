@@ -2270,3 +2270,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the authoritative source (Acuity vs Google Calendar), import the full schedule, and match every
   appointment to a client. Needs Paul's input on the source and access. Until then, both the Calendar
   floor and win-back run on partial data.
+- **Calendar source confirmed: Google Calendar (2026-06-08).** Paul's authoritative schedule is his
+  primary Google Calendar (`nickerson.paul@gmail.com`, America/New_York), fed by Acuity. Each event
+  carries the full booking detail in its description (Name, Phone, Email, Address, dog type, Price,
+  AcuityID) and a summary like "Eric Shannon: Zip Code 34470: Groom 2 Dogs (Dog Gone Clean)";
+  recurring manual ones are just the client name; "Reserve" blocks are not appointments. Confirmed
+  the app is missing nearly the whole real schedule (e.g. Eric Shannon Thu Jun 11 3pm is in GCal but
+  not in `bath_appointments`). PLAN for the real sync (to build, with care, not blind): pull events
+  from the primary calendar via the Calendar tool, key each on the AcuityID (or gcal event id) so
+  re-runs are idempotent, match to an EXISTING client by name + `client_aliases` + email (never
+  auto-create, to avoid the duplicate mess just cleaned), get-or-create that client's subscriber,
+  upsert the appointment, skip Reserve blocks, and return the unmatched names for Paul to resolve.
+  A recurring auto-sync later needs the app to hold its own Google Calendar credentials (infra).
