@@ -8,7 +8,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { calendar } from './supabase.js';
 
 const SERVICE = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
-const STATUS_COLOR = { confirmed: 'var(--ad-good,#1f8a4b)', requested: 'var(--ad-warn,#b9770a)', completed: 'var(--ad-text-dim,#565b6c)', cancelled: 'var(--ad-bad,#dc2626)', no_show: 'var(--ad-bad,#dc2626)' };
+const STATUS_COLOR = { confirmed: 'var(--ad-good,#1f8a4b)', tentative: 'var(--ad-accent,#2563eb)', requested: 'var(--ad-warn,#b9770a)', completed: 'var(--ad-text-dim,#565b6c)', cancelled: 'var(--ad-bad,#dc2626)', no_show: 'var(--ad-bad,#dc2626)' };
+// A tentative appointment is one you pencilled in with a trailing "?" in your
+// calendar. It is your private placeholder and never shown to the client; here
+// in your own operator view it reads as "pencilled" so you can tell it apart.
+const STATUS_LABEL = { tentative: 'pencilled' };
 
 function money(c) { return c == null ? '' : '$' + Math.round(c / 100); }
 function dayKey(ts) { return new Date(ts).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }); }
@@ -72,7 +76,7 @@ export default function CalendarView() {
                       <span style={{ opacity: 0.6, fontSize: 12 }}> · {SERVICE[a.service_type] || a.service_type || ''}{a.dog_count ? ` · ${a.dog_count} dog${a.dog_count === 1 ? '' : 's'}` : ''}</span>
                     </span>
                     {a.amount_cents != null && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
-                    <span className="ad-mono" style={{ fontSize: 11, color: STATUS_COLOR[a.status] || 'var(--ad-text-dim,#565b6c)', width: 76, textAlign: 'right' }}>{a.status}</span>
+                    <span className="ad-mono" style={{ fontSize: 11, color: STATUS_COLOR[a.status] || 'var(--ad-text-dim,#565b6c)', fontStyle: a.status === 'tentative' ? 'italic' : 'normal', width: 76, textAlign: 'right' }}>{STATUS_LABEL[a.status] || a.status}</span>
                   </div>
                 ))}
               </div>

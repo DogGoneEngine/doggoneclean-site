@@ -1491,6 +1491,25 @@ retention mechanism framed as genuine care for the dog serves the prime directiv
 (leave everyone better off) and the moat, where a "we want you back" blast erodes
 both. Exact selling copy still to finalize with Paul. Decided 2026-06-08.
 
+`tentative_marker_is_private` (Clean: growth):
+A trailing "?" on a Google Calendar appointment title is Paul's private
+placeholder so he does not forget a pencilled slot; it is never a client-facing
+thing. The "?" character itself is never stored in any column: the sync strips it
+for client matching and translates it into an internal `status = 'tentative'` on
+`bath_appointments` (distinct from `'confirmed'`). A tentative appointment is a
+SOFT booking, not a confirmed one. It is treated as real planned time
+everywhere internal: it excludes the client from win-back (a "?" client is by
+definition not forgotten) and counts toward the win-back calendar-capacity check,
+exactly like a confirmed appointment. But it is operator-only: in Paul's own
+Calendar floor it reads as "pencilled," and it must never surface on any
+client-facing surface (win-back or care email, portal, SMS) nor ever be presented
+to a client as a confirmed booking. The sync only owns the tentative/confirmed
+distinction; once an appointment has moved past that (on_the_way through completed,
+or cancelled) the sync does not downgrade it. Because the "?" is Paul's note to
+himself and exposing it, or treating a pencilled slot as a firm commitment to the
+client, would both break trust; while still honoring it as planned time keeps the
+calendar and win-back honest. Decided 2026-06-09.
+
 ---
 
 ## Clients
