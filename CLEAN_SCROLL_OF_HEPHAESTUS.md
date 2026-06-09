@@ -2165,3 +2165,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   live to triage it (inbox -> filed). Oracle rule `talk_back_with_because` (migration 0061).
   Eleven floors now live. Open: absorb wisdom into the Oracle/client records (by me or an agent),
   and feed the notes into the LLM agents' context.
+- **The Archivist agent (the wisdom absorber, 2026-06-08).** Eighth agent: an LLM edge function
+  (`wisdom-absorb`, daily, secret-gated) that reads the wisdom inbox and proposes where each note
+  belongs (oracle_rule / client_note / parking_lot / field_manual / drop) rewritten in clean
+  because-form, recommend-only. Proposals show under each inbox item on the Knowledge Base floor;
+  Paul files. Self-healing: it re-queues anything it could not place in a run. Verified: triaged a
+  fixed-income pricing note to a client_note and a two-generator rule to an oracle_rule, both
+  cleanly reworded (migration 0062). The actual write into the repo Oracle still happens in a
+  thread/PR by Claude; the Archivist does the triage and the polish.

@@ -75,10 +75,23 @@ export default function KnowledgeView() {
   );
 }
 
+const HOME_LABEL = {
+  oracle_rule: 'Oracle rule', client_note: 'client note', parking_lot: 'parking lot',
+  field_manual: 'field manual', drop: 'drop',
+};
+
 function Card({ w, onFile, filed }) {
   return (
     <div className="ad-panel" style={{ opacity: filed ? 0.65 : 1, padding: '10px 12px' }}>
       <div style={{ fontSize: 14, lineHeight: 1.45 }}>{w.body}</div>
+      {w.proposed_home && !filed && (
+        <div style={{ marginTop: 8, paddingLeft: 10, borderLeft: '3px solid var(--ad-primary, #2563d8)' }}>
+          <div className="ad-mono" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5 }}>
+            Archivist proposes · {HOME_LABEL[w.proposed_home] || w.proposed_home}
+          </div>
+          {w.proposed_text && <div style={{ fontSize: 13, opacity: 0.85, marginTop: 2 }}>{w.proposed_text}</div>}
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
         <span className="ad-mono" style={{ fontSize: 11, opacity: 0.55 }}>
           {w.scope}{w.client ? ` · ${w.client}` : ''} · {w.source === 'briefing' ? 'from a reply' : 'captured'} · {fmt(w.created_at)}
