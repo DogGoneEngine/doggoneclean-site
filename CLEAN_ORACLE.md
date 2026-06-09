@@ -1403,3 +1403,16 @@ can prompt past and a buyer can simply purchase, while the un-promptable moat is
 the operational intelligence tied to this specific business (revenue per hour,
 route economics, where the money leaks). QuickBooks or a bookkeeper stays the
 system of record for taxes, and this console feeds it. Decided 2026-06-08.
+
+`per_business_books` (Clean: finance):
+Each business keeps its books only in its own Supabase project. Clean's expenses,
+recurring costs, CFO, and bookkeeping live in dgc-prod; Nails' live in dgn-prod;
+and each new business gets its own, with one bank account per business feeding
+its own ledger and never crossing. The top level (Mount Olympus) shows a
+read-only consolidated view across businesses (total in, total out, net), but it
+never stores a shared ledger: the cross-business picture is computed from each
+project at view time, not held in a store that spans them. Shared costs that
+serve more than one business are paid by each from its own account where
+possible, or tagged and split when one account pays for several. Because
+clean_stays_saleable: a business's books must leave cleanly with it if it is ever
+sold, so they can never be commingled. Decided 2026-06-08.

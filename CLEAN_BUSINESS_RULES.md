@@ -141,6 +141,7 @@ even DGN has many rules sitting in only one or two layers.
 | clients_not_subscribers | Clean: data model | Oracle; convention (never surface "subscriber"/"subscription" in copy or UI); the `bath_*` table rename is parked in `CLEAN_PARKING_LOT.md` | `bath_*` table rename; portal/admin labels say "client" + "recurring schedule" |
 | expense_ledger_clean_start | Clean: finance | Oracle; the `expenses` ledger starts empty and bank imports are go-forward only (no historical backfill); revenue trends predate it | CFO net-profit from the cutover; bookkeeper review pass |
 | books_complement_not_replace | Clean: finance | Oracle; `expenses` + `recurring_costs` stay a management layer (no double-entry, tax-form, or payroll schema) | categorized CSV export for the accountant |
+| per_business_books | Clean: finance | Oracle; each business's ledger lives only in its own Supabase project (Clean in dgc-prod, never shared with dgn-prod); one bank account per business | Mount Olympus read-only consolidated rollup; shared-cost split tagging |
 
 ## How to add a row
 
