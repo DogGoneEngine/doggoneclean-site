@@ -47,13 +47,16 @@ function useIsNarrow(maxWidth = 760) {
   return narrow;
 }
 
-export default function ClientsView() {
+export default function ClientsView({ focus = null }) {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const narrow = useIsNarrow();
+
+  // Opened from another floor (e.g. a Today stop): focus that client's sheet.
+  useEffect(() => { if (focus && focus.id) setSelectedId(focus.id); }, [focus?.id, focus?.n]);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);

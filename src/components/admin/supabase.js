@@ -226,6 +226,11 @@ export async function listBriefings(department = null, status = null) {
   return Array.isArray(data) ? data : [];
 }
 
+export async function todayAppointments() {
+  const data = await rpc('admin_today_appointments');
+  return Array.isArray(data) ? data : [];
+}
+
 export async function setBriefingStatus(id, status) {
   return rpc('admin_set_briefing_status', { p_id: id, p_status: status });
 }
@@ -255,8 +260,7 @@ export async function growthSummary() {
   return rpc('admin_growth_summary');
 }
 
-export async function calendar(daysBack = 7, daysForward = 30) {
-  const data = await rpc('admin_calendar', { p_days_back: daysBack, p_days_forward: daysForward });
+export async function calendar(daysBack = 7, daysForward = 30) {  const data = await rpc('admin_calendar', { p_days_back: daysBack, p_days_forward: daysForward });
   return Array.isArray(data) ? data : [];
 }
 

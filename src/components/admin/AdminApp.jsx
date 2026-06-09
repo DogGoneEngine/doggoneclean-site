@@ -80,8 +80,13 @@ export default function AdminApp() {
     return 'today';
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [clientFocus, setClientFocus] = useState({ id: null, n: 0 });
   const closeDrawer = () => setDrawerOpen(false);
   const pickSection = (key) => { setSection(key); setDrawerOpen(false); };
+  // Open a client's contact sheet from anywhere (e.g. a Today stop): jump to the
+  // Clients floor and focus that record. The bumping nonce lets the same client
+  // be re-opened on a later click.
+  const openClient = (id) => { if (!id) return; setClientFocus((f) => ({ id, n: f.n + 1 })); setSection('clients'); setDrawerOpen(false); };
 
   useEffect(() => {
     let mounted = true;
@@ -216,8 +221,8 @@ export default function AdminApp() {
       </aside>
 
       <main className="ad-main">
-        {section === 'today' && <TodayView />}
-        {section === 'clients' && <ClientsView />}
+        {section === 'today' && <TodayView onOpenClient={openClient} />}
+        {section === 'clients' && <ClientsView focus={clientFocus} />}
         {section === 'schedule' && <ScheduleView />}
         {section === 'finance' && <FinanceView />}
         {section === 'reports' && <ReportsView />}

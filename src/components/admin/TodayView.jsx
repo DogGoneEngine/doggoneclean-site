@@ -7,8 +7,12 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
+
+const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
+const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
+function apptTime(ts) { try { return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ''; } }
 
 const SEV = {
   alert:  { color: '#dc2626', label: 'Alert' },
@@ -17,18 +21,20 @@ const SEV = {
 };
 function money(c) { return c == null ? null : '$' + (c / 100).toFixed(2).replace(/\.00$/, ''); }
 
-export default function TodayView() {
+export default function TodayView({ onOpenClient }) {
   const [briefings, setBriefings] = useState([]);
   const [agents, setAgents] = useState([]);
+  const [appts, setAppts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const [b, a] = await Promise.all([listBriefings(), listAgents()]);
+      const [b, a, t] = await Promise.all([listBriefings(), listAgents(), todayAppointments()]);
       setBriefings(b.filter((x) => x.status === 'new' || x.status === 'read'));
       setAgents(a);
+      setAppts(t);
     } catch (e) { setError(e.message || 'load_failed'); }
     finally { setLoading(false); }
   }, []);
@@ -40,7 +46,41 @@ export default function TodayView() {
   return (
     <>
       <h1>Today</h1>
-      <p className="ad-sub">{today}. Your department heads work around the clock and leave their findings here. Talk back to any of them.</p>
+      <p className="ad-sub">{today}. Your stops for the day, then the feed from your AI department heads. Talk back to any of them.</p>
+
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Today's stops</div>
+          <span style={{ fontSize: 12, opacity: 0.6 }}>{appts.length} {appts.length === 1 ? 'stop' : 'stops'}</span>
+        </div>
+        {appts.length === 0 ? (
+          <div style={{ opacity: 0.65, fontSize: 14 }}>Nothing on the calendar for today.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {appts.map((a) => {
+              const clickable = !!a.client_id;
+              return (
+                <div
+                  key={a.id}
+                  onClick={clickable ? () => onOpenClient?.(a.client_id) : undefined}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, padding: '7px 6px', borderBottom: '1px solid var(--ad-outline, #ececf1)', cursor: clickable ? 'pointer' : 'default', borderRadius: 8 }}
+                  title={clickable ? 'Open contact sheet' : 'Unmatched import'}
+                >
+                  <span className="ad-mono" style={{ width: 72, opacity: 0.75 }}>{apptTime(a.scheduled_start)}</span>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    {a.client
+                      ? <strong>{a.client}</strong>
+                      : <strong style={{ color: 'var(--ad-warn,#b9770a)' }}>{a.fallback ? `${a.fallback} (unmatched)` : 'Unmatched import'}</strong>}
+                    <span style={{ opacity: 0.6, fontSize: 12 }}> · {SERVICE_LABEL[a.service_type] || a.service_type || ''}{a.dog_count ? ` · ${a.dog_count} dog${a.dog_count === 1 ? '' : 's'}` : ''}{a.status === 'tentative' ? ' · pencilled' : ''}</span>
+                  </span>
+                  {a.amount_cents != null && a.amount_cents > 0 && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
+                  <span className="ad-mono" style={{ fontSize: 11, color: STATUS_TINT[a.status] || 'var(--ad-text-dim,#565b6c)' }}>{clickable ? '›' : ''}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       <RikerCapture onApplied={load} />
 
