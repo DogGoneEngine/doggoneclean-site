@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientNofly, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -193,7 +193,7 @@ function ClientSheet({ clientId, onChanged }) {
           <h2 style={{ margin: 0 }}>{c.name}{c.aka ? <span className="ad-mono" style={{ marginLeft: 8, opacity: 0.6, fontSize: 14 }}>{c.aka}</span> : null}</h2>
           <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{c.roster_group} · {c.status}</span>
         </div>
-        <NoFlyControl client={c} onChanged={() => { load(); onChanged?.(); }} />
+        {c.nofly_level && <StatusBadge level={c.nofly_level} reason={c.nofly_reason} />}
         <AliasManager clientId={clientId} onChanged={onChanged} />
         <dl style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: '4px 14px', margin: '12px 0 0' }}>
           <Field label="Service" value={SERVICE_LABELS[c.service_type] || c.service_type} />
@@ -212,12 +212,9 @@ function ClientSheet({ clientId, onChanged }) {
         {dogs.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Dogs</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {dogs.map((d) => (
-                <div key={d.id} className="ad-mono" style={{ fontSize: 13, border: '1px solid var(--ad-outline, #d9dbe6)', borderRadius: 10, padding: '6px 10px' }}>
-                  <strong>{d.name}</strong>{d.breed ? ` · ${d.breed}` : ''}{d.price_cents != null ? ` · ${money(d.price_cents)}` : ''}
-                  {d.notes ? <div style={{ opacity: 0.7, marginTop: 2 }}>{d.notes}</div> : null}
-                </div>
+                <DogCard key={d.id} dog={d} onChanged={() => { load(); onChanged?.(); }} />
               ))}
             </div>
           </div>
@@ -293,6 +290,10 @@ function ClientSheet({ clientId, onChanged }) {
           </div>
         )}
       </div>
+
+      {/* Client status (shadow ban / hard ban). Tucked at the bottom on purpose:
+          a rare, deliberate action, not something to fat-finger from the header. */}
+      <ClientStatusControl client={c} onChanged={() => { load(); onChanged?.(); }} />
     </div>
   );
 }
@@ -459,8 +460,9 @@ function NoFlyPanel({ onChanged }) {
   if (!list) return null;
 
   async function remove(id) {
-    try { await setClientNofly(id, false); await load(); onChanged?.(); } catch { /* noop */ }
+    try { await setClientStatus(id, null); await load(); onChanged?.(); } catch { /* noop */ }
   }
+  if (list.length === 0) return null;
   return (
     <div className="ad-panel" style={{ marginBottom: 16, borderLeft: '4px solid var(--ad-bad, #dc2626)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen((o) => !o)}>
@@ -469,11 +471,11 @@ function NoFlyPanel({ onChanged }) {
       </div>
       {open && (
         <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {list.length === 0 && <div style={{ opacity: 0.6, fontSize: 13 }}>No one is on the no-fly list. Open a client and use "Put on no-fly list".</div>}
           {list.map((c) => (
             <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, borderBottom: '1px solid var(--ad-outline, #ececf1)', paddingBottom: 4 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <strong>{c.name}</strong>{c.aka ? <span className="ad-mono" style={{ opacity: 0.55, marginLeft: 6 }}>{c.aka}</span> : null}
+                <span className="ad-mono" style={{ fontSize: 10, marginLeft: 8, padding: '1px 6px', borderRadius: 6, color: c.level === 'banned' ? 'var(--ad-bad, #dc2626)' : 'var(--ad-warn, #b9770a)', background: c.level === 'banned' ? 'rgba(220,38,38,0.10)' : 'rgba(185,119,10,0.10)' }}>{c.level === 'banned' ? 'banned' : 'shadow'}</span>
                 {c.reason ? <div style={{ fontSize: 12, opacity: 0.7 }}>{c.reason}</div> : null}
               </div>
               <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => remove(c.id)}>Remove</button>
@@ -575,43 +577,105 @@ function AliasManager({ clientId, onChanged }) {
   );
 }
 
-function NoFlyControl({ client, onChanged }) {
-  const [adding, setAdding] = useState(false);
+// A quiet status banner in the header, shown only when a status is actually set.
+function StatusBadge({ level, reason }) {
+  const banned = level === 'banned';
+  return (
+    <div style={{ marginTop: 8, padding: '4px 8px', borderRadius: 8, display: 'inline-flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', background: banned ? 'rgba(220,38,38,0.10)' : 'rgba(185,119,10,0.10)' }}>
+      <strong style={{ fontSize: 12, color: banned ? 'var(--ad-bad, #dc2626)' : 'var(--ad-warn, #b9770a)' }}>{banned ? 'BANNED' : 'SHADOW BAN'}</strong>
+      {reason && <span style={{ fontSize: 12, opacity: 0.8 }}>{reason}</span>}
+    </div>
+  );
+}
+
+// One dog: header line, condition notes, and the editable standing instructions
+// (the semi-permanent "how to handle this dog every time" from the contact sheet).
+function DogCard({ dog, onChanged }) {
+  const [editing, setEditing] = useState(false);
+  const [val, setVal] = useState(dog.standing_instructions || '');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setVal(dog.standing_instructions || ''); }, [dog.standing_instructions]);
+
+  async function save() {
+    setBusy(true);
+    try { await setDogStanding(dog.id, val); setEditing(false); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ border: '1px solid var(--ad-outline, #d9dbe6)', borderRadius: 10, padding: '8px 10px' }}>
+      <div className="ad-mono" style={{ fontSize: 13 }}>
+        <strong>{dog.name}</strong>{dog.breed ? ` · ${dog.breed}` : ''}{dog.price_cents != null ? ` · ${money(dog.price_cents)}` : ''}
+      </div>
+      {dog.notes ? <div style={{ opacity: 0.7, marginTop: 2, fontSize: 12 }}>{dog.notes}</div> : null}
+      <div style={{ marginTop: 6 }}>
+        <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5 }}>Standing instructions</div>
+        {editing ? (
+          <div style={{ marginTop: 4 }}>
+            <textarea className="ad-textarea" rows={3} value={val} onChange={(e) => setVal(e.target.value)} style={{ width: '100%' }}
+              placeholder="How to handle this dog every time (e.g. muzzle for the back feet, start at the rear, hates the dryer, do nails first)" />
+            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+              <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+              <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setVal(dog.standing_instructions || ''); setEditing(false); }}>Cancel</button>
+            </div>
+          </div>
+        ) : dog.standing_instructions ? (
+          <div style={{ fontSize: 13, marginTop: 2, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+            <span style={{ flex: 1 }}>{dog.standing_instructions}</span>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
+          </div>
+        ) : (
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ marginTop: 2 }} onClick={() => setEditing(true)}>+ Add standing instructions</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Client status (shadow ban / hard ban). Collapsed by default and parked at the
+// bottom of the sheet on purpose: a rare, deliberate action, not a header button
+// to fat-finger. Shadow ban keeps the client but stops all solicitation; a hard
+// ban removes them everywhere.
+function ClientStatusControl({ client, onChanged }) {
+  const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);
+  const current = client.nofly_level;
 
-  async function ban() {
+  async function apply(level) {
     setBusy(true);
-    try { await setClientNofly(client.id, true, reason.trim() || null); setAdding(false); setReason(''); onChanged?.(); }
-    finally { setBusy(false); }
-  }
-  async function unban() {
-    setBusy(true);
-    try { await setClientNofly(client.id, false); onChanged?.(); }
+    try { await setClientStatus(client.id, level, reason.trim() || null); setReason(''); setOpen(false); onChanged?.(); }
     finally { setBusy(false); }
   }
 
-  if (client.nofly) {
-    return (
-      <div style={{ marginTop: 10, padding: '8px 10px', borderRadius: 8, background: 'rgba(220,38,38,0.08)', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <strong style={{ color: 'var(--ad-bad, #dc2626)', fontSize: 13 }}>ON NO-FLY LIST</strong>
-        {client.nofly_reason && <span style={{ fontSize: 13, opacity: 0.8, flex: 1 }}>{client.nofly_reason}</span>}
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={unban} disabled={busy}>Remove</button>
-      </div>
-    );
-  }
-  if (adding) {
-    return (
-      <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <input className="ad-input" placeholder="reason (do not serve / contact)" value={reason} onChange={(e) => setReason(e.target.value)} style={{ flex: '1 1 220px' }} autoFocus />
-        <button className="ad-btn ad-btn--sm" onClick={ban} disabled={busy}>Add to no-fly</button>
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(false)}>Cancel</button>
-      </div>
-    );
-  }
   return (
-    <div style={{ marginTop: 10 }}>
-      <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(true)}>Put on no-fly list</button>
+    <div className="ad-panel">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen((o) => !o)}>
+        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>
+          Client status{current ? ` · ${current === 'banned' ? 'banned' : 'shadow ban'}` : ''}
+        </span>
+        <span style={{ fontSize: 12, opacity: 0.5 }}>{open ? 'hide' : 'manage'}</span>
+      </div>
+      {open && (
+        <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {current && (
+            <div style={{ fontSize: 13 }}>
+              Currently <strong style={{ color: current === 'banned' ? 'var(--ad-bad, #dc2626)' : 'var(--ad-warn, #b9770a)' }}>{current === 'banned' ? 'banned' : 'shadow banned'}</strong>
+              {client.nofly_reason ? `: ${client.nofly_reason}` : ''}
+            </div>
+          )}
+          <div style={{ fontSize: 12, opacity: 0.7, lineHeight: 1.5 }}>
+            Shadow ban keeps them in the book and still serves them, but never solicits their business (no win-back, no outreach). A hard ban removes them everywhere and stops all contact.
+          </div>
+          <textarea className="ad-textarea" rows={2} placeholder="reason (kept private)" value={reason} onChange={(e) => setReason(e.target.value)} style={{ width: '100%' }} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => apply('shadow')}>Shadow ban</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} style={{ color: 'var(--ad-bad, #dc2626)' }}
+              onClick={() => { if (window.confirm('Hard ban this client? They are removed everywhere and all contact stops.')) apply('banned'); }}>Hard ban</button>
+            {current && <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => apply(null)}>Clear status</button>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -119,6 +119,15 @@ export async function setClientNofly(clientId, banned, reason = null) {
   return rpc('admin_set_client_nofly', { p_client_id: clientId, p_banned: banned, p_reason: reason });
 }
 
+// Two-tier status: level is 'shadow' | 'banned' | null (clear).
+export async function setClientStatus(clientId, level, reason = null) {
+  return rpc('admin_set_client_status', { p_client_id: clientId, p_level: level, p_reason: reason });
+}
+
+export async function setDogStanding(dogId, text) {
+  return rpc('admin_set_dog_standing', { p_dog_id: dogId, p_text: text });
+}
+
 export async function listNofly() {
   const data = await rpc('admin_list_nofly');
   return Array.isArray(data) ? data : [];

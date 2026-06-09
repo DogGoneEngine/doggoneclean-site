@@ -1668,3 +1668,29 @@ stay private and inside Clean's own project so the business stays sellable (`cle
 simplest intake that works on his Pixel (direct pick-and-upload) beats a Google Photos integration that
 would add a dependency to untangle at sale. Per-dog tagging and a Riker "add the photos?" handoff are
 later passes. Decided 2026-06-09.
+
+`dog_standing_instructions` (Clean: clients):
+Every dog carries standing instructions: the semi-permanent "how to handle this dog every time"
+(muzzle the back feet, start at the rear, do nails first, hates the dryer), sourced from Paul's Drive
+contact sheets. They live in `dogs.standing_instructions`, separate from the freeform visit-condition
+notes (`dogs.notes` and `visits.visit_notes`), and are shown and editable per dog on the contact sheet
+(`admin_set_dog_standing`). Because this per-dog handling knowledge is exactly the proprietary,
+un-promptable context that is the moat (`dig_the_moat`): a buyer or a fill-in specialist can run the
+business well only if it is written down, so it gets a durable home of its own rather than living in
+Paul's head or buried in visit notes. The first populated pass is the cross-reference of active clients
+against their newest Drive contact sheet. Decided 2026-06-09.
+
+`nofly_two_tiers` (Clean: clients):
+The no-fly list has two tiers, not one. BANNED is a hard ban (the falling-out, the genuine "do not
+serve": `nofly = true`, `nofly_level = 'banned'`, `exclude_from_everything`, `roster_group = 'banned'`,
+hidden and never contacted). SHADOW is a shadow ban: the client stays in the book and is still served
+if they come, but is never solicited (excluded from win-back and outreach via `nofly_level = 'shadow'`,
+which the win-back due view excludes; `exclude_from_everything` stays false so they remain a real
+client). `clients.nofly_level` carries the tier; `admin_set_client_status(client, level, reason)` sets
+it. The set-status control is collapsed at the BOTTOM of the contact sheet, never a prominent header
+button, and the hard ban asks for confirmation, because banning is a rare, deliberate, roughly
+once-a-year action and a fat-fingered ban from the header is a real risk. The header shows only a quiet
+read-only badge when a status is set. Shadow is distinct from `suppress_winback` (the neutral
+"self-manages their own cadence" flag, e.g. Mary Jane): both stop win-back, but shadow is a negative
+disposition and lands on the no-fly list, while suppress_winback is neutral and does not. Supersedes
+the single-tier framing in `no_fly_list`. Decided 2026-06-09.
