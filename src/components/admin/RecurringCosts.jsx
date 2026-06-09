@@ -12,7 +12,7 @@ const CATS = ['infrastructure', 'ai', 'software', 'payments', 'domains', 'insura
 const CADENCES = ['monthly', 'quarterly', 'yearly', 'weekly', 'usage'];
 function money(cents) { return cents == null ? '' : '$' + Math.round(cents / 100).toLocaleString('en-US'); }
 
-export default function RecurringCosts() {
+export default function RecurringCosts({ refreshSignal = 0 }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,7 +24,7 @@ export default function RecurringCosts() {
     catch (e) { setError(e.message || 'load_failed'); }
     finally { setLoading(false); }
   }, []);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); }, [load, refreshSignal]);
 
   return (
     <div className="ad-panel" style={{ marginTop: 4 }}>
