@@ -2294,3 +2294,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   now-booked clients were cleared. Only this week was synced (the events Claude had in hand); extending
   is a re-run of the same RPC with more event data, and the recurring auto-sync remains the infra
   follow-on (the app needs its own Google Calendar credentials).
+- **Recurring calendar sync built; one Google credential needed from Paul (2026-06-08).** Paul wants a
+  REAL sync (change Google Calendar -> shows in the app). Built the `calendar-sync` edge function: a
+  Google service-account JWT flow (RS256 via Web Crypto) reads the calendar (`gcal_calendar_id`, his
+  primary) every 15 minutes via the `calendar-sync` cron + `calendar_sync_dispatch`, parses each event
+  (name from the summary, email/dogs/price from the description, skip Reserve/all-day), mirrors via
+  `_sync_appointments`, and `_sync_prune`s anything cancelled or moved out of the window so the app
+  tracks reschedules and cancellations too (migration 0073). Secret-gated; verified it runs and
+  no-ops gracefully until the credential is set. The ONLY remaining piece is Paul's: in Clean's Google
+  Cloud project, enable the Calendar API, make a service account + JSON key, share his calendar
+  (read-only) with the service-account email, and store the key JSON as the `google_service_account_json`
+  edge secret. Within 15 minutes of that, the live sync is on. A separate Google Cloud project + its own
+  key keeps `clean_stays_saleable`.
