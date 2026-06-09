@@ -2306,3 +2306,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   (read-only) with the service-account email, and store the key JSON as the `google_service_account_json`
   edge secret. Within 15 minutes of that, the live sync is on. A separate Google Cloud project + its own
   key keeps `clean_stays_saleable`.
+- **Calendar sync pivoted to Google Apps Script (2026-06-08).** The service-account path hit Google's
+  "Secure by Default" org policy (`iam.disableServiceAccountKeyCreation`) which blocks SA key creation
+  on new projects, so that path is dead without loosening an org security policy. Pivoted to a cleaner
+  model: a Google Apps Script (`supabase/apps-script-calendar.gs`) runs inside Paul's own account
+  (native CalendarApp access, no key, no service account, no calendar sharing) on a 15-minute
+  time-driven trigger, parses each grooming event, and POSTs to the new `calendar-ingest` edge function
+  (secret-gated), which calls `_sync_appointments` + `_sync_prune`. Per-instance idempotency key is the
+  iCal id plus the start time. The old pull-based `calendar-sync` cron was unscheduled (the function
+  stays deployed but unused). Paul's remaining step: paste the script into script.google.com, authorize
+  it, and add a 15-minute trigger on syncCalendar.
