@@ -148,6 +148,10 @@ export async function setClientPlus(clientId, text) {
   return rpc('admin_set_client_plus', { p_client_id: clientId, p_text: text });
 }
 
+export async function setClientAlt(clientId, label, address) {
+  return rpc('admin_set_client_alt', { p_client_id: clientId, p_label: label, p_address: address });
+}
+
 export async function setClientThoughts(clientId, text) {
   return rpc('admin_set_client_thoughts', { p_client_id: clientId, p_text: text });
 }

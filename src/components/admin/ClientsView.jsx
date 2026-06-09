@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -210,6 +210,7 @@ function ClientSheet({ clientId, onChanged }) {
           <Field label="Data gaps" value={(c.data_gaps || []).join(', ')} />
         </dl>
         <PlusCode client={c} onChanged={() => { load(); onChanged?.(); }} />
+        <AltAddress client={c} onChanged={() => { load(); onChanged?.(); }} />
         <AccessNotes client={c} onChanged={() => { load(); onChanged?.(); }} />
         <OnsitePeople client={c} onChanged={() => { load(); onChanged?.(); }} />
         <MessageDraftTool client={c} onChanged={() => { load(); onChanged?.(); }} />
@@ -655,6 +656,49 @@ function LocationField({ client }) {
         {client.location_plus ? <span style={{ opacity: 0.5, fontSize: 12 }}> · maps uses plus code</span> : null}
       </dd>
     </>
+  );
+}
+
+// A second, alternate address for a client who works between two places (Lisa Irwin
+// alternates home and her office). Shown clickable to Google Maps, with a label.
+function AltAddress({ client, onChanged }) {
+  const [editing, setEditing] = useState(false);
+  const [label, setLabel] = useState(client.alt_label || '');
+  const [addr, setAddr] = useState(client.alt_address || '');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setLabel(client.alt_label || ''); setAddr(client.alt_address || ''); }, [client.alt_label, client.alt_address]);
+
+  async function save() {
+    setBusy(true);
+    try { await setClientAlt(client.id, label, addr); setEditing(false); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+  const url = client.alt_address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(client.alt_address)}`
+    : null;
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55, marginBottom: 2 }}>Alternate address</div>
+      {editing ? (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <input className="ad-input" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label (e.g. Office)" style={{ flex: '1 1 140px' }} />
+          <input className="ad-input" value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="2322 NE 8th Rd, Ocala, FL 34470" style={{ flex: '2 1 240px' }} />
+          <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setLabel(client.alt_label || ''); setAddr(client.alt_address || ''); setEditing(false); }}>Cancel</button>
+        </div>
+      ) : client.alt_address ? (
+        <div style={{ fontSize: 14, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ flex: 1, minWidth: 200 }}>
+            {client.alt_label ? <span style={{ opacity: 0.7 }}>{client.alt_label}: </span> : null}
+            <a href={url} target="_blank" rel="noreferrer" style={{ color: 'var(--ad-primary, #2563d8)' }}>{client.alt_address} ↗</a>
+          </span>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
+        </div>
+      ) : (
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>+ Add alternate address</button>
+      )}
+    </div>
   );
 }
 
