@@ -1679,8 +1679,25 @@ un-promptable context that is the moat (`dig_the_moat`): a buyer or a fill-in sp
 business well only if it is written down, so it gets a durable home of its own rather than living in
 Paul's head or buried in visit notes. The first populated pass is the cross-reference of active clients
 against their newest Drive contact sheet. Per dog the source is the explicit "Standing Instructions"
-field on the sheet, transcribed as written; the dated visit history is not mined for instructions
-(that would be interpretive and risk inventing). Decided 2026-06-09.
+field on the sheet, transcribed as written; the dated visit history is not folded INTO the standing
+instructions (that would be interpretive), but the history itself is migrated separately as visit
+records, see `visit_history_migration`. Decided 2026-06-09.
+
+`visit_history_migration` (Clean: clients):
+The old contact-sheet visit history is MIGRATED into the new system, not abandoned. Paul's whole
+purpose in switching systems was to carry his data forward, and an earlier import had captured only the
+visit dates and dollar amounts and silently dropped the real content: the per-dog 1-to-5 vibe score and
+Paul's per-visit note ("skin irritated", "took over 4 hours", "bit my arm"). That content is migrated
+into `visit_dog_ratings`, which now carries a per-dog `note` and a NULLABLE `score` (the pre-1-to-5-era
+entries recorded a word like "Ok" or "good dog"; those migrate faithfully as a note with no number
+rather than a fabricated one). The contact sheet is the authoritative source: each dated entry's
+per-dog score and note attaches to the matching existing visit by date, or a visit is created where
+none exists. It shows per visit in the contact-sheet history (the score dot plus the note). Distinct
+from `dog_standing_instructions` (the semi-permanent how-to-groom field): the history is the running
+ledger, the standing instructions are the header. The cross-reference pass migrates both per client,
+and the eight clients already done for standing instructions still need their history migrated. Because
+abandoning years of real per-dog observations would gut the proprietary record that is the moat
+(`dig_the_moat`), which is exactly what the prior import quietly did. Decided 2026-06-09.
 
 `client_access_notes` (Clean: clients):
 Client-level "how to get in" notes (gate, door, and lock codes, where to park, how to reach the dog),

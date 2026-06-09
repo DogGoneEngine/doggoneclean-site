@@ -270,11 +270,13 @@ function ClientSheet({ clientId, onChanged }) {
                   </span>
                 </div>
                 {(v.dog_ratings || []).length > 0 && (
-                  <div style={{ marginTop: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {v.dog_ratings.map((r) => (
-                      <span key={r.dog_id || r.name} title="vibe score (1 unsafe to 5 a joy)" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        {r.name || 'dog'} <ScoreDot score={r.score} />
-                      </span>
+                      <div key={r.dog_id || r.name} style={{ fontSize: 13, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 600 }}>{r.name || 'dog'}</span>
+                        {r.score != null && <span title="vibe score (1 unsafe to 5 a joy)"><ScoreDot score={r.score} /></span>}
+                        {r.note ? <span style={{ opacity: 0.8 }}>{r.note}</span> : null}
+                      </div>
                     ))}
                   </div>
                 )}
