@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { financeSummary } from './supabase.js';
 import RecurringCosts from './RecurringCosts.jsx';
 import BankImport from './BankImport.jsx';
+import ExpensesLedger from './ExpensesLedger.jsx';
 
 function money(cents) {
   if (cents === null || cents === undefined) return '$0';
@@ -22,7 +23,7 @@ export default function FinanceView() {
   const [windowDays, setWindowDays] = useState(90);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [costsRefresh, setCostsRefresh] = useState(0);
+  const [expensesRefresh, setExpensesRefresh] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -53,9 +54,13 @@ export default function FinanceView() {
       )}
 
       <h2 style={{ marginTop: 28, marginBottom: 4 }}>Money out</h2>
-      <p className="ad-sub" style={{ marginTop: 0 }}>What the business pays every month to run. Out of your head, into one place.</p>
-      <RecurringCosts refreshSignal={costsRefresh} />
-      <BankImport onImported={() => setCostsRefresh((x) => x + 1)} />
+      <p className="ad-sub" style={{ marginTop: 0 }}>Your business account spend, from the statements. Out of your head, into one place.</p>
+      <BankImport onImported={() => setExpensesRefresh((x) => x + 1)} />
+      <ExpensesLedger refreshSignal={expensesRefresh} />
+
+      <h3 style={{ marginTop: 24, marginBottom: 4 }}>Subscriptions and billing days</h3>
+      <p className="ad-sub" style={{ marginTop: 0 }}>The recurring ones to watch, with the day of the month each hits.</p>
+      <RecurringCosts />
     </>
   );
 }

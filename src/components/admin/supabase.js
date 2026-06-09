@@ -188,3 +188,28 @@ export async function upsertRecurringCost(c) {
 export async function deleteRecurringCost(id) {
   return rpc('admin_delete_recurring_cost', { p_id: id });
 }
+
+// Expense ledger (the business account's money-out) --------------------------
+
+export async function importExpenses(rows) {
+  return rpc('admin_import_expenses', { p_rows: rows });
+}
+
+export async function expenseSummary(windowDays = 90) {
+  return rpc('admin_expense_summary', { p_window_days: windowDays });
+}
+
+export async function addExpense(e) {
+  return rpc('admin_add_expense', {
+    p_txn_date: e.txnDate, p_description: e.description, p_amount_cents: e.amountCents,
+    p_category: e.category ?? 'other', p_card: e.card ?? null, p_vendor: e.vendor ?? null, p_notes: e.notes ?? null,
+  });
+}
+
+export async function setExpenseBusiness(id, isBusiness) {
+  return rpc('admin_set_expense_business', { p_id: id, p_is_business: isBusiness });
+}
+
+export async function setExpenseCategory(id, category) {
+  return rpc('admin_set_expense_category', { p_id: id, p_category: category });
+}

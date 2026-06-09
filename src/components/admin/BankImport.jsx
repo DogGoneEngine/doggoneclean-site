@@ -1,15 +1,15 @@
 // src/components/admin/BankImport.jsx
 //
-// Monthly bank-statement upload. Parses the CSV IN THE BROWSER and pulls out
-// what was paid (outflows) with amount and billing day. The statement file is
-// never uploaded or stored - only the costs Paul chooses to keep are written,
-// via upsertRecurringCost. This keeps the full bank statement (and any personal
-// transactions) out of the database, which honors clean_stays_saleable.
+// Monthly bank-statement upload. Parses the CSV in the browser, pulls out every
+// outflow, and imports them ALL as business expenses by default (it is the
+// business account, so everything out of it is a business expense). Re-imports
+// are idempotent (deduped on the server by date + amount + description). The
+// only per-row action is the rare exception: untick a charge that is not a
+// business expense before importing.
 
-import { useEffect, useState } from 'react';
-import { listRecurringCosts, upsertRecurringCost } from './supabase.js';
+import { useState } from 'react';
+import { importExpenses } from './supabase.js';
 
-// --- tiny CSV parser (handles quoted fields, commas, escaped quotes) ---------
 function parseCsv(text) {
   const rows = [];
   let row = [], field = '', inQuotes = false;
@@ -30,7 +30,6 @@ function parseCsv(text) {
   if (field !== '' || row.length) { row.push(field); if (row.some((x) => x.trim() !== '')) rows.push(row); }
   return rows;
 }
-
 function parseAmount(s) {
   if (s == null) return null;
   let t = String(s).trim();
@@ -41,70 +40,52 @@ function parseAmount(s) {
   if (isNaN(n)) return null;
   return neg ? -n : n;
 }
-function looksLikeDate(s) {
-  if (!s) return false;
-  return /\d{1,4}[\/\-.]\d{1,2}[\/\-.]\d{1,4}/.test(String(s)) || !isNaN(Date.parse(s));
-}
-function dayOfMonth(s) {
+function looksLikeDate(s) { return s ? (/\d{1,4}[\/\-.]\d{1,2}[\/\-.]\d{1,4}/.test(String(s)) || !isNaN(Date.parse(s))) : false; }
+function isoDate(s) {
   const d = new Date(s);
-  if (!isNaN(d.getTime())) return d.getDate();
-  const m = String(s).match(/\d{1,4}[\/\-.](\d{1,2})[\/\-.]\d{1,4}/); // mm/dd
-  return m ? parseInt(m[1], 10) : null;
+  if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+  const m = String(s).match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/); // mm/dd/yyyy
+  if (m) { let [_, a, b, y] = m; if (y.length === 2) y = '20' + y; return `${y}-${a.padStart(2, '0')}-${b.padStart(2, '0')}`; }
+  return null;
 }
-function cleanDesc(s) {
-  return String(s || '').replace(/\s+/g, ' ').replace(/\b\d{2,}\b/g, '').replace(/[*#]/g, '').trim().slice(0, 60) || 'Unnamed charge';
-}
+function cleanDesc(s) { return String(s || '').replace(/\s+/g, ' ').replace(/[*#]/g, '').trim().slice(0, 80) || 'Unnamed charge'; }
 function guessCategory(name) {
   const n = name.toLowerCase();
-  if (/supabase|digitalocean|aws|vercel|cloudflare|droplet|server/.test(n)) return 'infrastructure';
+  if (/supabase|digitalocean|aws|vercel|cloudflare|server/.test(n)) return 'infrastructure';
   if (/anthropic|openai|claude/.test(n)) return 'ai';
-  if (/stripe|square|paypal/.test(n)) return 'payments';
-  if (/google|resend|twilio|zapier|notion|github|software|app/.test(n)) return 'software';
+  if (/stripe|square|paypal|fee/.test(n)) return 'payments';
+  if (/google|resend|twilio|zapier|notion|github|adobe|microsoft|software/.test(n)) return 'software';
   if (/domain|namecheap|godaddy|squarespace/.test(n)) return 'domains';
   if (/insur/.test(n)) return 'insurance';
+  if (/shell|chevron|exxon|bp|fuel|gas|wawa|circle k|racetrac/.test(n)) return 'fuel';
+  if (/petco|petsmart|chewy|tractor supply|shampoo|supply/.test(n)) return 'supplies';
+  if (/facebook|meta|instagram|google ads|yelp|advertis/.test(n)) return 'marketing';
   return 'other';
 }
 
 export default function BankImport({ onImported }) {
-  const [existing, setExisting] = useState([]);
   const [rows, setRows] = useState(null);
   const [fileName, setFileName] = useState('');
   const [error, setError] = useState(null);
-  const [savedIds, setSavedIds] = useState({});
-
-  useEffect(() => {
-    listRecurringCosts().then((d) => setExisting(d.items || [])).catch(() => {});
-  }, []);
-
-  function matchExisting(name) {
-    const first = name.toLowerCase().split(' ')[0];
-    if (!first || first.length < 3) return null;
-    return existing.find((e) => {
-      const en = (e.name || '').toLowerCase();
-      return en.includes(first) || name.toLowerCase().includes((e.name || '').toLowerCase().split(' ')[0]);
-    }) || null;
-  }
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState(null);
 
   async function onFile(e) {
-    setError(null); setRows(null); setSavedIds({});
+    setError(null); setRows(null); setResult(null);
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
     try {
-      const text = await file.text();
-      const grid = parseCsv(text);
+      const grid = parseCsv(await file.text());
       if (grid.length < 2) throw new Error('That file has no rows I can read.');
       const header = grid[0].map((h) => h.trim().toLowerCase());
       const body = grid.slice(1);
-
       const findCol = (re) => header.findIndex((h) => re.test(h));
       let dateI = findCol(/date|posted/);
       let descI = findCol(/desc|name|memo|payee|detail|transaction|merchant/);
-      let debitI = findCol(/debit|withdraw/);
-      let creditI = findCol(/credit|deposit/);
+      const debitI = findCol(/debit|withdraw/);
+      const creditI = findCol(/credit|deposit/);
       let amountI = findCol(/amount/);
-
-      // Fallbacks by sniffing values if headers were unhelpful.
       if (dateI < 0) dateI = header.findIndex((_, i) => body.slice(0, 8).filter((r) => looksLikeDate(r[i])).length >= 4);
       if (descI < 0) {
         let best = -1, bestLen = 0;
@@ -118,72 +99,61 @@ export default function BankImport({ onImported }) {
         let outflow = null;
         if (debitI >= 0) { const d = parseAmount(r[debitI]); if (d && d > 0) outflow = d; }
         if (outflow == null && amountI >= 0) { const a = parseAmount(r[amountI]); if (a != null && a < 0) outflow = -a; }
-        // a credit column with a value means money in -> skip
         if (creditI >= 0 && parseAmount(r[creditI])) continue;
         if (outflow == null || outflow <= 0) continue;
+        const date = dateI >= 0 ? isoDate(r[dateI]) : null;
+        if (!date) continue;
         const name = cleanDesc(descI >= 0 ? r[descI] : '');
-        out.push({ key: out.length, name, amount: outflow, day: dateI >= 0 ? dayOfMonth(r[dateI]) : null, raw: descI >= 0 ? r[descI] : '' });
+        out.push({ key: out.length, date, name, amount: outflow, category: guessCategory(name), business: true });
       }
-      out.sort((a, b) => b.amount - a.amount);
-      if (out.length === 0) throw new Error('I could not find any outflows. Check that this is a transactions export with a description and amount.');
+      out.sort((a, b) => (a.date < b.date ? 1 : -1));
+      if (out.length === 0) throw new Error('I could not find any outflows. Check that this is a transactions export with a date, description, and amount.');
       setRows(out);
-    } catch (err) {
-      setError(err.message || 'Could not read that file.');
-    }
+    } catch (err) { setError(err.message || 'Could not read that file.'); }
   }
 
-  async function add(item) {
-    const match = matchExisting(item.name);
+  const total = rows ? rows.filter((r) => r.business).reduce((a, r) => a + r.amount, 0) : 0;
+
+  async function doImport() {
+    setBusy(true); setError(null);
     try {
-      const id = await upsertRecurringCost({
-        id: match?.id ?? null,
-        name: match?.name ?? item.name,
-        category: match?.category ?? guessCategory(item.name),
-        amountCents: Math.round(item.amount * 100),
-        cadence: match?.cadence ?? 'monthly',
-        billingDay: item.day ?? match?.billing_day ?? null,
-        active: true,
-      });
-      setSavedIds((s) => ({ ...s, [item.key]: match ? `updated ${match.name}` : 'added' }));
-      const fresh = await listRecurringCosts();
-      setExisting(fresh.items || []);
+      const payload = rows.map((r) => ({ txn_date: r.date, description: r.name, amount_cents: Math.round(r.amount * 100), category: r.category, is_business: r.business }));
+      const res = await importExpenses(payload);
+      setResult(res); setRows(null); setFileName('');
       onImported?.();
-      return id;
-    } catch (e) {
-      setError(e.message || 'save_failed');
-    }
+    } catch (e) { setError(e.message || 'import_failed'); }
+    finally { setBusy(false); }
   }
 
   return (
     <div className="ad-panel" style={{ marginTop: 12 }}>
-      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Import from a bank statement</div>
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Import a bank statement</div>
       <p style={{ fontSize: 13, opacity: 0.75, margin: '6px 0 10px' }}>
-        Export your statement as CSV and choose it here. It is read in your browser to pull out what you paid; the file itself is never uploaded or stored. Pick the charges that are real business costs and they fill the tracker above with the amount and billing day.
+        Export your business-account statement as CSV and choose it here. It is read in your browser and every outflow imports as a business expense. Re-uploading is safe, charges already imported are skipped. Untick anything that is not a business expense before importing.
       </p>
-      <input type="file" accept=".csv,text/csv" onChange={onFile} />
+      <input type="file" accept=".csv,text/csv" onChange={onFile} disabled={busy} />
       {fileName && <span style={{ fontSize: 12, opacity: 0.6, marginLeft: 8 }}>{fileName}</span>}
       {error && <div className="ad-error" style={{ marginTop: 8 }}>{error}</div>}
+      {result && <div className="ad-success" style={{ marginTop: 8 }}>Imported {result.inserted} expense(s){result.skipped ? `, ${result.skipped} already on file` : ''}.</div>}
 
       {rows && (
         <div style={{ marginTop: 12 }}>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 6 }}>{rows.length} outflow(s) found. Add the recurring business costs:</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: '50vh', overflow: 'auto' }}>
-            {rows.map((it) => {
-              const match = matchExisting(it.name);
-              const saved = savedIds[it.key];
-              return (
-                <div key={it.key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, padding: '3px 0', borderBottom: '1px solid var(--ad-outline, #ececf1)' }}>
-                  <span style={{ width: 70, textAlign: 'right' }} className="ad-mono">${it.amount.toFixed(2)}</span>
-                  <span style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {it.name}{it.day ? <span style={{ opacity: 0.5 }}> · day {it.day}</span> : null}
-                    {match ? <span style={{ opacity: 0.55, fontSize: 12 }}> · matches {match.name}</span> : null}
-                  </span>
-                  {saved
-                    ? <span style={{ fontSize: 12, color: 'var(--ad-good, #1f8a4b)' }}>{saved}</span>
-                    : <button className="ad-btn ad-btn--sm" onClick={() => add(it)}>{match ? 'Update' : 'Add'}</button>}
-                </div>
-              );
-            })}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
+            <span style={{ fontSize: 13, opacity: 0.75 }}>{rows.filter((r) => r.business).length} of {rows.length} outflows · <strong>${total.toFixed(2)}</strong></span>
+            <button className="ad-btn ad-btn--sm" onClick={doImport} disabled={busy}>{busy ? 'Importing…' : `Import ${rows.filter((r) => r.business).length} as business expenses`}</button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, maxHeight: '50vh', overflow: 'auto' }}>
+            {rows.map((it) => (
+              <div key={it.key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, padding: '3px 0', borderBottom: '1px solid var(--ad-outline, #ececf1)', opacity: it.business ? 1 : 0.45 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 4 }} title="business expense?">
+                  <input type="checkbox" checked={it.business} onChange={(e) => setRows((rs) => rs.map((x) => x.key === it.key ? { ...x, business: e.target.checked } : x))} />
+                </label>
+                <span className="ad-mono" style={{ width: 78, textAlign: 'right' }}>${it.amount.toFixed(2)}</span>
+                <span style={{ width: 78, opacity: 0.6, fontSize: 12 }}>{it.date.slice(5)}</span>
+                <span style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.name}</span>
+                <span className="ad-mono" style={{ fontSize: 11, opacity: 0.5 }}>{it.category}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
