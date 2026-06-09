@@ -2241,3 +2241,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   grouped by day, joined through the subscriber to the client name (`admin_calendar`, migration
   0068), with a window toggle (14/30/90 days). The booking surface stays the /book funnel; this is
   the operator's view of what is coming. Fourteen of sixteen floors live; HR and Geography remain.
+- **HR floor (2026-06-08).** Fifteenth floor: for a solo operator the honest content is the
+  workload, computed from real visit hours and held against the prime directive (earn more, grind
+  less). `admin_hr_summary` (migration 0069) returns hours worked, work days, hours and visits per
+  work day, revenue, and the hardest day, over a window. Shows Paul as sole owner-operator and a
+  "when to hire" note; scales into a team roster / commission split when he hires. Fifteen of
+  sixteen floors live; only Geography remains.

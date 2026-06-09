@@ -23,6 +23,7 @@ import KnowledgeView from './KnowledgeView.jsx';
 import VendorsView from './VendorsView.jsx';
 import GrowthView from './GrowthView.jsx';
 import CalendarView from './CalendarView.jsx';
+import HRView from './HRView.jsx';
 import QuickCapture from './QuickCapture.jsx';
 import './admin.css';
 
@@ -45,7 +46,7 @@ const SECTIONS = [
     what: 'Revenue per visit and per hour, who owes you, the Square and Stripe split, and the expense ledger. Home of the CFO.' },
   { key: 'pricing',   label: 'Pricing',        ready: true,
     what: 'The locked price grid per city and coat tier, and the founders-spot counter.' },
-  { key: 'hr',        label: 'HR',             ready: false,
+  { key: 'hr',        label: 'HR',             ready: true,
     what: 'You today, your specialists later. Roles, hours, pay, commission tiers, and onboarding.' },
   { key: 'growth',    label: 'Growth',         ready: true,
     what: 'The lead funnel, the waitlist, referrals, retention, and a churn watch.' },
@@ -228,6 +229,7 @@ export default function AdminApp() {
         {section === 'vendors' && <VendorsView />}
         {section === 'growth' && <GrowthView />}
         {section === 'calendar' && <CalendarView />}
+        {section === 'hr' && <HRView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
 
