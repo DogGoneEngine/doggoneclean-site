@@ -1038,3 +1038,50 @@ a:hover { color: #0a4f63; }
   .ad-dogcard { transition: none; }
   .ad-dogcard:hover { transform: none; }
 }
+
+/* Standing instructions: the "how to handle this dog every time" line is the
+   single most important operational fact on the card, so it is a callout, not
+   a quiet field. Amber accent so it reads as a must-see, distinct from the
+   blue brand chrome around it. */
+.ad-standing {
+  position: relative;
+  margin-top: 8px;
+  padding: 10px 12px 10px 14px;
+  border-radius: var(--ad-r-sm);
+  background:
+    linear-gradient(90deg, rgba(185, 119, 10, 0.14) 0%, rgba(185, 119, 10, 0.05) 70%, transparent 100%),
+    var(--ad-surface-container-low);
+  border: 1px solid rgba(185, 119, 10, 0.30);
+  border-left: 4px solid var(--ad-warn);
+}
+.ad-standing__label {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ad-warn);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ad-standing__value {
+  margin-top: 3px;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ad-text);
+}
+.ad-standing__row { display: flex; gap: 8px; align-items: flex-start; }
+.ad-standing__row > .ad-standing__value { flex: 1; }
+
+/* Per-appointment note in the visit history: the note is the point of the row,
+   so it reads as solid body text in a faint card, not a greyed afterthought. */
+.ad-visitnote {
+  margin-top: 4px;
+  padding: 6px 10px;
+  border-radius: var(--ad-r-xs);
+  background: var(--ad-surface-container-high);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ad-text);
+}

@@ -294,13 +294,13 @@ function ClientSheet({ clientId, onChanged }) {
                       <div key={r.dog_id || r.name} style={{ fontSize: 13, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
                         <span style={{ fontWeight: 600 }}>{r.name || 'dog'}</span>
                         {r.score != null && <span title="vibe score (1 unsafe to 5 a joy)"><ScoreDot score={r.score} /></span>}
-                        {r.note ? <span style={{ opacity: 0.8 }}>{r.note}</span> : null}
+                        {r.note ? <span style={{ color: 'var(--ad-text)' }}>{r.note}</span> : null}
                       </div>
                     ))}
                   </div>
                 )}
                 {v.work_done ? <div style={{ fontSize: 14, marginTop: 2 }}>{v.work_done}</div> : null}
-                {v.visit_notes ? <div style={{ fontSize: 13, opacity: 0.75, marginTop: 2 }}>{v.visit_notes}</div> : null}
+                {v.visit_notes ? <div className="ad-visitnote">{v.visit_notes}</div> : null}
                 {(v.condition_flags || []).length > 0 && (
                   <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {v.condition_flags.map((f) => (
@@ -816,7 +816,7 @@ function OnsitePeople({ client, onChanged }) {
 // (the semi-permanent "how to handle this dog every time" from the contact sheet).
 // A labeled, inline-editable free-text field (used for a dog's standing
 // instructions and its separate follow-up).
-function DogField({ label, value, placeholder, onSave }) {
+function DogField({ label, value, placeholder, onSave, variant }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value || '');
   const [busy, setBusy] = useState(false);
@@ -828,18 +828,38 @@ function DogField({ label, value, placeholder, onSave }) {
     finally { setBusy(false); }
   }
 
+  const editor = (
+    <div style={{ marginTop: 4 }}>
+      <textarea className="ad-textarea" rows={2} value={val} onChange={(e) => setVal(e.target.value)} style={{ width: '100%' }} placeholder={placeholder} />
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setVal(value || ''); setEditing(false); }}>Cancel</button>
+      </div>
+    </div>
+  );
+
+  // The "standing" variant is the must-see handling instruction for the dog:
+  // an amber callout that jumps out when Paul scans the card, not a quiet row.
+  if (variant === 'standing') {
+    return (
+      <div className="ad-standing">
+        <div className="ad-standing__label">{'★'} {label}</div>
+        {editing ? editor : value ? (
+          <div className="ad-standing__row">
+            <span className="ad-standing__value">{value}</span>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
+          </div>
+        ) : (
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ marginTop: 4 }} onClick={() => setEditing(true)}>+ Add standing instructions</button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div style={{ marginTop: 6 }}>
       <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5 }}>{label}</div>
-      {editing ? (
-        <div style={{ marginTop: 4 }}>
-          <textarea className="ad-textarea" rows={2} value={val} onChange={(e) => setVal(e.target.value)} style={{ width: '100%' }} placeholder={placeholder} />
-          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-            <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
-            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setVal(value || ''); setEditing(false); }}>Cancel</button>
-          </div>
-        </div>
-      ) : value ? (
+      {editing ? editor : value ? (
         <div style={{ fontSize: 13, marginTop: 2, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
           <span style={{ flex: 1 }}>{value}</span>
           <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
@@ -1036,13 +1056,13 @@ function DogCard({ dog, onChanged }) {
         <DogStatusChip status={dog.roster_status} />
       </div>
       <div className="ad-dogcard__body">
-      <DogField label="Notes" value={dog.notes}
-        placeholder="Anything about this dog (e.g. moved to Tampa, on psych meds, sister's dog)"
-        onSave={async (v) => { await setDogNote(dog.id, v); onChanged?.(); }} />
-      <DogBirthday dog={dog} onChanged={onChanged} />
-      <DogField label="Standing instructions" value={dog.standing_instructions}
+      <DogField label="Standing instructions" variant="standing" value={dog.standing_instructions}
         placeholder="How to handle this dog every time (e.g. 8mm comb on body, hates the dryer, do nails first)"
         onSave={async (v) => { await setDogStanding(dog.id, v); onChanged?.(); }} />
+      <DogField label="About this dog (always)" value={dog.notes}
+        placeholder="Anything that stays true about this dog (e.g. moved to Tampa, on psych meds, sister's dog)"
+        onSave={async (v) => { await setDogNote(dog.id, v); onChanged?.(); }} />
+      <DogBirthday dog={dog} onChanged={onChanged} />
       <DogFollowups dogId={dog.id} />
       <DogRosterControl dog={dog} onChanged={onChanged} />
       </div>
