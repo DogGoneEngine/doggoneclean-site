@@ -139,6 +139,8 @@ even DGN has many rules sitting in only one or two layers.
 | string_of_pearls_is_a_service | Hurricane Bath: engineering | Oracle | `get-available-slots` / `create-booking` / `reschedule-appointment` / `skip-appointment` / `stop-subscription` CORS-locked edge functions; `/schedule-widget` iframe route; service-type query param |
 | schedule_mirrors_real_bookings | Clean: scheduling | Oracle; calendar-to-app import keyed by Acuity ID (the app shows real bookings, never cadence-synthesized ones); `clients.cadence_days` used only as a due/overdue signal | calendar sync job; `bath_appointments` sourced from the calendar; portal "due soon" view |
 | clients_not_subscribers | Clean: data model | Oracle; convention (never surface "subscriber"/"subscription" in copy or UI); the `bath_*` table rename is parked in `CLEAN_PARKING_LOT.md` | `bath_*` table rename; portal/admin labels say "client" + "recurring schedule" |
+| expense_ledger_clean_start | Clean: finance | Oracle; the `expenses` ledger starts empty and bank imports are go-forward only (no historical backfill); revenue trends predate it | CFO net-profit from the cutover; bookkeeper review pass |
+| books_complement_not_replace | Clean: finance | Oracle; `expenses` + `recurring_costs` stay a management layer (no double-entry, tax-form, or payroll schema) | categorized CSV export for the accountant |
 
 ## How to add a row
 

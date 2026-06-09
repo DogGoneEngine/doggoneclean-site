@@ -1380,3 +1380,26 @@ target is the four-layer pattern in `CLEAN_BUSINESS_RULES.md`: Oracle
 (rationale), `business_rules` DB row (data), code mirror (`src/`),
 lint pattern (`scripts/check.py`). New rules close as many of those
 layers as they can the day they land.
+
+---
+
+## Finance
+
+`expense_ledger_clean_start` (Clean: finance):
+The expense ledger is a clean go-forward start, not a historical backfill. Paul
+begins uploading business-account statements from the current month onward, and
+net profit begins at that cutover. Because the revenue side already carries the
+proprietary multi-year trend that is the moat, the old full-groom cost structure
+has little forward value, a clean cutover is proper bookkeeping, and prior years
+already live with the accountant, so duplicating closed periods here would only
+create a second source of truth. Decided 2026-06-08.
+
+`books_complement_not_replace` (Clean: finance):
+The console money-in and money-out ledger is a management cockpit, not a
+tax-accounting system. It stays clean enough to drive the CFO and to export for
+the accountant, but it does not build double-entry, tax forms, payroll, or penny
+reconciliation. Because tax-grade accounting is the commodity layer that an AI
+can prompt past and a buyer can simply purchase, while the un-promptable moat is
+the operational intelligence tied to this specific business (revenue per hour,
+route economics, where the money leaks). QuickBooks or a bookkeeper stays the
+system of record for taxes, and this console feeds it. Decided 2026-06-08.
