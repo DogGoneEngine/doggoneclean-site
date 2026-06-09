@@ -2237,3 +2237,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   address (Paul Nickerson + his mom's dog Willie, test data). Flag: Jeannie/Tommy last seen 2024, so
   the household likely belongs on the inactive list, but the record still reads roster_group active
   and the active roster is the deliberately-set past-year list, so left for Paul to reclassify.
+- **Calendar floor (2026-06-08).** Fourteenth floor: a read-only agenda of `bath_appointments`
+  grouped by day, joined through the subscriber to the client name (`admin_calendar`, migration
+  0068), with a window toggle (14/30/90 days). The booking surface stays the /book funnel; this is
+  the operator's view of what is coming. Fourteen of sixteen floors live; HR and Geography remain.

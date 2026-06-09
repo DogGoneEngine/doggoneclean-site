@@ -22,6 +22,7 @@ import OperationsView from './OperationsView.jsx';
 import KnowledgeView from './KnowledgeView.jsx';
 import VendorsView from './VendorsView.jsx';
 import GrowthView from './GrowthView.jsx';
+import CalendarView from './CalendarView.jsx';
 import QuickCapture from './QuickCapture.jsx';
 import './admin.css';
 
@@ -30,7 +31,7 @@ import './admin.css';
 const SECTIONS = [
   { key: 'today',     label: 'Today',          ready: true,
     what: 'The crystal ball. Today’s route and next stop, money in motion, and the briefing feed from your AI department heads.' },
-  { key: 'calendar',  label: 'Calendar',       ready: false,
+  { key: 'calendar',  label: 'Calendar',       ready: true,
     what: 'Every appointment across the bath book and the legacy book, month and week, with a Google Calendar import overlay.' },
   { key: 'schedule',  label: 'Schedule',       ready: true,
     what: 'Set your work days and work hours, block a date, open a Saturday. Your real availability per city.' },
@@ -226,6 +227,7 @@ export default function AdminApp() {
         {section === 'knowledge' && <KnowledgeView />}
         {section === 'vendors' && <VendorsView />}
         {section === 'growth' && <GrowthView />}
+        {section === 'calendar' && <CalendarView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
 

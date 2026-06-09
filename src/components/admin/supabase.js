@@ -195,6 +195,11 @@ export async function growthSummary() {
   return rpc('admin_growth_summary');
 }
 
+export async function calendar(daysBack = 7, daysForward = 30) {
+  const data = await rpc('admin_calendar', { p_days_back: daysBack, p_days_forward: daysForward });
+  return Array.isArray(data) ? data : [];
+}
+
 export async function runWinbackCheck() {
   return rpc('admin_winback_check');
 }
