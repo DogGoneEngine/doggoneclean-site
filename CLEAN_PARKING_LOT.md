@@ -663,3 +663,18 @@ message. What is parked, because the booking funnel's Confirm is disabled until 
 instead of a raw error line, and (2) an EARLY in-funnel check at the contact step (reuse the
 phone-blur recognition path) so a banned person gets the soft decline before filling the whole form
 rather than at submit. Do both when the Stripe card step goes live.
+
+## Add the new clients that have no record yet (from Google Keep) (2026-06-09)
+
+Paul has been serving some NEW clients he never made a contact sheet for; he took the notes in
+Google Keep and they are not in the system at all (not among the 53 seeded active clients). Not
+urgent, but MUST NOT be forgotten: create a real record for each one. Source = Paul's Google Keep
+notes (he will paste/dictate them). For each new client capture whatever the notes hold, the same
+fields as the contact-sheet cross-reference: client (name, city/area, cadence, service type), each
+dog (name, breed, price, birthday + exact/estimated, standing instructions), access notes (gate /
+door / lock codes, plus code if the street address routes wrong), who's on site, and any open
+follow-ups. Unknown fields are data gaps, never invented (`real_data_only`). Write them as a
+replayable migration keyed by name so a reseed cannot wipe them (`client_dispositions_are_migrations`),
+then read them back to Paul to confirm. Optional enabler: an in-console "Add client" button so Paul
+can add future ones himself from his phone (runs-without-Paul); for this batch, pasting the notes is
+the faster path.
