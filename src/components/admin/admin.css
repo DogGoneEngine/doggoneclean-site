@@ -964,3 +964,77 @@ a:hover { color: #0a4f63; }
   .ad-side { transition: none; }
   .ad-scrim { transition: none; }
 }
+
+/* ---------------- Dog cards (Clients floor) ----------------
+   The dog is the unit Paul scans for, so each card is a strong visual
+   anchor: a brand-gradient spine down the left, a tinted name band, and
+   the dog's name in the deep-ink ombre display type. Operational fields
+   below stay solid for readability (the readability rule). Past/other
+   dogs get a desaturated variant so they recede without disappearing. */
+.ad-dogcard {
+  position: relative;
+  background: var(--ad-surface-container-low);
+  border: 1px solid var(--ad-border);
+  border-radius: var(--ad-r-md);
+  box-shadow: var(--ad-elev-1);
+  padding: 0;
+  overflow: hidden;
+  transition:
+    box-shadow var(--ad-dur) var(--ad-ease),
+    transform var(--ad-dur) var(--ad-ease);
+}
+.ad-dogcard::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background-image: var(--ad-ne-gradient);
+}
+.ad-dogcard:hover {
+  box-shadow: var(--ad-elev-2), var(--ad-brand-glow);
+  transform: translateY(-1px);
+}
+.ad-dogcard__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 11px 14px 11px 18px;
+  background:
+    linear-gradient(90deg, rgba(37, 99, 216, 0.10) 0%, rgba(37, 99, 216, 0.02) 60%, transparent 100%),
+    var(--ad-surface-container-high);
+  border-bottom: 1px solid var(--ad-border);
+}
+.ad-dogcard__name {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  background-image: var(--ad-ne-ombre);
+  background-clip: text; -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ad-dogcard__meta {
+  font-size: 12.5px;
+  color: var(--ad-text-dim);
+  font-weight: 600;
+}
+.ad-dogcard__body {
+  padding: 10px 14px 12px 18px;
+}
+/* Past / moved / deceased dogs: quiet the spine and name so the working
+   roster stays the focal set, but keep the card fully legible. */
+.ad-dogcard--past { box-shadow: none; }
+.ad-dogcard--past::before { background-image: none; background: var(--ad-text-faint); opacity: 0.5; }
+.ad-dogcard--past .ad-dogcard__head {
+  background: var(--ad-surface-container);
+}
+.ad-dogcard--past .ad-dogcard__name {
+  background-image: none;
+  -webkit-text-fill-color: var(--ad-text-dim);
+  color: var(--ad-text-dim);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-dogcard { transition: none; }
+  .ad-dogcard:hover { transform: none; }
+}

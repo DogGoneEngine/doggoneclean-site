@@ -1026,12 +1026,16 @@ function DogStatusChip({ status }) {
 }
 
 function DogCard({ dog, onChanged }) {
+  const isPast = ['former', 'deceased', 'moved'].includes(dog.roster_status);
+  const meta = [dog.breed, dog.price_cents != null ? money(dog.price_cents) : null].filter(Boolean).join(' · ');
   return (
-    <div style={{ border: '1px solid var(--ad-outline, #d9dbe6)', borderRadius: 10, padding: '8px 10px' }}>
-      <div className="ad-mono" style={{ fontSize: 13 }}>
-        <strong>{dog.name}</strong>{dog.breed ? ` · ${dog.breed}` : ''}{dog.price_cents != null ? ` · ${money(dog.price_cents)}` : ''}
+    <div className={`ad-dogcard${isPast ? ' ad-dogcard--past' : ''}`}>
+      <div className="ad-dogcard__head">
+        <span className="ad-dogcard__name">{dog.name}</span>
+        {meta && <span className="ad-dogcard__meta">{meta}</span>}
         <DogStatusChip status={dog.roster_status} />
       </div>
+      <div className="ad-dogcard__body">
       <DogField label="Notes" value={dog.notes}
         placeholder="Anything about this dog (e.g. moved to Tampa, on psych meds, sister's dog)"
         onSave={async (v) => { await setDogNote(dog.id, v); onChanged?.(); }} />
@@ -1041,6 +1045,7 @@ function DogCard({ dog, onChanged }) {
         onSave={async (v) => { await setDogStanding(dog.id, v); onChanged?.(); }} />
       <DogFollowups dogId={dog.id} />
       <DogRosterControl dog={dog} onChanged={onChanged} />
+      </div>
     </div>
   );
 }
