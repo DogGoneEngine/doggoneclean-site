@@ -143,6 +143,7 @@ even DGN has many rules sitting in only one or two layers.
 | books_complement_not_replace | Clean: finance | Oracle; `expenses` + `recurring_costs` stay a management layer (no double-entry, tax-form, or payroll schema) | categorized CSV export for the accountant |
 | per_business_books | Clean: finance | Oracle; each business's ledger lives only in its own Supabase project (Clean in dgc-prod, never shared with dgn-prod); one bank account per business | Mount Olympus read-only consolidated rollup; shared-cost split tagging |
 | agent_when_value_beats_cost | Clean: engineering | Oracle; the `agents` registry + cheap edge-function/SQL agent pattern (CFO + Compliance live); new agents proposed to Paul before building | bookkeeper, retention, and pricing watcher agents |
+| talk_back_with_because | Clean: knowledge | Oracle; `briefing_notes` (two-way thread) + `wisdom` inbox (RLS-locked, admin-only); replies + intentional resolutions + the speed-dial quick-capture write wisdom; pricing/retention respect 'intentional' | absorb wisdom into Oracle/client records; feed notes to the LLM agents |
 
 ## How to add a row
 

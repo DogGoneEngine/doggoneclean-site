@@ -19,6 +19,8 @@ import SettingsView from './SettingsView.jsx';
 import AuditView from './AuditView.jsx';
 import PricingView from './PricingView.jsx';
 import OperationsView from './OperationsView.jsx';
+import KnowledgeView from './KnowledgeView.jsx';
+import QuickCapture from './QuickCapture.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
@@ -48,8 +50,8 @@ const SECTIONS = [
     what: 'Insurance and license renewals, A2P registration, payment-processor verification, and tax dates.' },
   { key: 'vendors',   label: 'Vendors',        ready: false,
     what: 'Suppliers, reorder points, and the running-low tracker for shampoo, water, and parts.' },
-  { key: 'knowledge', label: 'Knowledge base', ready: false,
-    what: 'The Field Manual and the rulebook, read-only inside Orbit, so the console is the operating manual a buyer inherits.' },
+  { key: 'knowledge', label: 'Knowledge base', ready: true,
+    what: 'The wisdom inbox: reasons captured by the speed dial or by replying to an agent, on their way into the Oracle or a client record.' },
   { key: 'reports',   label: 'Reports',        ready: true,
     what: 'Cross-department rollups: the weekly business review, the revenue-per-hour trend, and the briefing archive.' },
   { key: 'audit',     label: 'Audit log',      ready: true,
@@ -219,8 +221,11 @@ export default function AdminApp() {
         {section === 'audit' && <AuditView />}
         {section === 'pricing' && <PricingView />}
         {section === 'operations' && <OperationsView />}
+        {section === 'knowledge' && <KnowledgeView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
+
+      <QuickCapture />
     </div>
   );
 }

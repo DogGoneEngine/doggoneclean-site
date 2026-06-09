@@ -156,6 +156,21 @@ export async function resolveBriefing(id, disposition, note = null) {
   return rpc('admin_resolve_briefing', { p_briefing_id: id, p_disposition: disposition, p_note: note });
 }
 
+// Wisdom / knowledge capture --------------------------------------------------
+
+export async function captureWisdom(body, scope = 'business', clientId = null) {
+  return rpc('admin_capture_wisdom', { p_body: body, p_scope: scope, p_client_id: clientId, p_source: 'quick_capture' });
+}
+
+export async function listWisdom(status = null) {
+  const data = await rpc('admin_list_wisdom', { p_status: status });
+  return Array.isArray(data) ? data : [];
+}
+
+export async function setWisdomStatus(id, status) {
+  return rpc('admin_set_wisdom_status', { p_id: id, p_status: status });
+}
+
 export async function listAgents() {
   const data = await rpc('admin_list_agents');
   return Array.isArray(data) ? data : [];

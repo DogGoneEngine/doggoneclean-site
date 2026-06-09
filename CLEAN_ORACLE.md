@@ -1435,3 +1435,20 @@ first keeps the spend intentional and the agent roster legible. The live pattern
 is the `agents` registry plus a cheap edge-function or SQL agent that reads
 scoped real data, writes a briefing (recommend, never act), and a human approves.
 Decided 2026-06-08.
+
+`talk_back_with_because` (Clean: knowledge):
+Briefings are a two-way conversation, and every time Paul talks back to an agent
+the reply should carry a "because" and is recorded as durable knowledge, not just
+used to silence one alert. His talk-backs are wisdom about the business (why a
+client is priced the way she is, why a cadence is what it is), and the reason is
+the most valuable thing to keep. Replies and "this is intentional" resolutions
+land in the `wisdom` inbox, scoped to the client or the department, and a one-tap
+quick-capture (the speed dial, a floating button on every Orbit floor, text or
+voice) lets Paul drop any idea into the same inbox to be absorbed into the Oracle
+or a client record. These notes are internal only: `briefing_notes` and `wisdom`
+are RLS-locked admin surfaces, never shown to a client (so a blunt private note
+like a fixed-income exception never reaches the client it is about). Because a
+reason captured once stops the same question being asked forever and compounds
+into the un-promptable moat, while an answer used and discarded has to be
+re-derived; and the friction between having a thought and capturing it is what
+loses it. Decided 2026-06-08.

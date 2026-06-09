@@ -2155,3 +2155,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   (verified: a client marked intentional is not re-flagged). The 'resolved' status was added to
   the briefings status constraint (migration 0060). Open: extend the same intentional-suppression
   to compliance/maintenance, and optionally feed Paul's notes into the LLM agents' context.
+- **Wisdom capture + speed dial (Paul's realization, 2026-06-08).** Confirmed the agent-reply
+  notes are internal only: `briefing_notes` and `wisdom` are RLS-locked with zero policies, so a
+  blunt private note (a fixed-income exception) can never reach the client. Built the knowledge
+  layer Paul described: every talk-back to an agent should carry a because and is now recorded as
+  durable `wisdom` (scoped to the client or department, source 'briefing'), not just used to
+  suppress; a one-tap speed-dial (floating + button on every Orbit floor, text or voice via
+  webkitSpeechRecognition) drops any idea into the same inbox; and the Knowledge Base floor went
+  live to triage it (inbox -> filed). Oracle rule `talk_back_with_because` (migration 0061).
+  Eleven floors now live. Open: absorb wisdom into the Oracle/client records (by me or an agent),
+  and feed the notes into the LLM agents' context.
