@@ -2258,3 +2258,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   per-floor enhancements (the live map, the opt-in win-back email send, a one-step merge tool), the
   other AI heads as data accrues (COO route optimizer is post-launch), and Mount Olympus (its own
   repo + subdomain, the one piece needing Paul).
+- **Known gap found while Paul tested: the appointment calendar is a partial, imperfect import
+  (2026-06-08).** `bath_appointments` holds only ~13 rows (source acuity:9, gcal:4), not Paul's real
+  schedule, and some imported appointments never matched a client (an orphan subscriber with dogs
+  Biscuit/Maple has no client record, showing as "Unknown" on Thursday). Consequence: the Calendar
+  floor is incomplete and the win-back agent misfires (it flagged Eric Shannon, whose real upcoming
+  appointment is not in the database, so it only sees his March 16 last visit). Two mitigations
+  shipped (migration 0071): win-back now skips any client with an upcoming appointment that IS in
+  bath_appointments, and the calendar shows the dogs + an "unmatched" flag instead of a bare
+  "Unknown". The REAL fix is a complete calendar sync per `schedule_mirrors_real_bookings`: decide
+  the authoritative source (Acuity vs Google Calendar), import the full schedule, and match every
+  appointment to a client. Needs Paul's input on the source and access. Until then, both the Calendar
+  floor and win-back run on partial data.

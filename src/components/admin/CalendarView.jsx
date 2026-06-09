@@ -66,7 +66,9 @@ export default function CalendarView() {
                   <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, padding: '3px 0', borderBottom: '1px solid var(--ad-outline,#ececf1)' }}>
                     <span className="ad-mono" style={{ width: 72, opacity: 0.75 }}>{time(a.scheduled_start)}</span>
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <strong>{a.client || 'Unknown'}</strong>
+                      {a.client
+                        ? <strong>{a.client}</strong>
+                        : <strong style={{ color: 'var(--ad-warn,#b9770a)' }}>{a.fallback ? `${a.fallback} (unmatched)` : 'Unmatched import'}</strong>}
                       <span style={{ opacity: 0.6, fontSize: 12 }}> · {SERVICE[a.service_type] || a.service_type || ''}{a.dog_count ? ` · ${a.dog_count} dog${a.dog_count === 1 ? '' : 's'}` : ''}</span>
                     </span>
                     {a.amount_cents != null && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
