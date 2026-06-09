@@ -177,7 +177,7 @@ function TimeCell({ label, value, busy, onStampNow, onSet, onClear }) {
       <span style={{ display: 'inline-flex', flexDirection: 'column', gap: 2 }}>
         <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>{label}</span>
         <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
-          <input type="time" autoFocus defaultValue={value ? isoToHHMM(value) : ''}
+          <input type="time" autoFocus defaultValue={value ? isoToHHMM(value) : isoToHHMM(new Date().toISOString())}
             onChange={(e) => e.target.value && onSet(e.target.value)}
             className="ad-mono" style={{ fontSize: 13, padding: '2px 4px', borderRadius: 6, border: '1px solid var(--ad-outline,#d8d8de)' }} />
           <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(false)}>ok</button>
@@ -202,12 +202,17 @@ function TimeCell({ label, value, busy, onStampNow, onSet, onClear }) {
               color: 'var(--ad-text-dim,#565b6c)', background: 'transparent', border: '1px solid var(--ad-outline,#e0e0e6)' }}>×</button>
         </span>
       ) : (
-        <button onClick={onStampNow} disabled={busy} title="tap to stamp now"
-          style={{ fontSize: 13, padding: '3px 12px', borderRadius: 8, cursor: 'pointer',
-            color: 'var(--ad-primary,#2563d8)', background: 'var(--ad-primary-container,#e6edfc)',
-            border: '1px dashed rgba(37,99,216,0.4)' }}>
-          {busy ? '…' : 'tap'}
-        </button>
+        <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+          <button onClick={onStampNow} disabled={busy} title="tap to stamp the current time"
+            style={{ fontSize: 13, padding: '3px 12px', borderRadius: 8, cursor: 'pointer',
+              color: 'var(--ad-primary,#2563d8)', background: 'var(--ad-primary-container,#e6edfc)',
+              border: '1px dashed rgba(37,99,216,0.4)' }}>
+            {busy ? '…' : 'tap'}
+          </button>
+          <button onClick={() => setEditing(true)} disabled={busy} title="forgot to tap? enter the time you actually left/arrived/finished"
+            style={{ fontSize: 12, lineHeight: 1, padding: '3px 6px', borderRadius: 6, cursor: 'pointer',
+              color: 'var(--ad-text-dim,#565b6c)', background: 'transparent', border: '1px solid var(--ad-outline,#e0e0e6)' }}>✎</button>
+        </span>
       )}
     </span>
   );

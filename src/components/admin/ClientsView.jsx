@@ -90,7 +90,7 @@ export default function ClientsView({ focus = null }) {
       )}
       {!showDetailOnly && <NoFlyPanel onChanged={load} />}
       {!showDetailOnly && <ArchivedPanel onChanged={load} />}
-      {!showDetailOnly && <TimeIsMoneyExportPanel clients={clients} />}
+      {!showDetailOnly && <TimeIsMoneyExportPanel />}
 
       {showDetailOnly ? (
         <div>
@@ -936,9 +936,9 @@ function DogBirthday({ dog, onChanged }) {
 // column order, ready to paste onto the end of the original sheet. Paul keeps the
 // original book in parallel until he trusts this; the app never writes to his sheet.
 // Where the time_is_money data lives: a tiny, out-of-the-way link (so the floor
-// stays clean) that opens both the export and a by-hand entry for a stop whose
-// times Paul forgot to tap on the Today sheet.
-function TimeIsMoneyExportPanel({ clients = [] }) {
+// stays clean) that opens the export. Missed-tap fixes happen per cell on the
+// Today sheet, not here, so this is export-only.
+function TimeIsMoneyExportPanel() {
   const COLS = ['Date', 'Client', 'Inbound', 'Arrival', 'Departure', 'Charged', 'Paid', 'Method'];
   const [open, setOpen] = useState(false);
   const [since, setSince] = useState('');
@@ -999,111 +999,10 @@ function TimeIsMoneyExportPanel({ clients = [] }) {
           </div>
         </>
       )}
-
-      <ManualStopForm clients={clients} onSaved={build} />
     </div>
   );
 }
 
-// The "I forgot to tap the button" path. A stop entered by hand: client, date,
-// the three times, and the money. Writes a manual visit so it flows into the
-// same export. Tucked inside the time-is-money place, collapsed by default, so
-// it never takes up room on the main screen.
-function ManualStopForm({ clients = [], onSaved }) {
-  const [open, setOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
-  const [done, setDone] = useState(false);
-  const today = new Date().toISOString().slice(0, 10);
-  const blank = { clientId: '', date: today, inbound: '', arrived: '', departed: '', charged: '', paid: '', method: '' };
-  const [f, setF] = useState(blank);
-  const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
-  const sorted = useMemo(() => [...clients].sort((a, b) => (a.name || '').localeCompare(b.name || '')), [clients]);
-
-  async function submit(e) {
-    e.preventDefault();
-    if (!f.clientId) { setError('Pick a client.'); return; }
-    setSaving(true); setError(null); setDone(false);
-    try {
-      const stamp = (hhmm) => (hhmm && f.date) ? new Date(f.date + 'T' + hhmm + ':00').toISOString() : null;
-      await logVisit({
-        clientId: f.clientId,
-        visitedAt: f.date ? new Date(f.date + 'T12:00:00').toISOString() : null,
-        inboundAt: stamp(f.inbound),
-        arrivedAt: stamp(f.arrived),
-        departedAt: stamp(f.departed),
-        chargedCents: f.charged ? Math.round(parseFloat(f.charged) * 100) : null,
-        amountCollectedCents: f.paid ? Math.round(parseFloat(f.paid) * 100) : null,
-        paymentMethod: f.method || null,
-        source: 'manual',
-      });
-      setF({ ...blank, date: f.date });
-      setDone(true);
-      onSaved?.();
-    } catch (err) {
-      setError(err.message || 'save_failed');
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  if (!open) {
-    return (
-      <div style={{ borderTop: '1px solid var(--ad-border, #e6e3dc)', paddingTop: 8 }}>
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(true)}>+ Add a stop by hand (forgot to tap)</button>
-      </div>
-    );
-  }
-  return (
-    <form onSubmit={submit} style={{ borderTop: '1px solid var(--ad-border, #e6e3dc)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Add a stop by hand</div>
-        <button type="button" className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setOpen(false); setDone(false); }}>close</button>
-      </div>
-      {error && <div className="ad-error">{error}</div>}
-      {done && <div style={{ fontSize: 12, color: 'var(--ad-good, #1f8a4b)' }}>Saved. It will show in the export above. Add another or close.</div>}
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <label style={{ fontSize: 13 }}>
-          Client<br />
-          <select className="ad-select" value={f.clientId} onChange={set('clientId')} style={{ minWidth: 180 }}>
-            <option value="">pick a client</option>
-            {sorted.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-          </select>
-        </label>
-        <label style={{ fontSize: 13 }}>
-          Date<br />
-          <input className="ad-input" type="date" value={f.date} onChange={set('date')} />
-        </label>
-      </div>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <label style={{ fontSize: 13 }}>Left<br /><input className="ad-input" type="time" value={f.inbound} onChange={set('inbound')} style={{ width: 120 }} /></label>
-        <label style={{ fontSize: 13 }}>Arrived<br /><input className="ad-input" type="time" value={f.arrived} onChange={set('arrived')} style={{ width: 120 }} /></label>
-        <label style={{ fontSize: 13 }}>Done<br /><input className="ad-input" type="time" value={f.departed} onChange={set('departed')} style={{ width: 120 }} /></label>
-      </div>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <label style={{ fontSize: 13 }}>Charged ($)<br /><input className="ad-input" type="number" min="0" step="0.01" value={f.charged} onChange={set('charged')} style={{ width: 100 }} /></label>
-        <label style={{ fontSize: 13 }}>Paid ($)<br /><input className="ad-input" type="number" min="0" step="0.01" value={f.paid} onChange={set('paid')} style={{ width: 100 }} /></label>
-        <label style={{ fontSize: 13 }}>
-          Method<br />
-          <select className="ad-select" value={f.method} onChange={set('method')}>
-            <option value="">unset</option>
-            <option value="square_in_person">Square</option>
-            <option value="stripe_card">Stripe</option>
-            <option value="cash">Cash</option>
-            <option value="wallet">Wallet</option>
-            <option value="invoice">Invoice</option>
-            <option value="check">Check</option>
-          </select>
-        </label>
-        <button type="submit" className="ad-btn" disabled={saving}>{saving ? 'Saving…' : 'Save stop'}</button>
-      </div>
-    </form>
-  );
-}
-
-// A time_is_money clock field: a native time input plus a one-tap "now" button that
-// stamps the current time. Tap "now" the moment you leave, arrive, or finish; nudge
-// the picker if you are logging it a little late.
 // Small chip showing a dog's standing on the roster. 'regular' is the default and
 // shows nothing (no clutter); the rest get a quiet label so a name is never a mystery.
 function DogStatusChip({ status }) {
