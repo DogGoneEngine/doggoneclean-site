@@ -1561,3 +1561,23 @@ auto-archived (it could be a freshly added record). The sweep
 people he is actually still seeing, a stale record is clutter, not a deletion
 decision; archiving keeps the active view honest while losing no history and
 auto-restoring the moment a client returns. Decided 2026-06-09.
+
+`calendar_flip_order` (Clean: calendar):
+Until a deliberate cutover, Paul's single Google calendar (his default calendar) stays the
+working source of truth he books and works out of; the Orbit admin Calendar floor is a
+read-only mirror he uses to test the sync against that calendar, never a replacement, and
+Acuity stays the system that actually sends client reminders until our own reminder send is
+built and verified. The cutover to a dedicated "Dog Gone Clean" calendar happens as ONE
+coordinated switch, in this exact order, never piecemeal: (1) Paul creates a "Dog Gone Clean"
+calendar in Google Calendar; (2) Claude repoints the Apps Script
+(`supabase/apps-script-calendar.gs`) from `getDefaultCalendar()` to the Dog Gone Clean calendar
+by id; (3) Claude moves the existing upcoming client events from the default calendar onto the
+Dog Gone Clean calendar via the Calendar API. The flip is complete only after all three; any
+step alone breaks the sync (a calendar the script does not read, or a repointed script with no
+events). After the flip two pieces unlock: per-business calendars give perfect Nails/Clean
+separation (each business's script reads only its own calendar, personal stays unread), and
+two-way enrichment can stamp each appointment's service address and gate code back into the
+calendar event for the field. No step starts until Paul says go. Because the calendar is Paul's
+live working tool and a half-done switch would silently drop appointments out of his view, and
+the calendar is also the durable Nails/Clean separation boundary that serves
+`clean_stays_saleable`. Full procedure parked in CLEAN_PARKING_LOT.md. Decided 2026-06-09.

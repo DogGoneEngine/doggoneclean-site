@@ -28,6 +28,38 @@ is the wall before the v2.0 online-payment surface and the remaining portal-pari
 (item 5) turns on text reminders. The bank/EIN/DBA (2-4) are the legal-entity spine Stripe and the
 bank sit on.
 
+## ====> CALENDAR FLIP: Google one-calendar-per-business cutover (strict order) <==== (2026-06-09)
+
+HIGH PROFILE. Read this before touching the calendar sync. The rule of record is
+`calendar_flip_order` in CLEAN_ORACLE.md.
+
+**Current state (true until the flip, do not change it):** Paul works out of his single
+Google calendar (his default calendar); that calendar is the source of truth he books from.
+The Orbit admin Calendar floor is a READ-ONLY MIRROR he uses to test the sync against that
+calendar, never a replacement. Acuity still sends the client reminders. Nothing about the sync
+changes Paul's calendar or his Acuity workflow.
+
+**The flip is ONE coordinated switch, in THIS EXACT ORDER, never piecemeal:**
+1. **Paul** creates a "Dog Gone Clean" calendar in Google Calendar.
+2. **Claude** repoints the Apps Script (`supabase/apps-script-calendar.gs`) from
+   `CalendarApp.getDefaultCalendar()` to the Dog Gone Clean calendar by id.
+3. **Claude** moves the existing upcoming client events from the default calendar onto the
+   Dog Gone Clean calendar (via the Calendar API).
+
+Why the order and the all-at-once: a new calendar the script does not yet read is invisible to
+the system; a repointed script with no events moved sees nothing. Either step alone silently
+drops appointments out of Paul's view. Do all three in one sitting, on Paul's go.
+
+**Unlocks AFTER the flip (not before):**
+- **Per-business separation:** when Nails gets the same sync it reads only the Nails calendar;
+  Clean reads only the Dog Gone Clean calendar; personal stays on the default calendar and is
+  read by neither. The calendar is the durable Nails/Clean boundary (serves `clean_stays_saleable`).
+- **Two-way enrichment:** stamp each appointment's service address + gate code back into the
+  calendar event so they are on Paul's phone at the stop (system stays the master record).
+
+**Do NOT start any step until Paul says go.** Until then the default calendar stays the working
+truth and the admin view stays a test mirror.
+
 ## Cutover follow-ons - legacy fold (2026-06-07)
 
 The legacy-fold cutover (legacy_folds_into_v2) is mid-build. Open threads, parked so they
