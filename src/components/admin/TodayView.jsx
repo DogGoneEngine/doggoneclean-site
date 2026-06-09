@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -77,6 +77,7 @@ export default function TodayView({ onOpenClient }) {
                     {a.amount_cents != null && a.amount_cents > 0 && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
                     <span className="ad-mono" style={{ fontSize: 11, color: STATUS_TINT[a.status] || 'var(--ad-text-dim,#565b6c)' }}>{clickable ? '›' : ''}</span>
                   </div>
+                  <TimeStrip appt={a} />
                   {followups.length > 0 && (
                     <div style={{ marginTop: 4, marginLeft: 82, display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {followups.map((f, i) => (
@@ -107,6 +108,108 @@ export default function TodayView({ onOpenClient }) {
         </div>
       )}
     </>
+  );
+}
+
+// Time is money, on the stop. Each stop carries three tappable times: when Paul
+// left for it (inbound), when he arrived, when he finished. A tap stamps the
+// current moment; he can adjust or clear. Persisted to the appointment's visit
+// so the existing time_is_money export picks it up. Mirrors the paper sheet.
+function fmtClock(iso) {
+  if (!iso) return null;
+  try { return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return null; }
+}
+function isoToHHMM(iso) {
+  const d = new Date(iso);
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+function hhmmToISO(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  const d = new Date();
+  d.setHours(h, m, 0, 0);
+  return d.toISOString();
+}
+
+const CLOCKS = [['inbound', 'Left'], ['arrived', 'Arrived'], ['departed', 'Done']];
+
+function TimeStrip({ appt }) {
+  const [times, setTimes] = useState({
+    inbound: appt.inbound_at || null,
+    arrived: appt.arrived_at || null,
+    departed: appt.departed_at || null,
+  });
+  const [busy, setBusy] = useState(null);
+  const [err, setErr] = useState(false);
+
+  async function set(field, at) {
+    const prev = times;
+    setTimes((t) => ({ ...t, [field]: at }));   // optimistic
+    setBusy(field); setErr(false);
+    try { await stampAppointmentTime(appt.id, field, at); }
+    catch { setTimes(prev); setErr(true); }     // revert on failure
+    finally { setBusy(null); }
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: 8, marginTop: 6, marginLeft: 82, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+      {CLOCKS.map(([field, label]) => (
+        <TimeCell
+          key={field}
+          label={label}
+          value={times[field]}
+          busy={busy === field}
+          onStampNow={() => set(field, new Date().toISOString())}
+          onSet={(hhmm) => set(field, hhmmToISO(hhmm))}
+          onClear={() => set(field, null)}
+        />
+      ))}
+      {err && <span style={{ fontSize: 11, color: 'var(--ad-bad, #dc2626)', alignSelf: 'center' }}>save failed, try again</span>}
+    </div>
+  );
+}
+
+function TimeCell({ label, value, busy, onStampNow, onSet, onClear }) {
+  const [editing, setEditing] = useState(false);
+  const shown = fmtClock(value);
+
+  if (editing) {
+    return (
+      <span style={{ display: 'inline-flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>{label}</span>
+        <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+          <input type="time" autoFocus defaultValue={value ? isoToHHMM(value) : ''}
+            onChange={(e) => e.target.value && onSet(e.target.value)}
+            className="ad-mono" style={{ fontSize: 13, padding: '2px 4px', borderRadius: 6, border: '1px solid var(--ad-outline,#d8d8de)' }} />
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(false)}>ok</button>
+        </span>
+      </span>
+    );
+  }
+
+  return (
+    <span style={{ display: 'inline-flex', flexDirection: 'column', gap: 2, minWidth: 64 }}>
+      <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>{label}</span>
+      {shown ? (
+        <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+          <button onClick={() => setEditing(true)} disabled={busy} title="tap to adjust"
+            className="ad-mono"
+            style={{ fontSize: 13, fontWeight: 700, padding: '3px 8px', borderRadius: 8, cursor: 'pointer',
+              color: 'var(--ad-on-primary,#fff)', background: 'var(--ad-primary,#2563d8)', border: 0 }}>
+            {shown}
+          </button>
+          <button onClick={onClear} disabled={busy} title="clear"
+            style={{ fontSize: 12, lineHeight: 1, padding: '2px 5px', borderRadius: 6, cursor: 'pointer',
+              color: 'var(--ad-text-dim,#565b6c)', background: 'transparent', border: '1px solid var(--ad-outline,#e0e0e6)' }}>×</button>
+        </span>
+      ) : (
+        <button onClick={onStampNow} disabled={busy} title="tap to stamp now"
+          style={{ fontSize: 13, padding: '3px 12px', borderRadius: 8, cursor: 'pointer',
+            color: 'var(--ad-primary,#2563d8)', background: 'var(--ad-primary-container,#e6edfc)',
+            border: '1px dashed rgba(37,99,216,0.4)' }}>
+          {busy ? '…' : 'tap'}
+        </button>
+      )}
+    </span>
   );
 }
 

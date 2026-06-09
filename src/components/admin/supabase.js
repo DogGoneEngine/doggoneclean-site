@@ -300,6 +300,13 @@ export async function todayAppointments() {
   return Array.isArray(data) ? data : [];
 }
 
+// Stamp one clock (inbound | arrived | departed) on a stop's time_is_money
+// capture. p_at is a full ISO timestamp (or null to clear). Returns the visit's
+// current three times + minutes so the Today row can update in place.
+export async function stampAppointmentTime(appointmentId, field, at) {
+  return rpc('admin_stamp_appointment_time', { p_appointment_id: appointmentId, p_field: field, p_at: at });
+}
+
 export async function setBriefingStatus(id, status) {
   return rpc('admin_set_briefing_status', { p_id: id, p_status: status });
 }

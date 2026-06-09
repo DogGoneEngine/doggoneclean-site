@@ -354,9 +354,6 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
     charged: '',
     amount: '',
     paymentMethod: '',
-    inbound: '',
-    arrived: '',
-    departed: '',
   });
 
   const [scores, setScores] = useState({});
@@ -369,7 +366,6 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
       const dogScores = Object.entries(scores)
         .filter(([, s]) => s)
         .map(([dog_id, score]) => ({ dog_id, score }));
-      const stamp = (hhmm) => (hhmm && form.visitedAt) ? new Date(form.visitedAt + 'T' + hhmm + ':00').toISOString() : null;
       await logVisit({
         clientId,
         subscriberId,
@@ -381,14 +377,11 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
         chargedCents: form.charged ? Math.round(parseFloat(form.charged) * 100) : null,
         amountCollectedCents: form.amount ? Math.round(parseFloat(form.amount) * 100) : null,
         paymentMethod: form.paymentMethod || null,
-        inboundAt: stamp(form.inbound),
-        arrivedAt: stamp(form.arrived),
-        departedAt: stamp(form.departed),
         dogIds: dogScores.length ? dogScores.map((d) => d.dog_id) : null,
         dogScores: dogScores.length ? dogScores : null,
         source: 'manual',
       });
-      setForm((f) => ({ ...f, workDone: '', visitNotes: '', actualMinutes: '', charged: '', amount: '', inbound: '', arrived: '', departed: '' }));
+      setForm((f) => ({ ...f, workDone: '', visitNotes: '', actualMinutes: '', charged: '', amount: '' }));
       setScores({});
       setOpen(false);
       onLogged?.();
@@ -445,14 +438,12 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
           </select>
         </label>
       </div>
-      {/* The three time_is_money clocks: tap "now" to stamp the current time; adjust if logging late. Minutes derive from Arrived to Departed. */}
+      {/* Time-of-day capture (left / arrived / done) lives on the Today sheet per
+          stop, in the field where it gets tapped. Here, just the total minutes. */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <ClockField label="Inbound (left for stop)" value={form.inbound} onChange={set('inbound')} />
-        <ClockField label="Arrived" value={form.arrived} onChange={set('arrived')} />
-        <ClockField label="Departed (finished)" value={form.departed} onChange={set('departed')} />
         <label style={{ fontSize: 13 }}>
           Minutes<br />
-          <input className="ad-input" type="number" min="1" value={form.actualMinutes} onChange={set('actualMinutes')} placeholder="auto" style={{ width: 80 }} />
+          <input className="ad-input" type="number" min="1" value={form.actualMinutes} onChange={set('actualMinutes')} style={{ width: 80 }} />
         </label>
       </div>
       {(dogs || []).length > 0 && (
@@ -1008,24 +999,6 @@ function TimeIsMoneyExportPanel() {
 // A time_is_money clock field: a native time input plus a one-tap "now" button that
 // stamps the current time. Tap "now" the moment you leave, arrive, or finish; nudge
 // the picker if you are logging it a little late.
-function ClockField({ label, value, onChange }) {
-  const stampNow = () => {
-    const d = new Date();
-    const hh = String(d.getHours()).padStart(2, '0');
-    const mm = String(d.getMinutes()).padStart(2, '0');
-    onChange({ target: { value: `${hh}:${mm}` } });
-  };
-  return (
-    <label style={{ fontSize: 13 }}>
-      {label}<br />
-      <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
-        <input className="ad-input" type="time" value={value} onChange={onChange} style={{ width: 110 }} />
-        <button type="button" className="ad-btn ad-btn--sm ad-btn--ghost" onClick={stampNow}>now</button>
-      </span>
-    </label>
-  );
-}
-
 // Small chip showing a dog's standing on the roster. 'regular' is the default and
 // shows nothing (no clutter); the rest get a quiet label so a name is never a mystery.
 function DogStatusChip({ status }) {
