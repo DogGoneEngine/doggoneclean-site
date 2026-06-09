@@ -167,6 +167,16 @@ export async function triggerArchivist() {
   return rpc('admin_trigger_archivist');
 }
 
+// Growth / win-back -----------------------------------------------------------
+
+export async function growthSummary() {
+  return rpc('admin_growth_summary');
+}
+
+export async function runWinbackCheck() {
+  return rpc('admin_winback_check');
+}
+
 export async function listWisdom(status = null) {
   const data = await rpc('admin_list_wisdom', { p_status: status });
   return Array.isArray(data) ? data : [];

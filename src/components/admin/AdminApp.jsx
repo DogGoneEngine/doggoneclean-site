@@ -21,6 +21,7 @@ import PricingView from './PricingView.jsx';
 import OperationsView from './OperationsView.jsx';
 import KnowledgeView from './KnowledgeView.jsx';
 import VendorsView from './VendorsView.jsx';
+import GrowthView from './GrowthView.jsx';
 import QuickCapture from './QuickCapture.jsx';
 import './admin.css';
 
@@ -45,7 +46,7 @@ const SECTIONS = [
     what: 'The locked price grid per city and coat tier, and the founders-spot counter.' },
   { key: 'hr',        label: 'HR',             ready: false,
     what: 'You today, your specialists later. Roles, hours, pay, commission tiers, and onboarding.' },
-  { key: 'growth',    label: 'Growth',         ready: false,
+  { key: 'growth',    label: 'Growth',         ready: true,
     what: 'The lead funnel, the waitlist, referrals, retention, and a churn watch.' },
   { key: 'compliance', label: 'Compliance',    ready: true,
     what: 'Insurance and license renewals, A2P registration, payment-processor verification, and tax dates.' },
@@ -224,6 +225,7 @@ export default function AdminApp() {
         {section === 'operations' && <OperationsView />}
         {section === 'knowledge' && <KnowledgeView />}
         {section === 'vendors' && <VendorsView />}
+        {section === 'growth' && <GrowthView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
 

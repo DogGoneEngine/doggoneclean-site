@@ -2190,3 +2190,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   trigger earlier/later by how full the calendar is; only surface win-backs when there is room; and
   if it is time but the calendar is full, surface THAT to Paul (make room or add capacity, never
   silently lose the window). Needs a calendar-capacity read off `bath_appointments` + the schedule.
+- **Win-back agent + Growth floor built (2026-06-08).** Thirteenth floor, tenth agent. The win-back
+  watcher times off cadence+14 (or 90d one-offs), targets the recently lapsed within an 18-month
+  window (tunable `winback_max_days`), checks calendar room (booked in next 14d vs tunable
+  `winback_capacity_14d`, default 40), surfaces only when there is room, trickles the most-recently
+  lapsed 6 per run so Today is not flooded, and when it is time but the calendar is full surfaces a
+  single "N due but no room" alert. Skips clients already flagged by retention and any marked
+  'intentional'. Email-framed (recommend the coat-care email; the opt-in Resend send is the next
+  piece). Verified on real data: first run surfaced winnable clients (Lynne Bottomley 28d rhythm 54d
+  out, Lisa Midgett 14d 56d), not the 3-year-old archaeology the naive version hit (migration 0065).
+  The Growth floor shows the candidate list + the calendar-room status. Capacity and max-window are
+  tunable via app_secrets.
