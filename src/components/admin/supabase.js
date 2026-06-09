@@ -255,3 +255,25 @@ export async function pricingGrid() {
   const data = await rpc('admin_pricing_grid');
   return Array.isArray(data) ? data : [];
 }
+
+// Operations / equipment ------------------------------------------------------
+
+export async function listEquipment() {
+  return rpc('admin_list_equipment');
+}
+
+export async function upsertEquipment(e) {
+  return rpc('admin_upsert_equipment', {
+    p_id: e.id ?? null, p_name: e.name, p_category: e.category ?? 'other',
+    p_last_service_date: e.lastServiceDate ?? null, p_interval_days: e.intervalDays ?? null,
+    p_provider: e.provider ?? null, p_notes: e.notes ?? null, p_active: e.active ?? true,
+  });
+}
+
+export async function deleteEquipment(id) {
+  return rpc('admin_delete_equipment', { p_id: id });
+}
+
+export async function runMaintenanceCheck() {
+  return rpc('admin_maintenance_check');
+}
