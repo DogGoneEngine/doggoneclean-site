@@ -158,8 +158,13 @@ export async function resolveBriefing(id, disposition, note = null) {
 
 // Wisdom / knowledge capture --------------------------------------------------
 
-export async function captureWisdom(body, scope = 'business', clientId = null) {
-  return rpc('admin_capture_wisdom', { p_body: body, p_scope: scope, p_client_id: clientId, p_source: 'quick_capture' });
+export async function captureWisdom(body, clientId = null) {
+  // No category from Paul; the Archivist agent assigns scope + home.
+  return rpc('admin_capture_wisdom', { p_body: body, p_scope: 'unsorted', p_client_id: clientId, p_source: 'quick_capture' });
+}
+
+export async function triggerArchivist() {
+  return rpc('admin_trigger_archivist');
 }
 
 export async function listWisdom(status = null) {

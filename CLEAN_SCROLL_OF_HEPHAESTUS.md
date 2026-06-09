@@ -2179,3 +2179,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   on a route, and respects 'intentional'. Mark Ordered to reset the clock. Seeded with the known
   consumables (shampoo, towels, #7 blades, oil, rotary bands, sanitizer, cologne); vendor + cadence
   blank for Paul (migration 0063). Twelve floors live, nine agents.
+- **Quick-capture: the agent decides the category, not Paul (2026-06-08).** Paul could not reliably
+  pick a scope and often none fit, so the speed-dial dropdown was removed: captures default to
+  'unsorted' and the Archivist assigns both home and scope (verified: an unsorted note got scope
+  'operations' + home 'field_manual', cleanly reworded). Added a "Sort now" button on the Knowledge
+  Base floor to run the Archivist on demand (migration 0064).
+- **Win-back design captured (Paul's spec, 2026-06-08), Oracle `winback_is_cadence_and_calendar_aware`.**
+  The win-back agent (Growth floor, to build) must time off the client's own cadence (cadence + ~2
+  weeks), or ~90 days for a one-off with no captured cadence, not a rigid arbitrary clock; flex the
+  trigger earlier/later by how full the calendar is; only surface win-backs when there is room; and
+  if it is time but the calendar is full, surface THAT to Paul (make room or add capacity, never
+  silently lose the window). Needs a calendar-capacity read off `bath_appointments` + the schedule.

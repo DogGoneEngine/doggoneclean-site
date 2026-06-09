@@ -6,7 +6,7 @@
 // "File" marks it handled. The reasons (the becauses) are the business's memory.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listWisdom, setWisdomStatus, captureWisdom } from './supabase.js';
+import { listWisdom, setWisdomStatus, captureWisdom, triggerArchivist } from './supabase.js';
 
 function fmt(ts) { try { return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch { return ts; } }
 
@@ -36,6 +36,12 @@ export default function KnowledgeView() {
     try { await setWisdomStatus(id, 'filed'); load(); }
     catch (e) { setError(e.message || 'file_failed'); }
   }
+  const [sorting, setSorting] = useState(false);
+  async function sortNow() {
+    setSorting(true);
+    try { await triggerArchivist(); setTimeout(async () => { await load(); setSorting(false); }, 6000); }
+    catch (e) { setError(e.message || 'sort_failed'); setSorting(false); }
+  }
 
   const inbox = (items || []).filter((w) => w.status === 'inbox');
   const filed = (items || []).filter((w) => w.status === 'filed');
@@ -56,7 +62,10 @@ export default function KnowledgeView() {
         <div className="ad-panel">Loading…</div>
       ) : (
         <>
-          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Inbox · {inbox.length}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Inbox · {inbox.length}</div>
+            {inbox.length > 0 && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={sortNow} disabled={sorting}>{sorting ? 'Archivist sorting…' : 'Sort now'}</button>}
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
             {inbox.length === 0 && <div className="ad-panel" style={{ opacity: 0.7 }}>Nothing waiting. Capture an idea above or with the + button.</div>}
             {inbox.map((w) => <Card key={w.id} w={w} onFile={() => file(w.id)} />)}

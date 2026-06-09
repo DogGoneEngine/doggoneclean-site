@@ -8,12 +8,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { captureWisdom } from './supabase.js';
 
-const SCOPES = ['business', 'pricing', 'operations', 'growth', 'finance', 'compliance', 'client', 'other'];
-
 export default function QuickCapture() {
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState('');
-  const [scope, setScope] = useState('business');
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
@@ -45,7 +42,7 @@ export default function QuickCapture() {
     if (!body.trim()) return;
     setBusy(true); setError(null);
     try {
-      await captureWisdom(body.trim(), scope);
+      await captureWisdom(body.trim());
       setBody(''); setSaved(true); setTimeout(() => { setSaved(false); setOpen(false); }, 900);
     } catch (e) { setError(e.message || 'save_failed'); }
     finally { setBusy(false); }
@@ -70,7 +67,7 @@ export default function QuickCapture() {
               <strong style={{ fontSize: 15 }}>Capture an idea</strong>
               <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)} disabled={busy}>Close</button>
             </div>
-            <p style={{ fontSize: 12, opacity: 0.65, margin: '0 0 8px' }}>Lead with the reason. Try to say "because" so it lands as wisdom, not just a note.</p>
+            <p style={{ fontSize: 12, opacity: 0.65, margin: '0 0 8px' }}>Just dump the idea, and try to say "because." The Archivist files it and picks the category for you.</p>
             <textarea value={body} onChange={(e) => setBody(e.target.value)} disabled={busy} rows={4} autoFocus
               placeholder="The idea, and the because behind it…"
               style={{ width: '100%', fontSize: 14, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
@@ -80,9 +77,6 @@ export default function QuickCapture() {
                   {listening ? '● listening… tap to stop' : '🎤 voice'}
                 </button>
               )}
-              <select className="ad-select" value={scope} onChange={(e) => setScope(e.target.value)} disabled={busy}>
-                {SCOPES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
               <div style={{ flex: 1 }} />
               <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy || !body.trim()}>{saved ? 'Saved' : 'Capture'}</button>
             </div>

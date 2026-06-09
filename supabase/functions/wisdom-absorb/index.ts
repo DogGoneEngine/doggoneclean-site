@@ -1,10 +1,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 // The Archivist. Reads the wisdom inbox and proposes where each captured note
-// belongs (oracle rule, client note, parking lot, field manual, or drop) in
-// clean because-form. Recommend only; Paul files from the Knowledge Base floor.
-// Daily via the wisdom-absorb cron, secret-gated. Self-healing: re-queues
-// anything it could not place this run.
+// belongs (oracle rule, client note, parking lot, field manual, or drop) AND its
+// topic scope, in clean because-form. Recommend only; Paul files from the
+// Knowledge Base floor. Daily via the wisdom-absorb cron (or admin_trigger_
+// archivist on demand), secret-gated. Self-healing: re-queues anything it could
+// not place this run. Paul does not categorize; the agent decides.
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -25,6 +26,7 @@ async function expectedSecret(): Promise<string | null> {
   return Array.isArray(rows) && rows[0] ? rows[0].value : null;
 }
 const HOMES = ["oracle_rule", "client_note", "parking_lot", "field_manual", "drop"];
+const SCOPES = ["business", "client", "pricing", "operations", "growth", "finance", "compliance", "other"];
 
 Deno.serve(async (req) => {
   try {
@@ -42,11 +44,12 @@ Deno.serve(async (req) => {
 
     const system = [
       "You are the Archivist for Dog Gone Clean, a mobile dog-grooming business owned by Paul.",
-      "You triage captured notes (wisdom) and decide where each belongs, then rewrite it cleanly.",
+      "You triage captured notes (wisdom) and decide where each belongs and what it is about, then rewrite it cleanly. Paul does not categorize; you do.",
       "Homes: 'oracle_rule' (a general, durable business rule or principle), 'client_note' (something specific to one named client), 'parking_lot' (a future idea or deferred work), 'field_manual' (an equipment, trailer, or craft how-to), 'drop' (noise, a duplicate, or nothing durable).",
+      "Scope (the topic): one of business, client, pricing, operations, growth, finance, compliance, other.",
       "Rewrite each as one clean statement in because-form: the decision or fact, then 'Because' and the reason. Keep Paul's meaning; do not invent facts. No em dashes, no corporate jargon.",
-      "If a note already names a client (the 'client' field is set), it is almost always 'client_note'.",
-      'Respond with ONLY a JSON array, one object per input note: [{"id": string, "home": one of the homes, "statement": string, "reason": short string}]. No prose around it.',
+      "If a note already names a client (the 'client' field is set), it is almost always home 'client_note' and scope 'client'.",
+      'Respond with ONLY a JSON array, one object per input note: [{"id": string, "home": a home, "scope": a scope, "statement": string, "reason": short string}]. No prose around it.',
     ].join(" ");
 
     const aRes = await fetch("https://api.anthropic.com/v1/messages", {
@@ -70,7 +73,8 @@ Deno.serve(async (req) => {
     let saved = 0;
     for (const p of proposals) {
       if (!p || !p.id || !HOMES.includes(p.home) || !p.statement) continue;
-      await rpc("wisdom_save_proposal", { p_id: p.id, p_home: p.home, p_text: String(p.statement).slice(0, 1000) });
+      const scope = SCOPES.includes(p.scope) ? p.scope : null;
+      await rpc("wisdom_save_proposal", { p_id: p.id, p_home: p.home, p_text: String(p.statement).slice(0, 1000), p_scope: scope });
       counts[p.home] = (counts[p.home] ?? 0) + 1;
       saved++;
     }

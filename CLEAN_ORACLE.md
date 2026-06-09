@@ -1452,3 +1452,23 @@ reason captured once stops the same question being asked forever and compounds
 into the un-promptable moat, while an answer used and discarded has to be
 re-derived; and the friction between having a thought and capturing it is what
 loses it. Decided 2026-06-08.
+
+---
+
+## Growth
+
+`winback_is_cadence_and_calendar_aware` (Clean: growth):
+The win-back nudge (re-engaging a lapsed client) is timed off the client's own
+cadence and flexed by the calendar, never a rigid arbitrary clock. A client with
+a recorded cadence becomes a win-back candidate at their cadence plus about two
+weeks; a one-off client with no captured cadence at about ninety days since the
+last visit. Neither threshold is rigid: it can slide a little earlier or later
+than the two-week or ninety-day mark based on how the calendar looks. The agent
+surfaces win-backs when there is actually room to take the client, because trying
+to win people back while the calendar is jammed is wasted effort and risks
+overbooking. But if it IS time to win a client back and there is no room, that
+itself is surfaced to Paul, so he can choose to make room or add capacity rather
+than silently lose the window. Because re-engagement timed to the client's own
+rhythm and to real available capacity converts, while an arbitrary ninety-day
+blast into a full calendar does not, and a quietly missed win-back window is lost
+revenue. Decided 2026-06-08.
