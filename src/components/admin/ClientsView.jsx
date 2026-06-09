@@ -212,16 +212,33 @@ function ClientSheet({ clientId, onChanged }) {
         <AccessNotes client={c} onChanged={() => { load(); onChanged?.(); }} />
         <OnsitePeople client={c} onChanged={() => { load(); onChanged?.(); }} />
         <MessageDraftTool client={c} onChanged={() => { load(); onChanged?.(); }} />
-        {dogs.length > 0 && (
-          <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Dogs</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {dogs.map((d) => (
-                <DogCard key={d.id} dog={d} onChanged={() => { load(); onChanged?.(); }} />
-              ))}
+        {dogs.length > 0 && (() => {
+          // Regular roster (regular + occasional) shows up top; past/other dogs
+          // (former + deceased) are kept but tucked into a collapsed section so the
+          // name is always findable without cluttering the working roster.
+          const isPast = (d) => d.roster_status === 'former' || d.roster_status === 'deceased';
+          const active = dogs.filter((d) => !isPast(d));
+          const past = dogs.filter(isPast);
+          const reload = () => { load(); onChanged?.(); };
+          return (
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Dogs</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {active.map((d) => (<DogCard key={d.id} dog={d} onChanged={reload} />))}
+              </div>
+              {past.length > 0 && (
+                <details style={{ marginTop: 10 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 12, opacity: 0.6 }}>
+                    Past and other dogs ({past.length})
+                  </summary>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+                    {past.map((d) => (<DogCard key={d.id} dog={d} onChanged={reload} />))}
+                  </div>
+                </details>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Riker: say it, it gets entered (one-tap confirm) */}
@@ -422,7 +439,7 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
             1 unsafe / aggression, not eligible · 2 poor, conditional · 3 average · 4 cooperative · 5 a joy, anticipates you
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
-            {dogs.map((d) => (
+            {dogs.filter((d) => d.roster_status !== 'former' && d.roster_status !== 'deceased').map((d) => (
               <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 14, minWidth: 90 }}>{d.name}</span>
                 <div style={{ display: 'flex', gap: 4 }}>
@@ -838,11 +855,30 @@ function DogBirthday({ dog, onChanged }) {
   );
 }
 
+// Small chip showing a dog's standing on the roster. 'regular' is the default and
+// shows nothing (no clutter); the rest get a quiet label so a name is never a mystery.
+function DogStatusChip({ status }) {
+  if (!status || status === 'regular') return null;
+  const map = {
+    occasional: { label: 'sometimes', bg: '#eef2ff', fg: '#3a44b0' },
+    former: { label: 'former', bg: '#f1f1f4', fg: '#666' },
+    deceased: { label: 'deceased', bg: '#f1f1f4', fg: '#888' },
+  };
+  const s = map[status] || { label: status, bg: '#f1f1f4', fg: '#666' };
+  return (
+    <span style={{ marginLeft: 6, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.4,
+      background: s.bg, color: s.fg, borderRadius: 6, padding: '1px 6px', verticalAlign: 'middle' }}>
+      {s.label}
+    </span>
+  );
+}
+
 function DogCard({ dog, onChanged }) {
   return (
     <div style={{ border: '1px solid var(--ad-outline, #d9dbe6)', borderRadius: 10, padding: '8px 10px' }}>
       <div className="ad-mono" style={{ fontSize: 13 }}>
         <strong>{dog.name}</strong>{dog.breed ? ` · ${dog.breed}` : ''}{dog.price_cents != null ? ` · ${money(dog.price_cents)}` : ''}
+        <DogStatusChip status={dog.roster_status} />
       </div>
       {dog.notes ? <div style={{ opacity: 0.7, marginTop: 2, fontSize: 12 }}>{dog.notes}</div> : null}
       <DogBirthday dog={dog} onChanged={onChanged} />
