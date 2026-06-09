@@ -5,19 +5,23 @@
 // more, grind less). It scales to a team roster when he hires.
 
 import { useCallback, useEffect, useState } from 'react';
-import { hrSummary } from './supabase.js';
+import { hrSummary, listAgents } from './supabase.js';
 
 function money(c) { return c == null ? '$0' : '$' + Math.round(c / 100).toLocaleString('en-US'); }
 
 export default function HRView() {
   const [data, setData] = useState(null);
+  const [agents, setAgents] = useState([]);
   const [windowDays, setWindowDays] = useState(30);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
-    try { setData(await hrSummary(windowDays)); }
+    try {
+      const [d, a] = await Promise.all([hrSummary(windowDays), listAgents()]);
+      setData(d); setAgents(a);
+    }
     catch (e) { setError(e.message || 'load_failed'); }
     finally { setLoading(false); }
   }, [windowDays]);
@@ -42,6 +46,23 @@ export default function HRView() {
           <div className="ad-panel" style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>The team</div>
             <div style={{ marginTop: 6, fontSize: 15 }}><strong>Paul</strong> <span style={{ opacity: 0.6 }}>· owner-operator (sole)</span></div>
+          </div>
+
+          <div className="ad-panel" style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>AI department heads</div>
+            <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 8 }}>Your around-the-clock staff. They watch their floors and leave findings on Today; they recommend, they never act on their own.</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {agents.length === 0 && <span style={{ fontSize: 13, opacity: 0.6 }}>No agents registered yet.</span>}
+              {agents.map((a) => (
+                <span key={a.agent_key} className="ad-mono" style={{
+                  fontSize: 12, padding: '3px 9px', borderRadius: 8,
+                  background: a.is_active ? 'var(--ad-primary-container, #e6edfc)' : 'var(--ad-surface-container, #f5f4f1)',
+                  opacity: a.is_active ? 1 : 0.55,
+                }} title={a.description || ''}>
+                  {a.label}{a.is_active ? '' : ' · dormant'}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>

@@ -60,7 +60,15 @@ drops appointments out of Paul's view. Do all three in one sitting, on Paul's go
 **Do NOT start any step until Paul says go.** Until then the default calendar stays the working
 truth and the admin view stays a test mirror.
 
-## Voice-capture agent ("Riker"): speak it, it gets entered (2026-06-09)
+## Voice-capture agent ("Riker"): BUILT v1 2026-06-09 (riker_capture_agent)
+
+Shipped: one-tap confirm, on Today (say the name) and the client sheet (client fixed). Writes a visit
+with per-dog vibe scores, a household note, and per-dog notes. Still open: photos through Riker (below),
+an `agent_runs` provenance log per capture, broader field coverage (cadence/availability/access changes
+as first-class structured updates, not just freeform notes), and Paul's final name for it. Original
+spec kept below for the next passes.
+
+### Original spec / next passes
 
 Paul's model: Picard does not do the data entry, he tells Riker and Riker gets it done. Paul wants a
 capture box (like the Oracle "lock it in" button) where, standing at an appointment, he dictates with
@@ -79,16 +87,27 @@ Build on top of the vibe score (done) and the visit model. Open choices for Paul
 one-tap confirm; how to pick the client when none is open (say the name); and the name (he said not
 "Riker"). Next build after he picks a direction.
 
-## Before/after photos per dog per visit (2026-06-09)
+## Photos per dog per visit (2026-06-09)
 
-Paul kept before/after photos of each dog at every appointment in the old Google Doc sheets and wants
-them here. `visits.photo_paths` already exists (text[]). Direction (recommended): Supabase Storage in
-a private bucket, one folder per client/dog/visit, upload straight from the phone camera in the
-Log-a-visit form (and via the voice-capture flow), thumbnails in the visit-history row, tap to enlarge.
-Keep the bucket private (signed URLs through an admin RPC) since these are client property and the
-business must stay sellable (`clean_stays_saleable`): photos are Clean's data, in Clean's project,
-never entangled. Open question for Paul: before/after as two explicit slots per dog, or a freeform set
-per visit. Parked as the next-but-one build.
+Paul's real practice: for each dog-grooming appointment he takes three photos on his phone, a BEFORE,
+an AFTER, and an AFTERWARD shot of him with the dog, plus the option for extra photos (something he
+observed, or just extras). Today they live in his Google Photos. He wants them on the visit record and
+noted that, unlike a quick spoken update to Riker, photos will take an extra step or two.
+`visits.photo_paths` already exists (text[]). Direction (recommended): three labeled slots (before /
+after / with-dog) plus an open "extras" set per visit, in a PRIVATE Supabase Storage bucket (signed
+URLs through an admin RPC), thumbnails in the visit-history row, tap to enlarge. Private because these
+are client property and the business must stay sellable (`clean_stays_saleable`): Clean's data, in
+Clean's project, never entangled.
+The real open question is the easiest intake from a phone where the shots are already in Google Photos:
+  1. (Recommended) Direct multi-select upload from the phone in the visit form (and a Riker follow-up
+     "add the photos?"). The Android share sheet / file picker reaches Google Photos, so it is
+     pick-and-go: no extra integration, no new API surface, nothing extra to untangle at sale. Fewest
+     moving parts that works on his Pixel.
+  2. A Google Photos API pull (pick from an album in-app). Smoother in theory but adds a Google
+     integration and scopes to untangle at sale; only worth it if option 1 is annoying in the field.
+  3. Auto-ingest via a per-day shared album. Most automatic, most fragile, hardest to map a photo to
+     the right dog and visit. Last resort.
+Decide intake (likely option 1) before building. Next build after Riker hardening.
 
 ## Cutover follow-ons - legacy fold (2026-06-07)
 

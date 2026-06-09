@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents } from './supabase.js';
+import RikerCapture from './RikerCapture.jsx';
 
 const SEV = {
   alert:  { color: '#dc2626', label: 'Alert' },
@@ -41,20 +42,7 @@ export default function TodayView() {
       <h1>Today</h1>
       <p className="ad-sub">{today}. Your department heads work around the clock and leave their findings here. Talk back to any of them.</p>
 
-      <div className="ad-panel" style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Department heads</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {agents.map((a) => (
-            <span key={a.agent_key} className="ad-mono" style={{
-              fontSize: 12, padding: '3px 9px', borderRadius: 8,
-              background: a.is_active ? 'var(--ad-primary-container, #e6edfc)' : 'var(--ad-surface-container, #f5f4f1)',
-              opacity: a.is_active ? 1 : 0.55,
-            }} title={a.description || ''}>
-              {a.label}{a.is_active ? '' : ' · dormant'}
-            </span>
-          ))}
-        </div>
-      </div>
+      <RikerCapture onApplied={load} />
 
       {error && <div className="ad-error">{error}</div>}
 

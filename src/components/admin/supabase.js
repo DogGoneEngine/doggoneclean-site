@@ -27,6 +27,35 @@ async function rpc(fnName, params = {}) {
   return data;
 }
 
+// Call an admin edge function with the signed-in user's bearer token.
+async function callAdminEdge(name, body = {}) {
+  const session = await getSession();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_ANON,
+      Authorization: `Bearer ${session?.access_token || SUPABASE_ANON}`,
+    },
+    body: JSON.stringify(body),
+  });
+  let json = null;
+  try { json = await res.json(); } catch { /* non-json */ }
+  if (!res.ok || (json && json.ok === false)) {
+    throw new Error((json && json.error) || `edge_${res.status}`);
+  }
+  return json;
+}
+
+// Riker: parse a spoken/typed update into a plan (proposes), then apply it.
+export async function rikerParse(utterance, clientId = null) {
+  const out = await callAdminEdge('riker', { utterance, client_id: clientId });
+  return out.plan;
+}
+export async function rikerApply(plan) {
+  return rpc('admin_riker_apply', { p_plan: plan });
+}
+
 // Auth ---------------------------------------------------------------------
 
 export async function signInWithGoogle() {

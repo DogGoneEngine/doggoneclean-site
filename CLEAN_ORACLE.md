@@ -1634,3 +1634,20 @@ decision (an unsafe dog is a no), a 2 is a conditional warning that sets an impr
 trend over time tells him which dogs are a joy and which are a grind, which feeds scheduling, pricing,
 and whether the work is worth doing. These definitions are Paul's working version and may be refined.
 Decided 2026-06-09.
+
+`riker_capture_agent` (Clean: clients):
+Riker is the speak-it-and-it-gets-entered clerk. Paul dictates a short note about an appointment he
+just finished (his phone's voice-to-text fills the box) and it is filed into the right place on the
+contact sheet instead of typed by hand: the replacement for the per-client Google Doc sheets. The
+split follows the house pattern, an AI proposes and a click writes: the `riker` edge function has
+Claude PARSE the utterance into a structured plan (proposes, never writes), and `admin_riker_apply`
+writes it under the admin gate; `admin_riker_context` feeds the parser only the client and dogs it may
+touch and doubles as the auth check. Supported writes: a visit (service, minutes, amount, payment,
+work done, visit notes) with per-dog vibe scores, a household note appended to `clients.note`, and
+per-dog notes appended to `dogs.notes`; every dog reference is validated to belong to the client.
+Nothing is written until Paul taps Confirm once (one-tap confirm), so a misheard word never lands. It
+is on Today (Riker resolves the client name Paul says) and on each client sheet (the client is fixed).
+Because the moat is the proprietary per-client knowledge Paul carries, and the way to keep it is to
+make capturing it as cheap as talking: the goal is that Paul interacts with the contact sheet the way
+he interacts with his GitHub, constantly but through an agent, never by hand. The voice-to-text is the
+phone's job; Riker takes no audio. The name is provisional. Decided 2026-06-09.

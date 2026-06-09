@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { listClients, getClient, logVisit, setClientNofly, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
+import RikerCapture from './RikerCapture.jsx';
 
 const SERVICE_LABELS = {
   full_groom: 'Full groom',
@@ -218,6 +219,9 @@ function ClientSheet({ clientId, onChanged }) {
           </div>
         )}
       </div>
+
+      {/* Riker: say it, it gets entered (one-tap confirm) */}
+      <RikerCapture clientId={clientId} clientName={c.name} onApplied={() => { load(); onChanged?.(); }} />
 
       {/* Log a visit */}
       <LogVisitForm
