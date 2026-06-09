@@ -1604,3 +1604,33 @@ are on the books the existing future-appointment guard also suppresses win-back 
 flag holds regardless of how far out those appointments are or whether they have synced yet. Because
 nudging a client who manages their own cadence is noise that erodes the relationship, and the right
 control is a quiet per-client suppression, not a ban and not removal from the book. Decided 2026-06-09.
+
+`visit_notes_are_observations_only` (Clean: clients):
+The `visits.visit_notes` field holds behavior and condition observations only, never payment status.
+The Acuity / calendar import had dumped the online-payment label ("paid: Invoice" and similar) into
+visit_notes on hundreds of visits, which read as "paid by invoice" for clients regardless of how they
+actually paid. It was scrubbed (`0078`), and the real method stays in `visits.payment_method`. Because
+mislabeled imported data presented as fact violates `real_data_only` and made the contact sheet lie
+about how people paid. Decided 2026-06-09.
+
+`vibe_score` (Clean: clients):
+Paul scores every dog at every appointment 1 to 5, the "vibe score", recorded per dog per visit in
+`visit_dog_ratings.score` and captured in the Log-a-visit form (and, once built, by the voice-capture
+agent). The scale is behavioral, about how the dog was to work with, not about looks or coat:
+  1 = the dog showed aggression (Paul has zero tolerance) or was so uncooperative it could not be
+      groomed safely (it could injure itself or Paul). A 1 means the dog is NOT eligible for future
+      service. Paul may at his own discretion keep working with a 1 conditionally when he believes it
+      can improve over the next couple of appointments, but a dog that stays a 1 is not worth the risk
+      and is done.
+  2 = like a 1 but with no aggression; Paul will conditionally serve again on the condition the dog
+      improves to a 3.
+  3 = average; neither excessively good nor bad.
+  4 = the dog goes out of its way to cooperate and tries to anticipate what Paul will do next.
+  5 = a 4 taken to the next level; the dog brings joy to the day, reads his cues, shifts its weight and
+      offers the next foot before he reaches for it, and learns his tool-and-task patterns (when a
+      certain blade goes on, it anticipates the body parts that follow in his fixed order).
+Because the vibe is real, safety-relevant signal Paul already tracks by hand: a 1 is an eligibility
+decision (an unsafe dog is a no), a 2 is a conditional warning that sets an improvement target, and the
+trend over time tells him which dogs are a joy and which are a grind, which feeds scheduling, pricing,
+and whether the work is worth doing. These definitions are Paul's working version and may be refined.
+Decided 2026-06-09.

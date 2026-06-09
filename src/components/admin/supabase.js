@@ -112,6 +112,7 @@ export async function logVisit(v) {
     p_tip_cents:             v.tipCents ?? null,
     p_payment_method:        v.paymentMethod ?? null,
     p_source:                v.source ?? 'manual',
+    p_dog_scores:            v.dogScores ?? null,
   });
 }
 

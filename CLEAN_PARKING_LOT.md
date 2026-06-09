@@ -60,6 +60,36 @@ drops appointments out of Paul's view. Do all three in one sitting, on Paul's go
 **Do NOT start any step until Paul says go.** Until then the default calendar stays the working
 truth and the admin view stays a test mirror.
 
+## Voice-capture agent ("Riker"): speak it, it gets entered (2026-06-09)
+
+Paul's model: Picard does not do the data entry, he tells Riker and Riker gets it done. Paul wants a
+capture box (like the Oracle "lock it in" button) where, standing at an appointment, he dictates with
+his phone's voice-to-text in plain speech ("Bella was a five today, the client wants the sanitary
+trim shorter from now on, collected 60 in cash") and the system files each piece into the right home
+on the client's record: the vibe score per dog (`visit_dog_ratings`), the visit row (`visits`:
+work done, minutes, amount, payment), and durable contact-sheet facts (access notes, cadence changes,
+standing instructions on `clients` / `dogs`). This is the replacement for the per-client Google Doc
+sheets Paul used to hand-keep: instead of typing, he talks. Design direction (recommended): a free-text
+box (voice-to-text is the phone's job, no audio upload) -> an LLM edge function that resolves which
+client (from the open sheet or a named client) and parses the utterance into structured proposed
+writes -> a quick "here is what I am about to record" confirm so nothing garbage lands -> writes via
+the existing `admin_log_visit` / client-update RPCs. It ACTS (Riker gets it done), but shows the parse
+first so a misheard word does not corrupt the record; an "undo" on the last capture covers the rest.
+Build on top of the vibe score (done) and the visit model. Open choices for Paul: auto-write vs the
+one-tap confirm; how to pick the client when none is open (say the name); and the name (he said not
+"Riker"). Next build after he picks a direction.
+
+## Before/after photos per dog per visit (2026-06-09)
+
+Paul kept before/after photos of each dog at every appointment in the old Google Doc sheets and wants
+them here. `visits.photo_paths` already exists (text[]). Direction (recommended): Supabase Storage in
+a private bucket, one folder per client/dog/visit, upload straight from the phone camera in the
+Log-a-visit form (and via the voice-capture flow), thumbnails in the visit-history row, tap to enlarge.
+Keep the bucket private (signed URLs through an admin RPC) since these are client property and the
+business must stay sellable (`clean_stays_saleable`): photos are Clean's data, in Clean's project,
+never entangled. Open question for Paul: before/after as two explicit slots per dog, or a freeform set
+per visit. Parked as the next-but-one build.
+
 ## Cutover follow-ons - legacy fold (2026-06-07)
 
 The legacy-fold cutover (legacy_folds_into_v2) is mid-build. Open threads, parked so they

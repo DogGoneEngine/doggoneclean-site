@@ -29,12 +29,29 @@ function fmtDate(ts) {
   } catch { return ts; }
 }
 
+// On a phone the master/detail layout stacked the contact sheet far below the
+// list, so a tap looked like nothing happened. Below this width we switch to a
+// single pane: the list, or the selected sheet with a back button.
+function useIsNarrow(maxWidth = 760) {
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mq = window.matchMedia(`(max-width: ${maxWidth}px)`);
+    const on = () => setNarrow(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, [maxWidth]);
+  return narrow;
+}
+
 export default function ClientsView() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState(null);
+  const narrow = useIsNarrow();
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -58,69 +75,81 @@ export default function ClientsView() {
       (c.aliases || []).some((a) => (a || '').toLowerCase().includes(q)));
   }, [clients, query]);
 
+  const showDetailOnly = narrow && selectedId;
+
   return (
     <>
       <h1>Clients</h1>
-      <p className="ad-sub">The contact-sheet book. {clients.length} active clients (seen within the past year). Pick one to open its sheet.</p>
+      {!showDetailOnly && (
+        <p className="ad-sub">The contact-sheet book. {clients.length} active clients (seen within the past year). Pick one to open its sheet.</p>
+      )}
+      {!showDetailOnly && <NoFlyPanel onChanged={load} />}
+      {!showDetailOnly && <ArchivedPanel onChanged={load} />}
 
-      <NoFlyPanel onChanged={load} />
-      <ArchivedPanel onChanged={load} />
+      {showDetailOnly ? (
+        <div>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setSelectedId(null)} style={{ marginBottom: 12 }}>← All clients</button>
+          <ClientSheet clientId={selectedId} onChanged={load} />
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 320px', minWidth: narrow ? 0 : 280, maxWidth: narrow ? 'none' : 460, width: narrow ? '100%' : undefined }}>
+            <input
+              className="ad-input"
+              placeholder="Search name, account, or zone"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ width: '100%', marginBottom: 12 }}
+            />
+            {error && <div className="ad-error">{error}</div>}
+            {loading ? (
+              <div className="ad-panel">Loading the book…</div>
+            ) : (
+              <div className="ad-panel" style={{ padding: 0, maxHeight: narrow ? 'none' : '70vh', overflow: 'auto' }}>
+                <table className="ad-table">
+                  <tbody>
+                    {filtered.map((c) => (
+                      <tr
+                        key={c.id}
+                        onClick={() => setSelectedId(c.id)}
+                        style={{
+                          cursor: 'pointer',
+                          background: c.id === selectedId ? 'var(--ad-surface-container-high, #eef1fb)' : undefined,
+                        }}
+                      >
+                        <td>
+                          <strong>{c.name}</strong>
+                          {c.aka ? <span className="ad-mono" style={{ marginLeft: 6, opacity: 0.6 }}>{c.aka}</span> : null}
+                          <div style={{ fontSize: 12, opacity: 0.7 }}>
+                            {SERVICE_LABELS[c.service_type] || c.service_type || 'service unset'}
+                            {c.cadence_days ? ` · every ${c.cadence_days}d` : ''}
+                            {c.location_zone ? ` · ${c.location_zone}` : ''}
+                            {c.dog_count ? ` · ${c.dog_count} dog${c.dog_count === 1 ? '' : 's'}` : ''}
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'right', fontSize: 12, whiteSpace: 'nowrap', opacity: 0.7 }}>
+                          {c.last_visit_at ? fmtDate(c.last_visit_at) : <span style={{ opacity: 0.5 }}>no visits</span>}
+                        </td>
+                      </tr>
+                    ))}
+                    {filtered.length === 0 && (
+                      <tr><td style={{ opacity: 0.6 }}>No clients match.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
 
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <div style={{ flex: '1 1 320px', minWidth: 280, maxWidth: 460 }}>
-          <input
-            className="ad-input"
-            placeholder="Search name, account, or zone"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            style={{ width: '100%', marginBottom: 12 }}
-          />
-          {error && <div className="ad-error">{error}</div>}
-          {loading ? (
-            <div className="ad-panel">Loading the book…</div>
-          ) : (
-            <div className="ad-panel" style={{ padding: 0, maxHeight: '70vh', overflow: 'auto' }}>
-              <table className="ad-table">
-                <tbody>
-                  {filtered.map((c) => (
-                    <tr
-                      key={c.id}
-                      onClick={() => setSelectedId(c.id)}
-                      style={{
-                        cursor: 'pointer',
-                        background: c.id === selectedId ? 'var(--ad-surface-container-high, #eef1fb)' : undefined,
-                      }}
-                    >
-                      <td>
-                        <strong>{c.name}</strong>
-                        {c.aka ? <span className="ad-mono" style={{ marginLeft: 6, opacity: 0.6 }}>{c.aka}</span> : null}
-                        <div style={{ fontSize: 12, opacity: 0.7 }}>
-                          {SERVICE_LABELS[c.service_type] || c.service_type || 'service unset'}
-                          {c.cadence_days ? ` · every ${c.cadence_days}d` : ''}
-                          {c.location_zone ? ` · ${c.location_zone}` : ''}
-                          {c.dog_count ? ` · ${c.dog_count} dog${c.dog_count === 1 ? '' : 's'}` : ''}
-                        </div>
-                      </td>
-                      <td style={{ textAlign: 'right', fontSize: 12, whiteSpace: 'nowrap', opacity: 0.7 }}>
-                        {c.last_visit_at ? fmtDate(c.last_visit_at) : <span style={{ opacity: 0.5 }}>no visits</span>}
-                      </td>
-                    </tr>
-                  ))}
-                  {filtered.length === 0 && (
-                    <tr><td style={{ opacity: 0.6 }}>No clients match.</td></tr>
-                  )}
-                </tbody>
-              </table>
+          {!narrow && (
+            <div style={{ flex: '2 1 460px', minWidth: 320 }}>
+              {selectedId
+                ? <ClientSheet clientId={selectedId} onChanged={load} />
+                : <div className="ad-panel" style={{ opacity: 0.7 }}>Select a client to open the contact sheet.</div>}
             </div>
           )}
         </div>
-
-        <div style={{ flex: '2 1 460px', minWidth: 320 }}>
-          {selectedId
-            ? <ClientSheet clientId={selectedId} onChanged={load} />
-            : <div className="ad-panel" style={{ opacity: 0.7 }}>Select a client to open the contact sheet.</div>}
-        </div>
-      </div>
+      )}
     </>
   );
 }
@@ -232,6 +261,15 @@ function ClientSheet({ clientId, onChanged }) {
                     {v.tip_cents ? ` (+${money(v.tip_cents)} tip)` : ''}
                   </span>
                 </div>
+                {(v.dog_ratings || []).length > 0 && (
+                  <div style={{ marginTop: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {v.dog_ratings.map((r) => (
+                      <span key={r.dog_id || r.name} title="vibe score (1 unsafe to 5 a joy)" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        {r.name || 'dog'} <ScoreDot score={r.score} />
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {v.work_done ? <div style={{ fontSize: 14, marginTop: 2 }}>{v.work_done}</div> : null}
                 {v.visit_notes ? <div style={{ fontSize: 13, opacity: 0.75, marginTop: 2 }}>{v.visit_notes}</div> : null}
                 {(v.condition_flags || []).length > 0 && (
@@ -260,6 +298,14 @@ function Field({ label, value }) {
   );
 }
 
+function ScoreDot({ score }) {
+  // 1 roughest (red) to 5 a joy (green).
+  const colors = { 1: '#dc2626', 2: '#d97706', 3: '#b9770a', 4: '#3f9142', 5: '#1f8a4b' };
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: '50%', background: colors[score] || '#565b6c', color: '#fff', fontSize: 11, fontWeight: 700 }}>{score}</span>
+  );
+}
+
 function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -275,12 +321,16 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
     paymentMethod: '',
   });
 
+  const [scores, setScores] = useState({});
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function submit(e) {
     e.preventDefault();
     setSaving(true); setError(null);
     try {
+      const dogScores = Object.entries(scores)
+        .filter(([, s]) => s)
+        .map(([dog_id, score]) => ({ dog_id, score }));
       await logVisit({
         clientId,
         subscriberId,
@@ -291,9 +341,12 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
         actualMinutes: form.actualMinutes ? parseInt(form.actualMinutes, 10) : null,
         amountCollectedCents: form.amount ? Math.round(parseFloat(form.amount) * 100) : null,
         paymentMethod: form.paymentMethod || null,
+        dogIds: dogScores.length ? dogScores.map((d) => d.dog_id) : null,
+        dogScores: dogScores.length ? dogScores : null,
         source: 'manual',
       });
       setForm((f) => ({ ...f, workDone: '', visitNotes: '', actualMinutes: '', amount: '' }));
+      setScores({});
       setOpen(false);
       onLogged?.();
     } catch (err) {
@@ -347,6 +400,32 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
           </select>
         </label>
       </div>
+      {(dogs || []).length > 0 && (
+        <div>
+          <div style={{ fontSize: 12, opacity: 0.6 }}>Vibe score</div>
+          <div style={{ fontSize: 11, opacity: 0.55, marginTop: 2, lineHeight: 1.45 }}>
+            1 unsafe / aggression, not eligible · 2 poor, conditional · 3 average · 4 cooperative · 5 a joy, anticipates you
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
+            {dogs.map((d) => (
+              <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 14, minWidth: 90 }}>{d.name}</span>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setScores((s) => ({ ...s, [d.id]: s[d.id] === n ? undefined : n }))}
+                      className={'ad-btn ad-btn--sm ' + (scores[d.id] === n ? '' : 'ad-btn--ghost')}
+                      style={{ minWidth: 34 }}
+                    >{n}</button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <label style={{ fontSize: 13 }}>
         What was done<br />
         <input className="ad-input" value={form.workDone} onChange={set('workDone')} style={{ width: '100%' }} />
