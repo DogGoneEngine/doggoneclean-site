@@ -2077,3 +2077,41 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   of the loop" (anti-shaming) - the per-client override reverses that, so it is not yet written
   into DGN pending Paul's decision on whether to supersede it and how to keep the anti-shaming
   intent (e.g. route on real time without surfacing it as a judgment in the operator app).
+
+## Decisions log (2026-06-08)
+
+- **Orbit admin console built out from 3 floors to 8 (this session).** The admin app
+  (`src/components/admin/`, page `/orbit`) gained live floors: Finance, Reports, Compliance,
+  Settings, and Audit, on top of the existing Today, Clients, and Schedule. Every floor is a
+  thin React view over an admin-gated `admin_*` RPC; the teeth live in the database, so the
+  console survives a redesign. Remaining stubs: Pricing, Operations/Field, HR, Growth, Vendors,
+  Knowledge Base, Calendar, Geography.
+- **The AI department-head framework is live, with six agents.** Pattern: an `agents` registry
+  plus a cheap worker (SQL function or edge function) that reads scoped real data, writes a
+  briefing into `briefings` (recommend, never act), and a human approves from the Today feed.
+  Live agents: CFO (LLM, daily, revenue-per-hour + net), Compliance watchdog (SQL, daily,
+  renewals), Retention (SQL, daily, standing clients past 1.5x cadence), Pricing (SQL, weekly,
+  clients below 75% of the business revenue-per-hour rate), Bookkeeper (SQL, daily,
+  uncategorized + duplicate expenses), and Chief of Staff (LLM, weekly cross-department review).
+  Migrations 0045-0055; edge functions `cfo-brief` and `weekly-review`; crons for each. The
+  three SQL agents are free; the LLM agents run a few cents a month total.
+- **CFO runs on Paul's own Anthropic key.** Paul added the key as a Supabase edge secret but
+  named it "Claude Anthropic CFO Key" rather than ANTHROPIC_API_KEY; verified it authenticates,
+  and the edge functions read that exact name with ANTHROPIC_API_KEY as the fallback. Model:
+  claude-sonnet-4-6.
+- **Finance suite complete (money in and money out).** Visits drive revenue and
+  revenue-per-hour; a new `expenses` ledger holds money out, fed by a browser-only bank-statement
+  CSV import (the statement is parsed client-side and never stored; only chosen expenses persist).
+  Plus `recurring_costs` (subscriptions + billing days), CFO net (revenue minus business
+  expenses), and a one-click categorized CSV export for the accountant.
+- **Four finance/architecture decisions locked into the Oracle this session:**
+  `expense_ledger_clean_start` (go-forward only, no historical backfill; net begins at the
+  cutover), `books_complement_not_replace` (management cockpit, not tax-grade QuickBooks),
+  `per_business_books` (each business keeps its ledger in its own Supabase project; Mount Olympus
+  aggregates read-only, never a shared ledger; one bank account per business), and
+  `agent_when_value_beats_cost` (add an agent wherever value beats its small cost; surface
+  candidates to Paul first). All four have matching index rows; audit green.
+- **Pre-launch caveat still holds.** The visit/money history is real, but figures are pre-launch
+  test data per the existing caveat; the agents flag real patterns (e.g. retention caught Chester
+  Weber 39 days out on a 21-day rhythm; pricing flagged four below-rate clients), which Paul
+  reviews rather than treats as final truth.
