@@ -1712,6 +1712,38 @@ those too. The live funnel's Confirm button is currently disabled pending Stripe
 waiting gate; mapping the message into a friendly funnel panel and an early in-funnel check are parked
 with the Stripe launch step. Decided 2026-06-09.
 
+`dog_follow_up` (Clean: clients):
+Each dog has a "ask / check next time" follow-up (`dogs.follow_up`), kept SEPARATE from
+`standing_instructions`. A standing instruction is how to groom the dog every time (8mm comb, hates the
+dryer); a follow-up is a one-time thing to check or ask on the next visit (ask about her belly, recheck
+the left ear). They were getting mingled (Donna's Fledge "ask about her belly" had landed in the
+instructions and was moved here). `admin_set_dog_followup`; both fields shown and editable per dog on
+the sheet. Because conflating a permanent instruction with a transient reminder makes both less
+trustworthy. Decided 2026-06-09.
+
+`dog_birthday` (Clean: clients):
+Each dog has a birthday (`dogs.birth_date`) with an exact-or-estimated flag (`dogs.dob_approximate`),
+since many ages are a guess (rescues, strays) and saying so honestly matters (`real_data_only`).
+`admin_set_dog_birthday`; shown and editable per dog (date + an "estimated" checkbox; displays "(exact)"
+or "(estimated)"). Decided 2026-06-09.
+
+`client_address_maps_link` (Clean: clients):
+The client's location on the contact sheet is a tappable Google Maps link, and it prefers the editable
+plus code (`clients.location_plus`, set via `admin_set_client_plus`) over the street address. Because
+some street addresses route to the wrong place (e.g. Heather Albinson), and the plus code is the
+reliable locator; the maps URL uses plus code, then address, then lat/lng. Decided 2026-06-09.
+
+`client_message_draft` (Clean: clients):
+Paul has a free stream-of-consciousness field per client (`clients.message_thoughts`) where he says
+whatever he is thinking about the dog or the visit, and a draft agent (the `message-draft` edge
+function, Claude) turns it into a short, warm, personal message he could send the client, pulling out
+what is worth saying and never inventing sentiment. TEST ONLY for now: it shows Paul a draft and never
+sends; the brain dump is saved so he can keep adding. Later it feeds an automatic post-appointment send
+(through the Resend notification path, opt-in, per `winback_contact_email_opt_in`). Because the warmth
+and specific memory of each dog is the un-promptable moat (`dig_the_moat`), and lowering the cost of
+turning Paul's real thoughts into a genuine client touch deepens the relationship without faking it.
+Decided 2026-06-09.
+
 `nofly_two_tiers` (Clean: clients):
 The no-fly list has two tiers, not one. BANNED is a hard ban (the falling-out, the genuine "do not
 serve": `nofly = true`, `nofly_level = 'banned'`, `exclude_from_everything`, `roster_group = 'banned'`,

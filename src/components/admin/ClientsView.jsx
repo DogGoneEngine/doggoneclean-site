@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setClientAccess, setClientOnsite, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setClientAccess, setClientOnsite, setClientPlus, setClientThoughts, setDogFollowup, setDogBirthday, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -202,15 +202,16 @@ function ClientSheet({ clientId, onChanged }) {
           <Field label="Availability" value={c.availability_hard} />
           <Field label="Avoid" value={(c.availability_not_days || []).join(', ')} />
           <Field label="Seasonal" value={c.availability_seasonal} />
-          <Field label="Location" value={c.location_address || c.location_zone} />
-          <Field label="Plus codes" value={c.location_plus} />
+          <LocationField client={c} />
           <Field label="Geo notes" value={c.location_geo_notes} />
           <Field label="Phone" value={c.phone_e164} />
           <Field label="Flags" value={(c.flags || []).join(', ')} />
           <Field label="Data gaps" value={(c.data_gaps || []).join(', ')} />
         </dl>
+        <PlusCode client={c} onChanged={() => { load(); onChanged?.(); }} />
         <AccessNotes client={c} onChanged={() => { load(); onChanged?.(); }} />
         <OnsitePeople client={c} onChanged={() => { load(); onChanged?.(); }} />
+        <MessageDraftTool client={c} onChanged={() => { load(); onChanged?.(); }} />
         {dogs.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Dogs</div>
@@ -590,6 +591,67 @@ function StatusBadge({ level, reason }) {
   );
 }
 
+// A Google Maps link, preferring the plus code (reliable when the street address
+// routes to the wrong place), then the address, then lat/lng.
+function mapsUrl(c) {
+  const q = (c.location_plus || '').trim()
+    || [c.location_address, c.location_zip].filter(Boolean).join(' ').trim()
+    || (c.geo_lat != null && c.geo_lng != null ? `${c.geo_lat},${c.geo_lng}` : '');
+  return q ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}` : null;
+}
+
+function LocationField({ client }) {
+  const text = client.location_address || client.location_zone || '';
+  const url = mapsUrl(client);
+  if (!text && !url) return null;
+  return (
+    <>
+      <dt style={{ fontSize: 12, opacity: 0.55, textTransform: 'uppercase', letterSpacing: 0.3 }}>Location</dt>
+      <dd style={{ margin: 0, fontSize: 14 }}>
+        {url
+          ? <a href={url} target="_blank" rel="noreferrer" style={{ color: 'var(--ad-primary, #2563d8)' }}>{text || 'Open in Maps'} ↗</a>
+          : text}
+        {client.location_plus ? <span style={{ opacity: 0.5, fontSize: 12 }}> · maps uses plus code</span> : null}
+      </dd>
+    </>
+  );
+}
+
+// Editable plus code. The maps link above prefers it, so set it when the street
+// address sends you to the wrong place.
+function PlusCode({ client, onChanged }) {
+  const [editing, setEditing] = useState(false);
+  const [val, setVal] = useState(client.location_plus || '');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setVal(client.location_plus || ''); }, [client.location_plus]);
+
+  async function save() {
+    setBusy(true);
+    try { await setClientPlus(client.id, val); setEditing(false); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55, marginBottom: 2 }}>Plus code (overrides the address for maps)</div>
+      {editing ? (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <input className="ad-input" value={val} onChange={(e) => setVal(e.target.value)} placeholder="e.g. FQH7+5RX Evinston FL" style={{ flex: '1 1 220px' }} />
+          <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setVal(client.location_plus || ''); setEditing(false); }}>Cancel</button>
+        </div>
+      ) : client.location_plus ? (
+        <div style={{ fontSize: 14, display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span className="ad-mono" style={{ flex: 1 }}>{client.location_plus}</span>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
+        </div>
+      ) : (
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>+ Add plus code</button>
+      )}
+    </div>
+  );
+}
+
 // Client-level "how to get in" notes: gate / door / lock codes, location and
 // parking, from the contact sheet. Editable inline.
 function AccessNotes({ client, onChanged }) {
@@ -667,44 +729,146 @@ function OnsitePeople({ client, onChanged }) {
 
 // One dog: header line, condition notes, and the editable standing instructions
 // (the semi-permanent "how to handle this dog every time" from the contact sheet).
-function DogCard({ dog, onChanged }) {
+// A labeled, inline-editable free-text field (used for a dog's standing
+// instructions and its separate follow-up).
+function DogField({ label, value, placeholder, onSave }) {
   const [editing, setEditing] = useState(false);
-  const [val, setVal] = useState(dog.standing_instructions || '');
+  const [val, setVal] = useState(value || '');
   const [busy, setBusy] = useState(false);
-  useEffect(() => { setVal(dog.standing_instructions || ''); }, [dog.standing_instructions]);
+  useEffect(() => { setVal(value || ''); }, [value]);
 
   async function save() {
     setBusy(true);
-    try { await setDogStanding(dog.id, val); setEditing(false); onChanged?.(); }
+    try { await onSave(val); setEditing(false); }
     finally { setBusy(false); }
   }
 
+  return (
+    <div style={{ marginTop: 6 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5 }}>{label}</div>
+      {editing ? (
+        <div style={{ marginTop: 4 }}>
+          <textarea className="ad-textarea" rows={2} value={val} onChange={(e) => setVal(e.target.value)} style={{ width: '100%' }} placeholder={placeholder} />
+          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+            <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setVal(value || ''); setEditing(false); }}>Cancel</button>
+          </div>
+        </div>
+      ) : value ? (
+        <div style={{ fontSize: 13, marginTop: 2, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <span style={{ flex: 1 }}>{value}</span>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
+        </div>
+      ) : (
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ marginTop: 2 }} onClick={() => setEditing(true)}>+ Add</button>
+      )}
+    </div>
+  );
+}
+
+function DogBirthday({ dog, onChanged }) {
+  const [editing, setEditing] = useState(false);
+  const [date, setDate] = useState(dog.birth_date || '');
+  const [approx, setApprox] = useState(!!dog.dob_approximate);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setDate(dog.birth_date || ''); setApprox(!!dog.dob_approximate); }, [dog.birth_date, dog.dob_approximate]);
+
+  async function save() {
+    setBusy(true);
+    try { await setDogBirthday(dog.id, date || null, approx); setEditing(false); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ marginTop: 6 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5 }}>Birthday</div>
+      {editing ? (
+        <div style={{ marginTop: 4, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <input className="ad-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <label style={{ fontSize: 13, display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+            <input type="checkbox" checked={approx} onChange={(e) => setApprox(e.target.checked)} /> estimated
+          </label>
+          <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setDate(dog.birth_date || ''); setApprox(!!dog.dob_approximate); setEditing(false); }}>Cancel</button>
+        </div>
+      ) : dog.birth_date ? (
+        <div style={{ fontSize: 13, marginTop: 2, display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ flex: 1 }}>{fmtDate(dog.birth_date + 'T12:00:00')}{dog.dob_approximate ? ' (estimated)' : ' (exact)'}</span>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
+        </div>
+      ) : (
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ marginTop: 2 }} onClick={() => setEditing(true)}>+ Add birthday</button>
+      )}
+    </div>
+  );
+}
+
+function DogCard({ dog, onChanged }) {
   return (
     <div style={{ border: '1px solid var(--ad-outline, #d9dbe6)', borderRadius: 10, padding: '8px 10px' }}>
       <div className="ad-mono" style={{ fontSize: 13 }}>
         <strong>{dog.name}</strong>{dog.breed ? ` · ${dog.breed}` : ''}{dog.price_cents != null ? ` · ${money(dog.price_cents)}` : ''}
       </div>
       {dog.notes ? <div style={{ opacity: 0.7, marginTop: 2, fontSize: 12 }}>{dog.notes}</div> : null}
-      <div style={{ marginTop: 6 }}>
-        <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5 }}>Standing instructions</div>
-        {editing ? (
-          <div style={{ marginTop: 4 }}>
-            <textarea className="ad-textarea" rows={3} value={val} onChange={(e) => setVal(e.target.value)} style={{ width: '100%' }}
-              placeholder="How to handle this dog every time (e.g. muzzle for the back feet, start at the rear, hates the dryer, do nails first)" />
-            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-              <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
-              <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setVal(dog.standing_instructions || ''); setEditing(false); }}>Cancel</button>
-            </div>
-          </div>
-        ) : dog.standing_instructions ? (
-          <div style={{ fontSize: 13, marginTop: 2, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-            <span style={{ flex: 1 }}>{dog.standing_instructions}</span>
-            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
-          </div>
-        ) : (
-          <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ marginTop: 2 }} onClick={() => setEditing(true)}>+ Add standing instructions</button>
-        )}
+      <DogBirthday dog={dog} onChanged={onChanged} />
+      <DogField label="Standing instructions" value={dog.standing_instructions}
+        placeholder="How to handle this dog every time (e.g. 8mm comb on body, hates the dryer, do nails first)"
+        onSave={async (v) => { await setDogStanding(dog.id, v); onChanged?.(); }} />
+      <DogField label="Ask / check next time" value={dog.follow_up}
+        placeholder="A one-time follow-up for next visit (e.g. ask about her belly, recheck the left ear)"
+        onSave={async (v) => { await setDogFollowup(dog.id, v); onChanged?.(); }} />
+    </div>
+  );
+}
+
+// Message draft (test): Paul dumps stream-of-consciousness about the dog or the
+// visit, the draft agent turns it into something worth sending the client. Never
+// sends; the brain dump is saved so he can keep adding to it.
+function MessageDraftTool({ client, onChanged }) {
+  const [thoughts, setThoughts] = useState(client.message_thoughts || '');
+  const [draft, setDraft] = useState('');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const [open, setOpen] = useState(false);
+  useEffect(() => { setThoughts(client.message_thoughts || ''); }, [client.message_thoughts]);
+
+  async function run() {
+    if (!thoughts.trim()) return;
+    setBusy(true); setError(null); setDraft(''); setNote('');
+    try {
+      await setClientThoughts(client.id, thoughts);
+      const out = await messageDraft(client.id, thoughts);
+      setDraft(out.draft || ''); setNote(out.note || '');
+      onChanged?.();
+    } catch (e) { setError(e.message || 'draft_failed'); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-accent, #2563eb)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen((o) => !o)}>
+        <strong style={{ fontSize: 14 }}>Message draft <span style={{ fontWeight: 400, opacity: 0.6, fontSize: 12 }}>(test, never sends)</span></strong>
+        <span style={{ fontSize: 12, opacity: 0.5 }}>{open ? 'hide' : 'open'}</span>
       </div>
+      {open && (
+        <div style={{ marginTop: 8 }}>
+          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Say whatever you are thinking about the dog or the visit. The draft agent pulls out something worth sending.</div>
+          <textarea className="ad-textarea" rows={3} value={thoughts} onChange={(e) => setThoughts(e.target.value)} style={{ width: '100%' }}
+            placeholder="Stream of consciousness… e.g. Bella finally let me do her back feet without a fuss today, she has come so far" />
+          <div style={{ display: 'flex', gap: 8, marginTop: 6, alignItems: 'center' }}>
+            <button className="ad-btn ad-btn--sm" onClick={run} disabled={busy || !thoughts.trim()}>{busy ? 'Drafting…' : 'Draft a message'}</button>
+          </div>
+          {error && <div className="ad-error" style={{ marginTop: 6 }}>{error}</div>}
+          {draft && (
+            <div style={{ marginTop: 8, padding: '8px 10px', borderRadius: 8, background: 'var(--ad-surface-container, #f1f1f4)' }}>
+              <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5, marginBottom: 4 }}>Draft (not sent)</div>
+              <div style={{ fontSize: 14, whiteSpace: 'pre-wrap' }}>{draft}</div>
+              {note && <div style={{ fontSize: 12, opacity: 0.6, marginTop: 6 }}>Agent note: {note}</div>}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

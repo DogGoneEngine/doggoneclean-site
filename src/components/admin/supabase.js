@@ -136,6 +136,27 @@ export async function setClientOnsite(clientId, text) {
   return rpc('admin_set_client_onsite', { p_client_id: clientId, p_text: text });
 }
 
+export async function setClientPlus(clientId, text) {
+  return rpc('admin_set_client_plus', { p_client_id: clientId, p_text: text });
+}
+
+export async function setClientThoughts(clientId, text) {
+  return rpc('admin_set_client_thoughts', { p_client_id: clientId, p_text: text });
+}
+
+export async function setDogFollowup(dogId, text) {
+  return rpc('admin_set_dog_followup', { p_dog_id: dogId, p_text: text });
+}
+
+export async function setDogBirthday(dogId, birthDate, approximate) {
+  return rpc('admin_set_dog_birthday', { p_dog_id: dogId, p_birth_date: birthDate, p_approximate: approximate });
+}
+
+// Message draft (test): turn Paul's stream-of-consciousness into a client message.
+export async function messageDraft(clientId, thoughts) {
+  return callAdminEdge('message-draft', { client_id: clientId, thoughts });
+}
+
 export async function listNofly() {
   const data = await rpc('admin_list_nofly');
   return Array.isArray(data) ? data : [];
