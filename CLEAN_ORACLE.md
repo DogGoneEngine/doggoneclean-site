@@ -1707,7 +1707,14 @@ per-dog score and note attaches to the matching existing visit by date, or a vis
 none exists. It shows per visit in the contact-sheet history (the score dot plus the note). Distinct
 from `dog_standing_instructions` (the semi-permanent how-to-groom field): the history is the running
 ledger, the standing instructions are the header. The cross-reference pass migrates both per client,
-and the eight clients already done for standing instructions still need their history migrated. Because
+and the eight clients already done for standing instructions still need their history migrated. LOSE
+NOTHING is the governing rule of this migration (Paul, 2026-06-09: "let's not throw any data away"):
+a dog named in the history but missing from the roster is the client's real dog and gets ADDED to
+`dogs` and migrated (Chloe's deceased Whiskey and Skout; Tonya's Andy, Scrappy, Pebbles), with a
+deceased or last-seen marker in `dogs.notes` where known; a visiting or relative's dog that is not the
+client's own is preserved in that visit's `visits.visit_notes` (Tonya's guest dogs Charlie, Dash,
+Eula) rather than given a false dog record; a genuinely sparse nail-only record (Steve, Nancy) migrates
+the few scores it has and leaves the rest an honest gap, never an invented number. Because
 abandoning years of real per-dog observations would gut the proprietary record that is the moat
 (`dig_the_moat`), which is exactly what the prior import quietly did. Decided 2026-06-09.
 
