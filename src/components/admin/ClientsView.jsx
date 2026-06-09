@@ -766,30 +766,63 @@ function DogField({ label, value, placeholder, onSave }) {
   );
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function parseBirth(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || '');
+  return m ? { y: m[1], m: String(+m[2]), d: String(+m[3]) } : { y: '', m: '', d: '' };
+}
+
 function DogBirthday({ dog, onChanged }) {
   const [editing, setEditing] = useState(false);
-  const [date, setDate] = useState(dog.birth_date || '');
+  const init = parseBirth(dog.birth_date);
+  const [mo, setMo] = useState(init.m);
+  const [day, setDay] = useState(init.d);
+  const [year, setYear] = useState(init.y);
   const [approx, setApprox] = useState(!!dog.dob_approximate);
   const [busy, setBusy] = useState(false);
-  useEffect(() => { setDate(dog.birth_date || ''); setApprox(!!dog.dob_approximate); }, [dog.birth_date, dog.dob_approximate]);
+  useEffect(() => {
+    const p = parseBirth(dog.birth_date);
+    setMo(p.m); setDay(p.d); setYear(p.y); setApprox(!!dog.dob_approximate);
+  }, [dog.birth_date, dog.dob_approximate]);
+
+  const nowY = new Date().getFullYear();
+  const years = [];
+  for (let yy = nowY; yy >= nowY - 26; yy--) years.push(yy);
+  const pad = (n) => String(n).padStart(2, '0');
 
   async function save() {
     setBusy(true);
-    try { await setDogBirthday(dog.id, date || null, approx); setEditing(false); onChanged?.(); }
-    finally { setBusy(false); }
+    try {
+      const date = (year && mo && day) ? `${year}-${pad(mo)}-${pad(day)}` : null;
+      await setDogBirthday(dog.id, date, approx);
+      setEditing(false); onChanged?.();
+    } finally { setBusy(false); }
   }
+
+  const selStyle = { padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', fontSize: 14, background: '#fff' };
 
   return (
     <div style={{ marginTop: 6 }}>
       <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.5 }}>Birthday</div>
       {editing ? (
-        <div style={{ marginTop: 4, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <input className="ad-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <select className="ad-select" value={mo} onChange={(e) => setMo(e.target.value)} style={selStyle}>
+            <option value="">Month</option>
+            {MONTHS.map((nm, i) => <option key={i} value={i + 1}>{nm}</option>)}
+          </select>
+          <select className="ad-select" value={day} onChange={(e) => setDay(e.target.value)} style={selStyle}>
+            <option value="">Day</option>
+            {Array.from({ length: 31 }, (_, i) => i + 1).map((n) => <option key={n} value={n}>{n}</option>)}
+          </select>
+          <select className="ad-select" value={year} onChange={(e) => setYear(e.target.value)} style={selStyle}>
+            <option value="">Year</option>
+            {years.map((yy) => <option key={yy} value={yy}>{yy}</option>)}
+          </select>
           <label style={{ fontSize: 13, display: 'inline-flex', gap: 4, alignItems: 'center' }}>
             <input type="checkbox" checked={approx} onChange={(e) => setApprox(e.target.checked)} /> estimated
           </label>
           <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
-          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setDate(dog.birth_date || ''); setApprox(!!dog.dob_approximate); setEditing(false); }}>Cancel</button>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { const p = parseBirth(dog.birth_date); setMo(p.m); setDay(p.d); setYear(p.y); setApprox(!!dog.dob_approximate); setEditing(false); }}>Cancel</button>
         </div>
       ) : dog.birth_date ? (
         <div style={{ fontSize: 13, marginTop: 2, display: 'flex', gap: 8, alignItems: 'center' }}>
