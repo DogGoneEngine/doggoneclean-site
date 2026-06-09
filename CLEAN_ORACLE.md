@@ -1543,3 +1543,21 @@ type any one of them and land on the same record rather than create or chase a
 duplicate; a household split into two records is how visit history, cadence, and
 win-back timing all go wrong, which is exactly what happened with Chris Votos /
 Donna Rodriquez and Lisa Midgett / Lisa Irwin. Decided 2026-06-08.
+
+`client_archive_after_a_year` (Clean: clients):
+A client whose newest visit is older than a year, with no upcoming appointment, is
+archived (`clients.archived_at` set), not deleted. Archived clients keep their full
+record and history; they are hidden from the default Clients book, the win-back
+agent, and the calendar-capacity count, so three-plus years of history does not
+clog the active view. Archiving is reversible and self-healing: an `after insert`
+trigger on `bath_appointments` and on `visits` clears `archived_at` the moment any
+new appointment or visit lands for that client, so anyone who comes back is
+restored automatically no matter the write path (calendar sync, manual log,
+booking funnel); Paul can also bring one back by hand from the Archived panel on
+the Clients floor (`admin_unarchive_client`). A never-visited client is never
+auto-archived (it could be a freshly added record). The sweep
+(`_archive_stale_clients`, default 365 days) runs on a monthly cron and via
+`admin_archive_stale_clients`. Because the book spans years and Paul only works the
+people he is actually still seeing, a stale record is clutter, not a deletion
+decision; archiving keeps the active view honest while losing no history and
+auto-restoring the moment a client returns. Decided 2026-06-09.

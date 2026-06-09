@@ -74,6 +74,15 @@ export async function listNofly() {
   return Array.isArray(data) ? data : [];
 }
 
+export async function listArchivedClients() {
+  const data = await rpc('admin_list_archived_clients');
+  return Array.isArray(data) ? data : [];
+}
+
+export async function unarchiveClient(clientId) {
+  return rpc('admin_unarchive_client', { p_client_id: clientId });
+}
+
 export async function listAliases(clientId) {
   const data = await rpc('admin_list_aliases', { p_client_id: clientId });
   return Array.isArray(data) ? data : [];

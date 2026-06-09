@@ -149,6 +149,7 @@ even DGN has many rules sitting in only one or two layers.
 | tentative_marker_is_private | Clean: growth | Oracle; trailing "?" never stored, mapped to internal `bath_appointments.status = 'tentative'` in `_sync_appointments` (0075); status CHECK allows it; soft booking: `_winback_due_view` excludes it + capacity count includes it; CalendarView shows it as "pencilled" (operator-only) | client-facing care email must never expose tentative or treat it as confirmed |
 | no_fly_list | Clean: clients | Oracle; `clients.nofly` + `nofly_reason` (sets `exclude_from_everything`); `admin_set_client_nofly` / `admin_list_nofly`; managed on the Clients floor; every agent + the win-back filter honor `exclude_from_everything` | the opt-in email send must also honor it |
 | households_search_by_any_name | Clean: clients | Oracle; `client_aliases` table + `admin_add_alias`/`admin_remove_alias`/`admin_list_aliases`; Clients-floor search matches name + aka + every alias; managed on the client sheet | one-step merge tool to fold a duplicate into a household |
+| client_archive_after_a_year | Clean: clients | Oracle; `clients.archived_at` (0076); `_archive_stale_clients`/`admin_archive_stale_clients` sweep (365d) + monthly cron; `admin_list_clients` + `_winback_due_view` + capacity exclude archived; auto un-archive triggers on `bath_appointments` + `visits` insert; `admin_unarchive_client` + Archived panel on Clients floor | none |
 
 ## How to add a row
 

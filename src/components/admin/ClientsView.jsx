@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientNofly, listNofly, listAliases, addAlias, removeAlias } from './supabase.js';
+import { listClients, getClient, logVisit, setClientNofly, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
 
 const SERVICE_LABELS = {
   full_groom: 'Full groom',
@@ -61,9 +61,10 @@ export default function ClientsView() {
   return (
     <>
       <h1>Clients</h1>
-      <p className="ad-sub">The contact-sheet book. {clients.length} clients. Pick one to open its sheet.</p>
+      <p className="ad-sub">The contact-sheet book. {clients.length} active clients (seen within the past year). Pick one to open its sheet.</p>
 
       <NoFlyPanel onChanged={load} />
+      <ArchivedPanel onChanged={load} />
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 320px', minWidth: 280, maxWidth: 460 }}>
@@ -388,6 +389,47 @@ function NoFlyPanel({ onChanged }) {
                 {c.reason ? <div style={{ fontSize: 12, opacity: 0.7 }}>{c.reason}</div> : null}
               </div>
               <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => remove(c.id)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ArchivedPanel({ onChanged }) {
+  const [list, setList] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(null);
+  const load = useCallback(async () => { try { setList(await listArchivedClients()); } catch { setList([]); } }, []);
+  useEffect(() => { load(); }, [load]);
+  if (!list || list.length === 0) return null;
+
+  async function restore(id) {
+    setBusy(id);
+    try { await unarchiveClient(id); await load(); onChanged?.(); }
+    finally { setBusy(null); }
+  }
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16, borderLeft: '4px solid var(--ad-text-dim, #565b6c)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen((o) => !o)}>
+        <strong style={{ fontSize: 14 }}>Archived · {list.length}</strong>
+        <span style={{ fontSize: 12, opacity: 0.6 }}>{open ? 'hide' : 'show'}</span>
+      </div>
+      {open && (
+        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ fontSize: 12, opacity: 0.65, marginBottom: 2 }}>Not seen in over a year, hidden from the book. Anyone who books or gets a visit logged comes back automatically; or bring one back here.</div>
+          {list.map((c) => (
+            <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, borderBottom: '1px solid var(--ad-outline, #ececf1)', paddingBottom: 4 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <strong>{c.name}</strong>{c.aka ? <span className="ad-mono" style={{ opacity: 0.55, marginLeft: 6 }}>{c.aka}</span> : null}
+                <div style={{ fontSize: 12, opacity: 0.7 }}>
+                  {SERVICE_LABELS[c.service_type] || c.service_type || 'service unset'}
+                  {c.location_zone ? ` · ${c.location_zone}` : ''}
+                  {c.last_visit_at ? ` · last seen ${fmtDate(c.last_visit_at)}` : ''}
+                </div>
+              </div>
+              <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => restore(c.id)} disabled={busy === c.id}>{busy === c.id ? '…' : 'Bring back'}</button>
             </div>
           ))}
         </div>
