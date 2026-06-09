@@ -17,6 +17,7 @@ import ReportsView from './ReportsView.jsx';
 import ComplianceView from './ComplianceView.jsx';
 import SettingsView from './SettingsView.jsx';
 import AuditView from './AuditView.jsx';
+import PricingView from './PricingView.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
@@ -36,7 +37,7 @@ const SECTIONS = [
     what: 'The trailer, wash system, generators, climate, and maintenance intervals. Pre-trip checklist and maintenance-due alerts.' },
   { key: 'finance',   label: 'Finance',        ready: true,
     what: 'Revenue per visit and per hour, who owes you, the Square and Stripe split, and the expense ledger. Home of the CFO.' },
-  { key: 'pricing',   label: 'Pricing',        ready: false,
+  { key: 'pricing',   label: 'Pricing',        ready: true,
     what: 'The locked price grid per city and coat tier, and the founders-spot counter.' },
   { key: 'hr',        label: 'HR',             ready: false,
     what: 'You today, your specialists later. Roles, hours, pay, commission tiers, and onboarding.' },
@@ -215,6 +216,7 @@ export default function AdminApp() {
         {section === 'compliance' && <ComplianceView />}
         {section === 'settings' && <SettingsView />}
         {section === 'audit' && <AuditView />}
+        {section === 'pricing' && <PricingView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
     </div>

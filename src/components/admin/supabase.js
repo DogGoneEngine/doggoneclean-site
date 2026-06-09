@@ -250,3 +250,8 @@ export async function systemStatus() {
 export async function auditFeed(limit = 60) {
   return rpc('admin_audit_feed', { p_limit: limit });
 }
+
+export async function pricingGrid() {
+  const data = await rpc('admin_pricing_grid');
+  return Array.isArray(data) ? data : [];
+}
