@@ -240,3 +240,13 @@ export async function deleteComplianceItem(id) {
 export async function runComplianceCheck() {
   return rpc('admin_compliance_check');
 }
+
+// Settings + Audit ------------------------------------------------------------
+
+export async function systemStatus() {
+  return rpc('admin_system_status');
+}
+
+export async function auditFeed(limit = 60) {
+  return rpc('admin_audit_feed', { p_limit: limit });
+}

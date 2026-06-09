@@ -15,6 +15,8 @@ import TodayView from './TodayView.jsx';
 import FinanceView from './FinanceView.jsx';
 import ReportsView from './ReportsView.jsx';
 import ComplianceView from './ComplianceView.jsx';
+import SettingsView from './SettingsView.jsx';
+import AuditView from './AuditView.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
@@ -48,9 +50,9 @@ const SECTIONS = [
     what: 'The Field Manual and the rulebook, read-only inside Orbit, so the console is the operating manual a buyer inherits.' },
   { key: 'reports',   label: 'Reports',        ready: true,
     what: 'Cross-department rollups: the weekly business review, the revenue-per-hour trend, and the briefing archive.' },
-  { key: 'audit',     label: 'Audit log',      ready: false,
+  { key: 'audit',     label: 'Audit log',      ready: true,
     what: 'Every owner action and every AI recommendation, append-only.' },
-  { key: 'settings',  label: 'Settings',       ready: false,
+  { key: 'settings',  label: 'Settings',       ready: true,
     what: 'Owner identity, the Google, Stripe, Square, and Claude integrations, and notification killswitches.' },
 ];
 
@@ -211,6 +213,8 @@ export default function AdminApp() {
         {section === 'finance' && <FinanceView />}
         {section === 'reports' && <ReportsView />}
         {section === 'compliance' && <ComplianceView />}
+        {section === 'settings' && <SettingsView />}
+        {section === 'audit' && <AuditView />}
         {!READY.includes(section) && <RoadmapPanel section={active} />}
       </main>
     </div>
