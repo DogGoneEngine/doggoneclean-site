@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { financeSummary } from './supabase.js';
+import RecurringCosts from './RecurringCosts.jsx';
 
 function money(cents) {
   if (cents === null || cents === undefined) return '$0';
@@ -48,6 +49,10 @@ export default function FinanceView() {
       ) : (
         <FinanceBody d={data} />
       )}
+
+      <h2 style={{ marginTop: 28, marginBottom: 4 }}>Money out</h2>
+      <p className="ad-sub" style={{ marginTop: 0 }}>What the business pays every month to run. Out of your head, into one place.</p>
+      <RecurringCosts />
     </>
   );
 }

@@ -162,3 +162,29 @@ export async function financeSummary(windowDays = 90) {
 export async function reportsSummary() {
   return rpc('admin_reports_summary');
 }
+
+// Recurring costs (subscriptions / tech-stack burn) --------------------------
+
+export async function listRecurringCosts() {
+  return rpc('admin_list_recurring_costs');
+}
+
+export async function upsertRecurringCost(c) {
+  return rpc('admin_upsert_recurring_cost', {
+    p_id: c.id ?? null,
+    p_name: c.name,
+    p_category: c.category ?? 'other',
+    p_amount_cents: c.amountCents ?? null,
+    p_cadence: c.cadence ?? 'monthly',
+    p_billing_day: c.billingDay ?? null,
+    p_billing_month: c.billingMonth ?? null,
+    p_vendor: c.vendor ?? null,
+    p_url: c.url ?? null,
+    p_notes: c.notes ?? null,
+    p_active: c.active ?? true,
+  });
+}
+
+export async function deleteRecurringCost(id) {
+  return rpc('admin_delete_recurring_cost', { p_id: id });
+}
