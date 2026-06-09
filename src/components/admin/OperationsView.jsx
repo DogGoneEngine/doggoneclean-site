@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { listEquipment, upsertEquipment, deleteEquipment, runMaintenanceCheck } from './supabase.js';
+import GeneratorsPanel from './GeneratorsPanel.jsx';
 
 const CATS = ['trailer', 'tow_vehicle', 'generator', 'bath_system', 'dryer', 'clippers', 'rotary', 'water_system', 'other'];
 
@@ -52,6 +53,11 @@ export default function OperationsView() {
         </div>
       )}
 
+      <h2 style={{ marginBottom: 4 }}>Generators and power</h2>
+      <p className="ad-sub" style={{ marginTop: 0 }}>Tracked by engine hours. Enter the watts each appliance draws to see how much capacity is free on each generator.</p>
+      <GeneratorsPanel />
+
+      <h2 style={{ marginTop: 8, marginBottom: 4 }}>Other equipment</h2>
       {error && <div className="ad-error">{error}</div>}
       {loading || !data ? (
         <div className="ad-panel">Loading…</div>

@@ -173,6 +173,19 @@ two Predator 5000s). Because if one fails you can limp through the rest of the d
 instead of losing the day. Predator 5000s have been reliable and quiet where other generators
 were not.
 
+**Generators named by function, tracked by hours.** The two Predator 5000s are split by load and
+named for it in Orbit: the Infrastructure generator (passenger side) runs the air conditioner,
+main vacuum, clippers, and lights; the Bathing generator runs the high-velocity dryer, water
+pumps, and dehumidifier. Each is tracked by engine hours read off the panel, not calendar dates,
+with hours-based service from the Predator 5000 manual: oil change at the first 30 hours then
+every 100 (10W-30), clean the air filter around every 50, inspect the spark plug around 300
+(gap 0.028 to 0.031 in). The maintenance watcher reminds Paul to enter the hours when they go
+stale and flags a service when the hours cross an interval. Each unit puts out 3900W continuous;
+every appliance records its watt draw so Orbit shows the live load against capacity and the
+headroom before anything new is plugged in (pairs with "run with headroom"). Because hours, not
+dates, are what wear an engine, and knowing the real load is how Paul decides whether to add a
+third or fourth generator.
+
 **Know the load, wire it safely.** Know each generator's capacity and what you are plugging into
 it. Plug everything directly in, no daisy-chaining, and use heavy-duty extension cords for
 high-draw items. Because high-current devices need cords that can carry the load.

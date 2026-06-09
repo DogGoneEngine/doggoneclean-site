@@ -2126,3 +2126,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **Doc-discipline correction:** decisions were landing in the Oracle but the build narrative was
   not being appended to this log as it happened. Caught and corrected mid-thread; now appending a
   bullet per shipped floor/agent per the Scroll update policy.
+- **Generators reworked to hours-based, with power-load tracking (Paul's spec, 2026-06-08).** The
+  two Predator 5000s are now named by function in Orbit: Infrastructure generator (passenger side:
+  air conditioner, main vacuum, clippers, lights) and Bathing generator (high-velocity dryer,
+  water pumps, dehumidifier). Tracked by engine hours, not dates; `equipment` gained hours, watts,
+  rated_watts, side, and powered_by columns plus a `maintenance_tasks` table seeded with the real
+  Predator 5000 schedule (oil 30 then 100h, air filter ~50h, plug ~300h; 3900W continuous, from
+  the manual via web search). The maintenance watcher now reminds Paul to enter panel hours when
+  stale and flags a service when hours cross an interval. Every appliance records its watt draw so
+  the Operations floor shows live load against each generator's 3900W capacity and the headroom
+  before adding equipment (migration 0058; captured in CLEAN_FIELD_MANUAL.md power section).
+  Bathing generator's physical side still to confirm.

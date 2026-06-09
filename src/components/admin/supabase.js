@@ -277,3 +277,15 @@ export async function deleteEquipment(id) {
 export async function runMaintenanceCheck() {
   return rpc('admin_maintenance_check');
 }
+
+export async function powerSummary() {
+  return rpc('admin_power_summary');
+}
+
+export async function updateEquipmentHours(id, hours) {
+  return rpc('admin_update_equipment_hours', { p_id: id, p_hours: hours });
+}
+
+export async function setPower(id, { watts = null, ratedWatts = null }) {
+  return rpc('admin_set_power', { p_id: id, p_watts: watts, p_rated_watts: ratedWatts });
+}
