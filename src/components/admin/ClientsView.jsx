@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -90,6 +90,7 @@ export default function ClientsView({ focus = null }) {
       )}
       {!showDetailOnly && <NoFlyPanel onChanged={load} />}
       {!showDetailOnly && <ArchivedPanel onChanged={load} />}
+      {!showDetailOnly && <TimeIsMoneyExportPanel />}
 
       {showDetailOnly ? (
         <div>
@@ -349,8 +350,12 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
     workDone: '',
     visitNotes: '',
     actualMinutes: '',
+    charged: '',
     amount: '',
     paymentMethod: '',
+    inbound: '',
+    arrived: '',
+    departed: '',
   });
 
   const [scores, setScores] = useState({});
@@ -363,6 +368,7 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
       const dogScores = Object.entries(scores)
         .filter(([, s]) => s)
         .map(([dog_id, score]) => ({ dog_id, score }));
+      const stamp = (hhmm) => (hhmm && form.visitedAt) ? new Date(form.visitedAt + 'T' + hhmm + ':00').toISOString() : null;
       await logVisit({
         clientId,
         subscriberId,
@@ -371,13 +377,17 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
         workDone: form.workDone || null,
         visitNotes: form.visitNotes || null,
         actualMinutes: form.actualMinutes ? parseInt(form.actualMinutes, 10) : null,
+        chargedCents: form.charged ? Math.round(parseFloat(form.charged) * 100) : null,
         amountCollectedCents: form.amount ? Math.round(parseFloat(form.amount) * 100) : null,
         paymentMethod: form.paymentMethod || null,
+        inboundAt: stamp(form.inbound),
+        arrivedAt: stamp(form.arrived),
+        departedAt: stamp(form.departed),
         dogIds: dogScores.length ? dogScores.map((d) => d.dog_id) : null,
         dogScores: dogScores.length ? dogScores : null,
         source: 'manual',
       });
-      setForm((f) => ({ ...f, workDone: '', visitNotes: '', actualMinutes: '', amount: '' }));
+      setForm((f) => ({ ...f, workDone: '', visitNotes: '', actualMinutes: '', charged: '', amount: '', inbound: '', arrived: '', departed: '' }));
       setScores({});
       setOpen(false);
       onLogged?.();
@@ -414,22 +424,34 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
           </select>
         </label>
         <label style={{ fontSize: 13 }}>
-          Minutes<br />
-          <input className="ad-input" type="number" min="1" value={form.actualMinutes} onChange={set('actualMinutes')} style={{ width: 90 }} />
+          Charged ($)<br />
+          <input className="ad-input" type="number" min="0" step="0.01" value={form.charged} onChange={set('charged')} style={{ width: 100 }} />
         </label>
         <label style={{ fontSize: 13 }}>
-          Collected ($)<br />
-          <input className="ad-input" type="number" min="0" step="0.01" value={form.amount} onChange={set('amount')} style={{ width: 110 }} />
+          Paid ($)<br />
+          <input className="ad-input" type="number" min="0" step="0.01" value={form.amount} onChange={set('amount')} style={{ width: 100 }} />
         </label>
         <label style={{ fontSize: 13 }}>
-          Paid via<br />
+          Method<br />
           <select className="ad-select" value={form.paymentMethod} onChange={set('paymentMethod')}>
             <option value="">unset</option>
             <option value="square_in_person">Square</option>
             <option value="stripe_card">Stripe</option>
             <option value="cash">Cash</option>
             <option value="wallet">Wallet</option>
+            <option value="invoice">Invoice</option>
+            <option value="check">Check</option>
           </select>
+        </label>
+      </div>
+      {/* The three time_is_money clocks: tap "now" to stamp the current time; adjust if logging late. Minutes derive from Arrived to Departed. */}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <ClockField label="Inbound (left for stop)" value={form.inbound} onChange={set('inbound')} />
+        <ClockField label="Arrived" value={form.arrived} onChange={set('arrived')} />
+        <ClockField label="Departed (finished)" value={form.departed} onChange={set('departed')} />
+        <label style={{ fontSize: 13 }}>
+          Minutes<br />
+          <input className="ad-input" type="number" min="1" value={form.actualMinutes} onChange={set('actualMinutes')} placeholder="auto" style={{ width: 80 }} />
         </label>
       </div>
       {(dogs || []).length > 0 && (
@@ -852,6 +874,91 @@ function DogBirthday({ dog, onChanged }) {
         <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ marginTop: 2 }} onClick={() => setEditing(true)}>+ Add birthday</button>
       )}
     </div>
+  );
+}
+
+// Export new app-entered visits as tab-separated rows in the exact time_is_money
+// column order, ready to paste onto the end of the original sheet. Paul keeps the
+// original book in parallel until he trusts this; the app never writes to his sheet.
+function TimeIsMoneyExportPanel() {
+  const COLS = ['Date', 'Client', 'Inbound', 'Arrival', 'Departure', 'Charged', 'Paid', 'Method'];
+  const [open, setOpen] = useState(false);
+  const [since, setSince] = useState('');
+  const [rows, setRows] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  async function build() {
+    setBusy(true); setErr(null); setCopied(false);
+    try { setRows(await exportTimeIsMoney(since || null)); }
+    catch (e) { setErr(e.message || 'export_failed'); }
+    finally { setBusy(false); }
+  }
+  const tsv = (rows || [])
+    .map((r) => [r.date, r.client, r.inbound, r.arrival, r.departure, r.charged, r.paid, r.method].join('\t'))
+    .join('\n');
+  async function copy() {
+    try { await navigator.clipboard.writeText(tsv); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* manual select */ }
+  }
+
+  if (!open) {
+    return (
+      <div className="ad-panel" style={{ marginBottom: 12 }}>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(true)}>Export new visits for time is money</button>
+      </div>
+    );
+  }
+  return (
+    <div className="ad-panel" style={{ marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Export for time is money</div>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)}>close</button>
+      </div>
+      <div style={{ fontSize: 12, opacity: 0.7, lineHeight: 1.5 }}>
+        App-entered visits only, in your sheet's column order. Copy the block and paste it onto the end of the original sheet; the columns line up. Tune the date or time format with me if it does not match your sheet.
+      </div>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+        <label style={{ fontSize: 13 }}>
+          Since (optional)<br />
+          <input className="ad-input" type="date" value={since} onChange={(e) => setSince(e.target.value)} />
+        </label>
+        <button type="button" className="ad-btn" onClick={build} disabled={busy}>{busy ? 'Building…' : 'Build export'}</button>
+        {rows && <span style={{ fontSize: 12, opacity: 0.7 }}>{rows.length} row{rows.length === 1 ? '' : 's'}</span>}
+      </div>
+      {err && <div className="ad-error">{err}</div>}
+      {rows && (
+        <>
+          <div className="ad-mono" style={{ fontSize: 11, opacity: 0.55 }}>{COLS.join('  ·  ')}</div>
+          <textarea className="ad-input ad-mono" readOnly value={tsv} rows={Math.min(12, Math.max(3, (rows.length || 1) + 1))}
+            style={{ width: '100%', fontSize: 12, whiteSpace: 'pre' }} onFocusCapture={(e) => e.target.select()} />
+          <div>
+            <button type="button" className="ad-btn ad-btn--sm" onClick={copy} disabled={!tsv}>{copied ? 'Copied' : 'Copy block'}</button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// A time_is_money clock field: a native time input plus a one-tap "now" button that
+// stamps the current time. Tap "now" the moment you leave, arrive, or finish; nudge
+// the picker if you are logging it a little late.
+function ClockField({ label, value, onChange }) {
+  const stampNow = () => {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    onChange({ target: { value: `${hh}:${mm}` } });
+  };
+  return (
+    <label style={{ fontSize: 13 }}>
+      {label}<br />
+      <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+        <input className="ad-input" type="time" value={value} onChange={onChange} style={{ width: 110 }} />
+        <button type="button" className="ad-btn ad-btn--sm ad-btn--ghost" onClick={stampNow}>now</button>
+      </span>
+    </label>
   );
 }
 

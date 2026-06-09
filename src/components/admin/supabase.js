@@ -220,7 +220,15 @@ export async function logVisit(v) {
     p_payment_method:        v.paymentMethod ?? null,
     p_source:                v.source ?? 'manual',
     p_dog_scores:            v.dogScores ?? null,
+    p_inbound_at:            v.inboundAt ?? null,
+    p_arrived_at:            v.arrivedAt ?? null,
+    p_departed_at:           v.departedAt ?? null,
+    p_charged_cents:         v.chargedCents ?? null,
   });
+}
+
+export async function exportTimeIsMoney(since = null) {
+  return rpc('admin_export_time_is_money', { p_since: since });
 }
 
 export async function completeAppointment(appointmentId, v = {}) {
