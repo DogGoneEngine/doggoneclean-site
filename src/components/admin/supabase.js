@@ -148,6 +148,14 @@ export async function setBriefingStatus(id, status) {
   return rpc('admin_set_briefing_status', { p_id: id, p_status: status });
 }
 
+export async function replyBriefing(id, body) {
+  return rpc('admin_add_briefing_note', { p_briefing_id: id, p_body: body });
+}
+
+export async function resolveBriefing(id, disposition, note = null) {
+  return rpc('admin_resolve_briefing', { p_briefing_id: id, p_disposition: disposition, p_note: note });
+}
+
 export async function listAgents() {
   const data = await rpc('admin_list_agents');
   return Array.isArray(data) ? data : [];

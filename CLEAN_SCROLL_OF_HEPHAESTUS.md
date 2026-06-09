@@ -2146,3 +2146,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the Operations floor lets him reset a task's cycle (migration 0059). This is the pattern Paul
   named: let the agent surface the small recurring asks (hours, watts, filter cleanings) as part
   of its routine rather than making him remember.
+- **Briefings are now a two-way conversation (Paul's ask, 2026-06-08).** Action-item cards were
+  obey-or-delete only; now every card takes a reply, the agent acknowledges, and a "This is
+  intentional" button records Paul's reason and makes that agent stand down on that exact subject
+  for good (his example: a client priced low on purpose because she is on a fixed income, so the
+  pricing agent should stop flagging her). Added `briefing_notes` (the thread) + a `disposition`
+  column; the pricing and retention scans skip any client with an 'intentional' disposition
+  (verified: a client marked intentional is not re-flagged). The 'resolved' status was added to
+  the briefings status constraint (migration 0060). Open: extend the same intentional-suppression
+  to compliance/maintenance, and optionally feed Paul's notes into the LLM agents' context.
