@@ -1416,3 +1416,22 @@ serve more than one business are paid by each from its own account where
 possible, or tagged and split when one account pays for several. Because
 clean_stays_saleable: a business's books must leave cleanly with it if it is ever
 sold, so they can never be commingled. Decided 2026-06-08.
+
+---
+
+## AI agents
+
+`agent_when_value_beats_cost` (Clean: engineering):
+Add an AI department-head or watcher agent wherever its value clearly offsets its
+small cost, and surface each candidate to Paul rather than building it silently.
+The agent pattern is cheap (a daily Sonnet briefing over pre-computed numbers
+runs a few cents a month), so the bar is not "can we afford it" but "does it
+provide real recurring value," and Paul wants a say on each because even a small
+ongoing cost should be spent deliberately. Because the value of the strong
+candidates (catching a lapsing recurring client before it churns, nudging an
+underpriced client up toward the target revenue per hour, or keeping the books
+clean and the net accurate) dwarfs the token cost, while naming the candidate
+first keeps the spend intentional and the agent roster legible. The live pattern
+is the `agents` registry plus a cheap edge-function or SQL agent that reads
+scoped real data, writes a briefing (recommend, never act), and a human approves.
+Decided 2026-06-08.
