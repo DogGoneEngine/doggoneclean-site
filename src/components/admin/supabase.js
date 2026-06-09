@@ -128,6 +128,10 @@ export async function setDogStanding(dogId, text) {
   return rpc('admin_set_dog_standing', { p_dog_id: dogId, p_text: text });
 }
 
+export async function setClientAccess(clientId, text) {
+  return rpc('admin_set_client_access', { p_client_id: clientId, p_text: text });
+}
+
 export async function listNofly() {
   const data = await rpc('admin_list_nofly');
   return Array.isArray(data) ? data : [];

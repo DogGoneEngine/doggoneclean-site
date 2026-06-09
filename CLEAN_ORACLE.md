@@ -1678,7 +1678,18 @@ notes (`dogs.notes` and `visits.visit_notes`), and are shown and editable per do
 un-promptable context that is the moat (`dig_the_moat`): a buyer or a fill-in specialist can run the
 business well only if it is written down, so it gets a durable home of its own rather than living in
 Paul's head or buried in visit notes. The first populated pass is the cross-reference of active clients
-against their newest Drive contact sheet. Decided 2026-06-09.
+against their newest Drive contact sheet. Per dog the source is the explicit "Standing Instructions"
+field on the sheet, transcribed as written; the dated visit history is not mined for instructions
+(that would be interpretive and risk inventing). Decided 2026-06-09.
+
+`client_access_notes` (Clean: clients):
+Client-level "how to get in" notes (gate, door, and lock codes, where to park, how to reach the dog),
+transcribed from the contact sheets into `clients.access_notes` (a dedicated human-readable field,
+separate from the jsonb `access` and the general `note`), shown and editable on the contact sheet under
+"How to get in". Because this is exactly what Paul needs on his phone at the stop, it lives on the
+sheets, and writing it down where the app surfaces it serves the runs-without-Paul directive (a
+fill-in specialist can get in). Captured in the same Drive cross-reference pass as the standing
+instructions. Decided 2026-06-09.
 
 `nofly_two_tiers` (Clean: clients):
 The no-fly list has two tiers, not one. BANNED is a hard ban (the falling-out, the genuine "do not

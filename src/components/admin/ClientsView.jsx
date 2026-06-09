@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setClientAccess, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -209,6 +209,7 @@ function ClientSheet({ clientId, onChanged }) {
           <Field label="Flags" value={(c.flags || []).join(', ')} />
           <Field label="Data gaps" value={(c.data_gaps || []).join(', ')} />
         </dl>
+        <AccessNotes client={c} onChanged={() => { load(); onChanged?.(); }} />
         {dogs.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Dogs</div>
@@ -584,6 +585,44 @@ function StatusBadge({ level, reason }) {
     <div style={{ marginTop: 8, padding: '4px 8px', borderRadius: 8, display: 'inline-flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', background: banned ? 'rgba(220,38,38,0.10)' : 'rgba(185,119,10,0.10)' }}>
       <strong style={{ fontSize: 12, color: banned ? 'var(--ad-bad, #dc2626)' : 'var(--ad-warn, #b9770a)' }}>{banned ? 'BANNED' : 'SHADOW BAN'}</strong>
       {reason && <span style={{ fontSize: 12, opacity: 0.8 }}>{reason}</span>}
+    </div>
+  );
+}
+
+// Client-level "how to get in" notes: gate / door / lock codes, location and
+// parking, from the contact sheet. Editable inline.
+function AccessNotes({ client, onChanged }) {
+  const [editing, setEditing] = useState(false);
+  const [val, setVal] = useState(client.access_notes || '');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setVal(client.access_notes || ''); }, [client.access_notes]);
+
+  async function save() {
+    setBusy(true);
+    try { await setClientAccess(client.id, val); setEditing(false); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55, marginBottom: 2 }}>How to get in</div>
+      {editing ? (
+        <div>
+          <textarea className="ad-textarea" rows={3} value={val} onChange={(e) => setVal(e.target.value)} style={{ width: '100%' }}
+            placeholder="Gate / door / lock codes, where to park, how to reach the dog" />
+          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+            <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setVal(client.access_notes || ''); setEditing(false); }}>Cancel</button>
+          </div>
+        </div>
+      ) : client.access_notes ? (
+        <div style={{ fontSize: 14, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <span style={{ flex: 1 }}>{client.access_notes}</span>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
+        </div>
+      ) : (
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>+ Add access notes</button>
+      )}
     </div>
   );
 }
