@@ -1691,6 +1691,27 @@ sheets, and writing it down where the app surfaces it serves the runs-without-Pa
 fill-in specialist can get in). Captured in the same Drive cross-reference pass as the standing
 instructions. Decided 2026-06-09.
 
+`client_onsite_people` (Clean: clients):
+Every client record carries a "who's on site" note: the people Paul might meet at the appointment
+(housekeeper, family, staff, who lets him in, who to ask for), transcribed from the contact sheets into
+`clients.onsite_people`, shown and editable on the sheet. Because walking up to a stop and knowing that
+the man with the beard is Isaiah or that Gloria is the housekeeper is real situational knowledge that
+makes the work smoother and is exactly the proprietary context a fill-in specialist would need.
+Captured in the same Drive cross-reference pass. Decided 2026-06-09.
+
+`block_banned_from_booking` (Clean: clients):
+A hard-banned client cannot book. A `before insert or update` trigger on `bath_subscribers` (the first
+row the booking funnel writes) rejects any contact whose email or phone matches a client with
+`nofly_level = 'banned'`, aborting the booking with a soft, non-provoking message ("Sorry, we are not
+taking new clients in your area right now.") that reads like a service-area decline, never a personal
+rejection, so it does not provoke. Only the hard ban blocks; a shadow-banned client who books on their
+own is still served. The teeth live in the database trigger so no booking path can bypass them and a
+redesign cannot drop them. Limitation: it can only match a banned person Paul has an email or phone on
+file for; a banned person booking under brand-new contact details would get through, and Paul bans
+those too. The live funnel's Confirm button is currently disabled pending Stripe, so this is the
+waiting gate; mapping the message into a friendly funnel panel and an early in-funnel check are parked
+with the Stripe launch step. Decided 2026-06-09.
+
 `nofly_two_tiers` (Clean: clients):
 The no-fly list has two tiers, not one. BANNED is a hard ban (the falling-out, the genuine "do not
 serve": `nofly = true`, `nofly_level = 'banned'`, `exclude_from_everything`, `roster_group = 'banned'`,

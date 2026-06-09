@@ -653,3 +653,13 @@ pulled here.
 - Multi-specialist routing: apprentice Jake can take solo dogs (e.g. Spero at Heather's).
 - Route-generation automation that reads `clients.json` + the template and honors every
   HARD window, plus a check that banned/one-off clients never appear in a generated route.
+
+## Banned-booking funnel polish (parked with Stripe) (2026-06-09)
+
+The hard teeth are built (`block_banned_from_booking`): a trigger on `bath_subscribers` already
+blocks a banned contact from creating any booking with a soft "not taking new clients in your area"
+message. What is parked, because the booking funnel's Confirm is disabled until Stripe is wired
+(launch blocker #6): (1) map that specific error into the funnel's friendly service-area panel
+instead of a raw error line, and (2) an EARLY in-funnel check at the contact step (reuse the
+phone-blur recognition path) so a banned person gets the soft decline before filling the whole form
+rather than at submit. Do both when the Stripe card step goes live.

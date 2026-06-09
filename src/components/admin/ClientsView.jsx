@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setClientAccess, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setClientAccess, setClientOnsite, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -210,6 +210,7 @@ function ClientSheet({ clientId, onChanged }) {
           <Field label="Data gaps" value={(c.data_gaps || []).join(', ')} />
         </dl>
         <AccessNotes client={c} onChanged={() => { load(); onChanged?.(); }} />
+        <OnsitePeople client={c} onChanged={() => { load(); onChanged?.(); }} />
         {dogs.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Dogs</div>
@@ -622,6 +623,43 @@ function AccessNotes({ client, onChanged }) {
         </div>
       ) : (
         <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>+ Add access notes</button>
+      )}
+    </div>
+  );
+}
+
+// Who Paul might meet on site (housekeeper, family, staff, who lets him in).
+function OnsitePeople({ client, onChanged }) {
+  const [editing, setEditing] = useState(false);
+  const [val, setVal] = useState(client.onsite_people || '');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setVal(client.onsite_people || ''); }, [client.onsite_people]);
+
+  async function save() {
+    setBusy(true);
+    try { await setClientOnsite(client.id, val); setEditing(false); onChanged?.(); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55, marginBottom: 2 }}>Who's on site</div>
+      {editing ? (
+        <div>
+          <textarea className="ad-textarea" rows={3} value={val} onChange={(e) => setVal(e.target.value)} style={{ width: '100%' }}
+            placeholder="People you might meet here: housekeeper, family, staff, who lets you in, who to ask for" />
+          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+            <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setVal(client.onsite_people || ''); setEditing(false); }}>Cancel</button>
+          </div>
+        </div>
+      ) : client.onsite_people ? (
+        <div style={{ fontSize: 14, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <span style={{ flex: 1 }}>{client.onsite_people}</span>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>Edit</button>
+        </div>
+      ) : (
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setEditing(true)}>+ Add who's on site</button>
       )}
     </div>
   );
