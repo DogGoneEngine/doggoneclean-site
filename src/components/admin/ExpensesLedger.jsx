@@ -6,7 +6,20 @@
 // outlier, and add by hand a business charge that hit a personal card.
 
 import { useCallback, useEffect, useState } from 'react';
-import { expenseSummary, addExpense, setExpenseBusiness, setExpenseCategory } from './supabase.js';
+import { expenseSummary, addExpense, setExpenseBusiness, setExpenseCategory, exportExpenses } from './supabase.js';
+
+function toCsv(rows) {
+  const cols = ['txn_date', 'description', 'amount', 'category', 'is_business', 'source', 'notes'];
+  const esc = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  return [cols.join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))].join('\n');
+}
+function downloadCsv(name, text) {
+  const blob = new Blob([text], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 const CATS = ['supplies', 'fuel', 'equipment', 'software', 'infrastructure', 'ai', 'payments', 'domains', 'insurance', 'marketing', 'meals', 'wages', 'other'];
 function money(cents) { return cents == null ? '$0' : '$' + Math.round(cents / 100).toLocaleString('en-US'); }
@@ -40,6 +53,10 @@ export default function ExpensesLedger({ refreshSignal = 0 }) {
           {[30, 90, 365].map((d) => (
             <button key={d} className={'ad-btn ad-btn--sm ' + (windowDays === d ? '' : 'ad-btn--ghost')} onClick={() => setWindowDays(d)}>{d === 365 ? '1y' : `${d}d`}</button>
           ))}
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={async () => {
+            try { const rows = await exportExpenses(); if (!rows.length) { setError('No expenses to export yet.'); return; } downloadCsv(`dgc-expenses-${new Date().toISOString().slice(0,10)}.csv`, toCsv(rows)); }
+            catch (e) { setError(e.message || 'export_failed'); }
+          }} title="Export all expenses as CSV for your accountant">Export CSV</button>
         </div>
       </div>
       {error && <div className="ad-error" style={{ marginTop: 6 }}>{error}</div>}

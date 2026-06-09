@@ -2,11 +2,9 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 // The CFO department head. Pulls real numbers from the books (cfo_brief_data),
 // has Claude write a short owner-facing briefing in the CFO's voice, and saves
-// it to the feed (cfo_save_briefing). Recommend, never act. Runs daily via the
-// cfo-daily-briefing cron, authenticated by the x-cfo-secret shared secret
-// (mirrors the send-notification pattern). verify_jwt is off; the secret guard
-// is the auth. Reads the Anthropic key from the ANTHROPIC_API_KEY edge secret
-// (falls back to the "Claude Anthropic CFO Key" name Paul originally used).
+// it to the feed (cfo_save_briefing). Recommend, never act. Daily via the
+// cfo-daily-briefing cron, authenticated by x-cfo-secret. Reads the Anthropic
+// key from ANTHROPIC_API_KEY (falls back to the name Paul originally used).
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -45,6 +43,7 @@ Deno.serve(async (req) => {
     }
 
     const m = await rpc("cfo_brief_data", { p_window_days: 90 });
+    const hasCosts = (m.expense_count ?? 0) > 0;
     const facts = {
       window_days: m.window_days,
       visits: m.visits,
@@ -54,7 +53,8 @@ Deno.serve(async (req) => {
       timed_visits: m.timed_visits,
       revenue_per_hour: m.revenue_per_hour != null ? `$${m.revenue_per_hour}` : "not yet measurable",
       prior_window_revenue_per_hour: m.prev_revenue_per_hour != null ? `$${m.prev_revenue_per_hour}` : "unknown",
-      no_shows: m.no_shows,
+      business_expenses: hasCosts ? dollars(m.expenses_cents) : "none recorded yet",
+      net_after_costs: hasCosts ? dollars(m.net_cents) : "same as collected, no costs recorded yet",
       accounts_receivable_count: m.ar_count,
       accounts_receivable_value: dollars(m.ar_cents),
       top_clients_by_collected: (m.top_clients ?? []).map((t: any) => ({ name: t.name, visits: t.visits, collected: dollars(t.collected_cents) })),
@@ -65,6 +65,7 @@ Deno.serve(async (req) => {
       "You are given REAL figures computed directly from the books. Write a short CFO note to Paul.",
       "Lead with the single most important finding, then give one clear recommendation and the reason for it.",
       "Revenue per hour (the on-site rate) is the number the business is run on; treat changes in it as the headline when relevant.",
+      "If costs are recorded, also report net (collected minus costs). If no costs are recorded yet, say so plainly in one short clause and do not invent any cost figure.",
       "Use ONLY the figures provided. Never invent or estimate a number that is not given.",
       "No corporate jargon (no 'reach out', 'circle back', 'bandwidth', 'free up'). No em dashes. Three to five sentences.",
       'Respond as a single JSON object: {"title": string (<= 60 chars), "body": string, "severity": "info" | "signal" | "alert"}. Output only the JSON.',

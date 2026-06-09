@@ -213,3 +213,8 @@ export async function setExpenseBusiness(id, isBusiness) {
 export async function setExpenseCategory(id, category) {
   return rpc('admin_set_expense_category', { p_id: id, p_category: category });
 }
+
+export async function exportExpenses(from = null, to = null) {
+  const data = await rpc('admin_export_expenses', { p_from: from, p_to: to });
+  return Array.isArray(data) ? data : [];
+}

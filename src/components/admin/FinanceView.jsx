@@ -80,6 +80,9 @@ function FinanceBody({ d }) {
         <Stat label="Collected" value={money(d.revenue_cents)} sub={`${d.priced_visits} priced visits`} />
         <Stat label="Visits" value={String(d.visits)} sub={`${d.clients} clients`} />
         <Stat label="A/R outstanding" value={money(d.ar_cents)} sub={`${d.ar_count} appt(s) past due`} tone={d.ar_count > 0 ? 'bad' : 'good'} />
+        <Stat label="Net after costs" value={money(d.net_cents)}
+          sub={d.expenses_cents > 0 ? `after ${money(d.expenses_cents)} in costs` : 'no costs recorded yet'}
+          tone={d.expenses_cents > 0 ? (d.net_cents >= 0 ? 'good' : 'bad') : 'flat'} />
       </div>
 
       {/* Payment mix */}
