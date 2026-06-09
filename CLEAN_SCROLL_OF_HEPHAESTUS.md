@@ -2316,3 +2316,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   iCal id plus the start time. The old pull-based `calendar-sync` cron was unscheduled (the function
   stays deployed but unused). Paul's remaining step: paste the script into script.google.com, authorize
   it, and add a 15-minute trigger on syncCalendar.
+- **Live calendar sync is ON (2026-06-08).** Paul pasted the Apps Script, authorized it, and set the
+  15-minute time-driven trigger. Two bugs fixed during bring-up (migration 0074): `dog_count` is NOT
+  NULL so missing counts default to 1, and Paul marks tentative appointments with a trailing "?" in
+  the title so the matcher now strips it. Verified end to end: a real run synced all 49 of Paul's
+  appointments through Jul 23, matched every one to a client (including Mary Beth Anderson and Ligia
+  Amyotte, whose "?" markers had blocked them), and pruned the stale manual rows. From now on any
+  Google Calendar change (add / reschedule / cancel) lands in the app within 15 minutes. The Calendar
+  floor and the win-back agent now run on the real, complete schedule.
