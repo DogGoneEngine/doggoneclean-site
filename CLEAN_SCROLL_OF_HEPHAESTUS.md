@@ -2228,3 +2228,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   as / household names" editor. Seeded the reconciled households (Donna: Chris Votos, Donna Rodriguez,
   Votos; Lisa: Lisa Midgett). Migration 0067. Deferred: a one-step "merge a duplicate into this
   household" tool so future splits do not need manual SQL.
+- **Duplicate-household scan + Jeannie/Tommy merge (2026-06-08).** Scanned for split households by
+  shared address/plus code; only one real candidate beyond the known ones: Jeannie Savegnago and
+  Tommy Burns (same driveway + parking plus codes, same 56-day cadence). Confirmed same household
+  (married) and merged onto Tommy Burns (kept his dogs Austin/Tulip/Ellie + more recent visit),
+  aliases Jeannie / Jeannie Savegnago / Savegnago. The other two scan hits were noise (a placeholder
+  "pluscode ocala" shared by Chester Weber + Heather Albinson, not a real address) and Paul's own
+  address (Paul Nickerson + his mom's dog Willie, test data). Flag: Jeannie/Tommy last seen 2024, so
+  the household likely belongs on the inactive list, but the record still reads roster_group active
+  and the active roster is the deliberately-set past-year list, so left for Paul to reclassify.
