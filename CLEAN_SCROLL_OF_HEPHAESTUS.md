@@ -2282,3 +2282,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   auto-create, to avoid the duplicate mess just cleaned), get-or-create that client's subscriber,
   upsert the appointment, skip Reserve blocks, and return the unmatched names for Paul to resolve.
   A recurring auto-sync later needs the app to hold its own Google Calendar credentials (infra).
+- **Calendar sync built and run (2026-06-08).** Built `_sync_appointments` / `admin_sync_appointments`
+  (migration 0072): takes parsed gcal events and upserts into `bath_appointments`, matching each to an
+  existing client by name + alias + email (never auto-creating), get-or-creating the subscriber, keyed
+  on the gcal event id for idempotency, returning unmatched names. Ran it on this week's real schedule
+  (Jun 9-13, 17 appointments, Reserve blocks skipped): 13 inserted, 4 updated, ZERO unmatched - every
+  appointment matched a real client via the aliases. Then deleted the stale partial import (source
+  acuity/gcal, including the phantom Biscuit/Maple), leaving a clean 17-appointment week all source
+  'gcal_sync'. Verified: Thursday now shows Becky Swinford / Eric Shannon / Emily Walker (no more
+  Unknown), Eric has his appointment and is off the win-back list, and the win-back cards for all
+  now-booked clients were cleared. Only this week was synced (the events Claude had in hand); extending
+  is a re-run of the same RPC with more event data, and the recurring auto-sync remains the infra
+  follow-on (the app needs its own Google Calendar credentials).
