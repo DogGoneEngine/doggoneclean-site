@@ -462,6 +462,17 @@ function HomeView({ ctx }) {
           <p className="pt-glance-hint">Manage your plan, details, and reminders in the Account tab.</p>
         </section>
       )}
+
+      {/* The stop button lives on the main screen, not behind a tab
+          (stop_sign_two_taps, Paul 2026-06-10): the whole strategy is that
+          stopping is easy, and an exit control you have to hunt for would
+          make the two-tap brag a three-tap reality. Home still sells care
+          first; the stop sign anchors the bottom as the standing proof. */}
+      {subscription && (
+        <section className="pt-section">
+          <StopControl subscription={subscription} onChanged={ctx.onChanged} toast={ctx.toast} />
+        </section>
+      )}
     </div>
   );
 }
@@ -759,12 +770,79 @@ function CadenceControl({ subscription, onChanged, toast }) {
   );
 }
 
+// ── The stop button (stop_sign_two_taps) ───────────────────────────────
+// The marketing brags about it, so in the portal it looks like what it is:
+// a real stop sign. Tap it, confirm, done: two taps, we stop charging, we
+// stop coming. It lives on the portal HOME screen (Paul 2026-06-10: hiding
+// it a tab away made the two-tap brag a three-tap reality) and also in
+// Account > Your plan, where someone managing their plan would look.
+function StopControl({ subscription, onChanged, toast }) {
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  if (!subscription || subscription.status === 'cancelled') return null;
+
+  async function confirmStop() {
+    setBusy(true);
+    let res;
+    try {
+      res = await cancelSubscription();
+    } catch {
+      res = { ok: false, error: 'network' };
+    }
+    setBusy(false);
+    if (res && res.ok) {
+      setConfirming(false);
+      if (toast) toast('Plan stopped. The door stays open.');
+      if (onChanged) await onChanged();
+    } else if (toast) {
+      toast(humanError(res), true);
+    }
+  }
+
+  if (confirming) {
+    return (
+      <div className="pt-confirm pt-confirm--stop">
+        <div className="pt-confirm__text">
+          <strong>Stop your plan?</strong> One more tap and it is done: we stop
+          charging, we stop coming. No call, no hold music, no questions.
+        </div>
+        <div className="pt-confirm__text">
+          Stopping frees your visit times for another family on the route. The
+          door stays open: come back whenever you like and pick from the times
+          that are open then.
+        </div>
+        <div className="pt-confirm__row">
+          <button className="pt-btn pt-btn-danger pt-btn-sm" disabled={busy}
+            onClick={confirmStop}>
+            {busy ? <span className="pt-spinner-sm" /> : 'Yes, stop my plan'}
+          </button>
+          <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy}
+            onClick={() => setConfirming(false)}>
+            Keep my plan
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <button type="button" className="pt-stop" onClick={() => setConfirming(true)} aria-label="Stop my plan">
+      <span className="pt-stop__sign" aria-hidden="true">STOP</span>
+      <span className="pt-stop__text">
+        <strong>The stop button.</strong>
+        <span>Two taps and it is done. We stop charging. We stop coming.</span>
+      </span>
+    </button>
+  );
+}
+
 // ── Plan actions: pause, restart, cancel ───────────────────────────────
-// Active  -> Pause plan, Cancel plan (each with a confirm step: two taps).
-// Paused  -> Restart plan, Cancel plan.
+// Active  -> Pause plan, the stop button (two taps).
+// Paused  -> Restart plan, the stop button.
 // Cancelled -> nothing (the banner up top already explains it).
 function PlanActions({ subscription, onChanged, toast }) {
-  const [mode, setMode] = useState('idle'); // 'idle' | 'confirmPause' | 'confirmCancel'
+  const [mode, setMode] = useState('idle'); // 'idle' | 'confirmPause'
   const [busy, setBusy] = useState(false);
   const status = subscription.status;
 
@@ -786,32 +864,6 @@ function PlanActions({ subscription, onChanged, toast }) {
     } else if (toast) {
       toast(humanError(res), true);
     }
-  }
-
-  if (mode === 'confirmCancel') {
-    return (
-      <div className="pt-confirm pt-confirm--stop">
-        <div className="pt-confirm__text">
-          <strong>Stop your plan?</strong> One more tap and it is done: we stop
-          charging, we stop coming. No call, no hold music, no questions.
-        </div>
-        <div className="pt-confirm__text">
-          Stopping frees your visit times for another family on the route. The
-          door stays open: come back whenever you like and pick from the times
-          that are open then.
-        </div>
-        <div className="pt-confirm__row">
-          <button className="pt-btn pt-btn-danger pt-btn-sm" disabled={busy}
-            onClick={() => run(cancelSubscription, 'Plan stopped. The door stays open.')}>
-            {busy ? <span className="pt-spinner-sm" /> : 'Yes, stop my plan'}
-          </button>
-          <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy}
-            onClick={() => setMode('idle')}>
-            Keep my plan
-          </button>
-        </div>
-      </div>
-    );
   }
 
   if (mode === 'confirmPause') {
@@ -849,16 +901,7 @@ function PlanActions({ subscription, onChanged, toast }) {
           Pause plan
         </button>
       )}
-      {/* The stop button (stop_sign_two_taps): the marketing brags about it,
-          so in the portal it looks like what it is, a real stop sign. Tap it,
-          confirm, done: two taps, we stop charging, we stop coming. */}
-      <button type="button" className="pt-stop" onClick={() => setMode('confirmCancel')} aria-label="Stop my plan">
-        <span className="pt-stop__sign" aria-hidden="true">STOP</span>
-        <span className="pt-stop__text">
-          <strong>The stop button.</strong>
-          <span>Two taps and it is done. We stop charging. We stop coming.</span>
-        </span>
-      </button>
+      <StopControl subscription={subscription} onChanged={onChanged} toast={toast} />
     </div>
   );
 }

@@ -734,9 +734,10 @@ the faster path.
 The portal's bar: clients amazed at how easy everything is, amazed enough to tell people.
 Everything a client could possibly want to do with Dog Gone Clean, buildable in the portal.
 LIVE today: sign in three ways, see the next visit and full history, reschedule, skip, pause,
-restart, the stop button (red octagon, two taps, slot-release copy), change cadence, manage the
-pack, edit contact + verified service address, reminder + Dog Gone Tracker preferences, shared
-visit photos. THE INVENTORY still to build (roughly in order of client value):
+restart, the stop button (red octagon, two taps, slot-release copy, on the Home screen and in
+Account), change cadence, manage the pack, edit contact + verified service address, reminder +
+Dog Gone Tracker preferences, shared visit photos, the live tracker (six stages, ETA, the truck
+on a map, opt-in chimes). THE INVENTORY still to build (roughly in order of client value):
 
 1. **Pay and tip from the phone** (Stripe-gated): see the card on file, update it, tip after a
    great visit, see receipts per visit.
@@ -751,10 +752,15 @@ visit photos. THE INVENTORY still to build (roughly in order of client value):
    number do I text?"), honoring online_only_comms.
 6. **Live answers**: "when are you coming next month?" answered without asking; cadence and
    upcoming visits laid out plainly.
-7. **Gift a visit** (post-Stripe): pay for a friend's first visit; the referral engine's big
-   sibling.
 Each item ships only when it can be real (no_mockups); the bar for each is "would a client
 mention this to a friend?"
+
+REJECTED, do not re-add (Paul, 2026-06-10): **Gift a visit** (pay for a friend's first visit).
+Because a gifted visit lands on a recipient who never walked the funnel's fit gates: the
+giver's friend may have a doodle, a matting coat, an out-of-area address, or an unsafe dog,
+and the gift converts a kind gesture into a doorstep decline or an ineligible booking. The
+sanctioned version of the same growth instinct is Refer a friend (item 4), where the friend
+walks the slide themselves and the person-shaped holes still work.
 
 ## Scheduling engine: committed next rounds (NOT parked indefinitely; Paul 2026-06-10)
 
@@ -779,3 +785,31 @@ Order of work after the current stragglers:
    low confidence; (c) appointment duration = sum of the selected dogs' estimates + per-visit
    refinement as new data lands; (d) a NEW dog on a known client = known baseline + estimated
    increment for that dog, refined as it accrues history (never reset the client to a guess).
+
+## Orbit first-principles cleanup (assessed 2026-06-10; staged, behavior-preserving)
+
+Paul flagged that Orbit "was iterated into existence" and is starting to Frankenstein. Ground
+truth from the code, not vibes: the SHELL is actually sound (AdminApp is one taxonomy array,
+one router, one drawer; 261 lines). The Frankenstein lives one level down, in four specific
+debts, listed in fix order. Each step is mechanical and behavior-preserving; none should be
+batched with feature work.
+
+1. **Split ClientsView.jsx (1272 lines, 203 inline style objects).** It is a god-file holding
+   the client list, the contact-sheet header, dog cards, visit logging, photos, follow-ups,
+   aliases, status controls, and the time-is-money export. Cut it along the seams that already
+   exist as components-in-file (ClientHeader, DogCard, VisitLog, sheet panels), one file each,
+   no logic changes. This is the single highest-value cut.
+2. **Promote repeated inline styles into admin.css classes, floor by floor.** Two styling
+   systems coexist: admin.css classes (the durable layer; the dog-card restyle proved the
+   pattern) and per-element style={{}} objects re-invented per floor (panel headers, uppercase
+   captions, pill buttons, mono cells). Inline styles are how a redesign loses rules; the
+   class layer survives. Do it opportunistically: whichever floor is touched next converts.
+3. **One shared async-panel wrapper.** Loading / error / empty states are re-written in nearly
+   every floor with slightly different copy and markup. A single usePanelData hook (or a
+   <PanelData> wrapper) collapses roughly 16 re-implementations.
+4. **Today is the cockpit; keep it lean.** The 2026-06-10 StopCard redesign (one big header
+   target, one stepping action button, times tucked behind "fix times") is the template for
+   any future per-stop control: never another row of small adjacent buttons.
+
+Explicitly NOT problems: the 16-floor taxonomy (it is the roadmap in plain sight), the
+RoadmapPanel placeholders, the agent/briefing card pattern (shared already).

@@ -719,7 +719,13 @@ On top of that recurring block he can manually open extra days, or add a brief r
 Ocala on an off week, and the schedule offers slots only on days he is actually there. Because his
 real Ocala presence alternates by week, so the booking engine must never offer a day he is in The
 Villages, and his route still throws off ad-hoc Ocala trips that need room (for example the
-multi-dog Cummings job that landed on an off week in his calendar).
+multi-dog Cummings job that landed on an off week in his calendar). Teeth landed 2026-06-10
+(migration 0143): `cities.hb_week_parity_anchor` (Ocala = 2026-06-08) makes `bath_open_slots`
+open recurring windows only on on-weeks, and a manual open exception bypasses the parity, which
+is exactly the extra-day / off-week-trip path this rule reserves. The same migration fixed the
+engine refusing hb_active-false cities, which had silently broken every legacy portal
+reschedule (hb_active means "open to NEW public booking" and is enforced in
+`bath_start_subscription`, not in the slot grid).
 
 `legacy_login_by_claim` (auth):
 A legacy client signs in with phone (SMS OTP), email (magic link), or Google, and the portal links
@@ -961,17 +967,22 @@ portal. No questions asked." The portal cancel screen carries no reason
 field per `no_reason_field_ever`. Refined 2026-06-10 (Paul): the portal
 control is DRAMATIC, a literal red stop-sign octagon labeled STOP with "Two
 taps and it is done. We stop charging. We stop coming." (the brag made
-physical), it lives in Account > Your plan (you stop a plan where the plan
-lives; the Home tab sells care, not exit), and the confirm screen states the
-slot consequence elegantly: "Stopping frees your visit times for another
-family on the route. The door stays open: come back whenever you like and
-pick from the times that are open then." That phrasing carries
-subject-to-availability honestly without legal chill: the freed slot is
-presented as generosity to the route, and re-entry as an open door whose
-times are whatever is open then. Because frictionless exit is a marketing
-feature that drives signups, and the visible cancel commitment is what makes
-a card-on-file subscription emotionally signable; hard-to-cancel is what
-gives subscriptions their bad name.
+physical), and the confirm screen states the slot consequence elegantly:
+"Stopping frees your visit times for another family on the route. The door
+stays open: come back whenever you like and pick from the times that are
+open then." That phrasing carries subject-to-availability honestly without
+legal chill: the freed slot is presented as generosity to the route, and
+re-entry as an open door whose times are whatever is open then. Placement
+refined again later the same day (Paul, superseding the morning's Account >
+Your plan call): the stop sign lives ON THE PORTAL HOME SCREEN, at the
+bottom under the care content, and also in Account > Your plan where someone
+managing a plan would look, because the literal two-tap count only holds if
+the first tap is available where the client lands (tucked one tab away it
+was really three taps), and an exit control you have to hunt for undercuts
+the brag exactly where a client goes to check it. Because frictionless exit
+is a marketing feature that drives signups, and the visible cancel
+commitment is what makes a card-on-file subscription emotionally signable;
+hard-to-cancel is what gives subscriptions their bad name.
 
 `octane_selector_cadence_picker` (ux):
 Booking step 2 presents three cadence options as three buttons laid out left
@@ -1095,9 +1106,21 @@ The client-facing name is THE DOG GONE TRACKER (working name, Paul 2026-06-10;
 "pizza tracker" is the internal inspiration shorthand, never client-facing).
 The tracker loop runs per appointment, replacing every manual
 text: (1) when Paul leaves for the stop, one button push sends the client a
-heads-up with a live Google Maps progress link to their house (the home of
+heads-up with a live progress link to their house (the home of
 `heads_up_on_the_way`); (2) progress updates flow to the client's tracker view
-as the visit advances (on the way, arrived, underway, done); (3) photos taken
+as the visit advances through SIX stages (refined by Paul 2026-06-10):
+scheduled; rolling your way; we're here (the "I'm here" tap: "setting up in
+your driveway, with you shortly", auto-advancing to underway 10 minutes after
+the Arrived stamp so no extra tap is needed); underway; coming back to your
+door (a DELIBERATELY MANUAL one-tap stage, because only Paul knows the moment
+the dogs are headed back and that is exactly when the client should watch the
+door); done. While rolling, the tracker shows a PROMINENT live drive ETA and
+the truck on a map (operator location from the Today sheet's geolocation
+watch, ETA via Google server-side, both token-scoped and broadcast only until
+arrival); status changes can chime and vibrate, gentle and short (a doorbell
+for the driveway, a bright run for the door), opt-in via one tap on the
+tracker because browsers require a gesture before sound, remembered per
+device; (3) photos taken
 through the visit (before, after, extras including skin or health observations
 worth flagging) attach to the visit and surface in the client's portal record
 as their dog's history; (4) after Paul drives away, a professional follow-up:
@@ -1106,7 +1129,12 @@ service, never blanket), and a feedback-plus-Google-review ask for everyone
 EXCEPT anyone already asked or who already left one. The review ask is tracked
 per client (record the ask, track the click, stop forever once a review
 exists) and stays active only for a limited window after the visit, so the ask
-is timed, never nagging. Because the tracker is the experience clients tell
+is timed, never nagging. A tracker link answers for the visit plus 7 days
+after the scheduled end, then reports expired and points at the portal:
+long enough for the "show someone" photo moment, short enough that an old
+text never stays a live window into the household's schedule; tokens stay on
+the row (history is never deleted), only the public answer goes quiet.
+Because the tracker is the experience clients tell
 their friends about and the un-promptable moat (`dig_the_moat`); review volume
 is throughput-limited near full capacity, so the system optimizes the timing
 of one well-placed ask instead of manufacturing volume; and a tip ask aimed
@@ -1295,6 +1323,20 @@ as a downgrade, while copy that hides the operator entirely makes the brand
 feel faceless. Named-but-not-promised is the version that serves both the
 "clients grateful it exists" test (you know who is coming) and the
 runs-without-Paul test (the brand survives a hire) at the same time.
+
+`hurricane_bath_operator_title` (copy):
+The client-facing title of the person who does the work is HURRICANE BATH OPERATOR, capitalized
+as a title; Paul's full styling is "Owner and Hurricane Bath Operator". Use it everywhere the
+worker is named or described in customer-facing copy (the tracker, the city-page specialist
+card, the trust lines, the team copy); never a bare "operator" or "the operator" in client-facing
+prose. Internal usage (Oracle rules, code, DB roles, the route data model) keeps plain "operator"
+since the role name and the display title are different things, same as the String of Pearls
+pattern at DGN. Locked by Paul 2026-06-10 ("in Clean overall the name of the worker is Hurricane
+Bath Operator, make it so"). Because the bare word is generic filler while the title carries the
+brand's signature system in the worker's own name, so every mention of who is coming restates
+what makes the service different; Paul chose it on sound ("Owner and Hurricane Bath Operator
+sounds better"). Pairs with `specialist_named_not_promised`: the title scales to every future
+hire without re-writing the promise.
 
 `no_dgn_import` (copy):
 Never import DGN's nail vocabulary or bans into Clean. Because the two businesses describe
@@ -1517,7 +1559,22 @@ be granted to its audience deliberately (migration 0135). Because Postgres grant
 EXECUTE to PUBLIC on function creation, which silently made about 110 functions
 anon-callable over a month of fast building, including ungated internal write helpers;
 a default that fails open cannot be outrun by remembering, so the default itself was
-flipped. Locked 2026-06-10.
+flipped. Locked 2026-06-10. Refinement (same day, the photos-into-the-void lesson): a
+helper referenced by an RLS POLICY runs as the INVOKER, not as a definer, so it must
+keep an explicit grant to every role whose queries that policy can gate; the 0135
+lockdown silently broke every visit-photo upload and signed-URL read because the
+storage policies call `_is_admin()` as the authenticated user. Fixed by migration 0142
+(grant `_is_admin` to authenticated + anon; it only reads auth.uid() against admins and
+returns a boolean). When locking grants down, list the functions used inside
+`pg_policy` expressions first; those are the ones the lockdown must exempt.
+Round two (0147, same day): 0135's default-privileges fix only revoked PUBLIC, but
+Supabase projects ship per-role defaults (pg_default_acl grants EXECUTE to anon,
+authenticated, service_role on every new public function), so everything created after
+0135 was born anon-callable again and per-migration "REVOKE FROM PUBLIC" never touched
+those explicit grants. 0147 drops anon + authenticated from postgres's function
+defaults and re-runs the tier sweep over all public app functions (extension functions
+are supabase_admin-owned and unaffected). The durable lesson: after any grant lockdown,
+verify with pg_default_acl and has_function_privilege, not with the migration text.
 
 `offline_first_field_app` (engineering):
 If a Clean field/operator app is built, it renders today's full state from a local store
@@ -1608,6 +1665,26 @@ first keeps the spend intentional and the agent roster legible. The live pattern
 is the `agents` registry plus a cheap edge-function or SQL agent that reads
 scoped real data, writes a briefing (recommend, never act), and a human approves.
 Decided 2026-06-08.
+
+`capacity_watchdog_agent` (Clean: operations):
+The Availability watcher answers one question daily: if a client came looking for an
+appointment today, how long until they could actually get one, measured against THEIR real
+constraints (hard windows, not-days, their own visit length, their city's open days), plus the
+same for a hypothetical new client per city. When anyone's wait would exceed the threshold (10
+days, Paul's number) it cards Today once (one summary card, never one per client; it re-cards
+only after the last card is closed). Slots come from `bath_open_slots`, the same engine every
+booking path uses, so the watcher and the booking surface can never disagree; per-client
+constraints come from `availability_not_days` (exact) and `availability_hard` (free text,
+parsed for the patterns that exist in the book; anything unreadable is treated as unconstrained
+and flagged on the card, honest about its own blind spots). suppress_winback clients are
+INCLUDED because this is an internal capacity signal, never outreach. The release valve it
+points at is opening capacity (an extra day, an off-week exception), and when there is no room
+for someone, that is surfaced rather than silently absorbed. Because Paul should learn the
+calendar is too tight from a card, days before a client learns it from a failed booking
+attempt: a quietly squeezed-out client is lost revenue and eroded trust, and capacity pressure
+is invisible until someone hits the wall. Asked for by Paul 2026-06-10; threshold and the
+new-client half are his spec. Lives as `_capacity_scan()` + the daily cron + the `capacity`
+agent row (migration 0144).
 
 `talk_back_with_because` (Clean: knowledge):
 Briefings are a two-way conversation, and every time Paul talks back to an agent

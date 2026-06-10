@@ -319,6 +319,32 @@ export async function onMyWay(appointmentId) {
   return rpc('admin_on_my_way', { p_appointment: appointmentId });
 }
 
+// One tap when pulling up: flips the appointment to on_site, stamps the
+// Arrived clock server-side if empty, and stops the live-location broadcast.
+// The tracker turns to "We're here, getting set up, with you shortly."
+export async function adminArrived(appointmentId) {
+  return rpc('admin_arrived', { p_appointment: appointmentId });
+}
+
+// One tap when walking the dogs back: flips the appointment to returning so
+// the tracker tells the client to watch the door. Deliberately manual (Paul):
+// only he knows the moment the dogs are headed back.
+export async function adminReturning(appointmentId) {
+  return rpc('admin_returning', { p_appointment: appointmentId });
+}
+
+// The Today sheet's geolocation watch pushes the truck's position here while
+// a stop is on_the_way; the tracker-eta edge function serves it (token-scoped)
+// to the one client waiting on that stop.
+export async function trackerLocation(appointmentId, lat, lng) {
+  return rpc('admin_tracker_location', { p_appointment: appointmentId, p_lat: lat, p_lng: lng });
+}
+
+// Run the Availability watcher on demand (it also runs on its daily cron).
+export async function runCapacityCheck() {
+  return rpc('admin_capacity_check');
+}
+
 // The hours-ask briefing card's Save button: writes the panel reading
 // straight onto the named equipment (never a free-text reply into the void).
 export async function setEquipmentHoursByName(name, hours) {

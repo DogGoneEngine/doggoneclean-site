@@ -44,10 +44,15 @@ Deno.serve(async (req) => {
 
   const { data: appt } = await sb
     .from('bath_appointments')
-    .select('id')
+    .select('id, scheduled_end')
     .eq('tracker_token', token)
     .maybeSingle();
   if (!appt) return json({ photos: [] });
+  // Link lifetime matches tracker_status: 7 days past the scheduled end the
+  // link goes quiet; the photos live on in the client's portal.
+  if (appt.scheduled_end && Date.now() > new Date(appt.scheduled_end).getTime() + 7 * 86400_000) {
+    return json({ photos: [] });
+  }
 
   const { data: visits } = await sb
     .from('visits')

@@ -420,7 +420,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
       <div className="bk-friendly">
         <p className="bk-friendly__title">Friendly Dogs Only</p>
         <p className="bk-friendly__body">Normal wiggling is fine. Dogs that show aggression toward people or are excessively uncooperative are not eligible for this service.</p>
-        <p className="bk-friendly__note">A mobile dog grooming visit runs on the trust between the dog and the operator.</p>
+        <p className="bk-friendly__note">A mobile dog grooming visit runs on the trust between the dog and the Hurricane Bath Operator.</p>
       </div>
       <ul className="bk-checklist">
         {ELIGIBILITY.map((item) => (

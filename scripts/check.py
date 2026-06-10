@@ -501,6 +501,30 @@ def check_rule_survival():
             "stop_sign_two_taps",
             "'two taps' (Oracle: stop-sign cancel marketed on four surfaces)",
         )
+    # The stop sign lives ON the portal Home screen (Paul 2026-06-10): the
+    # two-tap count only holds if the first tap is where the client lands.
+    # Structure check (the control inside HomeView), so a portal redesign
+    # cannot quietly tuck it back behind a tab.
+    portal_views = COMPONENTS / "portal" / "PortalViews.jsx"
+    require_present(
+        portal_views,
+        r"function HomeView.*?<StopControl",
+        "stop_sign_two_taps",
+        "StopControl rendered inside HomeView (the stop sign on the portal home screen)",
+    )
+
+    # ── hurricane_bath_operator_title ─────────────────────────────────────
+    # The worker's client-facing title is "Hurricane Bath Operator"
+    # (Paul 2026-06-10). The tracker and the city specialist card are the
+    # surfaces that name the person; the title is the decision, so it blocks.
+    track = PAGES / "track.astro"
+    for page in (track, villages):
+        require_present(
+            page,
+            r"Hurricane Bath Operator",
+            "hurricane_bath_operator_title",
+            "'Hurricane Bath Operator' (the worker's client-facing title)",
+        )
 
     # ── auto_charge_at_24h ────────────────────────────────────────────────
     # The customer-facing promise is "charged the day before, never sooner."

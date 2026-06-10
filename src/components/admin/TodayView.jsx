@@ -7,12 +7,45 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, setEquipmentHoursByName } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
-const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
+const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
 function apptTime(ts) { try { return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ''; } }
+
+// One live-location broadcast at a time, module-level so it survives floor
+// changes and re-renders. While a stop is on_the_way the Pixel's geolocation
+// watch pushes the truck's position (throttled to one write per 15s) so the
+// client's tracker can show live progress and a real drive ETA. Stops on the
+// "I'm here" tap (the server also deletes the row then). Honest limit: Chrome
+// only delivers fixes while the tab is alive; if Orbit is fully backgrounded
+// behind navigation the client sees the last fix with its age, never a guess.
+const locShare = { apptId: null, watchId: null, lastPush: 0 };
+function startLocationShare(apptId) {
+  if (!navigator.geolocation) return;
+  if (locShare.apptId === apptId && locShare.watchId != null) return;
+  stopLocationShare();
+  locShare.apptId = apptId;
+  locShare.watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      const now = Date.now();
+      if (now - locShare.lastPush < 15000) return;
+      locShare.lastPush = now;
+      trackerLocation(apptId, pos.coords.latitude, pos.coords.longitude).catch(() => {});
+    },
+    () => {},
+    { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 },
+  );
+}
+function stopLocationShare() {
+  if (locShare.watchId != null && navigator.geolocation) {
+    navigator.geolocation.clearWatch(locShare.watchId);
+  }
+  locShare.apptId = null;
+  locShare.watchId = null;
+  locShare.lastPush = 0;
+}
 
 const SEV = {
   alert:  { color: '#dc2626', label: 'Alert' },
@@ -40,6 +73,13 @@ export default function TodayView({ onOpenClient }) {
   }, []);
   useEffect(() => { load(); }, [load]);
 
+  // If a stop was already on_the_way when the floor loaded (page reload mid
+  // drive), resume the live-location broadcast without another tap.
+  useEffect(() => {
+    const rolling = appts.find((x) => x.status === 'on_the_way');
+    if (rolling) startLocationShare(rolling.id);
+  }, [appts]);
+
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const activeHeads = agents.filter((a) => a.is_active).map((a) => a.label);
 
@@ -56,38 +96,8 @@ export default function TodayView({ onOpenClient }) {
         {appts.length === 0 ? (
           <div style={{ opacity: 0.65, fontSize: 14 }}>Nothing on the calendar for today.</div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {appts.map((a) => {
-              const clickable = !!a.client_id;
-              const followups = a.followups || [];
-              return (
-                <div key={a.id} style={{ borderBottom: '1px solid var(--ad-outline, #ececf1)', padding: '7px 6px' }}>
-                  <div
-                    onClick={clickable ? () => onOpenClient?.(a.client_id) : undefined}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: clickable ? 'pointer' : 'default', borderRadius: 8 }}
-                    title={clickable ? 'Open contact sheet' : 'Unmatched import'}
-                  >
-                    <span className="ad-mono" style={{ width: 72, opacity: 0.75 }}>{apptTime(a.scheduled_start)}</span>
-                    <span style={{ flex: 1, minWidth: 0 }}>
-                      {a.client
-                        ? <strong>{a.client}</strong>
-                        : <strong style={{ color: 'var(--ad-warn,#b9770a)' }}>{a.fallback ? `${a.fallback} (unmatched)` : 'Unmatched import'}</strong>}
-                      <span style={{ opacity: 0.6, fontSize: 12 }}> · {SERVICE_LABEL[a.service_type] || a.service_type || ''}{a.dog_count ? ` · ${a.dog_count} dog${a.dog_count === 1 ? '' : 's'}` : ''}{a.status === 'tentative' ? ' · pencilled' : ''}</span>
-                    </span>
-                    {a.amount_cents != null && a.amount_cents > 0 && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
-                    <span className="ad-mono" style={{ fontSize: 11, color: STATUS_TINT[a.status] || 'var(--ad-text-dim,#565b6c)' }}>{clickable ? '›' : ''}</span>
-                  </div>
-                  <TimeStrip appt={a} />
-                  {followups.length > 0 && (
-                    <div style={{ marginTop: 4, marginLeft: 82, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {followups.map((f, i) => (
-                        <div key={i} style={{ fontSize: 12, color: 'var(--ad-warn, #b9770a)' }}>↳ ask{f.dog ? ` (${f.dog})` : ''}: {f.body}</div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {appts.map((a) => <StopCard key={a.id} appt={a} onOpenClient={onOpenClient} />)}
           </div>
         )}
       </div>
@@ -132,69 +142,163 @@ function hhmmToISO(hhmm) {
 
 const CLOCKS = [['inbound', 'Left'], ['arrived', 'Arrived'], ['departed', 'Done']];
 
-function TimeStrip({ appt }) {
+// One stop, one card (Paul 2026-06-10: the old dense row mixed the open-the-
+// record tap with a strip of small buttons and everything fat-fingered).
+// Layout rule: the whole header is the open-the-record target, the visit flow
+// is ONE big button showing only the next step, and the three time cells hide
+// behind a small "fix times" link for the forgot-to-tap case.
+function StopCard({ appt, onOpenClient }) {
+  const [status, setStatus] = useState(appt.status);
   const [times, setTimes] = useState({
     inbound: appt.inbound_at || null,
     arrived: appt.arrived_at || null,
     departed: appt.departed_at || null,
   });
-  const [busy, setBusy] = useState(null);
+  const [busyCell, setBusyCell] = useState(null);
+  const [busyStep, setBusyStep] = useState(false);
   const [err, setErr] = useState(false);
-  const [shareState, setShareState] = useState(null); // null | 'busy' | 'shared' | 'copied'
+  const [shareState, setShareState] = useState(null); // null | 'shared' | 'copied'
+  const [showTimes, setShowTimes] = useState(false);
+
+  const clickable = !!appt.client_id;
+  const followups = appt.followups || [];
 
   async function set(field, at) {
     const prev = times;
     setTimes((t) => ({ ...t, [field]: at }));   // optimistic
-    setBusy(field); setErr(false);
+    setBusyCell(field); setErr(false);
     try { await stampAppointmentTime(appt.id, field, at); }
     catch { setTimes(prev); setErr(true); }     // revert on failure
-    finally { setBusy(null); }
+    finally { setBusyCell(null); }
   }
 
-  // One tap when pulling out: flips the appointment to on_the_way, stamps the
-  // Left clock if it is still empty (one tap does both jobs), then hands Paul
-  // the heads-up message with the Dog Gone Tracker link. Until Twilio sends
-  // it automatically, the share sheet / clipboard bridges to Google Voice.
-  async function headsUp() {
-    setShareState('busy'); setErr(false);
+  // The visit flow, one tap per step:
+  // On my way -> I'm here -> Bringing them back -> All done.
+  // Each tap flips the appointment status (tracker stage), stamps the
+  // matching time_is_money clock, and the first one opens the share sheet
+  // with the tracker link (Google Voice paste until Twilio sends it).
+  async function step() {
+    setBusyStep(true); setErr(false);
     try {
-      const res = await onMyWay(appt.id);
-      if (!times.inbound) set('inbound', new Date().toISOString());
-      const url = `https://hurricanebath.com/track?t=${res.tracker_token}`;
-      const text = `Dog Gone Clean is rolling your way. Follow along: ${url}`;
-      if (navigator.share) {
-        try { await navigator.share({ text }); setShareState('shared'); }
-        catch { setShareState(null); } // user closed the sheet; no-op
-      } else {
-        await navigator.clipboard.writeText(text);
-        setShareState('copied');
+      if (status === 'requested' || status === 'confirmed' || status === 'tentative') {
+        const res = await onMyWay(appt.id);
+        if (!times.inbound) set('inbound', new Date().toISOString());
+        setStatus('on_the_way');
+        startLocationShare(appt.id);
+        const url = `https://hurricanebath.com/track?t=${res.tracker_token}`;
+        const text = `Dog Gone Clean is rolling your way. Follow along: ${url}`;
+        if (navigator.share) {
+          try { await navigator.share({ text }); setShareState('shared'); }
+          catch { setShareState(null); } // user closed the sheet; no-op
+        } else {
+          await navigator.clipboard.writeText(text);
+          setShareState('copied');
+        }
+      } else if (status === 'on_the_way') {
+        await adminArrived(appt.id);
+        stopLocationShare();
+        if (!times.arrived) setTimes((t) => ({ ...t, arrived: new Date().toISOString() }));
+        setStatus('on_site');
+      } else if (status === 'on_site' || status === 'in_service') {
+        await adminReturning(appt.id);
+        setStatus('returning');
+      } else if (status === 'returning') {
+        await set('departed', new Date().toISOString());
       }
-    } catch { setErr(true); setShareState(null); }
+    } catch { setErr(true); }
+    finally { setBusyStep(false); }
   }
+
+  const wrapped = status === 'completed' || !!times.departed;
+  const stepLabel = wrapped ? null
+    : status === 'on_the_way' ? "I'm here"
+    : (status === 'on_site' || status === 'in_service') ? 'Bringing them back'
+    : status === 'returning' ? 'All done, rolling out'
+    : shareState === 'copied' ? 'Message copied. Tap when here'
+    : shareState === 'shared' ? 'Heads up sent. Tap when here'
+    : 'On my way';
+  const stepHint = wrapped ? null
+    : status === 'on_the_way' ? 'flips their tracker to "We’re here, getting set up"'
+    : (status === 'on_site' || status === 'in_service') ? 'tells them to watch the door'
+    : status === 'returning' ? 'stamps Done and closes the stop'
+    : 'marks on the way and shares the tracker link';
 
   return (
-    <div style={{ display: 'flex', gap: 8, marginTop: 6, marginLeft: 82, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-      <button
-        type="button"
-        onClick={headsUp}
-        disabled={shareState === 'busy'}
-        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, border: '1px solid var(--ad-accent, #2563d8)', background: 'transparent', color: 'var(--ad-accent, #2563d8)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
-        title="Mark on the way and share the Dog Gone Tracker link"
+    <div style={{ border: '1px solid var(--ad-outline, #ececf1)', borderRadius: 12, overflow: 'hidden' }}>
+      <div
+        onClick={clickable ? () => onOpenClient?.(appt.client_id) : undefined}
+        style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, padding: '12px 12px',
+          cursor: clickable ? 'pointer' : 'default',
+          background: 'var(--ad-surface-container, #f7f7fa)' }}
+        title={clickable ? 'Open contact sheet' : 'Unmatched import'}
       >
-        {shareState === 'busy' ? '...' : shareState === 'copied' ? 'Message copied' : shareState === 'shared' ? 'Heads up sent' : 'On my way'}
-      </button>
-      {CLOCKS.map(([field, label]) => (
-        <TimeCell
-          key={field}
-          label={label}
-          value={times[field]}
-          busy={busy === field}
-          onStampNow={() => set(field, new Date().toISOString())}
-          onSet={(hhmm) => set(field, hhmmToISO(hhmm))}
-          onClear={() => set(field, null)}
-        />
-      ))}
-      {err && <span style={{ fontSize: 11, color: 'var(--ad-bad, #dc2626)', alignSelf: 'center' }}>save failed, try again</span>}
+        <span className="ad-mono" style={{ width: 64, opacity: 0.75, flexShrink: 0 }}>{apptTime(appt.scheduled_start)}</span>
+        <span style={{ flex: 1, minWidth: 0 }}>
+          {appt.client
+            ? <strong style={{ fontSize: 15 }}>{appt.client}</strong>
+            : <strong style={{ color: 'var(--ad-warn,#b9770a)' }}>{appt.fallback ? `${appt.fallback} (unmatched)` : 'Unmatched import'}</strong>}
+          <span style={{ display: 'block', opacity: 0.6, fontSize: 12 }}>
+            {SERVICE_LABEL[appt.service_type] || appt.service_type || ''}{appt.dog_count ? ` · ${appt.dog_count} dog${appt.dog_count === 1 ? '' : 's'}` : ''}{status === 'tentative' ? ' · pencilled' : ''}{appt.amount_cents > 0 ? ` · ${money(appt.amount_cents)}` : ''}
+          </span>
+        </span>
+        {clickable && <span style={{ fontSize: 20, opacity: 0.45, flexShrink: 0 }}>›</span>}
+      </div>
+
+      <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {wrapped ? (
+          <div style={{ fontSize: 13, color: 'var(--ad-text-dim,#565b6c)' }}>
+            Wrapped{times.departed ? ` at ${fmtClock(times.departed)}` : ''}.
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={step}
+            disabled={busyStep}
+            style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: 0, cursor: 'pointer',
+              background: 'linear-gradient(135deg, var(--ad-primary,#2563d8), #4f46e5)',
+              color: '#fff', fontSize: 15, fontWeight: 800, letterSpacing: 0.2 }}
+            title={stepHint || ''}
+          >
+            {busyStep ? '...' : stepLabel}
+          </button>
+        )}
+        {!wrapped && stepHint && (
+          <div style={{ fontSize: 11, opacity: 0.5, textAlign: 'center' }}>{stepHint}</div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setShowTimes((v) => !v)}
+          style={{ alignSelf: 'flex-start', background: 'transparent', border: 0, padding: 0,
+            fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', textDecoration: 'underline', cursor: 'pointer' }}
+        >
+          {showTimes ? 'hide times' : 'fix times'}
+        </button>
+        {showTimes && (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            {CLOCKS.map(([field, label]) => (
+              <TimeCell
+                key={field}
+                label={label}
+                value={times[field]}
+                busy={busyCell === field}
+                onStampNow={() => set(field, new Date().toISOString())}
+                onSet={(hhmm) => set(field, hhmmToISO(hhmm))}
+                onClear={() => set(field, null)}
+              />
+            ))}
+          </div>
+        )}
+        {err && <span style={{ fontSize: 11, color: 'var(--ad-bad, #dc2626)' }}>save failed, try again</span>}
+
+        {followups.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {followups.map((f, i) => (
+              <div key={i} style={{ fontSize: 12, color: 'var(--ad-warn, #b9770a)' }}>↳ ask{f.dog ? ` (${f.dog})` : ''}: {f.body}</div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

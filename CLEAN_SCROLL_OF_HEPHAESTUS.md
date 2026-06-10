@@ -2727,3 +2727,80 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   stamps are already collecting real per-stop drive data for it), (3) per-dog durations with
   the lowest-touch design (decompose from historical subset variation + vibe-rating dog sets,
   no new field workflow; a new dog = known client baseline + estimated increment).
+- **The worker's name is Hurricane Bath Operator (Paul, 2026-06-10).** Client-facing title
+  everywhere in Clean: "Hurricane Bath Operator", Paul styled "Owner and Hurricane Bath
+  Operator" (the Villages card's phrasing, which Paul liked, promoted to the standard). Applied
+  on the tracker, the Villages specialist card, the homepage + booking trust lines, and the
+  hurricane-bath team line. Oracle `hurricane_bath_operator_title`; check.py asserts the title
+  on track.astro + the-villages.astro. Internal "operator" (code, DB, Oracle prose) unchanged.
+- **The Dog Gone Tracker grows up (Paul, 2026-06-10; migration 0141 + tracker-eta edge fn).**
+  Six stages now: scheduled, rolling, WE'RE HERE (the "I'm here" tap: "setting up in your
+  driveway, with you shortly", auto-advancing to underway after 10 minutes), underway, COMING
+  BACK TO YOUR DOOR (a deliberately manual tap per Paul: only he knows the moment, and that is
+  when the client should watch the door), done. Live ETA shown big while rolling, with the
+  truck on a real map: the Today sheet's geolocation watch writes tracker_locations (one row
+  per appointment, deleted on arrival), and the token-scoped tracker-eta edge function serves
+  position + a cached Google drive ETA (recomputed only on 75s age or ~250m movement, so
+  20-second polling does not re-bill Distance Matrix). Status changes chime + vibrate, gentle
+  (a doorbell for the driveway, a bright run for the door), opt-in via one tap (browser
+  autoplay rules) and remembered per device. Tracker links now expire 7 days after the
+  scheduled end (long enough for "show someone", short enough that an old text is not a live
+  window into the household) and point at the portal; tracker-photos honors the same lifetime.
+  The page itself got the full Neural Expressive treatment: glow washes, an ombre wordmark
+  under a trotting paw line, paw-print stage dots, and a full-size "who's coming to your door"
+  photo card at the bottom (the thumbnail says a name; the big photo says THIS person).
+- **Today's stops became fat-finger-proof cards (Paul, 2026-06-10).** The old dense row mixed
+  the open-the-record tap with a strip of small buttons. Now: the whole card header opens the
+  contact sheet, the visit flow is ONE big stepping button (On my way -> I'm here -> Bringing
+  them back -> All done, rolling out) that flips the tracker stage and stamps the matching
+  time_is_money clock, and the three time cells hide behind a small "fix times" link. The
+  On-my-way tap also starts the live-location broadcast; I'm-here stops it.
+- **The stop button moved to the portal Home screen (Paul, 2026-06-10).** Superseding the
+  morning's Account-placement call, on Paul's read that hiding it a tab away made the two-tap
+  brag a three-tap reality: the red octagon now anchors the bottom of Home (care content still
+  sells first) and stays in Account > Your plan. stop_sign_two_taps refined; check.py asserts
+  StopControl renders inside HomeView.
+- **Gift a visit REJECTED (Paul, 2026-06-10).** Dropped from the portal-amazement inventory: a
+  gifted first visit lands on a recipient who never walked the funnel's fit gates (breed, coat,
+  area, friendly), converting a kind gesture into a doorstep decline. Refer-a-friend stays as
+  the sanctioned version (the friend walks the slide themselves). Recorded in the parking lot
+  so it is never re-added.
+- **Photos were going into the void; root-caused and fixed (2026-06-10, migration 0142).**
+  Paul's upload error ("permission denied for function _is_admin") was the 0135 grant lockdown
+  breaking the visit-photos storage policies: an RLS policy runs as the INVOKER, so the
+  authenticated role itself needs EXECUTE on _is_admin. One grant restored uploads, thumbnails,
+  and deletes at once. rpc_grants_explicit refined with the lesson: before locking grants down,
+  list the functions used inside pg_policy expressions; those need invoker grants.
+- **Two slot-engine truth bugs found and fixed (2026-06-10, migration 0143).** (1) bath_open_slots
+  refused hb_active-false cities, and all 33 legacy subscribers live in Ocala (hb_active false),
+  so every legacy portal reschedule errored; hb_active means "open to NEW public booking" and is
+  enforced in bath_start_subscription, so the slot grid now serves any configured city. (2) The
+  Ocala every-other-week rule had no teeth: cities.hb_week_parity_anchor (Ocala = 2026-06-08) now
+  filters recurring windows to on-weeks inside bath_open_slots, with open exceptions bypassing
+  parity (exactly Paul's manual extra-day path). ocala_availability_every_other_week updated.
+- **The Availability watcher built (Paul's spec, 2026-06-10; migration 0144,
+  capacity_watchdog_agent).** Daily question: if a client without an upcoming appointment came
+  looking today, how long until a slot that fits THEIR constraints (not-days exact;
+  availability_hard free text parsed for the book's real patterns; unreadable text treated as
+  unconstrained and flagged)? Plus the same for a hypothetical new client per city. One summary
+  card on Today when anyone's wait passes 10 days (alert past 14), re-carded only after the last
+  card closes. Slots come from bath_open_slots so the watcher and the booking surface can never
+  disagree. admin_capacity_check runs it on demand.
+- **Orbit assessed from first principles (Paul's ask, 2026-06-10).** Verdict: the shell is
+  sound; the Frankenstein is (1) ClientsView.jsx as a 1272-line god-file with 203 inline style
+  objects, (2) two coexisting styling systems (admin.css classes vs per-floor inline styles),
+  (3) loading/error/empty re-implemented per floor, (4) per-stop controls that had drifted into
+  button salads (fixed today). Staged, behavior-preserving cleanup plan recorded in
+  CLEAN_PARKING_LOT.md "Orbit first-principles cleanup"; the Today card redesign is its first
+  shipped piece.
+- **Grant lockdown round two (2026-06-10, migration 0147).** The advisors showed every
+  function created since 0135 anon-callable again: 0135 revoked only the PUBLIC default,
+  while Supabase's per-role defaults (pg_default_acl) kept granting EXECUTE to anon and
+  authenticated on each new public function, and per-migration "REVOKE FROM PUBLIC" never
+  touched those explicit grants. 0147 drops anon + authenticated from postgres's function
+  defaults (functions are now born service_role-only for real) and re-ran the tier sweep
+  over all app functions; extension functions are supabase_admin-owned and were unaffected.
+  Verified by ACL: tracker_status anon-callable by design, admin_* authenticated-only,
+  _capacity_* service_role-only, _is_admin keeps the 0142 invoker exception. Lesson in the
+  Oracle: verify a lockdown with pg_default_acl + has_function_privilege, never with the
+  migration text.
