@@ -9,12 +9,16 @@ Dog Gone Clean (DGC) is Paul's mobile dog grooming business in the Ocala, FL are
 old). This repo is becoming the **DGC website and operations app**. Clean is one existing
 business that is evolving, not a new one. Today it is full grooming in Ocala, and it keeps
 serving its legacy full-grooming clients there. From that base it is making a hard pivot to
-**bath only** (dogs that do not get haircuts), because haircuts are where the cycle time drags
-and bath work is faster and far higher revenue per hour (`favor_high_hourly_work`,
-`core_is_no_haircut_dogs`). The bath pivot starts in Ocala, where Paul already works, then
-migrates from Ocala to the Villages as the legacy full-grooming clients wind down. The
-destination is bath only in the Villages, reached by morphing the same business, not by
-standing up a separate "new Clean". Clean
+**no-haircut dogs**, because haircuts are where the cycle time drags and no-haircut work is
+faster and far higher revenue per hour (`favor_high_hourly_work`, `core_is_no_haircut_dogs`).
+IMPORTANT framing (corrected 2026-06-10, `v2_full_grooming_no_haircuts`): the v2.0 service is
+NOT "bath only". It is the FULL dog grooming visit for dogs that do not need haircuts: the
+Hurricane Bath, climate-controlled drying, deshedding, foot-pad hair, nail care included,
+everything except teeth brushing, no add-ons. The pivot declines slow haircut and bog-down
+dogs; it never does less for the dogs it takes. The pivot starts in Ocala, where Paul already
+works, then migrates from Ocala to the Villages as the legacy full-grooming clients wind down.
+The destination is the no-haircut book in the Villages, reached by morphing the same business,
+not by standing up a separate "new Clean". Clean
 is built as a fork of the proven Dog Gone Nails (DGN) platform, with its own instances and
 infrastructure, never merged with DGN. The authoritative legacy client records in `legacy/data/`
 seed the legacy doggoneclean.us rebuild when it happens.
@@ -22,7 +26,7 @@ Treat this as a construction site for the building that is coming.
 
 There are two businesses total: DGN (Dog Gone Nails, the new nails-only business in the
 Villages, fully separate) and Clean (this repo, the existing Ocala full-grooming business
-evolving to Villages bath only). A third, separate reinvented bath business was considered and
+evolving to Villages no-haircut full dog grooming). A third, separate reinvented bath business was considered and
 dropped as too complicated; Clean absorbs that direction by evolving into it rather than as its
 own company.
 

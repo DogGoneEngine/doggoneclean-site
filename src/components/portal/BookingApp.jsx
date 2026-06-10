@@ -103,6 +103,15 @@ function buildRecurringPreview(slotISO, cadence, count) {
   return out;
 }
 
+// excluded_breeds_are_slide_holes: the hard breed exclusions, declined kindly
+// and early (here) and rejected server-side in bath_start_subscription (the
+// durable teeth). Doodles and poodle crosses, Siberian Huskies, Great
+// Pyrenees, Great Danes: coats and sizes that need hours, not a route stop.
+const EXCLUDED_BREED_RE = /(doodle|poodle|husky|huskies|pyrenees|great\s*dane)/i;
+function breedNotAFit(breed) {
+  return EXCLUDED_BREED_RE.test(breed || '');
+}
+
 const BLANK_DOG = { name: '', breed: '', coat_tier: '', dobMonth: '', dobDay: '', dobYear: '', dobApproximate: false };
 const BLANK = {
   step: 1,
@@ -314,6 +323,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 
   const contactValid = place.firstName.trim() && place.lastName.trim() && looksLikeEmail(place.email) && toE164US(place.phone);
   const dogsValid = dogs.every((d) => d.name.trim() && d.breed.trim()
+    && !breedNotAFit(d.breed)
     && (d.coat_tier === 'smoothcoat' || d.coat_tier === 'doublecoat')
     && d.dobMonth && d.dobDay && d.dobYear);
   const canContinue = stage1 && stage2done && contactValid && dogsValid;
@@ -342,7 +352,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
       <div className="bk-friendly">
         <p className="bk-friendly__title">Friendly Dogs Only</p>
         <p className="bk-friendly__body">Normal wiggling is fine. Dogs that show aggression toward people or are excessively uncooperative are not eligible for this service.</p>
-        <p className="bk-friendly__note">A mobile dog bath runs on the trust between the dog and the operator.</p>
+        <p className="bk-friendly__note">A mobile dog grooming visit runs on the trust between the dog and the operator.</p>
       </div>
       <ul className="bk-checklist">
         {ELIGIBILITY.map((item) => (
@@ -443,6 +453,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 
 function DogCard({ idx, dog, showNumber, onChange }) {
   const age = computeDogAge(dog.dobMonth, dog.dobDay, dog.dobYear);
+  const notAFit = breedNotAFit(dog.breed);
   return (
     <div className="bk-dog">
       <div className="bk-dog__head">
@@ -450,15 +461,27 @@ function DogCard({ idx, dog, showNumber, onChange }) {
         <span className="bk-dog__name">Tell us about {dog.name || 'your dog'}</span>
       </div>
       <Field label="Name"><input className="pt-input" value={dog.name} onChange={(e) => onChange('name', e.target.value)} autoComplete="off" /></Field>
-      <Field label="Breed"><input className="pt-input" value={dog.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="e.g. Labrador, Husky, or Lab / Poodle mix" autoComplete="off" /></Field>
-      <Field label="Coat type">
+      <Field label="Breed"><input className="pt-input" value={dog.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="e.g. Lab, German Shepherd, or Boxer mix" autoComplete="off" /></Field>
+      {notAFit && (
+        <div className="bk-area bk-area--out">
+          <span className="bk-area__icon">!</span> We have to be honest up front: we are not built for this one.
+          Doodles and poodle crosses, Siberian Huskies, Great Pyrenees, and Great Danes need haircut-level
+          coat work or more hours than a mobile route can give one stop. A full-service dog grooming salon
+          is the right home for that coat, and we would rather tell you here, kindly, than at your door.
+        </div>
+      )}
+      <Field label="Which kind of dog?">
         <div className="bk-tier-row">
-          {[['smoothcoat', 'Smoothcoat', 'Short, single coat'], ['doublecoat', 'Doublecoat', 'Sheds, does not mat']].map(([val, lab, sub]) => (
+          {[
+            ['smoothcoat', 'Smoothcoat', 'The easy kind. Smooth, short coat: pit bulls, Boxers, Labs.'],
+            ['doublecoat', 'Doublecoat', 'The full-coat kind. Thick double coat: German Shepherds, Australian Shepherds. Longer visit, deeper deshed, priced for it.'],
+          ].map(([val, lab, sub]) => (
             <button key={val} type="button" className={`bk-tier${dog.coat_tier === val ? ' is-on' : ''}`} onClick={() => onChange('coat_tier', val)}>
               <span className="bk-tier__lab">{lab}</span><span className="bk-tier__sub">{sub}</span>
             </button>
           ))}
         </div>
+        <p className="bk-fineprint">Mixed breed? Pick by the coat your dog actually wears: smooth and short, or thick double coat. No haircut either way; that is the point.</p>
       </Field>
       <Field label="Date of birth">
         <div className="bk-dob-row">
@@ -487,11 +510,11 @@ function Step2({ city, dogs, cadence, setCadence, onAdvance }) {
   const options = [
     { key: '4wk', label: 'Every 4 weeks', hook: 'It just gets done.', sub: 'Book once. We show up every 4 weeks automatically.', badge: 'Founders rate' },
     { key: '2wk', label: 'Every 2 weeks', hook: 'Extra fresh.', sub: 'Same price as every 4 weeks. Heavy shedders love it.', badge: 'Same price' },
-    { key: 'oneoff', label: 'Single visit', hook: 'Just this once.', sub: 'One bath, one charge. No subscription.', badge: null },
+    { key: 'oneoff', label: 'Single visit', hook: 'Just this once.', sub: 'One visit, one charge. No subscription.', badge: null },
   ];
   const total = visitPriceCents(city, dogs, cadence);
   const dogLabel = dogs.length === 1 ? '1 dog' : `${dogs.length} dogs`;
-  const periodLabel = cadence === 'oneoff' ? 'One bath' : (cadence === '2wk' ? 'Every 2 weeks' : 'Every 4 weeks');
+  const periodLabel = cadence === 'oneoff' ? 'One visit' : (cadence === '2wk' ? 'Every 2 weeks' : 'Every 4 weeks');
   return (
     <div className="bk-card">
       <h2 className="bk-step__title">Choose your <span className="grad">plan</span></h2>

@@ -14,12 +14,29 @@ const valueProps = [
     body: 'A wash system Paul built himself. Powerful when it needs to be, gentle when it has to be. Strong flow drives water through a thick coat to the skin. A soft trickle for faces, eyes, and nervous dogs. No fire hosing where it does not belong.',
   },
   {
+    title: 'The whole job, one price',
+    body: 'The Hurricane Bath is the centerpiece, not the whole show. Deshedding, nail care, foot pad hair, a full high velocity dry in the climate controlled trailer. Everything your dog needs except a haircut they do not need. No add ons, because nothing is held back to upsell.',
+  },
+  {
     title: 'Built around the dog',
-    body: 'We bath one household at a time in a climate controlled trailer. No cages, no assembly line, no crowded lobby. Your dog gets focused care and the trailer rolls on.',
+    body: 'One household at a time in a climate controlled trailer. No cages, no assembly line, no crowded lobby. Your dog gets focused care and the trailer rolls on.',
   },
   {
     title: 'We come to you',
-    body: 'The trailer parks in your driveway. The bath happens. Your dog walks back inside clean. You stay home. Your day stays yours.',
+    body: 'The trailer parks in your driveway. The work happens. Your dog walks back inside clean, dry, and done. You stay home. Your day stays yours.',
+  },
+];
+
+const dogKinds = [
+  {
+    name: 'The easy kind',
+    examples: 'Pit bulls, Boxers, Labs',
+    body: 'Smooth, short single coats. They wash fast, dry fast, and walk out gleaming. The quickest visit and the lowest price.',
+  },
+  {
+    name: 'The full-coat kind',
+    examples: 'German Shepherds, Australian Shepherds',
+    body: 'Thick double coats that shed for a living. More time, more work, a deeper deshed, and priced for it. The transformation is worth photographing.',
   },
 ];
 
@@ -40,8 +57,8 @@ const recurringSteps = [
 ---
 
 <BaseLayout
-  title="Dog Gone Clean | Mobile dog baths in The Villages and Ocala, Florida"
-  description="A genuinely clean dog in your driveway, powered by the Hurricane Bath. Recurring or one off, in The Villages and Ocala, Florida."
+  title="Dog Gone Clean | Mobile dog grooming for dogs that don't need haircuts | The Villages and Ocala, Florida"
+  description="Full dog grooming in your driveway for dogs that don't need haircuts: the Hurricane Bath, deshedding, nails, the works. The Villages and Ocala, Florida."
 >
 
   <!-- HERO -->
@@ -50,11 +67,12 @@ const recurringSteps = [
     <div class="glow glow-b"></div>
     <div class="container">
       <div class="hero__inner">
-        <p class="eyebrow">Mobile dog baths, in your driveway</p>
-        <h1 class="hero__title">A bath your dog<br /><span class="grad">actually likes.</span></h1>
+        <p class="eyebrow">Mobile dog grooming, in your driveway</p>
+        <h1 class="hero__title">The full groom.<br /><span class="grad">Minus the haircut they don't need.</span></h1>
         <p class="hero__lede">
-          Powered by the Hurricane Bath, in your driveway. A genuinely clean
-          dog, calmly handled, without the trip.
+          The Hurricane Bath, a deep deshed, nails done, dried to the skin,
+          all in your driveway. Everything your dog needs, calmly handled,
+          without the trip.
         </p>
         <div class="hero__cta">
           <a class="button button--primary button--lg" href="/the-villages">Book a visit</a>
@@ -101,11 +119,12 @@ const recurringSteps = [
     <div class="container">
       <div class="text-center">
         <p class="section-label">What makes this different</p>
-        <h2 class="section-title">A clean dog is the real job here.</h2>
+        <h2 class="section-title">We specialize in the dogs salons rush.</h2>
         <p class="section-subtitle section-subtitle--center">
-          Dog Gone Clean does one thing: bath dogs, in their driveway, with
-          a system Paul designed to do it well. No salon theater, no
-          add ons, no upsells. One clean dog at a time.
+          Dog Gone Clean does full dog grooming for dogs that do not need
+          haircuts, in their own driveway, with a system Paul designed to do
+          it superbly. No salon theater, no upsells, no surprise extras.
+          One spotless dog at a time.
         </p>
       </div>
       <div class="value-grid">
@@ -115,6 +134,39 @@ const recurringSteps = [
             <p>{v.body}</p>
           </article>
         ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- TWO KINDS OF DOGS -->
+  <section class="section kinds-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">Is your dog our kind of dog?</p>
+        <h2 class="section-title">Two kinds of dogs. <span class="grad">You'll know yours instantly.</span></h2>
+        <p class="section-subtitle section-subtitle--center">
+          If your dog never gets a haircut, you are in the right place.
+          There are two kinds, and a mixed breed just picks by its coat.
+        </p>
+      </div>
+      <div class="kinds-grid">
+        {dogKinds.map(k => (
+          <article class="kind-card">
+            <h3>{k.name}</h3>
+            <p class="kind-card__examples">{k.examples}</p>
+            <p>{k.body}</p>
+          </article>
+        ))}
+      </div>
+      <div class="kinds-honest">
+        <p>
+          <strong>And we are honest about who we are not built for.</strong>
+          Dogs that need haircuts, doodles and poodle crosses, Siberian
+          Huskies, Great Pyrenees, and Great Danes need more time than a
+          mobile route can give one stop. We would rather tell you here,
+          kindly, than at your door. A full-service dog grooming salon is
+          the right home for those coats.
+        </p>
       </div>
     </div>
   </section>
@@ -188,10 +240,10 @@ const recurringSteps = [
         <div class="recurring__copy">
           <h3>Recurring, your way</h3>
           <p>
-            Your bath runs on the same rhythm every cycle. The Hurricane
-            Bath stays ahead of the shedding, the smell, and the dander
-            you would rather not vacuum. No reminding yourself. No
-            rebooking. No hassle.
+            Your dog's care runs on the same rhythm every cycle. The
+            Hurricane Bath and the deshed stay ahead of the shedding, the
+            smell, and the dander you would rather not vacuum. No reminding
+            yourself. No rebooking. No hassle.
           </p>
           <p>
             You can also book a single visit first and move to recurring
@@ -210,6 +262,31 @@ const recurringSteps = [
     </div>
   </section>
 
+  <!-- THE STOP BUTTON -->
+  <section class="section stop-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">The stop button</p>
+        <h2 class="section-title">Cancel in two taps. <span class="grad">No phone calls, no scripts, no guilt.</span></h2>
+      </div>
+      <div class="stop-card">
+        <p class="stop-card__big">
+          Two taps in your portal and it is done. We stop charging.
+          We stop coming.
+        </p>
+        <p>
+          No number to call. No hold music. No call center reading a
+          retention script while your card keeps getting charged. The stop
+          button is yours, it is two taps away, and it works.
+        </p>
+        <p>
+          That is why starting is easy: you are never more than two taps
+          from out. We keep you by being worth keeping.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- SERVICE AREA -->
   <section class="section city-section">
     <div class="container">
@@ -217,7 +294,7 @@ const recurringSteps = [
         <p class="section-label">Service area</p>
         <h2 class="section-title">We serve The Villages and Ocala.</h2>
         <p class="section-subtitle section-subtitle--center">
-          The Hurricane Bath is live in The Villages, Florida, and coming soon
+          Full dog grooming, live in The Villages, Florida, and coming soon
           to Ocala.
         </p>
       </div>
@@ -225,7 +302,7 @@ const recurringSteps = [
         <a href="/the-villages" class="city-card">
           <div class="city-card__state">Florida</div>
           <h3>The Villages</h3>
-          <p>Mobile dog baths in The Villages. Recurring or one off, on a schedule you keep.</p>
+          <p>Full dog grooming in The Villages, no haircut breeds. Recurring or one off, on a schedule you keep.</p>
           <div class="city-card__cta">
             See the offer
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
@@ -256,7 +333,7 @@ const recurringSteps = [
         <h2 class="section-title">Friendly dogs only</h2>
       </div>
       <div class="friendly__card">
-        <p>A mobile dog bath runs on the trust between the dog and the operator.</p>
+        <p>A mobile dog grooming visit runs on the trust between the dog and the operator.</p>
         <p>A dog that shows aggression toward people is not eligible for this service.</p>
         <p><strong>Normal wiggling is fine. Aggression is not.</strong></p>
       </div>
@@ -390,13 +467,90 @@ const recurringSteps = [
   /* VALUE PROPS */
   .value-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-xl);
     margin-top: var(--space-3xl);
   }
   @media (max-width: 900px) {
     .value-grid { grid-template-columns: 1fr; }
   }
+
+  /* TWO KINDS */
+  .kinds-section {
+    background: var(--surface-alt);
+    border-block: 1px solid var(--line);
+  }
+  .kinds-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    max-width: 880px;
+    margin: var(--space-2xl) auto 0;
+  }
+  @media (max-width: 760px) {
+    .kinds-grid { grid-template-columns: 1fr; }
+  }
+  .kind-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+  }
+  .kind-card h3 {
+    color: var(--accent);
+    margin: 0 0 var(--space-xs);
+    font-size: var(--text-xl);
+  }
+  .kind-card__examples {
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 var(--space-sm);
+  }
+  .kind-card p:last-child {
+    color: var(--soft);
+    margin: 0;
+  }
+  .kinds-honest {
+    max-width: 720px;
+    margin: var(--space-xl) auto 0;
+    padding: var(--space-lg) var(--space-xl);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
+  .kinds-honest p {
+    margin: 0;
+    color: var(--soft);
+  }
+
+  /* STOP BUTTON */
+  .stop-section {
+    background: var(--surface-alt);
+    border-block: 1px solid var(--line);
+  }
+  .stop-card {
+    max-width: 640px;
+    margin: var(--space-2xl) auto 0;
+    padding: var(--space-2xl);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .stop-card__big {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 var(--space-md);
+  }
+  .stop-card p {
+    margin-bottom: var(--space-md);
+    color: var(--soft);
+  }
+  .stop-card p:last-child { margin-bottom: 0; }
   .value-card {
     background: var(--card);
     border: 1px solid var(--line);

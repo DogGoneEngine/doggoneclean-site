@@ -116,6 +116,31 @@ The real open question is the easiest intake from a phone where the shots are al
      the right dog and visit. Last resort.
 Decide intake (likely option 1) before building. Next build after Riker hardening.
 
+## Pizza tracker client loop: build order (spec locked 2026-06-10, `pizza_tracker_client_loop`)
+
+The full spec is the Oracle rule. What is buildable NOW with no Paul input, in order:
+
+1. **Tracker plumbing.** A per-appointment tracker token (`bath_appointments.tracker_token`,
+   random, indexed) + a public token-scoped read RPC returning only status, ETA-ish fields, and
+   that visit's shareable photos. The progress states already exist on `bath_appointments.status`
+   (on_the_way through completed).
+2. **Tracker page.** `/track/[token]` Astro route + small island: status timeline, the live Google
+   Maps link, photos as they land. No auth (an SMS recipient is not logged in); token is the key.
+3. **Orbit "On my way" button.** On the Today stop: flips status to on_the_way, stamps the
+   time_is_money Left cell, and (Twilio-gated) fires the heads-up MMS with the tracker link. Until
+   Twilio, the button still flips status + stamps, and shows the link to copy into Google Voice by
+   hand, so the loop is field-testable today.
+4. **Portal photo sharing.** Surface each visit's before/after/extra photos in the CLIENT portal
+   visit history (today they are admin-only); a `client_visible` flag per photo so a skin-issue
+   shot is shared deliberately.
+5. **Review-ask tracking.** `review_asks` per client (asked_at, clicked_at, reviewed_at,
+   suppressed): ask once, track the click, stop forever once reviewed; never ask anyone already
+   asked; the ask expires after its window. Wire into the post-visit send when Twilio/Resend land.
+6. **Tip ask.** Post-visit, only for new clients and flagged lovers-of-the-service; online tip
+   capture is Stripe-gated, so this lands with the Stripe slice.
+
+Gates: Twilio (the sends), Stripe (online tips). Everything else above is real, buildable work.
+
 ## Cutover follow-ons - legacy fold (2026-06-07)
 
 The legacy-fold cutover (legacy_folds_into_v2) is mid-build. Open threads, parked so they

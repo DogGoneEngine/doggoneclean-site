@@ -585,18 +585,27 @@ def check_rule_survival():
             "'card on file' (signup requires it; customer should expect it)",
         )
 
-    # ── core_is_no_haircut_dogs ───────────────────────────────────────────
-    # Bath only. The page must say so where eligibility is discussed.
+    # ── core_is_no_haircut_dogs / v2_full_grooming_no_haircuts ───────────
+    # The service is the FULL dog grooming visit for dogs that do not need
+    # haircuts (corrected 2026-06-10): the haircut line must be stated where
+    # eligibility is discussed, and the "bath only" misframing must not return.
     for page in (villages, process_page):
         require_present(
             page,
-            r"bath only",
+            r"haircut",
             "core_is_no_haircut_dogs",
-            "'bath only' (we do not do haircuts)",
+            "'haircut' (dogs that do not need haircuts framing)",
             block=False,
         )
+    for page in (home, villages, process_page, booking_app):
+        require_absent(
+            page,
+            r"bath only",
+            "v2_full_grooming_no_haircuts",
+            "'bath only' (the corrected service is the full no-haircut visit, never bath only)",
+        )
 
-    # ── bath_only_no_mats ─────────────────────────────────────────────────
+    # ── bath_only_no_mats / two_dog_kinds_service_choice ──────────────────
     # Customer-facing eligibility: the tier names must be present (they
     # are the eligibility lens), and a yes/no eligibility distinction
     # must be visible.
@@ -616,18 +625,31 @@ def check_rule_survival():
     )
     require_present(
         villages,
-        r"[Ww]e bath",
+        r"[Ww]e groom",
         "bath_only_no_mats",
-        "'we bath' (the eligibility yes header)",
+        "'we groom' (the eligibility yes header)",
         block=False,
     )
     require_present(
         villages,
-        r"[Ww]e do not bath",
+        r"[Ww]e do not groom",
         "bath_only_no_mats",
-        "'we do not bath' (the eligibility no header)",
+        "'we do not groom' (the eligibility no header)",
         block=False,
     )
+
+    # ── excluded_breeds_are_slide_holes ───────────────────────────────────
+    # The hard exclusions must be visible where the dog is described; the
+    # durable teeth live in bath_start_subscription (server-side breed
+    # reject), so the copy presence is warn-only.
+    for page in (villages, booking_app):
+        require_present(
+            page,
+            r"doodle",
+            "excluded_breeds_are_slide_holes",
+            "'doodle' (the breed slide-holes stated up front)",
+            block=False,
+        )
 
     # ── no_dgn_import ─────────────────────────────────────────────────────
     # DGN's nail vocabulary must not appear on Clean's bath surface.
@@ -644,7 +666,7 @@ def check_rule_survival():
         for pat, label in dgn_nail_vocab:
             require_absent(
                 page, pat, "no_dgn_import",
-                f"DGN nail vocab '{label}' (Clean is bath only, not nails)",
+                f"DGN nail vocab '{label}' (Clean is dog grooming, not nails)",
             )
 
     # ── no_jargon ─────────────────────────────────────────────────────────
@@ -736,14 +758,20 @@ def check_rule_survival():
                    "service_area_enforced_server_side",
                    "the 'confirm later' manual-address punt copy in the booking flow")
 
-    # ── core_is_no_haircut_dogs / bath_only_no_mats (booking eligibility) ──
+    # ── core_is_no_haircut_dogs / bath_only_no_mats / two-kinds (booking) ──
     # Eligibility copy; the coat-tier teeth are the DB CHECK + the RPC. WARN.
-    require_present(booking_app, r"bath only", "core_is_no_haircut_dogs",
-                    "'bath only' on the booking eligibility gate", block=False)
+    require_present(booking_app, r"haircut", "core_is_no_haircut_dogs",
+                    "'haircut' on the booking eligibility gate", block=False)
     require_present(booking_app, r"Smoothcoat", "bath_only_no_mats",
                     "'Smoothcoat' tier on the booking coat picker", block=False)
     require_present(booking_app, r"Doublecoat", "bath_only_no_mats",
                     "'Doublecoat' tier on the booking coat picker", block=False)
+    require_present(booking_app, r"German Shepherd", "two_dog_kinds_service_choice",
+                    "a complicated-kind breed example on the coat picker", block=False)
+    require_present(booking_app, r"Boxer", "two_dog_kinds_service_choice",
+                    "an easy-kind breed example on the coat picker", block=False)
+    require_present(booking_app, r"[Mm]ix", "two_dog_kinds_service_choice",
+                    "the mixed-breed guidance on the coat picker", block=False)
 
     # ── premium_inclusive_no_addons (booking surface) ─────────────────────
     # One price per tier, no upsell may be introduced into the funnel. Catch a

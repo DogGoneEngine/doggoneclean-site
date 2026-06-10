@@ -25,14 +25,18 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Current focus / next action
 
-- **Next action (end of 2026-05-29 session):** The `/book` signup funnel is built and on
-  `main`: four steps, anonymous (keyed on phone), server-enforced in-area gate (no manual
-  path), per-coat pricing, founders cap, returning-client recognition, in the Neural
-  Expressive look. Deploy is now gated on `scripts/check.py`. The gate to going live is the
-  Stripe card step (needs the Dog Gone Clean test keys for the SetupIntent edge function)
-  and real availability data for the slot picker; the Maps autocomplete needs the Google
-  Cloud console setting flipped on Paul's side before it renders. See the 2026-05-29
-  "continued" entry below for the full session.
+- **Next action (end of 2026-06-10 session):** The service is now correctly presented as
+  FULL dog grooming on no-haircut dogs (`v2_full_grooming_no_haircuts`), with the two-kinds
+  service choice (`two_dog_kinds_service_choice`), the breed slide-holes enforced in the DB
+  (`excluded_breeds_are_slide_holes`), and the stop-button brag strengthened. The working
+  branch (portal self-service, the 16-floor Orbit console, client records, calendar sync,
+  visit history) is folded into `main` and deployed. What gates launch is Paul's external
+  list (iPostal1 address -> Sunbiz DBA -> EIN -> Relay bank -> Stripe -> Twilio -> Resend
+  sender; see CLEAN_PARKING_LOT.md "Launch blockers"): Stripe unlocks the booking Confirm,
+  card management, and tips; the Resend key + cancelling Acuity unlocks reminders going
+  live; Twilio unlocks SMS and the tracker sends. Build-side next: the pizza tracker client
+  loop (`pizza_tracker_client_loop`, plumbing buildable now), then the remaining parking-lot
+  items as Paul's pieces land.
 - **Direction:** Two businesses in Paul's portfolio. DGN (Dog Gone Nails): new, nails only,
   the Villages, fully separate (own repo `doggonenails-site`). Clean (this repo): the
   existing ~20-year business, one evolving business, a fork of the DGN platform, running on
@@ -2456,3 +2460,53 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Amyotte, whose "?" markers had blocked them), and pruned the stale manual rows. From now on any
   Google Calendar change (add / reschedule / cancel) lands in the app within 15 minutes. The Calendar
   floor and the win-back agent now run on the real, complete schedule.
+
+## Decisions log (2026-06-10)
+
+- **The service is corrected: full dog grooming on no-haircut dogs, NOT bath only (Paul,
+  2026-06-10).** The site's "we only give dogs baths" framing was a misunderstanding. Paul does
+  the full job on dogs that do not need haircuts: the Hurricane Bath, climate-controlled drying,
+  deshedding and undercoat work, foot-pad hair shaved, nail care included. Teeth brushing is the
+  one thing deliberately not offered. No extras, because nothing is held back to upsell. Locked as
+  `v2_full_grooming_no_haircuts`; `bath_only_no_mats` keeps the eligibility half with the framing
+  corrected; site copy rewritten across home, the-villages, ocala, hurricane-bath, and the booking
+  island; check.py "bath only" patterns replaced with the haircut framing.
+- **Two kinds of dogs, explained so a client self-classifies instantly (Paul, 2026-06-10).** The
+  nails model (one product, same for every dog) does not fit Clean: there are two kinds. The easy
+  kind (pit bull, boxer, Lab: smooth or short single coats) and the more complicated kind (German
+  Shepherd, Australian Shepherd: full double coats, longer, more work, higher price). Mixed breeds
+  pick by coat, and the funnel says so. These ARE the existing smoothcoat/doublecoat tiers; slugs
+  and pricing unchanged. Locked as `two_dog_kinds_service_choice`. NOTE: this supersedes the parked
+  Breed Firewall draft's exclusion of Australian Shepherds; Paul now names the Aussie as the example
+  of the accepted complicated kind.
+- **Slide holes: the hard breed exclusions, enforced in the database (Paul, 2026-06-10).** No
+  dogs whose breed starts or ends with doodle, no poodles or poodle crosses, no Siberian Huskies,
+  Great Pyrenees, or Great Danes, and nothing that bogs the day down 2 to 3 hours. Wrong-fit
+  visitors fall out of the funnel gracefully and early, declined kindly, never at the door. Legacy
+  husky/Pyrenees households are grandfathered. Locked as `excluded_breeds_are_slide_holes`; teeth
+  in `bath_start_subscription` (breed reject before any row is written) plus a kind early decline
+  in the funnel per dog.
+- **The gravity slide (Paul, 2026-06-10).** The website's job: pull a right-fit visitor down a
+  slide that ends in a booked appointment and a card on file, excited; sell by pulling real
+  emotional strings, never sleazy, and deliver on every promise. The trust mechanics (two-tap
+  stop, day-before charge, founders cap) are bragged about openly because they are real. Locked
+  as `gravity_slide_funnel`.
+- **The stop button is a headline selling feature, said in Paul's framing (2026-06-10).** "Two
+  taps: we stop charging, we stop coming. Done." Making cancellation this easy may lose a few
+  clients we would have kept, but it gains many more who will not hesitate to start because they
+  are not afraid of a call center between them and their own credit card. The rule was already
+  locked (`stop_sign_two_taps`); today's work strengthens the brag on the homepage and the city
+  page to carry the no-call-center contrast explicitly.
+- **Pizza tracker client loop spec locked (Paul, 2026-06-10), `pizza_tracker_client_loop`.** One
+  button push when leaving sends the heads-up with a live Google Maps link; progress updates flow
+  to the client as the visit advances; before/after/extra photos (including skin observations)
+  attach to the visit and surface in the client's portal record; after drive-away, a professional
+  tip ask only where appropriate (new clients and known lovers of the service) and a
+  feedback-plus-Google-review ask for everyone not already asked and not already reviewed, active
+  for a limited window, tracked per client so nobody is ever spammed. Sends gate on Twilio; online
+  tips gate on Stripe. Build order parked in CLEAN_PARKING_LOT.md.
+- **Trunk fold (2026-06-10).** Found `main` frozen at 2026-05-29 (fb1537d) while the working
+  branch carried 185 commits of finished June work (portal self-service, the 16-floor Orbit
+  console, the client-record system, calendar sync, visit-history migration). The deploy fires
+  only on push to `main`, so none of it had properly shipped per the trunk rule. Folded the
+  branch into `main` this session per ship_to_completion.

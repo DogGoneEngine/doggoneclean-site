@@ -32,10 +32,11 @@ const FOUNDERS_CAP = city.hb_founders_cap;
 
 const apptSteps = [
   'We park in your driveway and set up the trailer.',
-  'Your dog comes out. We bath in the climate controlled trailer.',
-  'The Hurricane Bath does the work. Pressure dialed to the dog.',
-  'High velocity dry in the same trailer. No standing wet.',
-  'Your dog walks back inside, clean. We roll on.',
+  'Your dog comes out. Everything happens in the climate controlled trailer.',
+  'The Hurricane Bath does the work. Pressure dialed to the dog, suds driven to the skin.',
+  'High velocity dry in the same trailer, with the deshed worked out of the coat. No standing wet.',
+  'Nails done, foot pad hair cleaned up. The full job, nothing left for later.',
+  'Your dog walks back inside clean, dry, and finished. We roll on.',
 ];
 
 const reminders = [
@@ -47,8 +48,8 @@ const reminders = [
 ---
 
 <BaseLayout
-  title="The Villages, FL | Dog Gone Clean Hurricane Bath"
-  description="Hurricane Bath service in The Villages, Florida. Powerful, gentle, in your driveway. Recurring every four weeks (or every two), or one off."
+  title="The Villages, FL | Dog Gone Clean full dog grooming"
+  description="Full dog grooming for dogs that don't need haircuts, in The Villages, Florida. The Hurricane Bath, deshedding, nails, the works, in your driveway. Recurring every four weeks (or every two), or one off."
 >
 
   <!-- HERO -->
@@ -66,8 +67,9 @@ const reminders = [
         </span>
         <h1>The Hurricane Bath,<br /><span class="grad">in your driveway.</span></h1>
         <p class="city-hero__sub">
-          Mobile dog baths for The Villages, on a schedule you keep.
-          Recurring every four weeks (or every two), or one off.
+          Full dog grooming for dogs that do not need haircuts: the
+          Hurricane Bath, deshedding, nails, the works, on a schedule you
+          keep. Recurring every four weeks (or every two), or one off.
         </p>
         <a class="button button--primary button--lg" href="/book?founders=1">
           Lock in the founders rate
@@ -127,7 +129,7 @@ const reminders = [
           </div>
           <div class="launch-card__term">
             <strong>Two-tap cancel.</strong>
-            Anytime, from your portal. No phone calls.
+            We stop charging, we stop coming. From your portal, no phone calls.
           </div>
         </div>
 
@@ -157,8 +159,8 @@ const reminders = [
           <div class="other-way__eyebrow">Try us once</div>
           <h3>Single visit</h3>
           <p class="other-way__desc">
-            Book one bath. No subscription. If you love it (you will),
-            move to recurring whenever you are ready.
+            Book one visit, the full job. No subscription. If you love it
+            (you will), move to recurring whenever you are ready.
           </p>
           <div class="other-way__rows">
             {tiers.map(t => (
@@ -210,27 +212,29 @@ const reminders = [
     <div class="container">
       <div class="text-center">
         <p class="section-label">Eligibility</p>
-        <h2 class="section-title">What we bath, and what we do not.</h2>
+        <h2 class="section-title">Who we groom, and who we do not.</h2>
         <p class="section-subtitle section-subtitle--center">
-          The Hurricane Bath is built for dogs that do not need a haircut.
-          We bath dogs whose coats clean up fast and dry well.
+          The service is built for dogs that do not need a haircut. If
+          yours never sees clippers on its body, you are almost certainly
+          in. A mixed breed picks by its coat.
         </p>
       </div>
 
       <div class="elig-grid">
         <div class="elig-card elig-card--yes">
-          <div class="elig-card__head">We bath</div>
+          <div class="elig-card__head">We groom</div>
           <ul>
-            <li>Smoothcoat dogs (single short coats: Labs, Pointers, Boxers, and friends)</li>
-            <li>Doublecoat dogs that shed without matting (short or medium double coats)</li>
+            <li>Smoothcoat dogs, the easy kind (smooth short single coats: pit bulls, Boxers, Labs)</li>
+            <li>Doublecoat dogs, the full-coat kind (thick double coats that shed without matting: German Shepherds, Australian Shepherds)</li>
             <li>Friendly dogs handleable without aggression</li>
             <li>Dogs at private homes inside The Villages with driveway parking</li>
           </ul>
         </div>
         <div class="elig-card elig-card--no">
-          <div class="elig-card__head">We do not bath</div>
+          <div class="elig-card__head">We do not groom</div>
           <ul>
-            <li>Dogs that need haircuts (we are bath only)</li>
+            <li>Dogs that need haircuts, including doodles and poodle crosses</li>
+            <li>Siberian Huskies, Great Pyrenees, and Great Danes (coats and sizes that need hours, not a route stop)</li>
             <li>Coats that mat or pack heavy undercoat against the skin</li>
             <li>Dogs that show aggression toward people</li>
             <li>Households outside the Villages service area</li>
@@ -239,8 +243,8 @@ const reminders = [
       </div>
       <p class="elig-note">
         Not sure your dog fits? The booking flow has a quick eligibility
-        check. If a coat type is borderline, we will tell you up front,
-        not at the door.
+        check. If a coat type is not a fit, we will tell you up front,
+        kindly, not at the door.
       </p>
     </div>
   </section>

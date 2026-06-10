@@ -523,10 +523,61 @@ its own rebuild. The full plan that locked these rules lives at the dated
 ### Product scope and eligibility
 
 `bath_only_no_mats` (product):
-Hurricane Bath accepts only short-haired and double-coated breeds that do not
-require haircuts and have low mat risk. Because cycle time depends on no mat
-surprise, and the premium-inclusive promise breaks if the operator has to charge
-for unexpected work or skip a booked dog at the door.
+(Key name historical; the eligibility half of this rule stands, the "bath only"
+service framing it once implied is corrected by `v2_full_grooming_no_haircuts`.)
+The v2.0 service accepts only short-haired and double-coated breeds that do not
+require haircuts and have low mat risk. The service delivered to an accepted dog
+is the full no-haircut dog grooming visit, not a reduced bath. Because cycle
+time depends on no mat surprise, and the premium-inclusive promise breaks if the
+operator has to charge for unexpected work or skip a booked dog at the door.
+
+`v2_full_grooming_no_haircuts` (product):
+The v2.0 service is a complete dog grooming visit for dogs that do not need
+haircuts, NOT a bath-only service. One visit includes everything the dog needs
+except a haircut it does not need: the Hurricane Bath, climate-controlled
+high-velocity drying, deshedding and undercoat work, nail care included, and
+foot-pad hair shaved. Teeth brushing is the one thing deliberately not offered.
+There are no add-ons because nothing was held back to upsell
+(`premium_inclusive_no_addons`): it is the full job, only on quick dogs. The
+"we only give baths" framing that shipped on the site was a misunderstanding
+and is corrected everywhere it appears. Because Paul does the full job on
+no-haircut dogs (a boxer or a pit bull gets everything it needs except teeth
+brushing), "bath only" undersold the service and misdescribed the business,
+and the pivot's economics are about declining slow haircut and bog-down dogs
+(`favor_high_hourly_work`), never about doing less for the dogs we take.
+Corrected by Paul 2026-06-10.
+
+`two_dog_kinds_service_choice` (ux):
+The service choice is presented as exactly two kinds of dogs a client instantly
+understands, defined clearly enough that no back-and-forth is ever needed, and
+the client self-classifies, mixed breeds included. The easy kind: smooth or
+short single coats (pit bull, boxer, Lab) that wash and dry fast. The more
+complicated kind: full double coats (German Shepherd, Australian Shepherd) that
+take longer, are more work, and cost more. These are the existing smoothcoat
+and doublecoat tiers (DB slugs and pricing unchanged); this rule governs how
+they are explained at the decision moment. A mixed dog picks by its coat, and
+the funnel says so explicitly. Because Dog Gone Nails sells one product that is
+the same for every dog while Clean has two, the difference was not being
+explained, and a category a visitor cannot confidently place their own dog in
+stalls the funnel exactly where it should accelerate. Paul, 2026-06-10.
+
+`excluded_breeds_are_slide_holes` (product):
+The funnel is a slide with person-shaped holes: right-fit visitors are pulled
+down into signup, and wrong-fit dogs fall out gracefully and early, declined
+kindly and directed away, never booked and never told no at the door. The hard
+breed exclusions for new v2 clients: any doodle (any breed name starting or
+ending with "doodle") and poodles or poodle crosses, Siberian Huskies, Great
+Pyrenees, Great Danes, and any coat or size that bogs the day down for 2 to 3
+hours. These sit alongside the standing holes: haircut and matting coats
+(`bath_only_no_mats`), aggression (`friendly_dogs_only`), and out-of-area
+addresses (the service-area gates). Legacy clients are grandfathered (the
+existing husky and Pyrenees households stay served). Enforced server-side in
+`bath_start_subscription` (breed reject before any row is written) and
+client-side as an early graceful decline in the funnel. Because one 2-to-3-hour
+dog ruins a route day and the pivot's economics (`favor_high_hourly_work`,
+`no_doodles`), the exclusions also shape what a future hire has to handle (a
+unicorn job needs a curated book), and a graceful early no preserves goodwill
+where a doorstep no destroys it. Paul, 2026-06-10.
 
 `villages_only_at_launch` (product):
 Hurricane Bath's service area at launch is The Villages, FL, with the address
@@ -964,6 +1015,43 @@ caught on 2026-05-27, where the first cut of `/the-villages` showed
 the single-visit price only as a row inside the tier pricing card,
 which Paul correctly read as "you can't actually try us once." Pairs
 with `single_oneoff_higher` (which defines the price spread).
+
+`gravity_slide_funnel` (ux):
+The website's job is to take a right-fit visitor and pull them with the force
+of gravity down a slide that ends with a booked appointment and a card on
+file, excited. The selling pulls real emotional strings (the dog's wellbeing,
+the clean home, the relief of a chore permanently handled, the pride in a dog
+that looks and smells great) and is never sleazy: every promise made on the
+slide is one the service actually delivers, and the trust mechanics (the
+two-tap stop, the day-before charge, the founders cap) are bragged about
+openly because they are real. Wrong-fit visitors fall out of the slide through
+the person-shaped holes (`excluded_breeds_are_slide_holes`) gracefully, early,
+and pointed somewhere useful. Because excitement plus zero friction is what
+converts, a visitor who signs up excited and then gets exactly what was
+promised becomes the grateful client the prime directive requires, and
+overselling converts a signup into a churn and a bad review. Paul, 2026-06-10.
+
+`pizza_tracker_client_loop` (ux):
+The client-facing tracker loop runs per appointment, replacing every manual
+text: (1) when Paul leaves for the stop, one button push sends the client a
+heads-up with a live Google Maps progress link to their house (the home of
+`heads_up_on_the_way`); (2) progress updates flow to the client's tracker view
+as the visit advances (on the way, arrived, underway, done); (3) photos taken
+through the visit (before, after, extras including skin or health observations
+worth flagging) attach to the visit and surface in the client's portal record
+as their dog's history; (4) after Paul drives away, a professional follow-up:
+an extra-tip ask only when appropriate (new clients and known lovers of the
+service, never blanket), and a feedback-plus-Google-review ask for everyone
+EXCEPT anyone already asked or who already left one. The review ask is tracked
+per client (record the ask, track the click, stop forever once a review
+exists) and stays active only for a limited window after the visit, so the ask
+is timed, never nagging. Because the tracker is the experience clients tell
+their friends about and the un-promptable moat (`dig_the_moat`); review volume
+is throughput-limited near full capacity, so the system optimizes the timing
+of one well-placed ask instead of manufacturing volume; and a tip ask aimed
+only where it is welcome reads as confidence while a blanket ask reads as a
+shakedown. Spec locked by Paul 2026-06-10; sends gate on Twilio and online
+tips gate on Stripe, build order in CLEAN_PARKING_LOT.md.
 
 ### Engineering
 

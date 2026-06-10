@@ -56,7 +56,7 @@ export function cityTiers(city) {
     {
       key: 'smooth',
       label: 'Smoothcoat',
-      sub: 'Single coat, short hair. Labs, Boxers, Pointers, and friends.',
+      sub: 'The easy kind: smooth, short single coats. Pit bulls, Boxers, Labs.',
       recurring: centsToDollars(city.hb_smoothcoat_recurring_cents, 'hb_smoothcoat_recurring_cents', slug),
       single:    centsToDollars(city.hb_smoothcoat_single_cents,    'hb_smoothcoat_single_cents',    slug),
       founders:  centsToDollars(city.hb_founders_smoothcoat_cents,  'hb_founders_smoothcoat_cents',  slug),
@@ -64,7 +64,7 @@ export function cityTiers(city) {
     {
       key: 'double',
       label: 'Doublecoat',
-      sub: 'Short or medium double coat that sheds without matting.',
+      sub: 'The full-coat kind: thick double coats that shed without matting. German Shepherds, Australian Shepherds.',
       recurring: centsToDollars(city.hb_doublecoat_recurring_cents, 'hb_doublecoat_recurring_cents', slug),
       single:    centsToDollars(city.hb_doublecoat_single_cents,    'hb_doublecoat_single_cents',    slug),
       founders:  centsToDollars(city.hb_founders_doublecoat_cents,  'hb_founders_doublecoat_cents',  slug),
