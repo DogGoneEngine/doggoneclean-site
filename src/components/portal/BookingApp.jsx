@@ -34,12 +34,22 @@ const CITY_SLUG = 'the-villages';
 const STORE_KEY = 'dgc_booking_v2';
 const TOTAL_STEPS = 4;
 
+// Cities the funnel knows about. The Villages runs the live funnel; Ocala
+// (home base, 20 years of clients) opens for NEW-client booking when the
+// anchor drive-time gate is wired in and hb_active flips, so until then it
+// gets an honest panel that routes to the waitlist and the portal.
+const FUNNEL_CITIES = [
+  ['the-villages', 'The Villages, FL'],
+  ['ocala', 'Ocala, FL'],
+];
+
 // No service-area line here: the address step right below verifies it, and
 // the intro already says The Villages. Stating it as a requirement is noise.
+// (No unpaved-roads line either: The Villages has no unpaved roads, so per
+// no_unpaved_roads the rule is stated only where it applies, e.g. Ocala.)
 const ELIGIBILITY = [
   'You live in a private home with a driveway.',
   'There is room to park our truck and trailer (about 2 standard car spaces, front to back).',
-  'Your home is reachable on paved roads. We do not drive on unpaved roads; an unpaved driveway is fine.',
 ];
 
 const MONTHS = [
@@ -129,10 +139,23 @@ function loadStored() {
   try { const raw = sessionStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
 }
 
+// Which city this funnel run is for. Priority: explicit ?city= param, then
+// params that only exist on Villages links (founders / plan), then whatever
+// a restored session chose, else null (show the chooser).
+function initialCitySlug(restoredSlug) {
+  if (typeof window === 'undefined') return restoredSlug || null;
+  const params = new URLSearchParams(window.location.search);
+  const fromParam = params.get('city');
+  if (FUNNEL_CITIES.some(([slug]) => slug === fromParam)) return fromParam;
+  if (params.get('founders') || params.get('plan')) return CITY_SLUG;
+  return restoredSlug || null;
+}
+
 export default function BookingApp() {
   const restored = useRef(loadStored());
   const init = restored.current || BLANK;
 
+  const [citySlug, setCitySlug] = useState(() => initialCitySlug(init.citySlug));
   const [city, setCity] = useState(null);
   const [cityError, setCityError] = useState(null);
   const [step, setStep] = useState(init.step || 1);
@@ -153,12 +176,13 @@ export default function BookingApp() {
 
   // Persist so the optional Google prefill redirect does not lose progress.
   useEffect(() => {
-    try { sessionStorage.setItem(STORE_KEY, JSON.stringify({ step, eligibilityAcked, place, smsConsent, dogs, cadence, chosenSlot })); } catch { /* noop */ }
-  }, [step, eligibilityAcked, place, smsConsent, dogs, cadence, chosenSlot]);
+    try { sessionStorage.setItem(STORE_KEY, JSON.stringify({ citySlug, step, eligibilityAcked, place, smsConsent, dogs, cadence, chosenSlot })); } catch { /* noop */ }
+  }, [citySlug, step, eligibilityAcked, place, smsConsent, dogs, cadence, chosenSlot]);
 
   // City pricing (anon-readable). On a Google-prefill return, fill name/email.
   useEffect(() => {
     let cancelled = false;
+    if (citySlug !== CITY_SLUG) return undefined;
     (async () => {
       const { city: c, error: ce } = await getBookingCity(CITY_SLUG);
       if (cancelled) return;
@@ -178,15 +202,55 @@ export default function BookingApp() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [citySlug]);
 
   function advance() { window.scrollTo({ top: 0 }); setError(''); setStep((s) => Math.min(s + 1, TOTAL_STEPS)); }
   function back() { window.scrollTo({ top: 0 }); setError(''); setStep((s) => Math.max(s - 1, 1)); }
 
+  // City chooser: the generic Book buttons land here with no city, and the
+  // funnel has to accommodate every served city, not just The Villages.
+  if (!citySlug) {
+    return (
+      <div className="pt-shell"><div className="bk-wrap">
+        <div className="bk-card">
+          <h2 className="bk-step__title">Where does <span className="grad">your dog</span> live?</h2>
+          <p className="bk-step__sub">Dog Gone Clean serves Ocala and The Villages, Florida.</p>
+          <div className="bk-plans">
+            {FUNNEL_CITIES.map(([slug, label]) => (
+              <button key={slug} type="button" className="bk-plan" onClick={() => setCitySlug(slug)}>
+                <span className="bk-plan__top"><span className="bk-plan__label">{label}</span></span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div></div>
+    );
+  }
+
+  // Ocala: home base for 20 years, but online booking for NEW clients opens
+  // with the anchor service-area gate. Honest panel, no dead end.
+  if (citySlug === 'ocala') {
+    return (
+      <div className="pt-shell"><div className="bk-wrap">
+        <div className="bk-card">
+          <h2 className="bk-step__title">Ocala is <span className="grad">home base.</span></h2>
+          <p className="bk-step__sub">Dog Gone Clean has groomed Ocala's dogs for 20 years.</p>
+          <p>
+            Online booking for new Ocala clients opens soon, and it will be for dogs that
+            do not need haircuts: the Hurricane Bath, deshedding, nails, the works.
+            <a href="/ocala"> Join the Ocala waitlist</a> and we will let you know the moment it opens.
+          </p>
+          <p>Already a client? <a href="/portal">Your portal is ready.</a></p>
+          <button className="bk-back" type="button" onClick={() => setCitySlug(null)}>← Pick a different city</button>
+        </div>
+      </div></div>
+    );
+  }
+
   if (cityError) {
     return (
       <div className="pt-shell"><div className="bk-wrap">
-        <div className="bk-card bk-notice">Booking is not open in this area yet. <a href="/the-villages">See where we serve</a>.</div>
+        <div className="bk-card bk-notice">Booking is not open in this area yet. <a href="/#cities">See where we serve</a>.</div>
       </div></div>
     );
   }

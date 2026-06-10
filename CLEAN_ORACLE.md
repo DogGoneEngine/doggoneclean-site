@@ -504,17 +504,36 @@ or UI; say "client" and "recurring schedule." Because the word misrepresents the
 Paul flagged it directly.
 
 `no_unpaved_roads` (routing):
-Dog Gone Clean does not drive on unpaved roads, in any city; an unpaved driveway is fine.
-Both halves are stated in the location requirements before the visitor enters their
-address, so a wrong-fit address falls out of the funnel early and kindly
-(`excluded_breeds_are_slide_holes` pattern, applied to roads). Carried forward from the
-legacy `service_area_ocala` operating limits, which were Ocala-scoped; this rule is the
-general form and it applies to The Villages and every future city. Because the
-truck-and-trailer rig does not belong on washboard dirt roads (the equipment takes the
-beating and the schedule takes the slowdown), while a driveway is short and slow so its
-surface does not matter; saying both up front prevents a doomed booking and a doorstep
-decline. Restored by Paul 2026-06-10 after it was omitted from the v2.0 surface for
-seeming not to apply to The Villages.
+Dog Gone Clean does not drive on unpaved roads; an unpaved driveway is fine. The rule is
+CITY-SCOPED in where it is stated: it appears in the location requirements only for
+cities that actually have unpaved roads (Ocala and Marion County today, where it sits on
+the Ocala page's new-client note), and it is deliberately omitted from The Villages
+surfaces because to Paul's knowledge The Villages has no unpaved roads, so stating it
+there is pure noise in the funnel (corrected 2026-06-10 after a first pass put it on the
+Villages checklist). The operating limit itself is company-wide; the copy placement is
+not. Carried forward from the legacy `service_area_ocala` operating limits, revived
+because Paul decided to revitalize Dog Gone Clean in Ocala rather than leave it behind.
+Because the truck-and-trailer rig does not belong on washboard dirt roads (the equipment
+takes the beating and the schedule takes the slowdown), while a driveway is short and
+slow so its surface does not matter; saying both up front where it applies prevents a
+doomed booking and a doorstep decline, and saying it where it cannot apply just adds
+friction to the slide.
+
+`mat_removal_out_of_scope` (service):
+Mat removal is not part of the v2.0 service, ever, in any city. The service cannot be
+delivered properly on a matted coat (shampoo and water cannot move through a mat, and
+drying a mat traps moisture against the skin), so a matted dog is not serviceable as
+"just give it a bath." The defense is layered: eligibility already excludes coats that
+can mat (`bath_only_no_mats`, `excluded_breeds_are_slide_holes`), the eligibility copy
+now says mat removal is outside this service, and if an accepted dog still arrives
+matted, the visit is declined or rescheduled rather than improvising mat removal at the
+door. Because someone will eventually bring a haircut-coat dog and ask for "just a
+bath," and a bath on a matted coat is either a bad job (against everything the brand
+promises) or unpaid out-of-scope coat work (against `premium_inclusive_no_addons` and
+`favor_high_hourly_work`); naming the line up front keeps the doorstep conversation
+short and kind. Captured from Paul's 2026-06-10 thinking-out-loud; he flagged it might
+only matter rarely, so the enforcement stays copy-plus-doorstep until reality shows it
+needs more teeth.
 
 `gated_community_hours` (routing):
 Some gated communities restrict the hours service vehicles may enter (for example no service

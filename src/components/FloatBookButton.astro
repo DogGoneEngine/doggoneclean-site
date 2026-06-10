@@ -110,7 +110,10 @@
 
       if (path === '/the-villages') {
         if (labelEl) labelEl.textContent = 'Lock in the founders rate';
-        btn.href = '/book?founders=1';
+        btn.href = '/book?city=the-villages&founders=1';
+      } else if (path === '/ocala') {
+        if (labelEl) labelEl.textContent = 'Join the Ocala waitlist';
+        btn.href = '/ocala#waitlist';
       } else {
         if (labelEl) labelEl.textContent = 'Book a visit';
         btn.href = '/book';

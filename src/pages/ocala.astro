@@ -1,42 +1,49 @@
 ---
 // src/pages/ocala.astro
-// Coming-soon city page for Ocala, mirroring the Dog Gone Nails coming-soon
-// city format (hero + waitlist). Ocala is a served Clean location
-// (ocala_is_a_served_city) but not yet open for new-client v2 booking
-// (hb_active false until the anchor drive-time gate is wired). New Ocala
-// clients are Hurricane Bath clients (new_ocala_clients_are_v2_only); this is a
-// bath page, no legacy full-groom copy. The waitlist captures interest so Paul
-// can notify them when Ocala opens.
+// City page for Ocala: NOT a coming-soon city. Ocala is home base, where
+// Dog Gone Clean has groomed dogs for 20 years (ocala_is_a_served_city).
+// What IS opening soon here is online booking for NEW clients, which is
+// v2.0-only (no-haircut dogs, new_ocala_clients_are_v2_only) and waits on
+// the anchor drive-time gate (hb_active false until wired). The waitlist
+// captures new-client interest; existing clients go to the portal. The
+// no_unpaved_roads rule is stated here because Marion County has unpaved
+// roads (The Villages does not, so its surfaces omit it as noise).
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="Ocala, Florida, coming soon | Dog Gone Clean"
-  description="Full dog grooming for dogs that don't need haircuts, in your own driveway, is coming to Ocala, Florida. Join the waitlist and be first in line when we open."
+  title="Ocala, Florida | Dog Gone Clean, 20 years of dog grooming"
+  description="Dog Gone Clean has groomed Ocala's dogs for 20 years. New client signups are opening soon, for dogs that don't need haircuts: the Hurricane Bath, deshedding, nails, the works, in your own driveway."
 >
   <section class="cs-hero">
     <div class="container">
       <span class="cs-hero__tag">Ocala, Florida</span>
-      <div class="cs-hero__badge">Coming soon</div>
-      <h1>The Hurricane Bath<br /><span class="grad">is coming to Ocala.</span></h1>
+      <div class="cs-hero__badge">Home base &middot; 20 years</div>
+      <h1>Ocala's dogs have known us<br /><span class="grad">for 20 years.</span></h1>
       <p class="cs-hero__lede">
-        Full dog grooming for dogs that do not need haircuts: the Hurricane
-        Bath, deshedding, nails, the works, in your own driveway. The same
-        service that runs The Villages is rolling out in Ocala.
+        Dog Gone Clean started here and never left: full dog grooming, one
+        household at a time, in your own driveway. The book is full of
+        longtime clients, and something new is opening up.
       </p>
       <p class="cs-hero__sub">
-        We are building the route now. Join the waitlist to be first in line when
-        Ocala opens for booking.
+        New client signups are opening soon, for dogs that do not need
+        haircuts: the Hurricane Bath, deshedding, nails, the works. Join the
+        waitlist to be first in line. Already a client?
+        <a href="/portal">Your portal is ready.</a>
       </p>
       <img class="cs-hero__photo" src="/photos/ocala-hero.jpg" loading="lazy" alt="Paul with a calm German Shepherd in the Hurricane Bath trailer" />
     </div>
   </section>
 
-  <section class="section cs-waitlist-section">
+  <section class="section cs-waitlist-section" id="waitlist">
     <div class="container">
       <div class="cs-card">
         <h2>Join the Ocala waitlist</h2>
-        <p>We will email you the moment Ocala opens for booking.</p>
+        <p>We will email you the moment new-client booking opens in Ocala.</p>
+        <p class="cs-note">
+          One note for new clients: we do not drive on unpaved roads (Marion
+          County has plenty). An unpaved driveway is fine.
+        </p>
 
         <form id="waitlist-form" class="cs-form" novalidate data-city-slug="ocala">
           <div class="cs-field">
@@ -140,6 +147,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
   .cs-card h2 { font-size: var(--text-2xl); margin-bottom: var(--space-sm); }
   .cs-card > p { color: #475569; margin-bottom: var(--space-xl); }
+  .cs-card .cs-note {
+    font-size: var(--text-sm);
+    color: #64748b;
+    background: #f4f7fd;
+    border: 1px solid #e3e8f4;
+    border-radius: var(--radius-md, 12px);
+    padding: var(--space-md);
+    margin-bottom: var(--space-xl);
+  }
   .cs-form { display: flex; flex-direction: column; gap: var(--space-md); text-align: left; }
   .cs-field { display: flex; flex-direction: column; gap: 6px; }
   .cs-label { font-size: var(--text-sm); font-weight: 600; color: #334155; }
@@ -196,7 +212,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         });
         if (!res.ok) throw new Error(await res.text());
         msg.classList.add('cs-form__note--success');
-        msg.textContent = "You're on the list. We'll be in touch the moment Ocala opens.";
+        msg.textContent = "You're on the list. We'll be in touch the moment new-client booking opens.";
         form.reset();
       } catch {
         msg.classList.add('cs-form__note--error');

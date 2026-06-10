@@ -73,7 +73,8 @@ even DGN has many rules sitting in only one or two layers.
 | favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |
 | accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |
 | house_shampoo | Service | Oracle; hurricane-bath page "The shampoo" section (house shampoo hyped unnamed + bring-your-own at no extra charge); brand private in the Field Manual | non-guarantee wording in intake/terms |
-| no_unpaved_roads | Routing | Oracle; booking Step 1 location requirements (paved-roads line with the unpaved-driveway exception); the-villages eligibility list; **`check.py`** asserts "unpaved" on the booking island | address-level enforcement if road-surface data ever exists |
+| no_unpaved_roads | Routing | Oracle; city-scoped copy placement: the Ocala page's new-client note (Marion County has unpaved roads), omitted from Villages surfaces as noise; **`check.py`** asserts "unpaved" on ocala.astro | Ocala booking checklist when the Ocala funnel opens; address-level enforcement if road-surface data ever exists |
+| mat_removal_out_of_scope | Service | Oracle; the-villages "We do not groom" bullet names it ("mat removal is outside this service"); doorstep policy: decline or reschedule, never improvise | intake ack + terms line when the Stripe slice ships |
 | online_only_comms | Process | Oracle; convention | site copy; intake; `business_rules` row |
 | friendly_dogs_only | Safety | Oracle; site copy; **`check.py`** asserts "friendly dogs" + "aggression" present on `index.astro`, `the-villages.astro`, and `BookingApp.jsx` (the booking gate) | intake gate |
 | core_is_no_haircut_dogs | Roster | Oracle; site copy; **`check.py`** asserts "bath only" present on `the-villages.astro`, `process.astro`, and `BookingApp.jsx` | intake gate |

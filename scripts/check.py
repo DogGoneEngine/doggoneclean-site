@@ -418,7 +418,7 @@ def check_rule_survival():
     # redesign that buries the trial path cannot ship.
     require_present(
         villages,
-        r"/book\?plan=single",
+        r"/book\?[^\"]*plan=single",
         "single_visit_as_own_path",
         "single-visit CTA href '/book?plan=single'",
     )
@@ -772,8 +772,10 @@ def check_rule_survival():
                     "an easy-kind breed example on the coat picker", block=False)
     require_present(booking_app, r"[Mm]ix", "two_dog_kinds_service_choice",
                     "the mixed-breed guidance on the coat picker", block=False)
-    require_present(booking_app, r"unpaved", "no_unpaved_roads",
-                    "the paved-roads requirement (unpaved driveways fine) on Step 1", block=False)
+    # no_unpaved_roads is city-scoped: stated where unpaved roads exist
+    # (Ocala / Marion County), omitted in The Villages as noise.
+    require_present(PAGES / "ocala.astro", r"unpaved", "no_unpaved_roads",
+                    "the no-unpaved-roads note (unpaved driveways fine) on the Ocala page", block=False)
 
     # ── premium_inclusive_no_addons (booking surface) ─────────────────────
     # One price per tier, no upsell may be introduced into the funnel. Catch a

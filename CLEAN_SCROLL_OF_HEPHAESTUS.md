@@ -2579,3 +2579,35 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   CLAUDE.md "What this repo is" updated to match ("wind down" framing corrected).
 - **Shedding-interception kernel used (2026-06-10).** The parked 2026-05-25 line is now the lead
   of the homepage recurring section, "van" updated to "trailer"; parking-lot entry marked USED.
+- **Ocala is not "coming soon"; The Villages is (Paul, 2026-06-10, reality wins).** A second
+  correction pass: Ocala has been served for 20 years; the only opening-soon thing there is
+  online booking for NEW clients (v2.0 no-haircut only). The Villages is the city actually
+  being launched. Fixed across the site: the Ocala page now leads with "Ocala's dogs have
+  known us for 20 years" (home-base framing, waitlist for new-client booking, portal link for
+  existing clients); the nav's "Coming soon" pill moved from Ocala to The Villages; the
+  homepage service-area section puts Ocala first ("20 years strong") with The Villages as the
+  coming-soon founders city; the footer location reads "Ocala and The Villages".
+- **The booking funnel is city-aware; generic Book buttons no longer hardwire The Villages
+  (Paul, 2026-06-10).** /book now reads ?city= and otherwise asks "Where does your dog live?"
+  (Ocala / The Villages). The Villages proceeds into the existing funnel; Ocala gets an honest
+  panel (home base, new-client booking opens soon, waitlist + portal links). Villages-page CTAs
+  carry ?city=the-villages explicitly; the float button on /ocala becomes "Join the Ocala
+  waitlist"; the hurricane-bath CTAs are city-neutral ("Book a visit" -> /book, "See the offer
+  where you live" -> /#cities). This is the durable shape: a future city is one entry in
+  FUNNEL_CITIES plus its own gate, not a site-wide link hunt. Root cause of the hardwiring
+  recorded: the v2.0 surface began as a Villages-only spinoff before the legacy fold and the
+  Ocala revival changed the plan.
+- **no_unpaved_roads corrected to city-scoped placement (Paul, 2026-06-10).** The Villages has
+  no unpaved roads, so the line is noise there and was removed from the Villages checklist and
+  eligibility; it lives on the Ocala page's new-client note (Marion County has plenty), with
+  the unpaved-driveways-fine softener. The Oracle rule and check.py pattern updated to match.
+- **Mat removal is out of scope, captured from Paul's ramble (2026-06-10), Oracle
+  `mat_removal_out_of_scope`.** The scenario he was circling: someone brings a haircut-coat dog
+  and asks for "just a bath," but a bath cannot be done properly on a matted coat and mat
+  removal is not part of this service. Defense layered: eligibility already excludes matting
+  coats; the Villages eligibility bullet now names mat removal as outside the service; doorstep
+  policy is decline or reschedule, never improvise. Per Paul it may rarely matter, so
+  enforcement stays copy-plus-doorstep until reality says otherwise.
+- **Paul's verdict on the rebuild (2026-06-10), for the record:** "you know how I said I didn't
+  like the site very much before? now. I love it. it looks amazing! and I feel like people are
+  going to see that and they'll be excited to do business with us."
