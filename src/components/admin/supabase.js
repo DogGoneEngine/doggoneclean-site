@@ -114,6 +114,11 @@ export async function deleteVisitPhoto(id, path) {
   try { await sb().storage.from(PHOTO_BUCKET).remove([path]); } catch { /* row delete still proceeds */ }
   return rpc('admin_delete_visit_photo', { p_id: id });
 }
+// Sharing a photo with the client is a deliberate per-photo choice
+// (visit_photos.client_visible); shared photos show in the client's portal.
+export async function setPhotoVisibility(id, visible) {
+  return rpc('admin_set_photo_visibility', { p_id: id, p_visible: visible });
+}
 
 export async function setClientNofly(clientId, banned, reason = null) {
   return rpc('admin_set_client_nofly', { p_client_id: clientId, p_banned: banned, p_reason: reason });

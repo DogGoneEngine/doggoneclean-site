@@ -19,7 +19,7 @@ import {
   addDog, updateDog, removeDog,
   updateProfile, updateServiceAddress, toE164US,
   getNotificationPrefs, setNotificationPrefs,
-  confirmProfile,
+  confirmProfile, myVisitPhotos, visitPhotoUrl,
 } from './supabase.js';
 import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds } from './maps.js';
 
@@ -489,7 +489,74 @@ function ApptsView({ ctx }) {
           </div>
         </section>
       )}
+
+      <VisitPhotosSection city={city} />
     </div>
+  );
+}
+
+// ── Photos from your visits ─────────────────────────────────────────────
+// The photos Paul chose to share (visit_photos.client_visible), grouped by
+// visit date, newest first. Before, after, the extras worth seeing (a skin
+// spot he flagged, a moment worth keeping). Renders nothing until at least
+// one photo is shared, so the tab stays clean for clients without any.
+const PHOTO_KIND_LABEL = { before: 'Before', after: 'After', with_dog: 'Together', extra: 'Extra' };
+
+function VisitPhotosSection({ city }) {
+  const [groups, setGroups] = useState(null); // null = loading, [] = none
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const rows = await myVisitPhotos();
+        const signed = await Promise.all(rows.map(async (p) => {
+          try { return { ...p, url: await visitPhotoUrl(p.path) }; } catch { return null; }
+        }));
+        const ok = signed.filter(p => p && p.url);
+        const dayFmt = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz(city), weekday: 'short', month: 'long', day: 'numeric', year: 'numeric',
+        });
+        const byDate = new Map();
+        for (const p of ok) {
+          const key = p.visited_at ? dayFmt.format(new Date(p.visited_at)) : 'Earlier visits';
+          if (!byDate.has(key)) byDate.set(key, []);
+          byDate.get(key).push(p);
+        }
+        if (alive) setGroups(Array.from(byDate.entries()));
+      } catch {
+        if (alive) setGroups([]);
+      }
+    })();
+    return () => { alive = false; };
+  }, [city]);
+
+  if (!groups || groups.length === 0) return null;
+
+  return (
+    <section className="pt-section">
+      <h2 className="pt-section__title">Photos from your visits</h2>
+      {groups.map(([day, photos]) => (
+        <div key={day} className="pt-card" style={{ marginBottom: 'var(--space-md)' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{day}</div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {photos.map(p => (
+              <a key={p.id} href={p.url} target="_blank" rel="noreferrer" style={{ position: 'relative', display: 'block' }}>
+                <img
+                  src={p.url}
+                  alt={PHOTO_KIND_LABEL[p.kind] || 'Visit photo'}
+                  loading="lazy"
+                  style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, display: 'block' }}
+                />
+                <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, fontSize: 10, textAlign: 'center', background: 'rgba(12,19,34,0.55)', color: '#fff', borderRadius: '0 0 10px 10px', padding: '1px 0' }}>
+                  {PHOTO_KIND_LABEL[p.kind] || 'Photo'}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }
 

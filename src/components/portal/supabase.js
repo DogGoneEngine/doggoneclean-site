@@ -468,3 +468,24 @@ export async function rescheduleAppointment(appointmentId, newStart) {
   if (error) return { ok: false, error: error.message };
   return data || { ok: false, error: 'no_result' };
 }
+
+// ── Visit photos shared with the client ────────────────────────────────
+// Paul shares chosen photos per visit (visit_photos.client_visible); the
+// portal lists them via bath_my_visit_photos and signs each path under the
+// visit_photos_client_select storage policy, which only matches the
+// caller's own shared photos. See pizza_tracker_client_loop.
+export async function myVisitPhotos() {
+  const client = sb();
+  if (!client) return [];
+  const { data, error } = await client.rpc('bath_my_visit_photos');
+  if (error) throw new Error(error.message);
+  return Array.isArray(data) ? data : [];
+}
+
+export async function visitPhotoUrl(path, expirySeconds = 3600) {
+  const client = sb();
+  if (!client) return null;
+  const { data, error } = await client.storage.from('visit-photos').createSignedUrl(path, expirySeconds);
+  if (error) throw new Error(error.message);
+  return data.signedUrl;
+}

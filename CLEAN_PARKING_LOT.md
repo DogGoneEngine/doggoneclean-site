@@ -141,10 +141,13 @@ shorthand). The full spec is the Oracle rule. Status:
    on_the_way (`admin_on_my_way`, never downgrades), stamps the Left clock if empty, and opens
    the share sheet (or copies) the heads-up message: "Dog Gone Clean is rolling your way. Follow
    along: <link>". Until Twilio, Paul pastes it into Google Voice; with Twilio the same tap sends.
-4. **Portal + tracker photo sharing (NEXT).** `visit_photos.client_visible` exists (0136, default
-   false). Remaining: a per-photo share toggle in the Orbit visit photos UI, the client portal
-   visit history showing visible photos, and the tracker page showing them (needs an edge
-   function to sign URLs for token-only visitors).
+4. **Photo sharing, portal half: DONE 2026-06-10 (migration 0137).** Per-photo Share toggle on
+   each Orbit visit photo (admin_set_photo_visibility); the client portal's Visits tab gains a
+   "Photos from your visits" section (bath_my_visit_photos + a storage policy that lets the
+   signed-in client sign URLs for exactly their own shared photos, nothing else). The tracker
+   page also now shows WHO is coming (Paul's name + photo, per specialist_named_not_promised).
+   REMAINING: shared photos on the tracker page itself (a token-only visitor has no auth to
+   satisfy storage RLS, so this needs a small edge function that signs URLs server-side).
 5. **Review-ask tracking.** `review_asks` table EXISTS (0136: asked/clicked/reviewed/suppressed
    per client). Remaining: the post-visit send (Twilio/Resend-gated), the click-tracking
    redirect, and the ask-window expiry logic.

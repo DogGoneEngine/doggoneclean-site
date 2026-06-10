@@ -6,7 +6,7 @@
 // no capture, so the gallery is offered, not just the camera. See visit_photos_capture.
 
 import { useState, useEffect, useCallback } from 'react';
-import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto } from './supabase.js';
+import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility } from './supabase.js';
 
 const KIND_LABEL = { before: 'Before', after: 'After', with_dog: 'With dog', extra: 'Extra' };
 const SLOTS = [['before', 'Before'], ['after', 'After'], ['with_dog', 'With dog']];
@@ -45,21 +45,44 @@ export default function VisitPhotos({ visitId, clientId, photos = [], onChanged 
     finally { setBusy(false); }
   }
 
+  // Sharing is per photo and deliberate: a shared photo shows in the
+  // client's portal (later the Dog Gone Tracker too). Optimistic toggle.
+  const [shared, setShared] = useState({});
+  useEffect(() => {
+    setShared(Object.fromEntries(photos.map((p) => [p.id, !!p.client_visible])));
+  }, [photos]);
+  async function toggleShare(p) {
+    const next = !shared[p.id];
+    setShared((s) => ({ ...s, [p.id]: next }));
+    setError(null);
+    try { await setPhotoVisibility(p.id, next); }
+    catch (e) { setShared((s) => ({ ...s, [p.id]: !next })); setError(e.message || 'share_failed'); }
+  }
+
   return (
     <div style={{ marginTop: 6 }}>
       {photos.length > 0 && (
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
           {photos.map((p) => (
-            <div key={p.id} style={{ position: 'relative' }}>
-              <a href={urls[p.id] || undefined} target="_blank" rel="noreferrer" title={KIND_LABEL[p.kind]}>
-                <div style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden', background: 'var(--ad-surface-container, #f1f1f4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {urls[p.id]
-                    ? <img src={urls[p.id]} alt={KIND_LABEL[p.kind]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <span style={{ fontSize: 10, opacity: 0.5 }}>…</span>}
-                </div>
-              </a>
-              <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, fontSize: 9, textAlign: 'center', background: 'rgba(0,0,0,0.55)', color: '#fff', borderRadius: '0 0 8px 8px' }}>{KIND_LABEL[p.kind]}</span>
-              <button onClick={() => remove(p)} disabled={busy} title="remove" style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', border: 'none', background: '#dc2626', color: '#fff', fontSize: 11, cursor: 'pointer', lineHeight: 1 }}>×</button>
+            <div key={p.id} style={{ width: 64 }}>
+              <div style={{ position: 'relative' }}>
+                <a href={urls[p.id] || undefined} target="_blank" rel="noreferrer" title={KIND_LABEL[p.kind]}>
+                  <div style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden', background: 'var(--ad-surface-container, #f1f1f4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {urls[p.id]
+                      ? <img src={urls[p.id]} alt={KIND_LABEL[p.kind]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <span style={{ fontSize: 10, opacity: 0.5 }}>…</span>}
+                  </div>
+                </a>
+                <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, fontSize: 9, textAlign: 'center', background: 'rgba(0,0,0,0.55)', color: '#fff', borderRadius: '0 0 8px 8px' }}>{KIND_LABEL[p.kind]}</span>
+                <button onClick={() => remove(p)} disabled={busy} title="remove" style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', border: 'none', background: '#dc2626', color: '#fff', fontSize: 11, cursor: 'pointer', lineHeight: 1 }}>×</button>
+              </div>
+              <button
+                onClick={() => toggleShare(p)}
+                title={shared[p.id] ? 'Shared: the client sees this in their portal' : 'Not shared: only you see this'}
+                style={{ marginTop: 3, width: '100%', fontSize: 9, fontWeight: 700, padding: '2px 0', borderRadius: 6, cursor: 'pointer', border: '1px solid', borderColor: shared[p.id] ? 'var(--ad-accent, #2563d8)' : 'var(--ad-outline, #d5d5dd)', background: shared[p.id] ? 'var(--ad-accent, #2563d8)' : 'transparent', color: shared[p.id] ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}
+              >
+                {shared[p.id] ? 'Shared' : 'Share'}
+              </button>
             </div>
           ))}
         </div>

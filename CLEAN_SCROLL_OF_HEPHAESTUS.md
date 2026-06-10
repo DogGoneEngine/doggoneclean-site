@@ -2635,3 +2635,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   returns found=false; admin_on_my_way raises not-authorized for a non-admin. Grants explicit
   per rpc_grants_explicit. Next slices in the parking lot: photo sharing (portal + tracker),
   the review-ask send, the tip ask.
+- **Tracker shows who is coming + photo sharing shipped, portal half (2026-06-10, migration
+  0137).** Paul asked whether the tracker should show a photo of the person on the way: yes,
+  per specialist_named_not_promised (the visitor sees by name and face who is coming), so the
+  tracker page now leads with Paul's existing specialist photo and name; when routes carry
+  operators this reads from the route. Photo sharing built as a deliberate per-photo choice:
+  each Orbit visit photo gains a Share toggle (admin_set_photo_visibility, default private),
+  and the client portal's Visits tab gains "Photos from your visits" (bath_my_visit_photos
+  RPC + a visit_photos_client_select storage policy that lets a signed-in client sign URLs
+  for exactly their own shared photos and nothing else; covers both bath-keyed and
+  legacy-client-keyed visits). admin_get_client now returns client_visible so the toggle
+  renders its state. Verified live: the policy exists alongside the admin-only 0080 policies,
+  and bath_my_visit_photos returns an empty array gracefully for a session with no subscriber.
+  Remaining tracker-photo half (token visitors need server-signed URLs, an edge function) is
+  in the parking lot.
