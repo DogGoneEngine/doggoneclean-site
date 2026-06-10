@@ -146,8 +146,10 @@ shorthand). The full spec is the Oracle rule. Status:
    "Photos from your visits" section (bath_my_visit_photos + a storage policy that lets the
    signed-in client sign URLs for exactly their own shared photos, nothing else). The tracker
    page also now shows WHO is coming (Paul's name + photo, per specialist_named_not_promised).
-   REMAINING: shared photos on the tracker page itself (a token-only visitor has no auth to
-   satisfy storage RLS, so this needs a small edge function that signs URLs server-side).
+   Tracker half DONE 2026-06-10 too: the `tracker-photos` edge function (verify_jwt off, house
+   pattern; the unguessable token is the credential) signs URLs server-side for that one visit's
+   shared photos, and /track shows them in a "Photos from this visit" strip, refreshed each
+   minute. Nothing left on this slice except first field use.
 5. **Review-ask tracking.** `review_asks` table EXISTS (0136: asked/clicked/reviewed/suppressed
    per client). Remaining: the post-visit send (Twilio/Resend-gated), the click-tracking
    redirect, and the ask-window expiry logic.

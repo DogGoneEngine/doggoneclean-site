@@ -2649,3 +2649,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   and bath_my_visit_photos returns an empty array gracefully for a session with no subscriber.
   Remaining tracker-photo half (token visitors need server-signed URLs, an edge function) is
   in the parking lot.
+- **Tracker photos shipped; the Dog Gone Tracker loop is now build-complete up to the gated
+  sends (2026-06-10).** The `tracker-photos` edge function (deployed, version 2) bridges the
+  storage-RLS gap for token-only visitors: token -> that appointment's visit -> its
+  client_visible photos -> short-lived server-signed URLs, nothing else. verify_jwt is OFF on
+  the house pattern (same as riker, and for the same reason rediscovered live: the new-format
+  publishable key is not a JWT, so the gateway 401s browser calls with verify_jwt on); the
+  unguessable tracker_token is the credential and the response is scoped to one visit's
+  deliberately-shared photos. /track now shows a "Photos from this visit" strip, refreshed each
+  minute, that appears only when a shared photo exists. Verified live: a real token and a bogus
+  token both return clean empty photo lists (no shared photos exist yet on an appointment-linked
+  visit), and the CORS preflight passes; the signing loop is the same createSignedUrl call the
+  Orbit UI exercises daily, and the first photo Paul shares on a stamped visit is the final
+  end-to-end confirmation. Remaining on the tracker: only the Twilio-gated automated send, the
+  review-ask send, and the Stripe-gated tip ask.
