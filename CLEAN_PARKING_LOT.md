@@ -260,9 +260,15 @@ survive a reset:
 - **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is
   bimodal (full grooms 45-59 min at $75, nails 5-11 min at $30, per Time is Money). Mixed
   groom/nails clients need a per-visit service type and duration, not one blended block.
-- **The 5 added one-off names.** Shane Smith, Jane Henrich, Amanda Posner, Billye Mallory, Edely
-  Abreu were added from cycle-time data with contact details as gaps; pull their contact sheets
-  for service address, dogs, service type, cadence, and one-off-vs-standing.
+- ~~**The 5 added one-off names.**~~ RESOLVED 2026-06-10 (migration 0138) from Paul's account +
+  his Google Calendar booking forms (no contact sheets exist for these; Abreu confirmed sheetless
+  by Drive search). All five: service_type full_groom, addresses + contacts verified. Dogs: Shane
+  Smith two Siberian Huskies (Ice, Luna, $175 each); Jane Henrich Great Pyrenees Dory ($150);
+  Amanda Posner a Boxer ($75, gate code 0155); Billye Mallory a Boykin Spaniel + Cavalier +
+  English Bulldog ($180 bundle); Edely Abreu an American Staffordshire Terrier ($75). Remaining
+  genuine gaps: the Posner/Mallory/Abreu dog NAMES (never recorded anywhere). No cadences: these
+  are one-offs by nature (Paul). Abreu and Mallory may go inactive; the yearly archive sweep
+  handles that on its own.
 - **Website fold + domain redirect.** Fold the doggoneclean.us content into the app and redirect
   the domain; retire Squarespace.
 - **bath_ table rename.** Cosmetic: the bath_* tables now hold grooming and nails too; rename to a

@@ -2663,3 +2663,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Orbit UI exercises daily, and the first photo Paul shares on a stamped visit is the final
   end-to-end confirmation. Remaining on the tracker: only the Twilio-gated automated send, the
   review-ask send, and the Stripe-gated tip ask.
+- **The five cycle-time one-off names resolved (2026-06-10, migration 0138).** Paul supplied the
+  direct facts (Shane Smith: husky Ice at $175; Jane Henrich: Great Pyrenees Dory at $150;
+  Abreu: a pit bull) and pointed at his Google Calendar for the rest; the Acuity booking-form
+  descriptions on the events carried addresses, contacts, breeds, and gate codes. Ground truth
+  first: the DB was further along than the parking-lot note said (all five already had verified
+  addresses and contacts from the earlier backfill; Jane already had Dory; Shane already had TWO
+  huskies, Ice and Luna, which the calendar's "Both huskys" confirms). What was actually missing
+  and is now filled: service_type full_groom on all five; Posner's Boxer ($75) + gate code 0155;
+  Mallory's three dogs (Boykin Spaniel ~40lb, Cavalier ~13lb, English Bulldog ~60lb, $180
+  bundle, priced per the Steve/Patty bundle precedent); Abreu's American Staffordshire Terrier
+  ($75). Abreu has NO Drive contact sheet (searched title + full text; Paul suspected as much),
+  so the calendar form is the best source that exists. The three unrecorded dog NAMES stay
+  honest gaps (real_data_only): each record carries a breed-based "(name unknown)" label and a
+  note saying so. No cadences on purpose: one-offs by nature. Keyed by name as a replayable
+  migration (client_dispositions_are_migrations); read back from the DB and verified.
