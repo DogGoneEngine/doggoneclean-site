@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -140,6 +140,7 @@ function TimeStrip({ appt }) {
   });
   const [busy, setBusy] = useState(null);
   const [err, setErr] = useState(false);
+  const [shareState, setShareState] = useState(null); // null | 'busy' | 'shared' | 'copied'
 
   async function set(field, at) {
     const prev = times;
@@ -150,8 +151,38 @@ function TimeStrip({ appt }) {
     finally { setBusy(null); }
   }
 
+  // One tap when pulling out: flips the appointment to on_the_way, stamps the
+  // Left clock if it is still empty (one tap does both jobs), then hands Paul
+  // the heads-up message with the Dog Gone Tracker link. Until Twilio sends
+  // it automatically, the share sheet / clipboard bridges to Google Voice.
+  async function headsUp() {
+    setShareState('busy'); setErr(false);
+    try {
+      const res = await onMyWay(appt.id);
+      if (!times.inbound) set('inbound', new Date().toISOString());
+      const url = `https://hurricanebath.com/track?t=${res.tracker_token}`;
+      const text = `Dog Gone Clean is rolling your way. Follow along: ${url}`;
+      if (navigator.share) {
+        try { await navigator.share({ text }); setShareState('shared'); }
+        catch { setShareState(null); } // user closed the sheet; no-op
+      } else {
+        await navigator.clipboard.writeText(text);
+        setShareState('copied');
+      }
+    } catch { setErr(true); setShareState(null); }
+  }
+
   return (
     <div style={{ display: 'flex', gap: 8, marginTop: 6, marginLeft: 82, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+      <button
+        type="button"
+        onClick={headsUp}
+        disabled={shareState === 'busy'}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, border: '1px solid var(--ad-accent, #2563d8)', background: 'transparent', color: 'var(--ad-accent, #2563d8)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+        title="Mark on the way and share the Dog Gone Tracker link"
+      >
+        {shareState === 'busy' ? '...' : shareState === 'copied' ? 'Message copied' : shareState === 'shared' ? 'Heads up sent' : 'On my way'}
+      </button>
       {CLOCKS.map(([field, label]) => (
         <TimeCell
           key={field}

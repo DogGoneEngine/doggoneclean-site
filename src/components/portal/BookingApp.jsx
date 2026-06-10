@@ -35,7 +35,7 @@ const STORE_KEY = 'dgc_booking_v2';
 const TOTAL_STEPS = 4;
 
 // Cities the funnel knows about. The Villages runs the live funnel; Ocala
-// (home base, 20 years of clients) opens for NEW-client booking when the
+// (home base, over 20 years of clients) opens for NEW-client booking when the
 // anchor drive-time gate is wired in and hb_active flips, so until then it
 // gets an honest panel that routes to the waitlist and the portal.
 const FUNNEL_CITIES = [
@@ -227,14 +227,14 @@ export default function BookingApp() {
     );
   }
 
-  // Ocala: home base for 20 years, but online booking for NEW clients opens
+  // Ocala: home base for over 20 years, but online booking for NEW clients opens
   // with the anchor service-area gate. Honest panel, no dead end.
   if (citySlug === 'ocala') {
     return (
       <div className="pt-shell"><div className="bk-wrap">
         <div className="bk-card">
           <h2 className="bk-step__title">Ocala is <span className="grad">home base.</span></h2>
-          <p className="bk-step__sub">Dog Gone Clean has groomed Ocala's dogs for 20 years.</p>
+          <p className="bk-step__sub">Dog Gone Clean has groomed Ocala's dogs for over 20 years.</p>
           <p>
             Online booking for new Ocala clients opens soon, and it will be for dogs that
             do not need haircuts: the Hurricane Bath, deshedding, nails, the works.

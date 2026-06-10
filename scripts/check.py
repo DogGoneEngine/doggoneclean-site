@@ -661,7 +661,8 @@ def check_rule_survival():
         (r"grind nails", "grind nails"),
     ]
     customer_pages = [home, villages, process_page, book, booking_app, portal, terms,
-                      PAGES / "privacy.astro", PAGES / "sms.astro"]
+                      PAGES / "privacy.astro", PAGES / "sms.astro",
+                      PAGES / "ocala.astro", PAGES / "track.astro"]
     for page in customer_pages:
         for pat, label in dgn_nail_vocab:
             require_absent(
@@ -776,6 +777,13 @@ def check_rule_survival():
     # (Ocala / Marion County), omitted in The Villages as noise.
     require_present(PAGES / "ocala.astro", r"unpaved", "no_unpaved_roads",
                     "the no-unpaved-roads note (unpaved driveways fine) on the Ocala page", block=False)
+
+    # ── pizza_tracker_client_loop ─────────────────────────────────────────
+    # The client-facing name is the Dog Gone Tracker; the durable teeth are
+    # the tracker_token + tracker_status RPC (migration 0136), so copy WARNs.
+    require_present(PAGES / "track.astro", r"Dog Gone Tracker",
+                    "pizza_tracker_client_loop",
+                    "the Dog Gone Tracker name on the tracker page", block=False)
 
     # ── premium_inclusive_no_addons (booking surface) ─────────────────────
     # One price per tier, no upsell may be introduced into the funnel. Catch a

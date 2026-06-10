@@ -23,6 +23,14 @@ on the network allowlist). Authentic source material for the rebuild, in Paul's 
 
 Keep this close to as-is for the rebuild's About. It is authentic and un-promptable.
 
+## Founding timeline (Paul, 2026-06-10, for the "over 20 years" claim)
+
+There is no single founding date; the claim "over 20 years" is the durable public phrasing
+(true now at 22-23 years, stays true without annual edits, reads bigger than a bare "20"):
+- January 2003: Paul starts training at the Florida Institute of Animal Arts.
+- Later 2003: soft launch, picking dogs up, grooming them at his house, driving them home.
+- Spring 2004 (Paul thinks): the first trailer; the mobile service proper begins.
+
 ## Homepage hero and taglines
 
 The current homepage hero and brand taglines, strong and worth keeping:

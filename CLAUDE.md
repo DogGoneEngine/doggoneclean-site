@@ -5,7 +5,7 @@ For what happened and why, read the other docs in the order below.
 
 ## What this repo is
 
-Dog Gone Clean (DGC) is Paul's mobile dog grooming business in the Ocala, FL area (~20 years
+Dog Gone Clean (DGC) is Paul's mobile dog grooming business in the Ocala, FL area (over 20 years
 old). This repo is becoming the **DGC website and operations app**. Clean is one existing
 business that is evolving, not a new one. Today it is full grooming in Ocala, and it keeps
 serving its legacy full-grooming clients there. From that base it is making a hard pivot to

@@ -123,30 +123,35 @@ The real open question is the easiest intake from a phone where the shots are al
      the right dog and visit. Last resort.
 Decide intake (likely option 1) before building. Next build after Riker hardening.
 
-## Pizza tracker client loop: build order (spec locked 2026-06-10, `pizza_tracker_client_loop`)
+## The Dog Gone Tracker: build order (spec locked 2026-06-10, `pizza_tracker_client_loop`)
 
-The full spec is the Oracle rule. What is buildable NOW with no Paul input, in order:
+Client-facing name: the Dog Gone Tracker (Paul, 2026-06-10; "pizza tracker" stays internal
+shorthand). The full spec is the Oracle rule. Status:
 
-1. **Tracker plumbing.** A per-appointment tracker token (`bath_appointments.tracker_token`,
-   random, indexed) + a public token-scoped read RPC returning only status, ETA-ish fields, and
-   that visit's shareable photos. The progress states already exist on `bath_appointments.status`
-   (on_the_way through completed).
-2. **Tracker page.** `/track/[token]` Astro route + small island: status timeline, the live Google
-   Maps link, photos as they land. No auth (an SMS recipient is not logged in); token is the key.
-3. **Orbit "On my way" button.** On the Today stop: flips status to on_the_way, stamps the
-   time_is_money Left cell, and (Twilio-gated) fires the heads-up MMS with the tracker link. Until
-   Twilio, the button still flips status + stamps, and shows the link to copy into Google Voice by
-   hand, so the loop is field-testable today.
-4. **Portal photo sharing.** Surface each visit's before/after/extra photos in the CLIENT portal
-   visit history (today they are admin-only); a `client_visible` flag per photo so a skin-issue
-   shot is shared deliberately.
-5. **Review-ask tracking.** `review_asks` per client (asked_at, clicked_at, reviewed_at,
-   suppressed): ask once, track the click, stop forever once reviewed; never ask anyone already
-   asked; the ask expires after its window. Wire into the post-visit send when Twilio/Resend land.
+1. ~~**Tracker plumbing.**~~ DONE 2026-06-10 (migration 0136): `bath_appointments.tracker_token`
+   (unique, defaulted, backfilled on all 56 appointments) + anon `tracker_status(p_token)` RPC
+   returning only stage / block / first name / dog names; the stage derives from the appointment
+   status AND the time_is_money stamps Paul already taps, so the tracker moves with his existing
+   workflow.
+2. ~~**Tracker page.**~~ DONE 2026-06-10: `/track?t=<token>` (query param, not a dynamic route,
+   because the site is static): four-stage timeline, the appointment block with the
+   not-an-arrival-window clarifier, auto-refresh every 45s, honest not-found and
+   no-longer-scheduled states.
+3. ~~**Orbit "On my way" button.**~~ DONE 2026-06-10: on each Today stop, one tap flips status to
+   on_the_way (`admin_on_my_way`, never downgrades), stamps the Left clock if empty, and opens
+   the share sheet (or copies) the heads-up message: "Dog Gone Clean is rolling your way. Follow
+   along: <link>". Until Twilio, Paul pastes it into Google Voice; with Twilio the same tap sends.
+4. **Portal + tracker photo sharing (NEXT).** `visit_photos.client_visible` exists (0136, default
+   false). Remaining: a per-photo share toggle in the Orbit visit photos UI, the client portal
+   visit history showing visible photos, and the tracker page showing them (needs an edge
+   function to sign URLs for token-only visitors).
+5. **Review-ask tracking.** `review_asks` table EXISTS (0136: asked/clicked/reviewed/suppressed
+   per client). Remaining: the post-visit send (Twilio/Resend-gated), the click-tracking
+   redirect, and the ask-window expiry logic.
 6. **Tip ask.** Post-visit, only for new clients and flagged lovers-of-the-service; online tip
    capture is Stripe-gated, so this lands with the Stripe slice.
 
-Gates: Twilio (the sends), Stripe (online tips). Everything else above is real, buildable work.
+Gates: Twilio (the sends), Stripe (online tips).
 
 ## Cutover follow-ons - legacy fold (2026-06-07)
 

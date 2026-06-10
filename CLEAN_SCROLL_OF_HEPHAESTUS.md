@@ -2611,3 +2611,27 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **Paul's verdict on the rebuild (2026-06-10), for the record:** "you know how I said I didn't
   like the site very much before? now. I love it. it looks amazing! and I feel like people are
   going to see that and they'll be excited to do business with us."
+- **"Over 20 years" locked as the durable tenure claim (Paul, 2026-06-10).** The real timeline,
+  now recorded in marketing/origin_and_brand.md: Florida Institute of Animal Arts starting
+  January 2003, soft launch later that year (picking dogs up, grooming at his house, driving
+  them home), first trailer spring 2004; so 22-23 years today with no single founding date.
+  "Over 20 years" chosen because it is accurate, reads bigger than a bare "20", and never goes
+  stale. Applied across the Ocala page, homepage cities section, booking funnel Ocala panel,
+  and the hurricane-bath shampoo copy; CLAUDE.md's "~20 years" corrected.
+- **The Dog Gone Tracker named and v1 built (Paul + build, 2026-06-10).** Client-facing name
+  locked: the Dog Gone Tracker ("pizza tracker" stays the internal inspiration shorthand).
+  Built and shipped (migration 0136 + /track page + Today button): every appointment carries an
+  unguessable tracker_token (backfilled on all 56, defaulted for new rows); an anon
+  tracker_status RPC returns only stage / block / first name / dog names, with the stage derived
+  from the appointment status AND the time_is_money stamps Paul already taps (Left -> rolling
+  your way, Arrived -> in the trailer, Done -> all done), so the tracker moves with his existing
+  workflow; /track?t= renders the four-stage timeline with the block-not-arrival-window
+  clarifier and refreshes every 45 seconds; and each Today stop gains an "On my way" button that
+  flips status (never downgrading), stamps the Left clock if empty, and opens the share sheet
+  with "Dog Gone Clean is rolling your way. Follow along: <link>" (Google Voice paste until
+  Twilio; the same tap becomes the automated send later). Groundwork also landed:
+  visit_photos.client_visible (default false) and the review_asks no-spam table. Verified live:
+  anon call with a real token returned Chester's noon stop (Ula, stage scheduled); a bogus token
+  returns found=false; admin_on_my_way raises not-authorized for a non-admin. Grants explicit
+  per rpc_grants_explicit. Next slices in the parking lot: photo sharing (portal + tracker),
+  the review-ask send, the tip ask.

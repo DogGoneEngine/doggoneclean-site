@@ -1064,7 +1064,9 @@ promised becomes the grateful client the prime directive requires, and
 overselling converts a signup into a churn and a bad review. Paul, 2026-06-10.
 
 `pizza_tracker_client_loop` (ux):
-The client-facing tracker loop runs per appointment, replacing every manual
+The client-facing name is THE DOG GONE TRACKER (working name, Paul 2026-06-10;
+"pizza tracker" is the internal inspiration shorthand, never client-facing).
+The tracker loop runs per appointment, replacing every manual
 text: (1) when Paul leaves for the stop, one button push sends the client a
 heads-up with a live Google Maps progress link to their house (the home of
 `heads_up_on_the_way`); (2) progress updates flow to the client's tracker view

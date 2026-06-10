@@ -307,6 +307,13 @@ export async function stampAppointmentTime(appointmentId, field, at) {
   return rpc('admin_stamp_appointment_time', { p_appointment_id: appointmentId, p_field: field, p_at: at });
 }
 
+// One tap when leaving for a stop: flips the appointment to on_the_way (never
+// downgrades a later status) and returns the Dog Gone Tracker token so the
+// Today sheet can hand Paul the ready-to-send heads-up message.
+export async function onMyWay(appointmentId) {
+  return rpc('admin_on_my_way', { p_appointment: appointmentId });
+}
+
 export async function setBriefingStatus(id, status) {
   return rpc('admin_set_briefing_status', { p_id: id, p_status: status });
 }

@@ -1,0 +1,196 @@
+---
+// src/pages/track.astro
+// The Dog Gone Tracker (pizza_tracker_client_loop): the client's live view
+// of their visit at /track?t=<tracker_token>. The token is the key (an SMS
+// recipient is not logged into anything); the page calls the anon
+// tracker_status RPC, which returns only what the recipient should see.
+// The stage moves off the appointment status and the time stamps Paul
+// already taps on the Today sheet, and the page re-checks every 45 seconds.
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="The Dog Gone Tracker | Dog Gone Clean"
+  description="Follow your dog's visit live: on the way, arrived, underway, done."
+>
+  <section class="trk-hero">
+    <div class="container">
+      <p class="trk-label">The Dog Gone Tracker</p>
+      <h1 id="trk-title">Checking on <span class="grad">your visit...</span></h1>
+      <p class="trk-sub" id="trk-sub"></p>
+
+      <div class="trk-card" id="trk-card" hidden>
+        <ol class="trk-steps" id="trk-steps">
+          <li data-stage="scheduled"><span class="trk-dot"></span><div><strong>Scheduled</strong><p>Your visit is on the books.</p></div></li>
+          <li data-stage="on_the_way"><span class="trk-dot"></span><div><strong>Rolling your way</strong><p>Dog Gone Clean is on the road to you.</p></div></li>
+          <li data-stage="arrived"><span class="trk-dot"></span><div><strong>In the trailer</strong><p>We are here and the work is underway.</p></div></li>
+          <li data-stage="done"><span class="trk-dot"></span><div><strong>All done</strong><p>Clean, dry, and back to their day.</p></div></li>
+        </ol>
+        <p class="trk-block" id="trk-block"></p>
+      </div>
+
+      <div class="trk-card trk-card--missing" id="trk-missing" hidden>
+        <p>We could not find a visit for this link. If it came in a text from
+        us, tap it again or ask us to resend it.</p>
+        <p><a href="/">Back to Dog Gone Clean</a></p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .trk-hero {
+    padding: var(--space-4xl) 0 var(--space-3xl);
+    text-align: center;
+    min-height: 60vh;
+  }
+  .trk-label {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 var(--space-md);
+  }
+  .trk-hero h1 {
+    font-size: clamp(1.9rem, 6vw, 3rem);
+    line-height: 1.1;
+    margin: 0 0 var(--space-sm);
+  }
+  .trk-sub {
+    color: var(--soft);
+    margin: 0 auto var(--space-xl);
+    max-width: 30rem;
+  }
+  .trk-card {
+    max-width: 460px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    text-align: left;
+  }
+  .trk-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  .trk-steps li {
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+    opacity: 0.38;
+  }
+  .trk-steps li.is-done { opacity: 0.75; }
+  .trk-steps li.is-active { opacity: 1; }
+  .trk-dot {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    background: var(--card);
+  }
+  .trk-steps li.is-done .trk-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .trk-steps li.is-active .trk-dot {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: var(--accent);
+    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.15);
+  }
+  .trk-steps strong { display: block; color: var(--ink); }
+  .trk-steps p { margin: 2px 0 0; color: var(--soft); font-size: var(--text-sm); }
+  .trk-block {
+    margin: var(--space-xl) 0 0;
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--line);
+    color: var(--soft);
+    font-size: var(--text-sm);
+  }
+  .trk-card--missing { text-align: center; color: var(--soft); }
+</style>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+  import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../components/portal/supabase.js';
+
+  const STAGES = ['scheduled', 'on_the_way', 'arrived', 'done'];
+  const token = new URLSearchParams(window.location.search).get('t') || '';
+
+  const titleEl = document.getElementById('trk-title')!;
+  const subEl = document.getElementById('trk-sub')!;
+  const cardEl = document.getElementById('trk-card')!;
+  const missingEl = document.getElementById('trk-missing')!;
+  const blockEl = document.getElementById('trk-block')!;
+
+  const dayFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'long', day: 'numeric' });
+  const timeFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+
+  const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+
+  function dogPhrase(dogs: string[]) {
+    if (!dogs || dogs.length === 0) return 'your dog';
+    if (dogs.length === 1) return dogs[0];
+    if (dogs.length === 2) return `${dogs[0]} and ${dogs[1]}`;
+    return `${dogs.slice(0, -1).join(', ')}, and ${dogs[dogs.length - 1]}`;
+  }
+
+  const HEADLINES: Record<string, string> = {
+    scheduled: 'is on the books.',
+    on_the_way: 'is rolling your way.',
+    arrived: 'is underway.',
+    done: 'is done. Show someone.',
+  };
+
+  async function refresh() {
+    if (!token) { missingEl.hidden = false; titleEl.textContent = 'No visit on this link.'; return; }
+    const { data, error } = await client.rpc('tracker_status', { p_token: token });
+    if (error || !data || !data.found) {
+      if (cardEl.hidden) { missingEl.hidden = false; titleEl.textContent = 'No visit on this link.'; }
+      return;
+    }
+    const stage = String(data.stage || 'scheduled');
+    if (stage === 'inactive') {
+      missingEl.hidden = false;
+      cardEl.hidden = true;
+      titleEl.textContent = 'This visit is no longer scheduled.';
+      subEl.textContent = '';
+      return;
+    }
+    missingEl.hidden = true;
+    cardEl.hidden = false;
+
+    const dogs = dogPhrase(data.dogs || []);
+    const visitOf = `${dogs.charAt(0).toUpperCase()}${dogs.slice(1)}'s visit`;
+    titleEl.textContent = `${visitOf} ${HEADLINES[stage] || HEADLINES.scheduled}`;
+    subEl.textContent = data.first_name ? `Hi ${data.first_name}. This page updates on its own; keep it open or check back any time.` : 'This page updates on its own; keep it open or check back any time.';
+
+    const idx = STAGES.indexOf(stage);
+    document.querySelectorAll('#trk-steps li').forEach((li) => {
+      const i = STAGES.indexOf(li.getAttribute('data-stage') || '');
+      li.classList.toggle('is-active', i === idx);
+      li.classList.toggle('is-done', i < idx);
+    });
+
+    if (data.scheduled_start && data.scheduled_end) {
+      const s = new Date(data.scheduled_start);
+      const e = new Date(data.scheduled_end);
+      blockEl.textContent = `${dayFmt.format(s)}, in the ${timeFmt.format(s)} to ${timeFmt.format(e)} block. The work happens inside the block; the opening minute is not an arrival promise.`;
+    } else {
+      blockEl.textContent = '';
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 45000);
+</script>
