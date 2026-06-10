@@ -2693,3 +2693,37 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   minimum stop; before this a Prater groom would have booked at 30. Grants explicit per
   rpc_grants_explicit. Any future mixed groom/nails client is two column values away from
   booking correctly.
+- **The generator hours went into the void; recovered + the card fixed (2026-06-10, migration
+  0140).** Paul answered the maintenance watcher's hours-ask cards in plain text ("641 hours",
+  "Bathing generator has 905 hours on it"); the replies were saved to briefing_notes but nothing
+  parsed them into equipment.current_hours, so from his side the entry vanished. Not user error:
+  the card asked for data it could not hear. Recovered both readings stamped at his reply times
+  (Infrastructure 641, Bathing 905, replay-guarded), and the hours-ask card now carries its own
+  number box + Save (admin_set_equipment_hours_by_name) that writes the equipment record and
+  resolves the card in one tap. Honest answer recorded for "does replying do anything": replies
+  are saved to the thread and captured as wisdom (the Archivist triages them; "This is
+  intentional" makes that agent stand down on that subject permanently, as with Jeanne's
+  fixed-income price), but free-text replies do NOT execute actions; any card that asks for a
+  data entry must carry the control on the card.
+- **Dog Gone Tracker preference added to the portal reminders card (0140).** A 'tracker' key in
+  the notification-preferences whitelist (default email on; text saved now, live when Twilio
+  lands) and a fourth row in the portal's Send me card: "Dog Gone Tracker (when we are on the
+  way)".
+- **The stop button made dramatic + the slot-release copy (Paul, 2026-06-10).** The portal
+  cancel control is now a literal red stop-sign octagon ("The stop button. Two taps and it is
+  done. We stop charging. We stop coming."), and the confirm screen adds the consequence Paul
+  wanted stated elegantly: "Stopping frees your visit times for another family on the route.
+  The door stays open: come back whenever you like and pick from the times that are open then."
+  Placement considered per Paul's ask and kept in Account > Your plan with a because: you stop
+  a plan where the plan lives, and the Home tab sells care, not exit; the drama now does the
+  visibility work. stop_sign_two_taps refined in the Oracle.
+- **portal_amazement locked (Paul, 2026-06-10).** The portal's overriding goal: clients amazed
+  at how easy everything is, amazed enough to tell people. New Oracle rule + a wants inventory
+  in the parking lot (pay/tip, in-portal booking, the dog's story page, refer a friend, message
+  us, live answers, gift a visit), each gated on being buildable for real.
+- **Scheduling commitments recorded (Paul, 2026-06-10).** Confirmed in the parking lot as
+  committed next rounds, not indefinite parking: (1) the rolling duration recompute, (2) drive
+  time as a first-class reservation when the route engine lands (the tracker's inbound->arrived
+  stamps are already collecting real per-stop drive data for it), (3) per-dog durations with
+  the lowest-touch design (decompose from historical subset variation + vibe-rating dog sets,
+  no new field workflow; a new dog = known client baseline + estimated increment).

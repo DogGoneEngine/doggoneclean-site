@@ -319,6 +319,12 @@ export async function onMyWay(appointmentId) {
   return rpc('admin_on_my_way', { p_appointment: appointmentId });
 }
 
+// The hours-ask briefing card's Save button: writes the panel reading
+// straight onto the named equipment (never a free-text reply into the void).
+export async function setEquipmentHoursByName(name, hours) {
+  return rpc('admin_set_equipment_hours_by_name', { p_name: name, p_hours: hours });
+}
+
 export async function setBriefingStatus(id, status) {
   return rpc('admin_set_briefing_status', { p_id: id, p_status: status });
 }

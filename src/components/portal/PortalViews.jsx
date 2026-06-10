@@ -153,6 +153,7 @@ const REMINDER_ROWS = [
   { key: 'reminder_3d', label: '3 days before' },
   { key: 'reminder_26h', label: 'The day before' },
   { key: 'reminder_day', label: 'Day of' },
+  { key: 'tracker', label: 'Dog Gone Tracker (when we are on the way)' },
 ];
 
 function NotificationsSection({ toast }) {
@@ -789,19 +790,24 @@ function PlanActions({ subscription, onChanged, toast }) {
 
   if (mode === 'confirmCancel') {
     return (
-      <div className="pt-confirm">
+      <div className="pt-confirm pt-confirm--stop">
         <div className="pt-confirm__text">
-          Cancel your plan? This takes any upcoming visit off the schedule.
-          You can book again any time.
+          <strong>Stop your plan?</strong> One more tap and it is done: we stop
+          charging, we stop coming. No call, no hold music, no questions.
+        </div>
+        <div className="pt-confirm__text">
+          Stopping frees your visit times for another family on the route. The
+          door stays open: come back whenever you like and pick from the times
+          that are open then.
         </div>
         <div className="pt-confirm__row">
           <button className="pt-btn pt-btn-danger pt-btn-sm" disabled={busy}
-            onClick={() => run(cancelSubscription, 'Plan cancelled.')}>
-            {busy ? <span className="pt-spinner-sm" /> : 'Yes, cancel plan'}
+            onClick={() => run(cancelSubscription, 'Plan stopped. The door stays open.')}>
+            {busy ? <span className="pt-spinner-sm" /> : 'Yes, stop my plan'}
           </button>
           <button className="pt-btn pt-btn-ghost pt-btn-sm" disabled={busy}
             onClick={() => setMode('idle')}>
-            Keep plan
+            Keep my plan
           </button>
         </div>
       </div>
@@ -843,9 +849,15 @@ function PlanActions({ subscription, onChanged, toast }) {
           Pause plan
         </button>
       )}
-      <button className="pt-btn pt-btn-ghost pt-btn-sm"
-        onClick={() => setMode('confirmCancel')}>
-        Cancel plan
+      {/* The stop button (stop_sign_two_taps): the marketing brags about it,
+          so in the portal it looks like what it is, a real stop sign. Tap it,
+          confirm, done: two taps, we stop charging, we stop coming. */}
+      <button type="button" className="pt-stop" onClick={() => setMode('confirmCancel')} aria-label="Stop my plan">
+        <span className="pt-stop__sign" aria-hidden="true">STOP</span>
+        <span className="pt-stop__text">
+          <strong>The stop button.</strong>
+          <span>Two taps and it is done. We stop charging. We stop coming.</span>
+        </span>
       </button>
     </div>
   );

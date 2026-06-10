@@ -728,3 +728,54 @@ replayable migration keyed by name so a reseed cannot wipe them (`client_disposi
 then read them back to Paul to confirm. Optional enabler: an in-console "Add client" button so Paul
 can add future ones himself from his phone (runs-without-Paul); for this batch, pasting the notes is
 the faster path.
+
+## Portal amazement: the wants inventory (`portal_amazement`, Paul 2026-06-10)
+
+The portal's bar: clients amazed at how easy everything is, amazed enough to tell people.
+Everything a client could possibly want to do with Dog Gone Clean, buildable in the portal.
+LIVE today: sign in three ways, see the next visit and full history, reschedule, skip, pause,
+restart, the stop button (red octagon, two taps, slot-release copy), change cadence, manage the
+pack, edit contact + verified service address, reminder + Dog Gone Tracker preferences, shared
+visit photos. THE INVENTORY still to build (roughly in order of client value):
+
+1. **Pay and tip from the phone** (Stripe-gated): see the card on file, update it, tip after a
+   great visit, see receipts per visit.
+2. **Book a visit from inside the portal** (calendar-sync + Stripe gated for bath; legacy can
+   self-book once the cutover lands): today the portal manages visits but new bookings go
+   through /book.
+3. **The dog's story page**: per dog, the before/after gallery over time, weight/coat notes,
+   birthday, "what we did last visit." The shareable pride surface.
+4. **Refer a friend**: a personal link that pre-fills the funnel; the moat grows by word of
+   mouth, give the words a handle.
+5. **Message us**: one async text-style thread per client inside the portal (replaces "what
+   number do I text?"), honoring online_only_comms.
+6. **Live answers**: "when are you coming next month?" answered without asking; cadence and
+   upcoming visits laid out plainly.
+7. **Gift a visit** (post-Stripe): pay for a friend's first visit; the referral engine's big
+   sibling.
+Each item ships only when it can be real (no_mockups); the bar for each is "would a client
+mention this to a friend?"
+
+## Scheduling engine: committed next rounds (NOT parked indefinitely; Paul 2026-06-10)
+
+Order of work after the current stragglers:
+1. **Rolling duration recompute.** clients.visit_minutes (and the groom/nails splits) re-derived
+   automatically from recent real visits so every completed visit feeds the next booking's
+   length; today the values are a one-time 2026-06-07 snapshot. Includes the seeded-values
+   finding (2026-06-10): the seeds track the CYCLE median (inbound drive included) while pure
+   on-site medians run 15-30 min lower; Paul's call pending on drive-inclusive vs on-site +
+   separate drive, default recommendation is drive-inclusive until the route engine exists.
+2. **Drive time as a first-class reservation.** EXPLICITLY COMMITTED, not procrastinated: when
+   the route engine lands, blocks become true on-site time and inbound drive is computed and
+   reserved per stop (the Oracle's original block-time intent). The new tracker stamps
+   (inbound -> arrived) are already capturing real per-stop drive times to feed it.
+3. **Per-dog durations** (Paul's spec, 2026-06-10): clients sometimes groom a subset (one dog
+   today, not the other; a dog dies; a new dog arrives), so appointment length should follow
+   the dogs actually being groomed. Time is Money only has per-visit totals, but visits carry
+   dog_ids and the vibe ratings already record which dogs were done, so the lowest-touch design
+   needs NO new field workflow: (a) decompose per-dog minutes from historical subset variation
+   per client (least-squares over their visits where different dog sets appear); (b) where a
+   client always grooms all dogs together, split the total by breed-informed priors and flag
+   low confidence; (c) appointment duration = sum of the selected dogs' estimates + per-visit
+   refinement as new data lands; (d) a NEW dog on a known client = known baseline + estimated
+   increment for that dog, refined as it accrues history (never reset the client to a guess).

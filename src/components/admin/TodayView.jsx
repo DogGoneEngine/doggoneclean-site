@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, setEquipmentHoursByName } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -256,6 +256,12 @@ function BriefingCard({ b, onChanged, onError }) {
   const [reply, setReply] = useState('');
   const [busy, setBusy] = useState(false);
 
+  // An hours-ask card carries its own number box. A free-text reply is just a
+  // recorded note (the 641-hours-into-the-void lesson, 2026-06-09): the data
+  // entry the card asks for has to BE on the card, one field, one save, done.
+  const hoursAsk = /^Update hours: (.+)$/.exec(b.title || '');
+  const [hoursVal, setHoursVal] = useState('');
+
   async function run(fn) {
     setBusy(true);
     try { await fn(); onChanged(); }
@@ -264,6 +270,14 @@ function BriefingCard({ b, onChanged, onError }) {
   const doReply = () => reply.trim() && run(() => replyBriefing(b.id, reply.trim()));
   const doIntentional = () => run(() => resolveBriefing(b.id, 'intentional', reply.trim() || null));
   const doDismiss = () => run(() => resolveBriefing(b.id, 'dismissed', reply.trim() || null));
+  const doSaveHours = () => {
+    const n = Number(hoursVal);
+    if (!hoursVal.trim() || Number.isNaN(n) || n < 0) { onError('Enter the hours as a number.'); return; }
+    run(async () => {
+      await setEquipmentHoursByName(hoursAsk[1], n);
+      await setBriefingStatus(b.id, 'resolved');
+    });
+  };
 
   return (
     <div className="ad-panel" style={{ borderLeft: `4px solid ${sev.color}` }}>
@@ -272,6 +286,21 @@ function BriefingCard({ b, onChanged, onError }) {
         <span className="ad-mono" style={{ fontSize: 11, color: sev.color }}>{sev.label} · {b.agent_key.toUpperCase()}</span>
       </div>
       {b.body && <p style={{ margin: '8px 0', fontSize: 14, lineHeight: 1.5 }}>{b.body}</p>}
+
+      {hoursAsk && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', margin: '8px 0', flexWrap: 'wrap' }}>
+          <input
+            type="number" inputMode="decimal" min="0" value={hoursVal} disabled={busy}
+            onChange={(e) => setHoursVal(e.target.value)}
+            placeholder="Panel hours"
+            style={{ width: 120, fontSize: 14, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }}
+          />
+          <button className="ad-btn ad-btn--sm" onClick={doSaveHours} disabled={busy || !hoursVal.trim()}>
+            Save hours
+          </button>
+          <span style={{ fontSize: 11, opacity: 0.55 }}>Saves to {hoursAsk[1]} and clears this card.</span>
+        </div>
+      )}
       {Object.keys(ev).length > 0 && (
         <div className="ad-mono" style={{ fontSize: 11, opacity: 0.65, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
           {ev.visits != null && <span>visits {ev.visits}</span>}

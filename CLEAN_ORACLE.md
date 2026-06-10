@@ -958,7 +958,17 @@ itself. Homepage copy: "Cancel in two taps. No phone calls, no scripts, no
 guilt." Booking step 2 tagline: "Try it. If it is not for you, cancel in two
 taps." Booking step 4 reassurance: "Cancel anytime in two taps from your
 portal. No questions asked." The portal cancel screen carries no reason
-field per `no_reason_field_ever`. Because frictionless exit is a marketing
+field per `no_reason_field_ever`. Refined 2026-06-10 (Paul): the portal
+control is DRAMATIC, a literal red stop-sign octagon labeled STOP with "Two
+taps and it is done. We stop charging. We stop coming." (the brag made
+physical), it lives in Account > Your plan (you stop a plan where the plan
+lives; the Home tab sells care, not exit), and the confirm screen states the
+slot consequence elegantly: "Stopping frees your visit times for another
+family on the route. The door stays open: come back whenever you like and
+pick from the times that are open then." That phrasing carries
+subject-to-availability honestly without legal chill: the freed slot is
+presented as generosity to the route, and re-entry as an open door whose
+times are whatever is open then. Because frictionless exit is a marketing
 feature that drives signups, and the visible cancel commitment is what makes
 a card-on-file subscription emotionally signable; hard-to-cancel is what
 gives subscriptions their bad name.
@@ -1047,6 +1057,23 @@ caught on 2026-05-27, where the first cut of `/the-villages` showed
 the single-visit price only as a row inside the tier pricing card,
 which Paul correctly read as "you can't actually try us once." Pairs
 with `single_oneoff_higher` (which defines the price spread).
+
+`portal_amazement` (ux):
+The portal's overriding goal is that clients are AMAZED at how awesome it is,
+amazed enough to tell other people about it. The main road to amazement is
+ease: everything a client could possibly want to do with Dog Gone Clean should
+be doable in the portal, and every one of those things should be really, really
+easy. The standing test for any portal change: does this make a client's want
+easier, and would a client mention it to a friend? The portal is the product
+surface clients actually live in after signup (the marketing site converts, the
+portal serves), so the amazement bar applies to every screen, every flow, every
+word in it. The running inventory of client wants to build toward lives in
+CLEAN_PARKING_LOT.md ("Portal amazement"). Because word of mouth is the
+business's strongest channel and the portal is the thing clients touch most;
+a portal that feels effortless converts routine service into the story a
+client tells at dinner, and that is the moat (`dig_the_moat`). Paul,
+2026-06-10: "let's make this portal something that people tell other people
+about. Because it is just that. Awesome."
 
 `gravity_slide_funnel` (ux):
 The website's job is to take a right-fit visitor and pull them with the force
