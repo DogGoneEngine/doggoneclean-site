@@ -28,9 +28,9 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 - **Next action (end of 2026-06-10 session):** The service is now correctly presented as
   FULL dog grooming on no-haircut dogs (`v2_full_grooming_no_haircuts`), with the two-kinds
   service choice (`two_dog_kinds_service_choice`), the breed slide-holes enforced in the DB
-  (`excluded_breeds_are_slide_holes`), and the stop-button brag strengthened. The working
-  branch (portal self-service, the 16-floor Orbit console, client records, calendar sync,
-  visit history) is folded into `main` and deployed. What gates launch is Paul's external
+  (`excluded_breeds_are_slide_holes`), and the stop-button brag strengthened. All of June's
+  work (portal self-service, the 16-floor Orbit console, client records, calendar sync,
+  visit history) is on `main` and deployed. What gates launch is Paul's external
   list (iPostal1 address -> Sunbiz DBA -> EIN -> Relay bank -> Stripe -> Twilio -> Resend
   sender; see CLEAN_PARKING_LOT.md "Launch blockers"): Stripe unlocks the booking Confirm,
   card management, and tips; the Resend key + cancelling Acuity unlocks reminders going
@@ -2505,11 +2505,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   feedback-plus-Google-review ask for everyone not already asked and not already reviewed, active
   for a limited window, tracked per client so nobody is ever spammed. Sends gate on Twilio; online
   tips gate on Stripe. Build order parked in CLEAN_PARKING_LOT.md.
-- **Trunk fold (2026-06-10).** Found `main` frozen at 2026-05-29 (fb1537d) while the working
-  branch carried 185 commits of finished June work (portal self-service, the 16-floor Orbit
-  console, the client-record system, calendar sync, visit-history migration). The deploy fires
-  only on push to `main`, so none of it had properly shipped per the trunk rule. Folded the
-  branch into `main` this session per ship_to_completion.
+- **Trunk-state false alarm, corrected in place (2026-06-10, reality wins).** This session's
+  shallow clone carried a stale local `main` ref frozen at 2026-05-29, which first read as "185
+  commits of June work never shipped." Verified against the remote before pushing: `origin/main`
+  was already current through 2026-06-09, so the June work (portal self-service, the 16-floor
+  Orbit console, the client-record system, calendar sync, visit-history migration) HAS been
+  deploying all along. The only fold needed was today's commits, merged to `main` per
+  ship_to_completion. Lesson for future sessions: the harness clones shallow (depth 50) with a
+  possibly stale local `main`; run `git fetch origin main` and compare against `origin/main`
+  before concluding anything about trunk state.
 - **Breed slide-holes given database teeth + verified live (2026-06-10, migration 0134).**
   `bath_start_subscription` now rejects an excluded breed before any row is written, with the
   kind decline message. Verified on dgc-prod: a Goldendoodle signup is refused at the gate with
