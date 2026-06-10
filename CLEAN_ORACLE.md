@@ -1434,6 +1434,21 @@ The build ends with a smoke test that verifies the critical pages built non-triv
 the expected islands emitted and are referenced. Because a build can finish without errors
 and still ship a structurally broken artifact.
 
+`rpc_grants_explicit` (engineering):
+Every SECURITY DEFINER function declares its audience with explicit grants, and PUBLIC
+never holds EXECUTE. The tiers: the deliberately-anonymous booking RPCs
+(bath_start_subscription, bath_open_slots, bath_lookup_subscriber,
+bath_founders_remaining) are granted to anon; admin_* and the authenticated portal
+bath_* RPCs are granted to authenticated only (their in-function auth gate, _is_admin
+or auth.uid(), still applies on top); everything else (internal _ helpers, agent scans,
+cron dispatchers, edge-function data feeds) is service_role only. Default privileges in
+the public schema revoke EXECUTE from PUBLIC, so a new function is born locked and must
+be granted to its audience deliberately (migration 0135). Because Postgres grants
+EXECUTE to PUBLIC on function creation, which silently made about 110 functions
+anon-callable over a month of fast building, including ungated internal write helpers;
+a default that fails open cannot be outrun by remembering, so the default itself was
+flipped. Locked 2026-06-10.
+
 `offline_first_field_app` (engineering):
 If a Clean field/operator app is built, it renders today's full state from a local store
 instantly with or without signal; the server is a sync target, not a query source, and

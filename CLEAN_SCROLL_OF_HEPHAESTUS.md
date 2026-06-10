@@ -2510,3 +2510,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   console, the client-record system, calendar sync, visit-history migration). The deploy fires
   only on push to `main`, so none of it had properly shipped per the trunk rule. Folded the
   branch into `main` this session per ship_to_completion.
+- **Breed slide-holes given database teeth + verified live (2026-06-10, migration 0134).**
+  `bath_start_subscription` now rejects an excluded breed before any row is written, with the
+  kind decline message. Verified on dgc-prod: a Goldendoodle signup is refused at the gate with
+  the friendly copy; a Boxer passes the breed gate and proceeds (failing only at slot
+  availability, as expected with no Villages windows set); nothing persisted.
+- **RPC grant lockdown (2026-06-10, migration 0135, `rpc_grants_explicit`).** The security
+  advisors showed about 110 SECURITY DEFINER functions executable by anon, including ungated
+  internal write helpers (_apply_visit_dog_scores, _archive_stale_clients, the agent scans),
+  because Postgres grants EXECUTE to PUBLIC on creation and a month of fast building never
+  revoked it. Locked down in tiers: the four anonymous booking RPCs keep anon; admin_* and the
+  authenticated portal RPCs keep authenticated (in-function gates still apply); everything else
+  is service_role only; and default privileges now revoke PUBLIC execute so future functions
+  are born locked. Verified: anon denied on admin_list_clients (permission denied at the grant
+  layer), anon bath_lookup_subscriber still works, authenticated still executes admin RPCs and
+  hits the in-function "not authorized" gate. anon-executable count: ~110 -> 4.
