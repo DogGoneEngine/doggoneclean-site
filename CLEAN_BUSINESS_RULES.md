@@ -72,7 +72,8 @@ even DGN has many rules sitting in only one or two layers.
 | cancellation_24h | Money | Oracle | booking engine; site copy |
 | favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |
 | accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |
-| house_shampoo | Service | Oracle; convention | site copy; intake form |
+| house_shampoo | Service | Oracle; hurricane-bath page "The shampoo" section (house shampoo hyped unnamed + bring-your-own at no extra charge); brand private in the Field Manual | non-guarantee wording in intake/terms |
+| no_unpaved_roads | Routing | Oracle; booking Step 1 location requirements (paved-roads line with the unpaved-driveway exception); the-villages eligibility list; **`check.py`** asserts "unpaved" on the booking island | address-level enforcement if road-surface data ever exists |
 | online_only_comms | Process | Oracle; convention | site copy; intake; `business_rules` row |
 | friendly_dogs_only | Safety | Oracle; site copy; **`check.py`** asserts "friendly dogs" + "aggression" present on `index.astro`, `the-villages.astro`, and `BookingApp.jsx` (the booking gate) | intake gate |
 | core_is_no_haircut_dogs | Roster | Oracle; site copy; **`check.py`** asserts "bath only" present on `the-villages.astro`, `process.astro`, and `BookingApp.jsx` | intake gate |

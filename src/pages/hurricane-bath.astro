@@ -181,6 +181,73 @@ const beats = [
     </div>
   </section>
 
+  <!-- ENVIRONMENT -->
+  <section class="section env-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">The environment</p>
+        <h2 class="section-title">A controlled environment, <span class="grad">whatever Florida is doing.</span></h2>
+      </div>
+      <div class="env-grid">
+        <div class="env-card">
+          <h3>Climate, held steady</h3>
+          <p>
+            Oversized generators power true climate control: air
+            conditioning, heat, and a dedicated dehumidifier that holds
+            the trailer near 30 percent humidity. Hot and humid. Cold and
+            rainy. Doesn't matter. Your dog stands in a stable,
+            comfortable space from the first minute to the last.
+          </p>
+        </div>
+        <div class="env-card">
+          <h3>The shed stays with us</h3>
+          <p>
+            Powerful vacuums contain the loose coat as it comes off, and
+            high-output dryers move the moisture out fast. Your dog walks
+            back inside dry, and the hair that came off rides away in the
+            trailer instead of settling into your house.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHAMPOO -->
+  <section class="section shampoo-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-label">The shampoo</p>
+        <h2 class="section-title">Two decades of auditions. <span class="grad">One winner.</span></h2>
+      </div>
+      <div class="shampoo-grid">
+        <div class="env-card">
+          <h3>The house shampoo</h3>
+          <p>
+            Paul has tried a lot of shampoos across twenty years of
+            dog grooming, and hundreds of households tell you fast what
+            works. The house shampoo is the one he stuck with: gentle,
+            soap free, made with naturally derived ingredients, with a
+            light tropical scent that has never once drawn a complaint.
+            Soap free matters: it cleans without stripping the coat, and
+            it does not wash away topical treatments your vet has
+            applied.
+          </p>
+        </div>
+        <div class="env-card">
+          <h3>Or bring your own</h3>
+          <p>
+            Does your dog need something specific? A medicated formula,
+            a flea product, a sensitive-skin shampoo your vet
+            recommends? Hand us the bottle. We add it to the Hurricane
+            Bath system, the recirculating flow works it deep through
+            the coat, and the bottle comes right back to you. No extra
+            charge.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- STANDARD -->
   <section class="section standard-section">
     <div class="container">
@@ -369,6 +436,40 @@ const beats = [
     font-size: var(--text-xl);
   }
   .beat__content p {
+    color: var(--soft);
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  /* ENVIRONMENT + SHAMPOO */
+  .env-section {
+    background: var(--surface-alt);
+    border-block: 1px solid var(--line);
+  }
+  .env-grid,
+  .shampoo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    max-width: 920px;
+    margin: var(--space-2xl) auto 0;
+  }
+  @media (max-width: 760px) {
+    .env-grid, .shampoo-grid { grid-template-columns: 1fr; }
+  }
+  .env-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+  }
+  .env-card h3 {
+    color: var(--accent);
+    margin: 0 0 var(--space-sm);
+    font-size: var(--text-xl);
+  }
+  .env-card p {
     color: var(--soft);
     margin: 0;
     line-height: 1.65;

@@ -503,6 +503,19 @@ auto-charge. Never surface "subscriber" or "subscription" in any client-facing o
 or UI; say "client" and "recurring schedule." Because the word misrepresents the relationship, and
 Paul flagged it directly.
 
+`no_unpaved_roads` (routing):
+Dog Gone Clean does not drive on unpaved roads, in any city; an unpaved driveway is fine.
+Both halves are stated in the location requirements before the visitor enters their
+address, so a wrong-fit address falls out of the funnel early and kindly
+(`excluded_breeds_are_slide_holes` pattern, applied to roads). Carried forward from the
+legacy `service_area_ocala` operating limits, which were Ocala-scoped; this rule is the
+general form and it applies to The Villages and every future city. Because the
+truck-and-trailer rig does not belong on washboard dirt roads (the equipment takes the
+beating and the schedule takes the slowdown), while a driveway is short and slow so its
+surface does not matter; saying both up front prevents a doomed booking and a doorstep
+decline. Restored by Paul 2026-06-10 after it was omitted from the v2.0 surface for
+seeming not to apply to The Villages.
+
 `gated_community_hours` (routing):
 Some gated communities restrict the hours service vehicles may enter (for example no service
 entry after 5pm); treat those windows as real access constraints when sequencing a day.
@@ -1156,14 +1169,23 @@ cash or an ATM stop, and naming the wallets removes a friction point at the trai
 
 `house_shampoo` (service):
 Clean washes everyone with one gentle, well-tolerated house shampoo; a client who wants a
-specific, medicated, prescription, or flea product provides it and Clean uses it without standing
-behind the result. Because at scale one reliably inoffensive shampoo avoids the steady stream of
-complaints any single product attracts, Clean cannot stock every medicated formula or know which
-one treats a given dog, and a single flea bath cannot fix an environmental flea problem the dog
-will just be re-exposed to. The specific house brand stays in the private record, not public copy
-(`dont_knock_competitors` and brand-neutral copy). Any non-guarantee wording (Clean does not
-promise a client-supplied medicated or flea product will work) lives in the intake or terms,
-never the marketing copy, which stays positive and skips the flea lecture (`reminder_voice`).
+specific, medicated, prescription, or flea product provides it, Clean runs it through the
+Hurricane Bath system at no extra charge, and the bottle goes right back to the client. Because
+at scale one reliably inoffensive shampoo avoids the steady stream of complaints any single
+product attracts (twenty years of auditions; this is the one no one has ever complained about),
+Clean cannot stock every medicated formula or know which one treats a given dog, and a single
+flea bath cannot fix an environmental flea problem the dog will just be re-exposed to. The
+specific house brand stays in the private record, not public copy (`dont_knock_competitors` and
+brand-neutral copy); privately it is TropiClean Papaya & Coconut Luxury 2-in-1 Shampoo and
+Conditioner (brand name corrected 2026-06-10 from "papaya and mango"; mango is only in the
+botanical blend). Public copy may hype the verifiable product facts without the name: gentle,
+soap free, paraben and dye free, naturally derived ingredients, light tropical scent, and
+soap-free cleaning that does not wash away vet-applied topical treatments. The
+bring-your-own offer is marketed as a service ("hand us the bottle, it comes right back, no
+extra charge"); it stays free unless it ever becomes a real hassle, which is Paul's call to
+revisit. Any non-guarantee wording (Clean does not promise a client-supplied medicated or flea
+product will work) lives in the intake or terms, never the marketing copy, which stays positive
+and skips the flea lecture (`reminder_voice`).
 
 ---
 

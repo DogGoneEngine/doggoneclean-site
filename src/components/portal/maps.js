@@ -11,35 +11,74 @@
 // project, never shared with DGN, per clean_stays_saleable.)
 export const MAPS_BROWSER_KEY = 'AIzaSyA77l7vz6_hr1CtJ8OGAUsy549TEAAclhw';
 
-// Load the Maps JS API (Places library) once. Resolves with google.maps,
-// rejects if the script fails (network / bad key). On failure the funnel
-// shows an honest "booking opens shortly" notice and keeps the gate closed:
-// there is no manual address path, because an address we cannot verify is
-// in-area must not be bookable.
+// Load the Maps JS API (Places library) once, using Google's documented
+// dynamic bootstrap + importLibrary('places'). Resolves with google.maps,
+// rejects if the script or library fails (network / bad key / blocked API).
+// On failure the funnel shows an honest "booking opens shortly" notice and
+// keeps the gate closed: there is no manual address path, because an address
+// we cannot verify is in-area must not be bookable.
+//
+// DIAGNOSED 2026-06-10 (live request, API_KEY_SERVICE_BLOCKED): suggestions
+// not appearing is NOT a code failure mode here; the browser key's API
+// restrictions in Google Cloud must include "Places API (New)" or every
+// autocomplete request is rejected server-side while the box renders fine.
+// See maps_js_api_only in CLEAN_ORACLE.md. lastMapsError below exists so the
+// funnel can name the reason instead of failing silently.
+export let lastMapsError = '';
 let _mapsPromise = null;
 export function loadGoogleMaps() {
   if (typeof window === 'undefined') return Promise.reject(new Error('no_window'));
-  const ready = () => window.google && window.google.maps && window.google.maps.places
-    && window.google.maps.places.PlaceAutocompleteElement;
-  if (ready()) return Promise.resolve(window.google.maps);
   if (_mapsPromise) return _mapsPromise;
-  _mapsPromise = new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    // Classic loader (libraries=places, v=weekly): this is the exact form
-    // that loads successfully on Clean's project (proven by the suggestions
-    // rendering in the field). We use the MODERN PlaceAutocompleteElement off
-    // it, NOT the legacy google.maps.places.Autocomplete widget — Google
-    // blocked the legacy widget for new Cloud projects (March 2025), so it
-    // errors here (nails' legacy widget works only because nails' project
-    // predates the cutoff). v=weekly guarantees the element is present.
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_BROWSER_KEY}&libraries=places&v=weekly`;
-    s.async = true;
-    s.defer = true;
-    s.onerror = () => { _mapsPromise = null; reject(new Error('maps_load_failed')); };
-    s.onload = () => { if (ready()) resolve(window.google.maps); else { _mapsPromise = null; reject(new Error('maps_load_failed')); } };
-    document.head.appendChild(s);
+  // Surfaces key/referer auth failures that otherwise only hit the console.
+  window.gm_authFailure = () => { lastMapsError = 'maps_auth_failure (check the key referrer lock and API restrictions)'; };
+  _mapsPromise = (async () => {
+    if (!(window.google && window.google.maps && window.google.maps.importLibrary)) {
+      bootstrapMapsLoader({ key: MAPS_BROWSER_KEY, v: 'weekly' });
+    }
+    const places = await window.google.maps.importLibrary('places');
+    if (!places.PlaceAutocompleteElement) {
+      lastMapsError = 'places_element_missing (PlaceAutocompleteElement not in this channel)';
+      throw new Error(lastMapsError);
+    }
+    return window.google.maps;
+  })().catch((e) => {
+    if (!lastMapsError) lastMapsError = (e && e.message) || 'maps_load_failed';
+    _mapsPromise = null;
+    throw e;
   });
   return _mapsPromise;
+}
+
+// Google's official dynamic library import bootstrap (from the Maps JS
+// docs), reformatted. It registers google.maps.importLibrary and loads the
+// script once with whatever libraries are requested.
+function bootstrapMapsLoader(g) {
+  var h; var a; var k; var p = 'The Google Maps JavaScript API'; var c = 'google';
+  var l = 'importLibrary'; var q = '__ib__'; var m = document; var b = window;
+  b = b[c] || (b[c] = {});
+  var d = b.maps || (b.maps = {}); var r = new Set(); var e = new URLSearchParams();
+  var u = function () {
+    return h || (h = new Promise(async function (f, n) {
+      a = m.createElement('script');
+      e.set('libraries', Array.from(r).join(','));
+      for (k in g) e.set(k.replace(/[A-Z]/g, function (t) { return '_' + t[0].toLowerCase(); }), g[k]);
+      e.set('callback', c + '.maps.' + q);
+      a.src = 'https://maps.' + c + 'apis.com/maps/api/js?' + e;
+      d[q] = f;
+      a.onerror = function () { h = n(Error(p + ' could not load.')); };
+      a.nonce = (m.querySelector('script[nonce]') || {}).nonce || '';
+      m.head.append(a);
+    }));
+  };
+  if (d[l]) {
+    console.warn(p + ' only loads once. Ignoring:', g);
+  } else {
+    d[l] = function (f) {
+      var n = Array.prototype.slice.call(arguments, 1);
+      r.add(f);
+      return u().then(function () { return d[l].apply(d, [f].concat(n)); });
+    };
+  }
 }
 
 // Pull structured address + coordinates out of a Places API (New) Place

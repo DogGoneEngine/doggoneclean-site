@@ -147,10 +147,13 @@ machine flush).
 
 ## Shampoo and product policy
 
-- **House shampoo.** TropiClean papaya and mango 2-in-1 shampoo and conditioner, used for
-  everyone. Not necessarily the best on the market, but in years of use at scale no one has
-  complained about the smell or the dog's skin, which is exactly what a single house product needs
-  to be. Many others were tried over the years.
+- **House shampoo.** TropiClean Papaya & Coconut Luxury 2-in-1 Shampoo and Conditioner, used for
+  everyone. (Name corrected 2026-06-10: the product is Papaya & Coconut; mango appears only in
+  the botanical extract blend. Verified against the manufacturer's listing. Product facts usable
+  in unnamed public copy: soap free, paraben and dye free, naturally derived ingredients, does
+  not wash away topical treatments.) Not necessarily the best on the market, but in years of use
+  at scale no one has complained about the smell or the dog's skin, which is exactly what a
+  single house product needs to be. Many others were tried over the years.
 - **Client-supplied products.** If a client prefers a specific shampoo, Clean uses it. The bottle
   only needs loading into the system, so it goes in first and the bottle goes straight back to the
   client before the bath.

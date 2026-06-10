@@ -772,6 +772,8 @@ def check_rule_survival():
                     "an easy-kind breed example on the coat picker", block=False)
     require_present(booking_app, r"[Mm]ix", "two_dog_kinds_service_choice",
                     "the mixed-breed guidance on the coat picker", block=False)
+    require_present(booking_app, r"unpaved", "no_unpaved_roads",
+                    "the paved-roads requirement (unpaved driveways fine) on Step 1", block=False)
 
     # ── premium_inclusive_no_addons (booking surface) ─────────────────────
     # One price per tier, no upsell may be introduced into the funnel. Catch a

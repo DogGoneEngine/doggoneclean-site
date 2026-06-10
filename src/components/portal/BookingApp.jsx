@@ -28,7 +28,7 @@ import {
   sb, getBookingCity, getOpenSlots, getOpenSlotsBetween,
   signInWithGoogle, toE164US, looksLikeEmail, lookupSubscriberByPhone,
 } from './supabase.js';
-import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds } from './maps.js';
+import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds, lastMapsError } from './maps.js';
 
 const CITY_SLUG = 'the-villages';
 const STORE_KEY = 'dgc_booking_v2';
@@ -39,6 +39,7 @@ const TOTAL_STEPS = 4;
 const ELIGIBILITY = [
   'You live in a private home with a driveway.',
   'There is room to park our truck and trailer (about 2 standard car spaces, front to back).',
+  'Your home is reachable on paved roads. We do not drive on unpaved roads; an unpaved driveway is fine.',
 ];
 
 const MONTHS = [
@@ -258,7 +259,10 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   useEffect(() => {
     if (!stage1) return undefined;
     let mounted = true;
-    loadGoogleMaps().then(() => { if (mounted) setMapsReady(true); }).catch(() => { if (mounted) setMapsFailed(true); });
+    loadGoogleMaps().then(() => { if (mounted) setMapsReady(true); }).catch((e) => {
+      console.error('maps load failed:', e, lastMapsError);
+      if (mounted) setMapsFailed(true);
+    });
     return () => { mounted = false; };
   }, [stage1]);
 
@@ -379,6 +383,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
           ) : (
             <div className="bk-notice">
               Online booking for The Villages is being set up and opens shortly. <a href="/the-villages">Reserve your founders spot</a> and we will let you know the moment it is live.
+              {lastMapsError && <span className="bk-fineprint" style={{ display: 'block', marginTop: 8, opacity: 0.7 }}>technical note: {lastMapsError}</span>}
             </div>
           )}
 
@@ -474,7 +479,7 @@ function DogCard({ idx, dog, showNumber, onChange }) {
         <div className="bk-tier-row">
           {[
             ['smoothcoat', 'Smoothcoat', 'The easy kind. Smooth, short coat: pit bulls, Boxers, Labs.'],
-            ['doublecoat', 'Doublecoat', 'The full-coat kind. Thick double coat: German Shepherds, Australian Shepherds. Longer visit, deeper deshed, priced for it.'],
+            ['doublecoat', 'Doublecoat', 'The full-coat kind. Thick double coat: Golden Retrievers, German Shepherds, Australian Shepherds. Longer visit, deeper deshed, priced for it.'],
           ].map(([val, lab, sub]) => (
             <button key={val} type="button" className={`bk-tier${dog.coat_tier === val ? ' is-on' : ''}`} onClick={() => onChange('coat_tier', val)}>
               <span className="bk-tier__lab">{lab}</span><span className="bk-tier__sub">{sub}</span>

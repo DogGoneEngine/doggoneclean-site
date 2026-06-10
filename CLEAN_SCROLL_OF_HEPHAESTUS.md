@@ -2529,3 +2529,53 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   are born locked. Verified: anon denied on admin_list_clients (permission denied at the grant
   layer), anon bath_lookup_subscriber still works, authenticated still executes admin RPCs and
   hits the in-function "not authorized" gate. anon-executable count: ~110 -> 4.
+- **Booking address autocomplete root-caused with a live request (2026-06-10).** Paul reported
+  the /book address box "straight up doesn't work" while nails autocompletes fine. Diagnosed
+  definitively, not by guess: a direct Places API (New) autocomplete request with the browser
+  key and a hurricanebath.com referer returns 403 API_KEY_SERVICE_BLOCKED. The Places API (New)
+  is enabled on the dog-gone-clean PROJECT (2026-06-07), but the browser KEY's API-restriction
+  list still blocks places.googleapis.com, so the element renders and every suggestion request
+  dies server-side. Fix is one minute in Paul's Google Cloud console (add "Places API (New)" to
+  the key's allowed APIs; keep the referrer lock); filed as Launch blocker 0. Exactly the trap
+  `maps_js_api_only` warns about; the rule held, the console step was missed. Code hardened the
+  same day: maps.js now loads via Google's documented dynamic bootstrap + importLibrary('places'),
+  hooks gm_authFailure, and surfaces the failure reason in the funnel notice and console
+  (lastMapsError), so any future failure names itself in Paul's screenshot instead of failing
+  silently.
+- **Golden Retrievers added as a primary doublecoat example (Paul, 2026-06-10).** Now named
+  first in the full-coat kind everywhere the examples appear (homepage two-kinds card, city-page
+  eligibility, booking coat picker, cities.js tier sub). Supersedes the parked Breed Firewall
+  draft's exclusion of feathered retrievers, same as the Aussie correction.
+- **No unpaved roads, restored and generalized (Paul, 2026-06-10), Oracle `no_unpaved_roads`.**
+  The legacy rule was omitted from the v2.0 surface because it seemed Villages-irrelevant; it is
+  back as a general rule for every city, stated in the booking Step 1 location requirements
+  before the address goes in, with the legacy site's exact softener: unpaved driveways are fine.
+- **Legacy-site material absorbed into the new site (Paul, 2026-06-10).** The about-Paul origin
+  block ("He chose dogs... trained at the Florida Institute of Animal Arts... The system came
+  later. The dogs came first.") now leads the Villages specialist section. From "How We
+  Operate": the "Not a spa. Not a salon. A structured mobile dog grooming system" positioning
+  replaces the homepage what-makes-this-different heading; pack grooming (dogs that live
+  together stay together when calm) folds into the built-around-the-dog card; the climate
+  section (oversized generators, dedicated dehumidifier near 30 percent, "Hot and humid. Cold
+  and rainy. Doesn't matter.", vacuums contain the shed, high-output dryers) lands on the
+  hurricane-bath page as "A controlled environment, whatever Florida is doing." Deliberately NOT
+  carried: the "RV-style pumps... they trickle" knock (`dont_knock_competitors`); the
+  city-water-flow point stays stated on our own merits.
+- **House shampoo copy shipped + brand corrected (Paul, 2026-06-10).** New "The shampoo" section
+  on the hurricane-bath page: the house shampoo hyped unnamed on verifiable facts (twenty years
+  of auditions, the one nobody complains about, gentle, soap free, naturally derived, light
+  tropical scent, does not wash away vet-applied topicals), plus the bring-your-own offer
+  (medicated / flea / sensitive-skin bottle runs through the system at no extra charge, bottle
+  handed right back; free unless it ever becomes a hassle, Paul's call). Brand corrected in the
+  Field Manual and `house_shampoo`: TropiClean Papaya & Coconut Luxury 2-in-1 (not "papaya and
+  mango"; mango is only in the extract blend), verified against the manufacturer's listing.
+- **Strategy clarified and captured (Paul, 2026-06-10).** Legacy full-grooming HAIRCUT clients
+  are kept INDEFINITELY, not wound down: they pay the bills, the portal accommodates them as
+  first-class clients, and the book closes to new haircut entries so it shrinks only by natural
+  attrition. The portal is the main surface clients live in after signup; the marketing site
+  converts, the portal serves. Priority order, target inside single-digit weeks (under a month):
+  (1) Dog Gone Clean to complete awesomeness in Ocala with legacy fully accommodated, (2) launch
+  The Villages ASAP, (3) lock in Dog Gone Nails in the Villages, because Jake needs it.
+  CLAUDE.md "What this repo is" updated to match ("wind down" framing corrected).
+- **Shedding-interception kernel used (2026-06-10).** The parked 2026-05-25 line is now the lead
+  of the homepage recurring section, "van" updated to "trailer"; parking-lot entry marked USED.

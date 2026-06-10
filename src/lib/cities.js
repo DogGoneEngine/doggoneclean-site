@@ -64,7 +64,7 @@ export function cityTiers(city) {
     {
       key: 'double',
       label: 'Doublecoat',
-      sub: 'The full-coat kind: thick double coats that shed without matting. German Shepherds, Australian Shepherds.',
+      sub: 'The full-coat kind: thick double coats that shed without matting. Golden Retrievers, German Shepherds, Australian Shepherds.',
       recurring: centsToDollars(city.hb_doublecoat_recurring_cents, 'hb_doublecoat_recurring_cents', slug),
       single:    centsToDollars(city.hb_doublecoat_single_cents,    'hb_doublecoat_single_cents',    slug),
       founders:  centsToDollars(city.hb_founders_doublecoat_cents,  'hb_founders_doublecoat_cents',  slug),

@@ -16,9 +16,17 @@ NOT "bath only". It is the FULL dog grooming visit for dogs that do not need hai
 Hurricane Bath, climate-controlled drying, deshedding, foot-pad hair, nail care included,
 everything except teeth brushing, no add-ons. The pivot declines slow haircut and bog-down
 dogs; it never does less for the dogs it takes. The pivot starts in Ocala, where Paul already
-works, then migrates from Ocala to the Villages as the legacy full-grooming clients wind down.
-The destination is the no-haircut book in the Villages, reached by morphing the same business,
-not by standing up a separate "new Clean". Clean
+works. The legacy full-grooming (haircut) clients are KEPT, indefinitely, for as long as they
+want service (Paul, 2026-06-10): they pay the bills today, the app and portal accommodate them
+as first-class clients, and the book shrinks only by natural attrition because it is closed to
+new haircut clients (`new_ocala_clients_are_v2_only`). The destination adds the no-haircut book
+in the Villages by morphing the same business, not by standing up a separate "new Clean".
+Priority order (Paul, 2026-06-10, target: all of it inside single-digit weeks, under a month):
+(1) bring Dog Gone Clean, the thing that pays the bills, to a level of complete awesomeness in
+Ocala, legacy haircut clients fully accommodated; (2) launch The Villages as soon as possible;
+(3) then lock in Dog Gone Nails in the Villages, because Jake needs it. The client portal is the
+main place clients live after they sign up; the marketing site exists to convert, the portal to
+serve. Clean
 is built as a fork of the proven Dog Gone Nails (DGN) platform, with its own instances and
 infrastructure, never merged with DGN. The authoritative legacy client records in `legacy/data/`
 seed the legacy doggoneclean.us rebuild when it happens.

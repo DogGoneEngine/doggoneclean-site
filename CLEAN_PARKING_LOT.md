@@ -9,6 +9,13 @@ when it becomes active.
 These gate the v2.0 online path and the Acuity/Squarespace cutover. Only Paul can do them
 (credentials, legal entity, physical-world); none are tool-accessible. Rough dependency order:
 
+0. **Maps key: add "Places API (New)" to the BROWSER key's API restrictions.** One minute in
+   Google Cloud console (project dog-gone-clean > Credentials > the browser key > API
+   restrictions: add Places API (New) to the allowed list, keep the referrer lock). Diagnosed
+   2026-06-10 with a live request: the booking funnel's address autocomplete renders but every
+   suggestion request returns 403 API_KEY_SERVICE_BLOCKED, which is why the box "just doesn't
+   work." The API is enabled on the PROJECT; the KEY still blocks it. This is the only thing
+   between the funnel and a working address gate; nothing else is queued behind it.
 1. **iPostal1 mailing address.** A real business mailing address. Feeds the Resend sender
    verification, the address drop-in on the privacy + terms pages, and the bank / Stripe / Twilio
    registrations that all want a business address. Paul is going in person (week of 2026-06-08).
@@ -435,13 +442,11 @@ visible to someone who has never seen inside.
 
 Kernels for the site copy, captured so they are not lost. Not approved and not for publish yet.
 
-- **Shedding interception (the two-week routine).** Paul's kernel, 2026-05-25, verbatim:
-  > We can't change your dog's natural shedding cycle, but by getting on a strict two-week
-  > routine, we can intercept a massive amount of that dead undercoat in our van before it ever
-  > has a chance to land on your rugs, your furniture, or your clothes.
-
-  Angle: sells the recurring two-week bath cadence as shedding control. Ties straight to the
-  bath-forward pivot and to recurring standing visits. Hold until the copy pass.
+- **Shedding interception (the two-week routine).** USED 2026-06-10: worked into the homepage
+  recurring section ("We can't change your dog's natural shedding cycle. But on a steady
+  routine, we intercept a massive amount of that dead undercoat in our trailer before it ever
+  has a chance to land on your rugs, your furniture, or your clothes."), with "van" updated to
+  "trailer". Kernel kept here for provenance (Paul, 2026-05-25).
 
 ## Portal and subscription ideas (parked, not ready to use)
 
