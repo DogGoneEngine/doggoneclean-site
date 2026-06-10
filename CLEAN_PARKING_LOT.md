@@ -813,3 +813,18 @@ batched with feature work.
 
 Explicitly NOT problems: the 16-floor taxonomy (it is the roadmap in plain sight), the
 RoadmapPanel placeholders, the agent/briefing card pattern (shared already).
+
+## Android companion app for true background GPS (parked 2026-06-10)
+
+The tracker's live location has a hard web-platform ceiling: Chrome on Android only delivers
+geolocation fixes while Orbit is on screen, so backgrounding Orbit (navigation, calls, anything)
+freezes the truck at its last fix. The tracker is honest about it (shows the fix's age, never
+guesses) and the today workarounds are split-screening Orbit beside Maps or just accepting
+last-fix staleness. The REAL fix is a small Android companion (a Capacitor/TWA wrapper around
+Orbit with a foreground location service): the OS-level service keeps fixes flowing with a
+persistent notification while a stop is on_the_way, with the same start/stop taps. Post-launch
+build, only if field staleness actually annoys clients; web push notifications for the tracker
+chimes (so a locked phone still dings at the doorbell moment) would ride in the same wrapper or
+arrive earlier via a service worker + Notification permission prompt. Neither blocks anything
+gated on Twilio: the SMS at each stage is the guaranteed channel regardless of what the open
+tab can do.

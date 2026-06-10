@@ -156,43 +156,63 @@ Deno.serve(async (req) => {
   const channels = await resolveChannels(sb, body.kind, ctx.sub.id);
   if (channels.length === 0) return json({ kind: body.kind, status: 'skipped', reason: 'all_channels_off' });
 
+  // Who actually receives this subscriber's messages right now: the client
+  // (unless an active 'instead' person covers today) plus every active
+  // 'in_addition' person (a spouse, a temporary dog sitter). One send and
+  // one dedup-keyed log row per person per channel. See notify_people /
+  // extra_notification_people.
+  const { data: recipData } = await sb.rpc('_notify_recipients', { p_subscriber_id: ctx.sub.id });
+  const people: Array<{ name: string; email: string | null; phone: string | null; source: string }> =
+    Array.isArray(recipData) && recipData.length > 0
+      ? recipData
+      : [{ name: ctx.sub.first_name ?? '', email: ctx.sub.email ?? null, phone: ctx.sub.phone_e164 ?? null, source: 'client' }];
+
   const resendKey = await secret(sb, 'resend_api_key');
   const from = (await secret(sb, 'resend_from')) || 'Dog Gone Clean <service@doggoneclean.us>';
   const results: any[] = [];
 
   for (const channel of channels) {
-    const dedup = `${body.kind}:${ctx.appt.id}:${channel}`;
+    for (const person of people) {
+      const address = channel === 'email' ? person.email : person.phone;
+      const dedup = `${body.kind}:${ctx.appt.id}:${channel}:${address ?? 'none'}`;
 
-    async function logRow(status: string, opts: Record<string, unknown> = {}) {
-      await sb.from('notification_log').insert({
-        subscriber_id: ctx!.sub.id, appointment_id: ctx!.appt.id, kind: body.kind, channel,
-        status, dedup_key: dedup, subject: rendered!.subject, ...opts,
-      });
-    }
+      async function logRow(status: string, opts: Record<string, unknown> = {}) {
+        await sb.from('notification_log').insert({
+          subscriber_id: ctx!.sub.id, appointment_id: ctx!.appt.id, kind: body.kind, channel,
+          status, dedup_key: dedup, subject: rendered!.subject, ...opts,
+        });
+      }
 
-    const { data: already } = await sb.from('notification_log')
-      .select('id').eq('dedup_key', dedup).eq('status', 'sent').maybeSingle();
-    if (already) { results.push({ channel, status: 'already_sent' }); continue; }
+      if (!address) {
+        if (person.source === 'client') {
+          await logRow('skipped', { skip_reason: 'no_recipient_on_file' });
+          results.push({ channel, status: 'skipped', reason: 'no_recipient_on_file' });
+        }
+        continue; // an extra person without this channel just does not get it
+      }
 
-    if (channel === 'sms') {
-      // Text channel is dormant until Twilio / A2P 10DLC is wired.
-      await logRow('skipped', { skip_reason: 'twilio_not_configured', recipient: ctx.sub.phone_e164 ?? null });
-      results.push({ channel, status: 'skipped', reason: 'twilio_not_configured' });
-      continue;
-    }
+      const { data: already } = await sb.from('notification_log')
+        .select('id').eq('dedup_key', dedup).eq('status', 'sent').maybeSingle();
+      if (already) { results.push({ channel, recipient: address, status: 'already_sent' }); continue; }
 
-    const recipient = ctx.sub.email;
-    if (!recipient) { await logRow('skipped', { skip_reason: 'no_recipient_on_file' }); results.push({ channel, status: 'skipped', reason: 'no_recipient_on_file' }); continue; }
-    if (!resendKey) { await logRow('skipped', { skip_reason: 'resend_not_configured', recipient }); results.push({ channel, status: 'skipped', reason: 'resend_not_configured', subject: rendered.subject, preview: rendered.text }); continue; }
+      if (channel === 'sms') {
+        // Text channel is dormant until Twilio / A2P 10DLC is wired.
+        await logRow('skipped', { skip_reason: 'twilio_not_configured', recipient: address });
+        results.push({ channel, recipient: address, status: 'skipped', reason: 'twilio_not_configured' });
+        continue;
+      }
 
-    try {
-      const r = await new Resend(resendKey).emails.send({ from, to: recipient, subject: rendered.subject, text: rendered.text, html: html(rendered.text) });
-      if ((r as any).error) { await logRow('failed', { recipient, error: JSON.stringify((r as any).error) }); results.push({ channel, status: 'failed' }); continue; }
-      await logRow('sent', { recipient, provider_id: (r as any).data?.id ?? null });
-      results.push({ channel, status: 'sent' });
-    } catch (e) {
-      await logRow('failed', { recipient, error: String(e) });
-      results.push({ channel, status: 'failed' });
+      if (!resendKey) { await logRow('skipped', { skip_reason: 'resend_not_configured', recipient: address }); results.push({ channel, recipient: address, status: 'skipped', reason: 'resend_not_configured', subject: rendered.subject, preview: rendered.text }); continue; }
+
+      try {
+        const r = await new Resend(resendKey).emails.send({ from, to: address, subject: rendered.subject, text: rendered.text, html: html(rendered.text) });
+        if ((r as any).error) { await logRow('failed', { recipient: address, error: JSON.stringify((r as any).error) }); results.push({ channel, recipient: address, status: 'failed' }); continue; }
+        await logRow('sent', { recipient: address, provider_id: (r as any).data?.id ?? null });
+        results.push({ channel, recipient: address, status: 'sent' });
+      } catch (e) {
+        await logRow('failed', { recipient: address, error: String(e) });
+        results.push({ channel, recipient: address, status: 'failed' });
+      }
     }
   }
 

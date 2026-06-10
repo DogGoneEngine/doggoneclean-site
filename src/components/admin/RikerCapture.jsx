@@ -114,6 +114,15 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                 {(plan.dog_notes || []).map((d, i) => (
                   <li key={i}>Note on {d.dog_name || 'dog'}: {d.text}</li>
                 ))}
+                {plan.notify_person && (
+                  <li>
+                    {plan.notify_person.mode === 'instead' ? 'Send the appointment messages to ' : 'Also send the appointment messages to '}
+                    <strong>{plan.notify_person.name}</strong>
+                    {plan.notify_person.phone ? ` (${plan.notify_person.phone})` : plan.notify_person.email ? ` (${plan.notify_person.email})` : ''}
+                    {plan.notify_person.mode === 'instead' ? ' instead of the client' : ''}
+                    {plan.notify_person.until ? `, until ${plan.notify_person.until}` : ''}
+                  </li>
+                )}
               </ul>
             </div>
           )}

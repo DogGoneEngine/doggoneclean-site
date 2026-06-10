@@ -749,6 +749,37 @@ on file and want them; messaging or chasing contact for someone who runs on a st
 would bother a person who never asked and add work for no gain (prime directive: earn more, grind
 less).
 
+`extra_notification_people` (messaging):
+A client's appointment messages can go to more people than the account holder: a standing
+co-recipient (a spouse who also wants the texts) or a temporary stand-in (Jane Henrich's dog
+sitter while she travels), each either IN ADDITION TO or INSTEAD OF the client, with an optional
+end date after which the person silently drops out (nobody has to remember to turn the sitter
+off). Rows live in `notify_people`; the dispatcher resolves the effective recipient set through
+`_notify_recipients` (the client unless an active instead-person covers today, plus every active
+in-addition person), so what the Clients-floor panel shows is exactly who gets the messages.
+Riker files these by voice ("Jane sent me her sitter's number, text Maria instead until July").
+When Twilio lands, the FIRST message to a new person opens with "[Client] asked us to keep you
+up to speed on [dog]'s visits" and carries opt-out: that one line is the courtesy that makes an
+unexpected text welcome AND the consent posture A2P expects; `opt_in_sent_at` tracks it. Because
+real households have two owners and real clients hand the reins to a sitter mid-trip, and the
+alternative is Paul keeping a side list in his head of who asked to be texted this month, which
+is exactly the kind of unwritten knowledge this system exists to absorb (Paul, 2026-06-10, from
+the Jane Henrich case). Pairs with `contact_omitted_is_intentional` (absence of contact stays
+deliberate) and `no_fly_list` (an excluded person is never added as a recipient).
+
+`operator_override_with_confirm` (scheduling):
+Scheduling rules bind CLIENTS hard and bind PAUL softly: where a client-facing path refuses
+outright (a slot that does not fit their constraint window, a duration that overflows a hard
+window like Mary Jane's Thursday 12 to 3), an operator-facing scheduling surface shows Paul the
+conflict and asks "are you sure?", one tap yes or no, and yes proceeds. Recorded now; takes
+effect when an Orbit booking/scheduling surface exists (today Paul books in Google Calendar,
+which the sync imports without any gate, so he already has an ungated path; this rule makes the
+future in-app path match that freedom WITH a visible heads-up instead of silently allowing).
+Because the rules encode his policies, not his physics: he holds knowledge the engine lacks (he
+knows he can get in and out of Mary Jane's window in time), and a system that hard-blocks its
+owner teaches the owner to route around it, which is worse, because the workaround leaves no
+record and the system stops reflecting reality (Paul, 2026-06-10).
+
 `villages_only_in_copy` (Hurricane Bath: copy):
 (Name kept for continuity; the rule now means served-cities-only.) The Hurricane
 Bath surface names only Clean's served cities, The Villages and Ocala, in
@@ -1110,17 +1141,26 @@ heads-up with a live progress link to their house (the home of
 `heads_up_on_the_way`); (2) progress updates flow to the client's tracker view
 as the visit advances through SIX stages (refined by Paul 2026-06-10):
 scheduled; rolling your way; we're here (the "I'm here" tap: "setting up in
-your driveway, with you shortly", auto-advancing to underway 10 minutes after
-the Arrived stamp so no extra tap is needed); underway; coming back to your
+your driveway, with you shortly"); underway, which advances when the BEFORE
+PHOTO lands on the visit, never on a timer (refined by Paul 2026-06-10 after
+the first field run: a 10-minute timer could say "in the trailer" while he is
+still talking in the client's living room, and the before photo is the one
+signal true by construction, taken in the trailer right before the work; no
+photo just means the stage waits for the next tap); coming back to your
 door (a DELIBERATELY MANUAL one-tap stage, because only Paul knows the moment
 the dogs are headed back and that is exactly when the client should watch the
 door); done. While rolling, the tracker shows a PROMINENT live drive ETA and
 the truck on a map (operator location from the Today sheet's geolocation
 watch, ETA via Google server-side, both token-scoped and broadcast only until
-arrival); status changes can chime and vibrate, gentle and short (a doorbell
-for the driveway, a bright run for the door), opt-in via one tap on the
-tracker because browsers require a gesture before sound, remembered per
-device; (3) photos taken
+arrival; honest limit: Chrome only delivers fixes while Orbit is on screen,
+so the client sees the last fix with its age, never a guess, and the true
+background fix is a small Android companion app, parked); status changes can
+chime and vibrate, gentle and short (a doorbell for the driveway, a bright
+run for the door), DEFAULT OFF and opt-in via one tap on the tracker because
+browsers require a gesture before sound, remembered per device, and a chime
+fires ONLY for a change observed live (page visible, last poll under a
+minute old): a backgrounded tab catches up silently, so nobody gets a
+doorbell an hour after the truck arrived and left; (3) photos taken
 through the visit (before, after, extras including skin or health observations
 worth flagging) attach to the visit and surface in the client's portal record
 as their dog's history; (4) after Paul drives away, a professional follow-up:
@@ -1916,8 +1956,11 @@ each visit's photo rows and the client signs them. Labeled thumbnails show on ea
 Because the photos are client property and a real part of the record Paul keeps, and the bucket must
 stay private and inside Clean's own project so the business stays sellable (`clean_stays_saleable`); the
 simplest intake that works on his Pixel (direct pick-and-upload) beats a Google Photos integration that
-would add a dependency to untangle at sale. Per-dog tagging and a Riker "add the photos?" handoff are
-later passes. Decided 2026-06-09.
+would add a dependency to untangle at sale. Per-dog tagging shipped 2026-06-10 (Paul: the upload
+assumed a one-dog household): `visit_photos.dog_id`, an "Of:" dog chip at upload for multi-dog
+clients, tap-the-label retro-tagging, and the dog's name on the Orbit, portal, and tracker photo
+labels; untagged stays legitimate (a whole-pack shot is real). The Riker "add the photos?" handoff
+is the remaining later pass. Decided 2026-06-09.
 
 `dog_standing_instructions` (Clean: clients):
 Every dog carries standing instructions: the semi-permanent "how to handle this dog every time"

@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -246,6 +246,12 @@ function ClientSheet({ clientId, onChanged }) {
       {/* Riker: say it, it gets entered (one-tap confirm) */}
       <RikerCapture clientId={clientId} clientName={c.name} onApplied={() => { load(); onChanged?.(); }} />
 
+      {/* People to notify: a spouse who also gets the appointment messages,
+          or a temporary stand-in like a dog sitter, in addition to or instead
+          of the client (extra_notification_people). Riker can add these by
+          voice; this panel is the by-hand path and the review surface. */}
+      <NotifyPeoplePanel clientId={clientId} />
+
       {/* Log a visit */}
       <LogVisitForm
         clientId={clientId}
@@ -308,7 +314,7 @@ function ClientSheet({ clientId, onChanged }) {
                     ))}
                   </div>
                 )}
-                <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} onChanged={load} />
+                <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} dogs={dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status))} onChanged={load} />
               </div>
             ))}
           </div>
@@ -1267,6 +1273,131 @@ function ClientStatusControl({ client, onChanged }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── People to notify ──────────────────────────────────────────────────────
+// Extra recipients for this client's appointment messages: a spouse who also
+// wants the texts (standing), or Jane's dog sitter while she travels
+// (temporary, with an end date), in addition to or instead of the client.
+// The reminder dispatcher reads the same rows, so what shows here is exactly
+// who gets the messages. Text sends start when Twilio lands; email rides now.
+function NotifyPeoplePanel({ clientId }) {
+  const [people, setPeople] = useState(null);
+  const [adding, setAdding] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const [form, setForm] = useState({ name: '', phone: '', email: '', relationship: '', mode: 'in_addition', until: '' });
+
+  const load = useCallback(async () => {
+    try { setPeople(await listNotifyPeople(clientId)); }
+    catch (e) { setErr(e.message || 'load_failed'); }
+  }, [clientId]);
+  useEffect(() => { load(); }, [load]);
+
+  async function save() {
+    if (!form.name.trim() || (!form.phone.trim() && !form.email.trim())) { setErr('Name plus a phone or email.'); return; }
+    setBusy(true); setErr(null);
+    try {
+      await upsertNotifyPerson({ client_id: clientId, name: form.name, phone: form.phone, email: form.email, relationship: form.relationship, mode: form.mode, until: form.until || null });
+      setForm({ name: '', phone: '', email: '', relationship: '', mode: 'in_addition', until: '' });
+      setAdding(false);
+      await load();
+    } catch (e) { setErr(e.message || 'save_failed'); }
+    finally { setBusy(false); }
+  }
+  async function toggle(p) {
+    setBusy(true); setErr(null);
+    try { await setNotifyPersonActive(p.id, !p.active); await load(); }
+    catch (e) { setErr(e.message || 'toggle_failed'); }
+    finally { setBusy(false); }
+  }
+  async function remove(p) {
+    setBusy(true); setErr(null);
+    try { await deleteNotifyPerson(p.id); await load(); }
+    catch (e) { setErr(e.message || 'delete_failed'); }
+    finally { setBusy(false); }
+  }
+
+  const lapsed = (p) => p.until_date && new Date(p.until_date + 'T23:59:59') < new Date();
+  const inputStyle = { fontSize: 13, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' };
+
+  if (people === null && !err) return null;
+  if ((people || []).length === 0 && !adding) {
+    return (
+      <div className="ad-panel">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>People to notify</div>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(true)}>+ Add a person</button>
+        </div>
+        <div style={{ fontSize: 12, opacity: 0.55, marginTop: 4 }}>
+          Appointment messages go to the client. Add a spouse who also wants them, or a temporary stand-in like a dog sitter.
+        </div>
+        {err && <div className="ad-error" style={{ marginTop: 6 }}>{err}</div>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="ad-panel">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>People to notify</div>
+        {!adding && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(true)}>+ Add a person</button>}
+      </div>
+
+      {(people || []).map((p) => (
+        <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', borderBottom: '1px solid var(--ad-outline, #ececf1)', flexWrap: 'wrap' }}>
+          <span style={{ flex: 1, minWidth: 160, fontSize: 14, opacity: p.active && !lapsed(p) ? 1 : 0.45 }}>
+            <strong>{p.name}</strong>
+            {p.relationship ? <span style={{ opacity: 0.6 }}> ({p.relationship})</span> : null}
+            <span style={{ display: 'block', fontSize: 12, opacity: 0.65 }}>
+              {[p.phone_e164, p.email].filter(Boolean).join(' · ')}
+              {' · '}{p.mode === 'instead' ? 'instead of the client' : 'in addition'}
+              {p.until_date ? ` · until ${p.until_date}${lapsed(p) ? ' (ended)' : ''}` : ''}
+              {!p.active ? ' · off' : ''}
+            </span>
+          </span>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => toggle(p)}>
+            {p.active ? 'Turn off' : 'Turn on'}
+          </button>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => remove(p)} title="remove entirely">x</button>
+        </div>
+      ))}
+
+      {adding && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <input style={{ ...inputStyle, flex: 1, minWidth: 140 }} placeholder="Name" value={form.name} disabled={busy}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+            <input style={{ ...inputStyle, flex: 1, minWidth: 120 }} placeholder="Relationship (spouse, dog sitter)" value={form.relationship} disabled={busy}
+              onChange={(e) => setForm((f) => ({ ...f, relationship: e.target.value }))} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <input style={{ ...inputStyle, flex: 1, minWidth: 140 }} type="tel" placeholder="Phone (+1...)" value={form.phone} disabled={busy}
+              onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
+            <input style={{ ...inputStyle, flex: 1, minWidth: 160 }} type="email" placeholder="Email" value={form.email} disabled={busy}
+              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <select style={inputStyle} value={form.mode} disabled={busy} onChange={(e) => setForm((f) => ({ ...f, mode: e.target.value }))}>
+              <option value="in_addition">In addition to the client</option>
+              <option value="instead">Instead of the client</option>
+            </select>
+            <label style={{ fontSize: 12, opacity: 0.6, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              until
+              <input style={inputStyle} type="date" value={form.until} disabled={busy}
+                onChange={(e) => setForm((f) => ({ ...f, until: e.target.value }))} />
+              <span style={{ opacity: 0.7 }}>(blank = standing)</span>
+            </label>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? '...' : 'Save'}</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setAdding(false); setErr(null); }} disabled={busy}>Cancel</button>
+          </div>
+        </div>
+      )}
+      {err && <div className="ad-error" style={{ marginTop: 6 }}>{err}</div>}
     </div>
   );
 }

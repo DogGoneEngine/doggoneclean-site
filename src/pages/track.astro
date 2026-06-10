@@ -568,6 +568,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   // ── The status loop ────────────────────────────────────────────────────
   let prevStage: string | null = null;
+  let lastPollAt = 0;
 
   async function refresh() {
     if (!token) { missingEl.hidden = false; titleEl.textContent = 'No visit on this link.'; return; }
@@ -614,9 +615,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       blockEl.textContent = '';
     }
 
-    if (prevStage !== null && prevStage !== stage) announce(stage);
+    // Chime only for a change observed LIVE: the page visible and the last
+    // poll recent. A backgrounded tab catches up silently, so nobody gets a
+    // doorbell an hour after the truck arrived (and left).
+    const live = !document.hidden && lastPollAt > 0 && Date.now() - lastPollAt < 60000;
+    if (prevStage !== null && prevStage !== stage && live) announce(stage);
     if (prevStage !== stage) scheduleEta(stage);
     prevStage = stage;
+    lastPollAt = Date.now();
   }
 
   // Photos Paul shared from this visit, via the tracker-photos edge function
@@ -638,7 +644,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       const data = await r.json();
       const photos = (data && data.photos) || [];
       if (photos.length === 0) return;
-      photosGrid.replaceChildren(...photos.map((p: { id: string; kind: string; url: string }) => {
+      photosGrid.replaceChildren(...photos.map((p: { id: string; kind: string; url: string; dog_name?: string }) => {
         const a = document.createElement('a');
         a.href = p.url;
         a.target = '_blank';
@@ -648,7 +654,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         img.loading = 'lazy';
         img.alt = PHOTO_LABELS[p.kind] || 'Visit photo';
         const label = document.createElement('span');
-        label.textContent = PHOTO_LABELS[p.kind] || 'Photo';
+        label.textContent = (PHOTO_LABELS[p.kind] || 'Photo') + (p.dog_name ? `, ${p.dog_name}` : '');
         a.append(img, label);
         return a;
       }));
@@ -662,6 +668,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const fast = prevStage === 'on_the_way' || prevStage === 'arrived' || prevStage === 'underway' || prevStage === 'returning';
     setTimeout(async () => { await refresh(); statusLoop(); }, fast ? 15000 : 45000);
   }
+
+  // Coming back to the tab resyncs immediately (and silently, via the
+  // freshness guard above).
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refresh();
+  });
 
   refresh().then(statusLoop);
   refreshPhotos();

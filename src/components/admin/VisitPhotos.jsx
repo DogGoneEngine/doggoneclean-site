@@ -6,16 +6,20 @@
 // no capture, so the gallery is offered, not just the camera. See visit_photos_capture.
 
 import { useState, useEffect, useCallback } from 'react';
-import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility } from './supabase.js';
+import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoDog } from './supabase.js';
 
 const KIND_LABEL = { before: 'Before', after: 'After', with_dog: 'With dog', extra: 'Extra' };
 const SLOTS = [['before', 'Before'], ['after', 'After'], ['with_dog', 'With dog']];
 
-export default function VisitPhotos({ visitId, clientId, photos = [], onChanged }) {
+export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [], onChanged }) {
   const [urls, setUrls] = useState({});
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  // Which dog the next uploads are of. Only surfaces for multi-dog
+  // households; null means untagged (a whole-pack or scene shot is real).
+  const [tagDog, setTagDog] = useState(null);
+  const multiDog = (dogs || []).length > 1;
 
   useEffect(() => {
     let alive = true;
@@ -32,11 +36,28 @@ export default function VisitPhotos({ visitId, clientId, photos = [], onChanged 
     if (!files || !files.length) return;
     setBusy(true); setError(null);
     try {
-      for (const f of Array.from(files)) await uploadVisitPhoto(visitId, clientId, kind, f);
+      for (const f of Array.from(files)) await uploadVisitPhoto(visitId, clientId, kind, f, tagDog);
       onChanged?.();
     } catch (e) { setError(e.message || 'upload_failed'); }
     finally { setBusy(false); }
-  }, [visitId, clientId, onChanged]);
+  }, [visitId, clientId, tagDog, onChanged]);
+
+  // Tap the label to cycle which dog a photo shows: none -> dog 1 -> dog 2
+  // -> ... -> none. Cheap retro-tagging that fits a 64px thumbnail.
+  async function cycleDog(p) {
+    if (!multiDog && (dogs || []).length === 0) return;
+    const ids = (dogs || []).map((d) => d.id);
+    const at = p.dog_id ? ids.indexOf(p.dog_id) : -1;
+    const next = at + 1 >= ids.length ? null : ids[at + 1];
+    setBusy(true); setError(null);
+    try { await setPhotoDog(p.id, next); onChanged?.(); }
+    catch (e) { setError(e.message || 'tag_failed'); }
+    finally { setBusy(false); }
+  }
+  function photoLabel(p) {
+    const kind = KIND_LABEL[p.kind] || 'Photo';
+    return p.dog_name ? `${kind} \u00b7 ${p.dog_name}` : kind;
+  }
 
   async function remove(p) {
     setBusy(true); setError(null);
@@ -73,7 +94,11 @@ export default function VisitPhotos({ visitId, clientId, photos = [], onChanged 
                       : <span style={{ fontSize: 10, opacity: 0.5 }}>…</span>}
                   </div>
                 </a>
-                <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, fontSize: 9, textAlign: 'center', background: 'rgba(0,0,0,0.55)', color: '#fff', borderRadius: '0 0 8px 8px' }}>{KIND_LABEL[p.kind]}</span>
+                <span
+                  onClick={(dogs || []).length > 0 ? () => cycleDog(p) : undefined}
+                  title={(dogs || []).length > 0 ? 'tap to tag which dog this is' : undefined}
+                  style={{ position: 'absolute', bottom: 0, left: 0, right: 0, fontSize: 9, textAlign: 'center', background: 'rgba(0,0,0,0.55)', color: '#fff', borderRadius: '0 0 8px 8px', cursor: (dogs || []).length > 0 ? 'pointer' : 'default' }}
+                >{photoLabel(p)}</span>
                 <button onClick={() => remove(p)} disabled={busy} title="remove" style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', border: 'none', background: '#dc2626', color: '#fff', fontSize: 11, cursor: 'pointer', lineHeight: 1 }}>×</button>
               </div>
               <button
@@ -89,6 +114,24 @@ export default function VisitPhotos({ visitId, clientId, photos = [], onChanged 
       )}
       {open ? (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          {multiDog && (
+            <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, opacity: 0.55 }}>Of:</span>
+              {[{ id: null, name: 'Pack' }, ...dogs].map((d) => (
+                <button
+                  key={d.id || 'all'}
+                  onClick={() => setTagDog(d.id)}
+                  disabled={busy}
+                  style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 999, cursor: 'pointer',
+                    border: '1px solid', borderColor: tagDog === d.id ? 'var(--ad-accent, #2563d8)' : 'var(--ad-outline, #d5d5dd)',
+                    background: tagDog === d.id ? 'var(--ad-accent, #2563d8)' : 'transparent',
+                    color: tagDog === d.id ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}
+                >
+                  {d.name}
+                </button>
+              ))}
+            </span>
+          )}
           {SLOTS.map(([kind, label]) => (
             <label key={kind} className="ad-btn ad-btn--ghost ad-btn--sm" style={{ cursor: 'pointer' }}>
               + {label}

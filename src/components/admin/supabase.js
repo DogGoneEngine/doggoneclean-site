@@ -97,13 +97,39 @@ export async function getClient(clientId) {
 // Visit photos: upload straight from the phone (the Android picker reaches Google
 // Photos), into the private visit-photos bucket, viewed via short-lived signed URLs.
 const PHOTO_BUCKET = 'visit-photos';
-export async function uploadVisitPhoto(visitId, clientId, kind, file) {
+export async function uploadVisitPhoto(visitId, clientId, kind, file, dogId = null) {
   const ext = (file.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
   const path = `${clientId}/${visitId}/${kind}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
   const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, file, { contentType: file.type || 'image/jpeg', upsert: false });
   if (error) throw new Error(error.message);
-  await rpc('admin_add_visit_photo', { p_visit_id: visitId, p_kind: kind, p_path: path });
+  await rpc('admin_add_visit_photo', { p_visit_id: visitId, p_kind: kind, p_path: path, p_dog_id: dogId });
   return path;
+}
+// Tag (or untag) which dog a photo shows; multi-dog households are the norm.
+export async function setPhotoDog(photoId, dogId) {
+  return rpc('admin_set_photo_dog', { p_id: photoId, p_dog_id: dogId });
+}
+
+// People to notify (extra_notification_people): a spouse who also gets the
+// appointment messages, or a temporary stand-in like a dog sitter, in
+// addition to or instead of the client, optionally until a date.
+export async function listNotifyPeople(clientId) {
+  const data = await rpc('admin_list_notify_people', { p_client_id: clientId });
+  return Array.isArray(data) ? data : [];
+}
+export async function upsertNotifyPerson(p) {
+  return rpc('admin_upsert_notify_person', {
+    p_id: p.id || null, p_client_id: p.client_id, p_name: p.name,
+    p_phone: p.phone || null, p_email: p.email || null,
+    p_relationship: p.relationship || null, p_mode: p.mode || 'in_addition',
+    p_until: p.until || null,
+  });
+}
+export async function setNotifyPersonActive(id, active) {
+  return rpc('admin_set_notify_person_active', { p_id: id, p_active: active });
+}
+export async function deleteNotifyPerson(id) {
+  return rpc('admin_delete_notify_person', { p_id: id });
 }
 export async function signedPhotoUrl(path, expirySeconds = 3600) {
   const { data, error } = await sb().storage.from(PHOTO_BUCKET).createSignedUrl(path, expirySeconds);

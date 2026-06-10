@@ -561,7 +561,7 @@ function VisitPhotosSection({ city }) {
                   style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, display: 'block' }}
                 />
                 <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, fontSize: 10, textAlign: 'center', background: 'rgba(12,19,34,0.55)', color: '#fff', borderRadius: '0 0 10px 10px', padding: '1px 0' }}>
-                  {PHOTO_KIND_LABEL[p.kind] || 'Photo'}
+                  {(PHOTO_KIND_LABEL[p.kind] || 'Photo') + (p.dog_name ? `, ${p.dog_name}` : '')}
                 </span>
               </a>
             ))}

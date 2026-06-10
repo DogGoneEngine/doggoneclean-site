@@ -2804,3 +2804,23 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   _capacity_* service_role-only, _is_admin keeps the 0142 invoker exception. Lesson in the
   Oracle: verify a lockdown with pg_default_acl + has_function_privilege, never with the
   migration text.
+- **Tracker field feedback round two, same day (Paul, 2026-06-10; migration 0148 + riker v3 +
+  send-notification v7 + tracker-photos v4).** Michelle got the first real tracker link and it
+  held up. Fixes and growth from the field: (1) underway now advances on the BEFORE PHOTO, not
+  a 10-minute timer (Paul could still be in the living room at minute ten; the before photo is
+  taken in the trailer by construction); (2) chimes confirmed default-off and now fire only on
+  changes observed live (page visible, fresh poll), so a backgrounded tab catches up silently
+  instead of door-belling an hour late; the guaranteed channel for locked phones is the Twilio
+  SMS per stage when it lands; (3) background GPS named honestly as a web-platform ceiling:
+  tracker shows fix age, split-screen Orbit+Maps is the today workaround, and the Android
+  companion app (foreground location service) is parked as the real fix; (4) notify_people
+  shipped (extra_notification_people): spouse co-recipients and temporary stand-ins like Jane
+  Henrich's dog sitter, in addition or instead, with self-expiring end dates, a Clients-floor
+  panel, dispatcher fan-out with per-address dedup, and Riker taking it by voice; the
+  first-text intro line ("Jane asked us to keep you up to speed") rides with Twilio; (5)
+  per-dog photo tagging shipped (the upload had silently assumed one dog): dog chip at upload,
+  tap-the-label retro-tag, dog names on every photo surface; (6) operator_override_with_confirm
+  locked: rules bind clients hard and Paul softly (are-you-sure, not a wall), landing with the
+  future Orbit booking surface, because a blocked owner routes around the system and that
+  workaround leaves no record. Mary Jane's 220-minute capacity flag acknowledged by Paul as
+  correct; he is refining her cycle time for the window.
