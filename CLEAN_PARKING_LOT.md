@@ -257,9 +257,13 @@ survive a reset:
   doggonenails-site/src/components/portal/.
 - **Anchor-growth decision still open:** do new bath clients become anchors (toggleable) or stay
   pinned to the legacy seed set? Recommended the former; build on Paul's call.
-- **Lisa Prater per-visit override.** Her visit_minutes (11) is nails-weighted; her record is
-  bimodal (full grooms 45-59 min at $75, nails 5-11 min at $30, per Time is Money). Mixed
-  groom/nails clients need a per-visit service type and duration, not one blended block.
+- ~~**Lisa Prater per-visit override.**~~ RESOLVED 2026-06-10 (migration 0139). New per-service
+  override columns `clients.visit_minutes_groom` / `visit_minutes_nails` sit on top of the
+  blended `visit_minutes`; `clean_effective_duration_minutes` gained a service-aware form
+  (per-service history -> blended history -> coat-tier default, floored by the city minimum)
+  and `bath_reschedule_appointment` passes the appointment's own service type. Lisa seeded
+  groom 52 / nails 11 from her Time is Money record; verified live (groom books 52, nails
+  floors to 30). Any future mixed client is two column values away from correct booking.
 - ~~**The 5 added one-off names.**~~ RESOLVED 2026-06-10 (migration 0138) from Paul's account +
   his Google Calendar booking forms (no contact sheets exist for these; Abreu confirmed sheetless
   by Drive search). All five: service_type full_groom, addresses + contacts verified. Dogs: Shane

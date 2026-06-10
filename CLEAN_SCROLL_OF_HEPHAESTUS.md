@@ -2678,3 +2678,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   honest gaps (real_data_only): each record carries a breed-based "(name unknown)" label and a
   note saying so. No cadences on purpose: one-offs by nature. Keyed by name as a replayable
   migration (client_dispositions_are_migrations); read back from the DB and verified.
+- **Lelo named (Paul, 2026-06-10, migration 0139).** Edely Abreu's American Staffordshire
+  Terrier is Lelo; the placeholder record from 0138 updated and the client note corrected.
+  Two name gaps remain (Posner's Boxer, Mallory's three).
+- **The Lisa Prater override: per-service durations shipped (2026-06-10, migration 0139).**
+  schedule_by_client_history always said grooms and nails split where a client gets both; the
+  engine now does it. New `clients.visit_minutes_groom` / `visit_minutes_nails` override the
+  blended `visit_minutes`; `clean_effective_duration_minutes` gained a service-aware form
+  (per-service history -> blended -> coat-tier default, floored by the city minimum; the 1-arg
+  form delegates so existing callers keep working) and `bath_reschedule_appointment` now passes
+  the appointment's own service_type. Lisa seeded straight from Time is Money: groom 52 (median
+  of her two recorded grooms, 45 and 59) and nails 11 (her nails-weighted median). Verified
+  live against her real subscriber: a full-groom books 52 minutes, nails floors to the 30-minute
+  minimum stop; before this a Prater groom would have booked at 30. Grants explicit per
+  rpc_grants_explicit. Any future mixed groom/nails client is two column values away from
+  booking correctly.
