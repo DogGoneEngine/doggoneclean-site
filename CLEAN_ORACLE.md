@@ -602,18 +602,23 @@ In the booking funnel the breed list is the authority, per dog: each dog card
 carries a breed dropdown (`src/components/portal/breeds.js`), and picking a
 listed breed SETS that dog's coat tier itself, shown as a locked confirmation
 ("A Golden Retriever books as Doublecoat"), never offered as a choice the
-client can downgrade. Picking an excluded breed (the
-`excluded_breeds_are_slide_holes` set, mirrored exactly in the list) shows the
-kind decline the moment it is picked. Mixed breeds pick "Mixed breed" and
-answer the resemblance question (which coat does their mix most resemble,
-described by real coat traits with example breeds) plus an optional what's-in-
-the-mix note; rare breeds use "Other / not listed" with free text, still gated
-by the exclusion check here and server-side. Because a household can have one
-smoothcoat and one doublecoat dog (the tier was always per dog and stays so),
-because "is your dog the easy kind?" invites honest confusion and dishonest
-discounts, and because a Siberian Husky owner rushing the form should learn at
-the breed pick, kindly, that we are not built for that coat, not slip through
-by clicking the cheaper card. Paul, 2026-06-11.
+client can downgrade. The dropdown leads with the breeds common around here
+(Labs, Goldens, doodles, Shepherds, Cavaliers, the small companions) and puts
+everything else under "All breeds A to Z", so the common case never scrolls
+past ninety rare breeds; "Mixed breed" and "Other / not listed" make the list
+effectively all-inclusive without being two hundred rows long. The tier is
+about the WORK, not the textbook (Paul, 2026-06-11): a Labrador is technically
+double-coated but grooms like a smoothcoat, so it books smoothcoat. Picking an
+excluded breed shows the kind decline, with the reason named, the moment it is
+picked. Mixed breeds answer the resemblance question (which coat does their
+mix most resemble, described by real coat traits with example breeds) plus an
+optional what's-in-the-mix note; rare breeds use "Other / not listed" with
+free text, still gated by the exclusion check here and server-side. Because a
+household can have one smoothcoat and one doublecoat dog (the tier was always
+per dog and stays so), because "is your dog the easy kind?" invites honest
+confusion and dishonest discounts, and because a Siberian Husky owner rushing
+the form should learn at the breed pick, kindly, that we are not built for
+that coat, not slip through by clicking the cheaper card.
 
 `excluded_breeds_are_slide_holes` (product):
 The funnel is a slide with person-shaped holes: right-fit visitors are pulled
@@ -631,7 +636,18 @@ client-side as an early graceful decline in the funnel. Because one 2-to-3-hour
 dog ruins a route day and the pivot's economics (`favor_high_hourly_work`,
 `no_doodles`), the exclusions also shape what a future hire has to handle (a
 unicorn job needs a curated book), and a graceful early no preserves goodwill
-where a doorstep no destroys it. Paul, 2026-06-10.
+where a doorstep no destroys it. Paul, 2026-06-10. Extended 2026-06-11 (Paul):
+the "any coat or size that bogs the day down" catch-all is now spelled out as
+three named families, each with its own kind decline: haircut-level coats
+(doodles and poodles, Shih Tzus, Yorkies, Maltese, Bichons, Schnauzers,
+Cockers, Pomeranians and friends; dogs that need haircut-type grooming are not
+a fit for a quick-bath business), excessive double coats (Siberian Husky,
+Alaskan Malamute, Samoyed, Chow Chow, Akita, Keeshond, Great Pyrenees), and
+excessively large dogs (Great Dane, Saint Bernard, Newfoundland, Mastiffs,
+Irish Wolfhound, Leonberger, Anatolian, Bernese; the business gets in and
+out). The shared teeth live in `_breed_excluded()` (0158), used by
+`bath_start_subscription`, mirrored in the funnel's breed list and free-text
+regex. Legacy grandfathering unchanged.
 
 `villages_only_at_launch` (product):
 Hurricane Bath's service area at launch is The Villages, FL, with the address

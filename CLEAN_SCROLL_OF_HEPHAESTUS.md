@@ -3018,3 +3018,25 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   what changed is who decides it. Paul reviews the tier-per-breed calls in the data file.
 - **Riker's inline card removed from Today**: the + button is the one gateway; the client
   sheet keeps its fixed-client box.
+
+### Batch ten: the breed list grows up (workload tiers, three exclusion families, common-first)
+
+- **Tiers re-cut by WORK, not textbook** (Paul): a Lab is technically double-coated but grooms
+  like a smoothcoat, so it books smoothcoat. The tier question is "how much work is this
+  coat", recorded in breed_pick_sets_tier.
+- **Exclusions spelled out as three families with their own kind declines**
+  (excluded_breeds_are_slide_holes extended; migration 0158): haircut-level coats (doodles,
+  poodles, Shih Tzus, Yorkies, Maltese, Bichons, Schnauzers, Cockers, and Pomeranian per
+  Paul's call: a haircut-type dog, not a quick-bath fit), excessive double coats (Husky,
+  Malamute, Samoyed, Chow, Akita, Keeshond, Pyrenees), excessively large dogs (Dane, Saint
+  Bernard, Newfoundland, Mastiffs, Wolfhound, Leonberger, Anatolian, Bernese). Shared teeth:
+  `_breed_excluded()` used by bath_start_subscription with reason-named messages, mirrored in
+  the funnel list and free-text regex. Verified live across 26 test breeds: every exclusion
+  classifies with the right reason; Lab/Golden/Boxer/Rottweiler/Corso/mixes pass.
+- **Common-around-here first**: the dropdown leads with ~16 area-common breeds (Labs, Goldens,
+  doodles so they decline early, Shepherds, Cavaliers, the small companions), then "All breeds
+  A to Z" (~85 more), then Mixed and Other catch everyone else, so the list reads
+  all-inclusive without 200 rows of scrolling.
+- Also in 0158: bath_start_subscription's sms_opt_in insert default flipped to false
+  (sms_consent_unchecked now holds server-side too). The "Tell us about Cooper" name
+  personalization Paul liked from Nails was already in this funnel, confirmed.

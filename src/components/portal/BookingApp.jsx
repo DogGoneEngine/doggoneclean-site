@@ -29,7 +29,7 @@ import {
   signInWithGoogle, toE164US, looksLikeEmail, lookupSubscriberByPhone,
 } from './supabase.js';
 import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds, lastMapsError } from './maps.js';
-import { BREEDS, TIER_LABEL, breedByName } from './breeds.js';
+import { COMMON_BREEDS, OTHER_BREEDS, TIER_LABEL, DECLINE_COPY, breedByName } from './breeds.js';
 
 const CITY_SLUG = 'the-villages';
 const STORE_KEY = 'dgc_booking_v2';
@@ -115,11 +115,12 @@ function buildRecurringPreview(slotISO, cadence, count) {
   return out;
 }
 
-// excluded_breeds_are_slide_holes: the hard breed exclusions, declined kindly
-// and early (here) and rejected server-side in bath_start_subscription (the
-// durable teeth). Doodles and poodle crosses, Siberian Huskies, Great
-// Pyrenees, Great Danes: coats and sizes that need hours, not a route stop.
-const EXCLUDED_BREED_RE = /(doodle|poodle|husky|huskies|pyrenees|great\s*dane)/i;
+// excluded_breeds_are_slide_holes + Paul's 2026-06-11 extension: haircut-level
+// coats, excessive double coats, and excessively large dogs, declined kindly
+// and early (here) and rejected server-side in bath_start_subscription via
+// _breed_excluded (the durable teeth). This regex is the net for the
+// free-text "Other" path; the breed list declines listed breeds by name.
+const EXCLUDED_BREED_RE = /(doodle|poodle|[a-z]+poo\b|shih\s*tzu|yorkie|yorkshire|maltese|bichon|havanese|lhasa|schnauzer|wheaten|west\s*highland|westie|scottish\s*terrier|scottie|cocker|pekingese|old\s*english\s*sheepdog|portuguese\s*water|bouvier|airedale|pomeranian|morkie|shorkie|cavachon|shichon|coton|husky|huskies|malamute|samoyed|chow|keeshond|akita|pyrenees|great\s*dane|saint\s*bernard|st\.?\s*bernard|newfoundland|mastiff|wolfhound|leonberger|anatolian)/i;
 function breedNotAFit(breed) {
   return EXCLUDED_BREED_RE.test(breed || '');
 }
@@ -584,10 +585,13 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 
 function DogCard({ idx, dog, showNumber, onChange }) {
   const age = computeDogAge(dog.dobMonth, dog.dobDay, dog.dobYear);
-  const notAFit = breedNotAFit(dog.breed);
   // Sessions saved before the breed list existed carry a typed breed with no
   // pick; show them as "Other / not listed" so their text stays visible.
   const pick = dog.breedPick || (dog.breed ? 'other' : '');
+  const pickedEntry = pick && pick !== 'mixed' && pick !== 'other' ? breedByName(pick) : null;
+  const notAFit = (pickedEntry && pickedEntry.tier === 'excluded') || breedNotAFit(dog.breed);
+  const declineCopy = (pickedEntry && DECLINE_COPY[pickedEntry.reason])
+    || 'We have to be honest up front: we are not built for this one. Coats that need haircut-level work, excessive double coats (Huskies, Chows), and the gentle giants (Danes, Saint Bernards, Newfoundlands) all need more than a mobile route stop can give. A full-service dog grooming salon is the right home, and we would rather tell you here, kindly, than at your door.';
   return (
     <div className="bk-dog">
       <div className="bk-dog__head">
@@ -617,9 +621,16 @@ function DogCard({ idx, dog, showNumber, onChange }) {
         }}>
           <option value="">Pick their breed…</option>
           <option value="mixed">Mixed breed</option>
-          {[...BREEDS].sort((a, b) => a.name.localeCompare(b.name)).map((b) => (
-            <option key={b.name} value={b.name}>{b.name}</option>
-          ))}
+          <optgroup label="Common around here">
+            {COMMON_BREEDS.map((b) => (
+              <option key={b.name} value={b.name}>{b.name}</option>
+            ))}
+          </optgroup>
+          <optgroup label="All breeds A to Z">
+            {OTHER_BREEDS.map((b) => (
+              <option key={b.name} value={b.name}>{b.name}</option>
+            ))}
+          </optgroup>
           <option value="other">Other / not listed</option>
         </select>
       </Field>
@@ -639,10 +650,7 @@ function DogCard({ idx, dog, showNumber, onChange }) {
 
       {notAFit && (
         <div className="bk-area bk-area--out">
-          <span className="bk-area__icon">!</span> We have to be honest up front: we are not built for this one.
-          Doodles and poodle crosses, Siberian Huskies, Great Pyrenees, and Great Danes need haircut-level
-          coat work or more hours than a mobile route can give one stop. A full-service dog grooming salon
-          is the right home for that coat, and we would rather tell you here, kindly, than at your door.
+          <span className="bk-area__icon">!</span> {declineCopy}
         </div>
       )}
 
