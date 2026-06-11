@@ -6,7 +6,7 @@
 // the clients carrying the most weight.
 
 import { useCallback, useEffect, useState } from 'react';
-import { financeSummary } from './supabase.js';
+import { financeSummary, businessValue } from './supabase.js';
 import RecurringCosts from './RecurringCosts.jsx';
 import BankImport from './BankImport.jsx';
 import ExpensesLedger from './ExpensesLedger.jsx';
@@ -37,6 +37,8 @@ export default function FinanceView() {
     <>
       <h1>Finance</h1>
       <p className="ad-sub">The money, from the books. Revenue per hour is the number you run on.</p>
+
+      <ValuePanel />
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {[30, 90, 365].map((d) => (
@@ -168,4 +170,39 @@ function Stat({ label, value, sub, tone = 'flat', big }) {
 }
 function Cap({ children }) {
   return <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>{children}</div>;
+}
+
+
+// The what-would-it-sell-for gauge (business_value_in_sight): the big-picture
+// number that stays in sight through the daily hustle. Not because Paul plans
+// to sell, but because a business someone would want to buy is a business
+// that is going well, and the inputs (recurring share, growth, costs) are the
+// health gauges themselves. The math lives in admin_business_value (0159) so
+// the assumptions are in one reviewable place.
+function ValuePanel() {
+  const [v, setV] = useState(null);
+  const [err, setErr] = useState(null);
+  useEffect(() => {
+    businessValue().then(setV).catch((e) => setErr(e.message || 'value_failed'));
+  }, []);
+  const k = (c) => '$' + Math.round((c || 0) / 100).toLocaleString('en-US');
+  if (err) return null;
+  if (!v) return <div className="ad-panel" style={{ marginBottom: 16 }}>Sizing up the business…</div>;
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16, borderLeft: '4px solid var(--ad-primary, #2563d8)' }}>
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>What the business is worth</div>
+      <div style={{ fontSize: 34, fontWeight: 800, margin: '4px 0 2px' }}>
+        {k(v.value_low_cents)} <span style={{ opacity: 0.45, fontWeight: 400 }}>to</span> {k(v.value_high_cents)}
+      </div>
+      <div style={{ fontSize: 13, opacity: 0.75, lineHeight: 1.5 }}>
+        {v.method === 'sde'
+          ? <>Earnings method: {k(v.base_cents)} of yearly earnings after costs, at {v.low_multiple} to {v.high_multiple} times (the going range for an owner-run route business).</>
+          : <>Revenue method: {k(v.ttm_revenue_cents)} collected in the last 12 months, at {v.low_multiple} to {v.high_multiple} times yearly revenue. Switches to the more accurate earnings method automatically once the expense ledger fills in.</>}
+      </div>
+      <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 13, marginTop: 8 }}>
+        <span><strong>{v.recurring_share_pct}%</strong> <span style={{ opacity: 0.6 }}>recurring revenue (this is the moat a buyer pays for)</span></span>
+        {v.growth_pct != null && <span><strong>{v.growth_pct >= 0 ? '+' : ''}{v.growth_pct}%</strong> <span style={{ opacity: 0.6 }}>vs the year before</span></span>}
+      </div>
+    </div>
+  );
 }

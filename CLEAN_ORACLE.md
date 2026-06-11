@@ -1867,6 +1867,31 @@ preview-first happens per surface on Paul's word, not on a date. Because
 recklessness is free before launch and expensive after it, and Paul wants to
 see a change with his own eyes before clients do.
 
+`one_visit_per_day_per_client` (Clean: clients):
+A client has ONE visit record per Eastern day, no matter how many paths feed
+it: the stop flow's arrival stamps create it, and anything Paul tells Riker
+about that day MERGES into it (filling empty fields, appending notes, adding
+scores) instead of inserting a second row. Bare dates are interpreted at noon
+Eastern, never midnight UTC, so a backdated visit can never display as the
+previous evening. Because the duplicate-visit glitch (Eric Shannon, found
+live 2026-06-11) came from two writers each making their own row, and a
+doubled visit corrupts everything downstream: cycle medians, adaptive blocks,
+revenue, and the suggestion engine's due dates.
+
+`business_value_in_sight` (Clean: finance):
+The Finance floor leads with a continuously updated what-would-it-sell-for
+range (`admin_business_value`). While the expense ledger is thin it uses an
+annual-revenue multiple adjusted by what we genuinely measure (recurring
+revenue share, year-over-year growth); the moment recorded business costs
+reach 5% of revenue it switches automatically to seller's discretionary
+earnings times the standard 2.0 to 2.8 owner-operated route multiple, same
+adjustments. All inputs and multiples display so the number shows its work,
+and every assumption lives in one migration for Paul to retune. Because Paul
+wants the big picture in sight through the daily hustle: he does not plan to
+sell, but a business valuable enough that someone would want to buy it is the
+truest single gauge that everything is going well, and it keeps
+clean_stays_saleable honest.
+
 `reminders_one_gateway` (Clean: operations):
 A time-based commitment ("contact her in 2 weeks", "follow up after the
 holidays") goes in through Riker like everything else and lands in `reminders`

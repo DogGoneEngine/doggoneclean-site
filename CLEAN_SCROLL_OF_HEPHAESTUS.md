@@ -3092,3 +3092,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   comp note; nothing special-cased in the engine. First appointment booked for TODAY 6:00 to
   7:30 pm ET (operator override), both dogs assigned, tracker verified returning Iroh and
   Nala. Emily Walker's appointment left sitting pending her new date, per Paul.
+
+### Batch ten: duplicate visits root-caused, the sheet reshaped for mid-appointment use, the business gets a price tag (Jun 11 night; migration 0159)
+
+- **Duplicate visits, root-caused and fixed** (`one_visit_per_day_per_client`): two writers
+  each made their own row (the stop flow's arrival stamps create the visit; Riker then
+  INSERTed another), and Riker's bare-date backdating cast to midnight UTC, which IS the
+  previous evening Eastern (Eric's "June 10" row). Riker now MERGES into the same-day visit
+  (filling fields, appending notes, upserting scores) and bare dates parse at noon Eastern.
+  Eric repaired: one June 11 visit, $100 cash, Kiera and Rebel both 5s. The ack now says
+  "added to today's visit record (no duplicate)".
+- **Client sheet reshaped for the driveway**: today's visit pins to the very top (green bar)
+  with photos and notes right there, Riker rides directly under it, and the visit rejoins
+  history automatically once the day passes. No more scrolling laps mid-appointment.
+- **The business has a price tag** (`business_value_in_sight`): Finance now leads with a live
+  what-would-it-sell-for range from admin_business_value. Verified live on real data:
+  $46,600 to $73,600 (revenue method: $68,306 TTM collected, 91% recurring share, +0.5%
+  growth, multiples 0.68 to 1.08). Switches itself to the SDE method when the expense ledger
+  reaches 5% of revenue. Inputs display so the number shows its work.

@@ -18,7 +18,8 @@ function money(c) { return c == null ? null : '$' + (c / 100).toFixed(2).replace
 export function describeApplied(res) {
   const n = (x) => Number(x || 0);
   const bits = [];
-  if (res.visit_id) bits.push('visit logged');
+  if (res.visit_merged) bits.push("added to today's visit record (no duplicate)");
+  else if (res.visit_id) bits.push('visit logged');
   if (res.visit_corrected) bits.push('the existing visit record corrected');
   if (n(res.scores_applied) > 0) bits.push(`${n(res.scores_applied)} vibe score${n(res.scores_applied) === 1 ? '' : 's'} saved`);
   if (n(res.dogs_added) > 0) bits.push(`${n(res.dogs_added)} dog card${n(res.dogs_added) === 1 ? '' : 's'} created`);

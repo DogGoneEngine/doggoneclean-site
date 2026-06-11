@@ -8,6 +8,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
+
+const easternDay = (ts) => new Date(ts).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 import VisitPhotos from './VisitPhotos.jsx';
 
 const SERVICE_LABELS = {
@@ -184,10 +186,30 @@ function ClientSheet({ clientId, onChanged }) {
   const c = data.client || {};
   const dogs = data.dogs || [];
   const visits = data.visits || [];
+  // The visit being worked right now pins to the top of the sheet; once the
+  // day passes it rejoins the history on its own (date-based, no cleanup).
+  const todayKey = easternDay(Date.now());
+  const todayVisits = visits.filter((v) => easternDay(v.visited_at) === todayKey);
+  const pastVisits = visits.filter((v) => easternDay(v.visited_at) !== todayKey);
   const upcoming = data.upcoming || [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* The visit being worked RIGHT NOW: front and center so photos, notes,
+          and Riker need no scrolling mid-appointment (Paul, 2026-06-11). It
+          returns to the history below once the day passes. */}
+      {todayVisits.length > 0 && (
+        <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-good, #1f8a4b)' }}>
+          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>Today's visit</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {todayVisits.map((v) => <VisitEntry key={v.id} v={v} clientId={clientId} dogs={dogs} onChanged={load} />)}
+          </div>
+        </div>
+      )}
+
+      {/* Riker rides at the top too: mid-appointment he is the most-used tool. */}
+      <RikerCapture clientId={clientId} clientName={c.name} onApplied={() => { load(); onChanged?.(); }} />
+
       {/* Semi-permanent header */}
       <div className="ad-panel">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
@@ -246,9 +268,6 @@ function ClientSheet({ clientId, onChanged }) {
         })()}
       </div>
 
-      {/* Riker: say it, it gets entered (one-tap confirm) */}
-      <RikerCapture clientId={clientId} clientName={c.name} onApplied={() => { load(); onChanged?.(); }} />
-
       {/* People to notify: a spouse who also gets the appointment messages,
           or a temporary stand-in like a dog sitter, in addition to or instead
           of the client (extra_notification_people). Riker can add these by
@@ -287,45 +306,14 @@ function ClientSheet({ clientId, onChanged }) {
       {/* Visit history (the growing bottom) */}
       <div className="ad-panel">
         <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>
-          Visit history · {visits.length}
+          Visit history · {pastVisits.length}
         </div>
         {visits.length === 0 ? (
           <div style={{ opacity: 0.6 }}>No visits logged yet. The history grows one row per appointment as it happens.</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {visits.map((v) => (
-              <div key={v.id} style={{ borderLeft: '3px solid var(--ad-primary, #2563d8)', paddingLeft: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
-                  <strong>{fmtDate(v.visited_at)}</strong>
-                  <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>
-                    {SERVICE_LABELS[v.service_type] || v.service_type || ''}
-                    {v.actual_minutes ? ` · ${v.actual_minutes} min` : ''}
-                    {v.amount_collected_cents != null ? ` · ${money(v.amount_collected_cents)}` : ''}
-                    {v.tip_cents ? ` (+${money(v.tip_cents)} tip)` : ''}
-                  </span>
-                </div>
-                {(v.dog_ratings || []).length > 0 && (
-                  <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {v.dog_ratings.map((r) => (
-                      <div key={r.dog_id || r.name} style={{ fontSize: 13, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
-                        <span style={{ fontWeight: 600 }}>{r.name || 'dog'}</span>
-                        {r.score != null && <span title="vibe score (1 unsafe to 5 a joy)"><ScoreDot score={r.score} /></span>}
-                        {r.note ? <span style={{ color: 'var(--ad-text)' }}>{r.note}</span> : null}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {v.work_done ? <div style={{ fontSize: 14, marginTop: 2 }}>{v.work_done}</div> : null}
-                {v.visit_notes ? <div className="ad-visitnote">{v.visit_notes}</div> : null}
-                {(v.condition_flags || []).length > 0 && (
-                  <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {v.condition_flags.map((f) => (
-                      <span key={f} className="ad-mono" style={{ fontSize: 11, background: 'var(--ad-surface-container-high, #eef1fb)', borderRadius: 6, padding: '1px 6px' }}>{f}</span>
-                    ))}
-                  </div>
-                )}
-                <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} dogs={dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status))} onChanged={load} />
-              </div>
+            {pastVisits.map((v) => (
+              <VisitEntry key={v.id} v={v} clientId={clientId} dogs={dogs} onChanged={load} />
             ))}
           </div>
         )}
@@ -1692,5 +1680,45 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
       )}
       {err && <div className="ad-error" style={{ marginTop: 6 }}>{err}</div>}
     </div>
+  );
+}
+
+
+// One visit record: the unit of the history list AND the pinned today's-visit
+// panel, so the two can never drift apart.
+function VisitEntry({ v, clientId, dogs, onChanged }) {
+  return (
+              <div style={{ borderLeft: '3px solid var(--ad-primary, #2563d8)', paddingLeft: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+                  <strong>{fmtDate(v.visited_at)}</strong>
+                  <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>
+                    {SERVICE_LABELS[v.service_type] || v.service_type || ''}
+                    {v.actual_minutes ? ` · ${v.actual_minutes} min` : ''}
+                    {v.amount_collected_cents != null ? ` · ${money(v.amount_collected_cents)}` : ''}
+                    {v.tip_cents ? ` (+${money(v.tip_cents)} tip)` : ''}
+                  </span>
+                </div>
+                {(v.dog_ratings || []).length > 0 && (
+                  <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {v.dog_ratings.map((r) => (
+                      <div key={r.dog_id || r.name} style={{ fontSize: 13, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 600 }}>{r.name || 'dog'}</span>
+                        {r.score != null && <span title="vibe score (1 unsafe to 5 a joy)"><ScoreDot score={r.score} /></span>}
+                        {r.note ? <span style={{ color: 'var(--ad-text)' }}>{r.note}</span> : null}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {v.work_done ? <div style={{ fontSize: 14, marginTop: 2 }}>{v.work_done}</div> : null}
+                {v.visit_notes ? <div className="ad-visitnote">{v.visit_notes}</div> : null}
+                {(v.condition_flags || []).length > 0 && (
+                  <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {v.condition_flags.map((f) => (
+                      <span key={f} className="ad-mono" style={{ fontSize: 11, background: 'var(--ad-surface-container-high, #eef1fb)', borderRadius: 6, padding: '1px 6px' }}>{f}</span>
+                    ))}
+                  </div>
+                )}
+                <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} dogs={dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status))} onChanged={onChanged} />
+              </div>
   );
 }

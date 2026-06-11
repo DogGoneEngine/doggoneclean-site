@@ -438,6 +438,13 @@ export async function adminAgentCosts() {
   return rpc('admin_agent_costs');
 }
 
+// The what-would-it-sell-for gauge (business_value_in_sight): live range from
+// trailing-twelve-month revenue, recurring share, growth, and (once the
+// ledger fills) seller's discretionary earnings.
+export async function businessValue() {
+  return rpc('admin_business_value');
+}
+
 // The human team roster (Paul, Jake, whoever joins).
 export async function listTeam() {
   return rpc('admin_list_team');
