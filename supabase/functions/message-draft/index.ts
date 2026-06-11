@@ -8,8 +8,20 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? Deno.env.get("Claude Anthropic CFO Key");
 const MODEL = "claude-sonnet-4-6";
+
+async function logUsage(usage: { input_tokens?: number; output_tokens?: number } | undefined) {
+  if (!usage) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/agent_costs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SERVICE_ROLE, Authorization: `Bearer ${SERVICE_ROLE}`, Prefer: "return=minimal" },
+      body: JSON.stringify({ agent_key: "message-draft", model: MODEL, input_tokens: usage.input_tokens ?? 0, output_tokens: usage.output_tokens ?? 0 }),
+    });
+  } catch (_) { /* cost logging never blocks the draft */ }
+}
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -59,6 +71,7 @@ Deno.serve(async (req) => {
     const aText = await aRes.text();
     if (!aRes.ok) throw new Error(`anthropic ${aRes.status}: ${aText}`);
     const aJson = JSON.parse(aText);
+    await logUsage(aJson.usage);
     const raw: string = (aJson.content ?? []).filter((b: any) => b.type === "text").map((b: any) => b.text).join("").trim();
 
     let out: any;

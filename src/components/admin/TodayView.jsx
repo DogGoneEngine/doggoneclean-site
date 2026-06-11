@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -58,16 +58,21 @@ export default function TodayView({ onOpenClient }) {
   const [briefings, setBriefings] = useState([]);
   const [agents, setAgents] = useState([]);
   const [appts, setAppts] = useState([]);
+  const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const [b, a, t] = await Promise.all([listBriefings(), listAgents(), todayAppointments()]);
+      const [b, a, t, r] = await Promise.all([
+        listBriefings(), listAgents(), todayAppointments(),
+        listReminders().catch(() => null),
+      ]);
       setBriefings(b.filter((x) => x.status === 'new' || x.status === 'read'));
       setAgents(a);
       setAppts(t);
+      setReminders(r && Array.isArray(r.open) ? r.open : []);
     } catch (e) { setError(e.message || 'load_failed'); }
     finally { setLoading(false); }
   }, []);
@@ -101,6 +106,27 @@ export default function TodayView({ onOpenClient }) {
           </div>
         )}
       </div>
+
+      {reminders.length > 0 && (
+        <div className="ad-panel" style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>On your plate</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {reminders.map((r) => (
+              <div key={r.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                <div style={{ flex: 1, fontSize: 14, lineHeight: 1.45 }}>
+                  {r.overdue ? <strong style={{ color: 'var(--ad-warn, #b9770a)' }}>Overdue · </strong>
+                    : r.due ? <strong>Today · </strong>
+                    : <span style={{ opacity: 0.6 }}>{new Date(r.due_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · </span>}
+                  {r.body}
+                </div>
+                <button className="ad-btn ad-btn--sm ad-btn--ghost" onClick={async () => {
+                  try { await setReminderDone(r.id); load(); } catch (e) { setError(e.message); }
+                }}>Done</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <RikerCapture onApplied={load} />
 

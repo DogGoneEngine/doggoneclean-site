@@ -2868,3 +2868,65 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   labels ("Paul and Bruno"); the map's home pin became a paw print in the prior commit.
   (6) Cycle-time method locked in the parking lot: median of the last 5 visits per service,
   recency by window rather than stddev machinery.
+
+## Decisions log (2026-06-11)
+
+### Batch five and six shipped in one run (evening; migrations 0152-0155, riker v5, suggest-drive v1)
+
+- **Jake joins HR** (Paul): `jakewnickerson@gmail.com` inserted into `admins` as role
+  `operator` (title: Hurricane Bath Operator). Adopt-by-email binds his auth user the first
+  time he signs into Orbit with Google; until then HR shows "has not signed in yet". The
+  operator role gets the masked floor set from `orbit_roles_operator_masked`.
+- **Agent costs visible** (`agent_costs_logged`): every LLM edge fn (riker, message-draft,
+  wisdom-absorb, weekly-review, cfo-brief) logs input/output tokens to `agent_costs` per
+  call; `admin_agent_costs` prices them (sonnet $3/$15 per MTok, haiku $1/$5, opus $5/$25 in
+  `_agent_cost_usd`) and HR shows last-30-days, projected month, all-time, per agent. SQL-only
+  agents cost nothing and are not listed. Logging starts today; history before today was never
+  recorded and is honestly absent.
+- **Reminders, one gateway** (`reminders_one_gateway`): `reminders` table + admin RPCs +
+  Riker `reminder` plan field + the "On your plate" panel on Today (overdue/today flagged,
+  Done button). Paul's Jane's-mother case is the founding row.
+- **Banana pencils decoded** (Paul's explanation; folded into `tentative_marker_is_private`):
+  the July 24 Michelle/Ginger events are Paul's year-ahead pencils in banana color, NOT
+  client-official; clients learn dates only when confirmed (today via Acuity, going forward
+  via this app). The Apps Script now flags banana events (`tentative: true`), the sync maps
+  them to status 'tentative' (0152), portal/win-back already exclude tentative, and Orbit's
+  booking panel says "Penciled in (your calendar pencil, not client-official)". Paul re-pastes
+  the script.
+- **Drive time in suggestions** (`drive_time_in_suggestions`): new `suggest-drive` edge fn
+  annotates every suggested slot with real drive minutes from the previous stop and to the
+  next stop (Distance Matrix, cached forever per home pair in `drive_cache`); slots at day
+  boundaries show nothing because the drive is irrelevant there. BookVisitPanel renders the
+  chips and falls back to the plain RPC.
+- **fill_the_near_gap recorded** (Paul): a near-future unfilled slot relaxes ALL routing rules
+  if the drive is mathematically possible, because an empty slot earns nothing. It was NOT in
+  the system before; now it is an Oracle rule whose teeth land in the String of Pearls engine.
+- **Adaptive blocks** (`adaptive_visit_blocks`, Paul's breathing-room question made the call):
+  `clean_effective_duration_minutes` now prefers the median of the last 5 recorded on-site
+  visits per service (3+ samples) plus `cities.hb_buffer_minutes` (default 15), 5-minute grid,
+  static snapshot as fallback. Verified live: Jane Henrich 269 -> 200 min, Eric Shannon 118 ->
+  85, Emily Walker 147 -> 120. This supersedes the parked drive-inclusive-vs-on-site pending
+  call: blocks track on-site reality, the buffer absorbs drive until the route engine reserves
+  drive per stop.
+- **Per-appointment dogs** (`appointment_dogs_explicit`, Emily Walker case):
+  `bath_appointments.dog_ids` (null = whole roster), booking panel "Who's going" chips,
+  tracker shows only assigned dogs. Cavaliers Reagan + Daisy to $105 each on the cards;
+  grooming-groups note on the client.
+- **Riker grew the powers he flunked today** (riker v5 + 0153/0154): dog_add (new cards with
+  breed/price), dog_update (price changes land on the card, never as a note; the Eric Shannon
+  failure), backdated visits via visited_at with scores by dog name (the Becky Swinford
+  failure), reminders, wisdom, and context now carries dog prices + last visit + next
+  appointment. Both failures were also fixed directly in data: Kiera + Rebel to $50 on the
+  cards (note cleaned), Maverick (Frenchie $75) + Sammy (mini Aussie $105) created with their
+  April 4 scores (3 and 4) attached to the real visit row.
+- **Mary Brantley record enriched** (was an archived thin import row): unarchived, address
+  727 NW 56th St Ocala 34475, email mfbrantley59@aol.com, phone = explicit data gap; Scot
+  (Lewy body dementia, ex-Bucs) and Lawana Glover (daytime caregiver, 352-299-6598) in
+  onsite_people; Lawana as a notify_people row, OFF until Paul toggles her (the tracker-contact
+  toggle he asked for); relationships cross-linked with Jane Henrich (daughter, next door);
+  dogs Mutley (poodle mix, $105, needs first groom ASAP), Kuku (nails $30 cash, shave pads,
+  standing instruction), Anna + Elsa (Great Pyrenees, former, went to a new home); reminder due
+  2026-06-25 honoring "opening in a few days or I contact her in 2 weeks".
+- **HR shows the real roster**: `admin_list_team` (0155) replaces the hardcoded "Paul · sole"
+  line; titles come from the role (Owner and Hurricane Bath Operator / Hurricane Bath
+  Operator).

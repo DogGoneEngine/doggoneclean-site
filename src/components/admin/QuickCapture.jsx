@@ -60,7 +60,7 @@ export default function QuickCapture() {
     } catch (e) { setError(e.message || 'apply_failed'); setPhase('review'); }
   }
 
-  const canApply = plan && plan.matched !== false && (plan.client_id || plan.wisdom);
+  const canApply = plan && plan.matched !== false && (plan.client_id || plan.wisdom || plan.reminder);
 
   return (
     <>
@@ -108,7 +108,7 @@ export default function QuickCapture() {
                 <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>
                   Riker will record
                 </div>
-                {plan.matched === false && !plan.wisdom ? (
+                {plan.matched === false && !plan.wisdom && !plan.reminder ? (
                   <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
                     {plan.summary || 'Could not tell which client you meant.'}
                     {(plan.candidates || []).length > 0 && (
@@ -119,7 +119,7 @@ export default function QuickCapture() {
                   </div>
                 ) : (
                   <>
-                    <div><strong>{plan.client_name || (plan.wisdom ? 'Business wisdom' : 'Client')}</strong></div>
+                    <div><strong>{plan.client_name || (plan.wisdom ? 'Business wisdom' : plan.reminder ? 'Reminder' : 'Client')}</strong></div>
                     {plan.summary && <div style={{ opacity: 0.8, margin: '2px 0 8px' }}>{plan.summary}</div>}
                   </>
                 )}

@@ -1,14 +1,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// Riker: parse one spoken/typed appointment update into a structured plan that
+// Riker: parse one spoken/typed note into a structured plan that
 // admin_riker_apply can write. PROPOSES only; it never writes. Authenticates the
 // caller as an admin by calling admin_riker_context with their own JWT (that RPC
 // raises for non-admins), which also returns the client + dogs the parse may
 // touch. Claude returns strict JSON; the frontend shows it for a one-tap confirm.
 // Reads the Anthropic key from ANTHROPIC_API_KEY (falls back to Paul's name).
+// Logs token usage to agent_costs so HR can show what each agent costs.
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? Deno.env.get("Claude Anthropic CFO Key");
 const MODEL = "claude-sonnet-4-6";
 
@@ -19,6 +21,23 @@ const CORS = {
 };
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...CORS } });
+
+async function logUsage(usage: { input_tokens?: number; output_tokens?: number } | undefined) {
+  if (!usage) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/agent_costs`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", apikey: SERVICE_ROLE,
+        Authorization: `Bearer ${SERVICE_ROLE}`, Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        agent_key: "riker", model: MODEL,
+        input_tokens: usage.input_tokens ?? 0, output_tokens: usage.output_tokens ?? 0,
+      }),
+    });
+  } catch (_) { /* cost logging never blocks the parse */ }
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -39,12 +58,12 @@ Deno.serve(async (req) => {
     if (!ctxRes.ok) return json({ ok: false, error: "not authorized" }, 403);
     const ctx = await ctxRes.json();
 
-    const today = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    const today = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "America/New_York" });
     const fixedClient = !!client_id;
 
     const system = [
       "You are Riker, the data clerk for Dog Gone Clean, a mobile dog-grooming business owned by Paul.",
-      "Paul speaks a short note about an appointment he just finished. Turn it into a structured plan of record updates.",
+      "Paul speaks a short note. It may contain SEVERAL actions at once; capture all of them in one plan. Turn it into a structured plan of record updates.",
       `Today is ${today}.`,
       fixedClient
         ? "The client is already fixed (a contact sheet is open). Use the provided client and dogs."
@@ -53,11 +72,16 @@ Deno.serve(async (req) => {
       "The vibe score is 1 to 5: 1 unsafe/aggression, 2 poor, 3 average, 4 cooperative, 5 a joy. Map words like 'a five', 'great', 'terror', 'bit me' sensibly; only set a score Paul actually gave.",
       "service_type is one of full_groom, bath, nails or null. payment_method is one of square_in_person, stripe_card, cash, wallet or null (map 'card'->square_in_person unless he says Stripe; 'venmo'/'apple pay'/'google pay'->wallet). amount_cents is dollars times 100.",
       "A standing instruction, access/gate change, or anything about how to do the work next time goes in client_note (household-level) or dog_notes (about one dog). Behavior or condition seen this visit goes in visit.visit_notes.",
+      "A PRICE CHANGE or breed correction on an existing dog goes in dog_update with the dog's id (or dog_name) and price_cents/breed. A price change is NEVER a note. '$50 each' means every regular dog gets its own dog_update entry.",
+      "A NEW DOG Paul describes that is not in the context goes in dog_add: name, breed, price_cents if he gives a price, notes for anything else he says about the dog. Do not also put the new dog in dog_notes.",
+      "If the visit he describes happened in the past ('the previous appointment', 'last time', a date), set visit.visited_at to that date as YYYY-MM-DD. The context's last_visit is the date of the most recent recorded visit; use it when he says 'the previous appointment, whenever it was'. Scores for dogs being added in this same plan use dog_name instead of dog_id.",
+      "If Paul commits to do something by or at a future time ('contact her in 2 weeks', 'follow up after the holidays', 'check on the dog next month'), include reminder: {body: a self-contained sentence with who/what/why, due: YYYY-MM-DD resolved from today}. The reminder surfaces on his Today screen when due.",
       "If Paul says someone else should receive the appointment messages (a spouse who also wants the texts, a dog sitter while the client is away), include notify_person: the name, the phone and/or email he gives (format US phones as +1 then ten digits), relationship if he says one, mode 'in_addition' when they get the messages too or 'instead' when they temporarily replace the client's, and until as YYYY-MM-DD when he gives an end (resolve phrases like 'until July' to a date). If the context lists an existing notify person he is clearly updating or turning off, reuse that person's id.",
       "If Paul says a dog should come off or back onto the working roster (moved away, passed away, no longer groomed, only sometimes, archive him, he's back), include it in dog_status with the dog's id and the right status: 'moved' (relocated, may return), 'deceased' (passed away), 'former' (no longer groomed), 'occasional' (sometimes), 'regular' (back on the roster). Nothing is ever deleted; this is reversible. Include a short note restating what Paul said when he gave a reason.",
+      "If Paul shares a general lesson, technique, or business insight not tied to one client's records, put it in wisdom as a self-contained sentence (it lands in the knowledge base). A client-specific fact is a note, not wisdom.",
       "If he gave a score, money, minutes, or what was done, include a visit object; otherwise visit is null.",
       "Write a short plain summary of exactly what will be recorded, so Paul can confirm in one tap. No corporate jargon. No em dashes.",
-      'Respond as ONE JSON object, output only the JSON: {"matched": boolean, "client_id": string|null, "client_name": string|null, "candidates": [{"id":string,"name":string}], "summary": string, "visit": null | {"service_type": string|null, "work_done": string|null, "visit_notes": string|null, "actual_minutes": number|null, "amount_cents": number|null, "payment_method": string|null, "dog_scores": [{"dog_id": string, "dog_name": string, "score": number}]}, "client_note": string|null, "dog_notes": [{"dog_id": string, "dog_name": string, "text": string}], "dog_status": [{"dog_id": string, "dog_name": string, "status": "regular"|"occasional"|"moved"|"former"|"deceased", "note": string|null}], "notify_person": null | {"id": string|null, "name": string, "phone": string|null, "email": string|null, "relationship": string|null, "mode": "in_addition"|"instead", "until": string|null}}',
+      'Respond as ONE JSON object, output only the JSON: {"matched": boolean, "client_id": string|null, "client_name": string|null, "candidates": [{"id":string,"name":string}], "summary": string, "visit": null | {"visited_at": string|null, "service_type": string|null, "work_done": string|null, "visit_notes": string|null, "actual_minutes": number|null, "amount_cents": number|null, "payment_method": string|null, "dog_scores": [{"dog_id": string|null, "dog_name": string, "score": number}]}, "client_note": string|null, "dog_notes": [{"dog_id": string, "dog_name": string, "text": string}], "dog_add": [{"name": string, "breed": string|null, "price_cents": number|null, "notes": string|null}], "dog_update": [{"dog_id": string|null, "dog_name": string, "price_cents": number|null, "breed": string|null}], "dog_status": [{"dog_id": string, "dog_name": string, "status": "regular"|"occasional"|"moved"|"former"|"deceased", "note": string|null}], "notify_person": null | {"id": string|null, "name": string, "phone": string|null, "email": string|null, "relationship": string|null, "mode": "in_addition"|"instead", "until": string|null}, "reminder": null | {"body": string, "due": string}, "wisdom": string|null}',
     ].join(" ");
 
     const userMsg = "Context:\n" + JSON.stringify(ctx) + "\n\nPaul said:\n" + String(utterance).trim();
@@ -66,13 +90,14 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY!, "anthropic-version": "2023-06-01" },
       body: JSON.stringify({
-        model: MODEL, max_tokens: 1200, thinking: { type: "disabled" }, system,
+        model: MODEL, max_tokens: 2400, thinking: { type: "disabled" }, system,
         messages: [{ role: "user", content: userMsg }],
       }),
     });
     const aText = await aRes.text();
     if (!aRes.ok) throw new Error(`anthropic ${aRes.status}: ${aText}`);
     const aJson = JSON.parse(aText);
+    await logUsage(aJson.usage);
     const raw: string = (aJson.content ?? []).filter((b: any) => b.type === "text").map((b: any) => b.text).join("").trim();
 
     let plan: any;

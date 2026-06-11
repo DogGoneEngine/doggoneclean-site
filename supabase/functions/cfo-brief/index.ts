@@ -11,6 +11,18 @@ const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? Deno.env.get("Claude Anthropic CFO Key");
 const MODEL = "claude-sonnet-4-6";
 
+async function logUsage(usage: { input_tokens?: number; output_tokens?: number } | undefined) {
+  if (!usage) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/agent_costs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SERVICE_ROLE, Authorization: `Bearer ${SERVICE_ROLE}`, Prefer: "return=minimal" },
+      body: JSON.stringify({ agent_key: "cfo-brief", model: MODEL, input_tokens: usage.input_tokens ?? 0, output_tokens: usage.output_tokens ?? 0 }),
+    });
+  } catch (_) { /* cost logging never blocks the run */ }
+}
+
+
 async function sb(path: string, init: RequestInit) {
   const res = await fetch(`${SUPABASE_URL}${path}`, {
     ...init,
@@ -82,6 +94,7 @@ Deno.serve(async (req) => {
     const aText = await aRes.text();
     if (!aRes.ok) throw new Error(`anthropic ${aRes.status}: ${aText}`);
     const aJson = JSON.parse(aText);
+    await logUsage(aJson.usage);
     const rawText: string = (aJson.content ?? []).filter((b: any) => b.type === "text").map((b: any) => b.text).join("").trim();
     const tokens = (aJson.usage?.input_tokens ?? 0) + (aJson.usage?.output_tokens ?? 0);
 

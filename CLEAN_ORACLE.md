@@ -716,6 +716,44 @@ real per-client time beats any average: a chatty household or a slow dog is a pe
 plannable fact of that stop, not noise to average away. The average exists only so a brand-new
 client can still be booked before they have a history of their own.
 
+`adaptive_visit_blocks` (scheduling):
+The block an appointment reserves adapts to reality on its own: when a client has at least 3
+completed visits with recorded on-site minutes, the block is the median of their last 5 (per
+service) plus the city's breathing buffer (`cities.hb_buffer_minutes`, default 15), rounded up
+to a 5-minute grid; the static `visit_minutes` snapshot is only the fallback for thin history
+(`clean_effective_duration_minutes`, 0153). The buffer stays until the route engine reserves
+drive time per stop explicitly; today the slot grid does not know which stop precedes a slot,
+so the buffer is what absorbs the drive. Because Paul asked for exactly this on 2026-06-11: a
+3-hour block that reality shows only needs 2 hours should shrink on its own, and a tight
+90-minute block should grow, with every completed visit feeding the next booking's length
+instead of a one-time snapshot going stale.
+
+`fill_the_near_gap` (scheduling):
+An unfilled slot in the very near future relaxes the routing rules completely: if it is
+mathematically possible to drive to that appointment between the neighboring stops, it is
+offered and filled, regardless of zone-day, cadence fit, or any routing preference. Because an
+empty near-term slot earns nothing, and filling it is better than letting it go empty; the
+routing rules exist to protect future efficiency, which an already-dying slot no longer has.
+(Paul, 2026-06-11. Teeth land in the String of Pearls route engine when it is built; until
+then the drive-time annotations in the suggestion panel are the manual version of this test.)
+
+`drive_time_in_suggestions` (scheduling):
+Every suggested booking slot shows the real drive minutes from the stop before it and to the
+stop after it (suggest-drive edge function annotating `admin_suggest_slots`); a slot at the
+start or end of the day, or with nothing else booked, shows nothing because the drive is
+irrelevant there. Drive seconds between two clients' homes are computed once via Distance
+Matrix and cached forever in `drive_cache`, since homes do not move. Because Paul picks the
+slot that fits tightest into the route, and the suggestion panel can only earn that choice by
+showing the real drives, not guesses.
+
+`appointment_dogs_explicit` (scheduling):
+An appointment can carry an explicit list of which dogs are going (`bath_appointments.dog_ids`);
+null means the whole regular roster, the historical default. The booking panel offers the
+choice whenever a household has more than one dog, and the tracker shows only the assigned
+dogs. Because households like Emily Walker's groom different dogs on different rhythms (the
+two Cavaliers together, the Golden on her own schedule), and assuming every dog in the house
+rides on every appointment records the wrong thing.
+
 `ocala_availability_every_other_week` (scheduling):
 Paul works the Ocala route every other week, Tuesday through Saturday, anchored on the week of
 Monday June 8, 2026 (the Ocala weeks are June 8, June 22, July 6, and every second Monday after).
@@ -1713,6 +1751,25 @@ sold, so they can never be commingled. Decided 2026-06-08.
 
 ## AI agents
 
+`agent_costs_logged` (Clean: finance):
+Every LLM-backed agent (Riker, the message drafter, the Archivist, the weekly
+review, the CFO brief, and whatever joins them) logs its token usage to
+`agent_costs` on every call, and the HR floor shows what each agent has cost
+historically and the projected month ahead, priced from the published per-token
+rates. Agents that run as plain database jobs (the availability watcher, the
+charge cron, the calendar sync) cost effectively nothing and log nothing.
+Because Paul asked to see what his AI staff costs, and `agent_when_value_beats_cost`
+is only checkable when the cost side is a number on a screen instead of a guess.
+
+`reminders_one_gateway` (Clean: operations):
+A time-based commitment ("contact her in 2 weeks", "follow up after the
+holidays") goes in through Riker like everything else and lands in `reminders`
+with a due date; it surfaces on the Today floor when due (and stays until
+marked done), instead of living in Paul's head or a separate to-do app.
+Because Paul is consolidating the whole business behind one gate he goes
+through, where things he must remember are intelligently surfaced when they
+become important, not stored where he has to remember to look.
+
 `agent_when_value_beats_cost` (Clean: engineering):
 Add an AI department-head or watcher agent wherever its value clearly offsets its
 small cost, and surface each candidate to Paul rather than building it silently.
@@ -1804,11 +1861,17 @@ retention mechanism framed as genuine care for the dog serves the prime directiv
 both. Exact selling copy still to finalize with Paul. Decided 2026-06-08.
 
 `tentative_marker_is_private` (Clean: growth):
-A trailing "?" on a Google Calendar appointment title is Paul's private
-placeholder so he does not forget a pencilled slot; it is never a client-facing
-thing. The "?" character itself is never stored in any column: the sync strips it
-for client matching and translates it into an internal `status = 'tentative'` on
-`bath_appointments` (distinct from `'confirmed'`). A tentative appointment is a
+Paul has two private pencil markers in Google Calendar and both mean the same
+thing: a trailing "?" on the title, and the banana event color. The banana
+pencils are his year-ahead strategy (explained 2026-06-11): when a client gets
+groomed he pencils their next visits at their normal cadence for up to a year
+ahead, in banana, in his own calendar only, never in the booking system the
+client sees; as the date approaches he resolves collisions and only then makes
+it official to the client. Many clients carry these. Neither marker is ever
+client-facing and neither is stored literally: the sync strips the "?" for
+client matching, the Apps Script flags banana-colored events, and both
+translate to an internal `status = 'tentative'` on `bath_appointments`
+(distinct from `'confirmed'`). A tentative appointment is a
 SOFT booking, not a confirmed one. It is treated as real planned time
 everywhere internal: it excludes the client from win-back (a "?" client is by
 definition not forgotten) and counts toward the win-back calendar-capacity check,
@@ -1820,7 +1883,10 @@ distinction; once an appointment has moved past that (on_the_way through complet
 or cancelled) the sync does not downgrade it. Because the "?" is Paul's note to
 himself and exposing it, or treating a pencilled slot as a firm commitment to the
 client, would both break trust; while still honoring it as planned time keeps the
-calendar and win-back honest. Decided 2026-06-09.
+calendar and win-back honest. Decided 2026-06-09; banana color and the year-ahead
+penciling strategy folded in 2026-06-11 (Apps Script color flag + `_sync_appointments`
+tentative field, 0152; Orbit's booking panel labels a tentative next booking
+"penciled, not client-official").
 
 ---
 

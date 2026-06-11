@@ -42,7 +42,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
   function cancel() { setPlan(null); setPhase('idle'); setError(null); }
 
   const v = plan?.visit;
-  const canApply = plan && plan.matched !== false && (plan.client_id || plan.wisdom);
+  const canApply = plan && plan.matched !== false && (plan.client_id || plan.wisdom || plan.reminder);
 
   return (
     <div className="ad-panel" style={{ marginBottom: 16, borderLeft: '4px solid var(--ad-primary, #2563d8)' }}>
@@ -100,12 +100,26 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
               <ul style={{ margin: '6px 0', paddingLeft: 18, fontSize: 13 }}>
                 {v && (
                   <li>
-                    Visit logged{v.service_type ? ` (${SERVICE[v.service_type] || v.service_type})` : ''}
+                    Visit logged{v.visited_at ? ` for ${v.visited_at}` : ''}{v.service_type ? ` (${SERVICE[v.service_type] || v.service_type})` : ''}
                     {v.actual_minutes ? `, ${v.actual_minutes} min` : ''}
                     {v.amount_cents != null ? `, ${money(v.amount_cents)}` : ''}
                     {v.payment_method ? ` ${PAY[v.payment_method] || v.payment_method}` : ''}
                   </li>
                 )}
+                {(plan.dog_add || []).map((d, i) => (
+                  <li key={`add${i}`}>
+                    New dog card: <strong>{d.name}</strong>
+                    {d.breed ? `, ${d.breed}` : ''}{d.price_cents != null ? `, ${money(d.price_cents)}` : ''}
+                    {d.notes ? ` (${d.notes})` : ''}
+                  </li>
+                ))}
+                {(plan.dog_update || []).map((d, i) => (
+                  <li key={`upd${i}`}>
+                    Card change for <strong>{d.dog_name || 'dog'}</strong>:
+                    {d.price_cents != null ? ` price to ${money(d.price_cents)}` : ''}
+                    {d.breed ? `${d.price_cents != null ? ',' : ''} breed to ${d.breed}` : ''}
+                  </li>
+                ))}
                 {(v?.dog_scores || []).map((s) => (
                   <li key={s.dog_id}>Vibe score for {s.dog_name || 'dog'}: <strong>{s.score}</strong></li>
                 ))}
@@ -123,6 +137,9 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                 ))}
                 {plan.wisdom && (
                   <li>To the wisdom inbox (the Archivist files it): {plan.wisdom}</li>
+                )}
+                {plan.reminder && (
+                  <li>On your plate {plan.reminder.due ? `for ${plan.reminder.due}` : ''}: {plan.reminder.body}</li>
                 )}
                 {plan.notify_person && (
                   <li>
@@ -161,14 +178,17 @@ export function RikerManual() {
     <details style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>
       <summary style={{ cursor: 'pointer' }}>What can I tell Riker?</summary>
       <ul style={{ margin: '6px 0 0', paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <li><strong>Log a visit:</strong> "Bella was a five today, full groom, 90 minutes, collected 120 cash." Service, minutes, money, payment method, what was done.</li>
+        <li><strong>Log a visit:</strong> "Bella was a five today, full groom, 90 minutes, collected 120 cash." Service, minutes, money, payment method, what was done. Past visits work too: "at the previous appointment, Sammy was a four."</li>
         <li><strong>Vibe scores:</strong> per dog, 1 to 5, only when you actually give one.</li>
+        <li><strong>New dogs:</strong> "Add Maverick, French Bulldog, 75 dollars, and Sammy, mini Aussie, 105." Real dog cards with breed and price.</li>
+        <li><strong>Price and breed changes:</strong> "Change the price to 50 dollars each." Lands on the dog cards, not as a note.</li>
         <li><strong>Notes:</strong> household notes ("gate code is now 4411") and per-dog notes ("Bruno hates the dryer").</li>
         <li><strong>Dog roster:</strong> "Windsor moved away, archive him." Moved, passed away, no longer groomed, sometimes, or back on the roster. Reversible, never deleted.</li>
         <li><strong>People to notify:</strong> "Jane wants her husband Tom texted too, 352-555-0101" or "text the dog sitter Maria instead of Jane until July 10."</li>
+        <li><strong>Reminders:</strong> "If I have not booked her by then, contact Mary in 2 weeks." It surfaces on Today when it comes due.</li>
         <li><strong>Anything else:</strong> ideas, rules, decisions, business thoughts. If it is not about one client's record, it lands in the wisdom inbox and the Archivist files it. Say "because" so the reason rides along.</li>
       </ul>
-      <div style={{ marginTop: 4, opacity: 0.8 }}>Nothing is written until you tap Confirm. Riker cannot touch schedules, prices, or rules; those go through Claude.</div>
+      <div style={{ marginTop: 4, opacity: 0.8 }}>Nothing is written until you tap Confirm. Riker cannot book or move appointments or change business rules; booking lives on the contact sheet, rules go through Claude.</div>
     </details>
   );
 }

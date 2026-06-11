@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, adminSuggestSlots } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -267,7 +267,9 @@ function ClientSheet({ clientId, onChanged }) {
       {/* Book the next visit, in the system (admin booking; the engine's open
           times sized to this client's real duration, with Paul's soft
           override per operator_override_with_confirm). */}
-      <BookVisitPanel clientId={clientId} clientName={c.name} onBooked={() => { load(); onChanged?.(); }} />
+      <BookVisitPanel clientId={clientId} clientName={c.name}
+        dogs={dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status))}
+        onBooked={() => { load(); onChanged?.(); }} />
 
       {/* Upcoming */}
       {upcoming.length > 0 && (
@@ -1419,9 +1421,10 @@ function NotifyPeoplePanel({ clientId }) {
 // App-booked appointments live in the system as the source; until the
 // calendar flip, the "Add to Google Calendar" link keeps his working calendar
 // in the loop with one tap.
-function BookVisitPanel({ clientId, clientName, onBooked }) {
+function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
   const [open, setOpen] = useState(false);
-  const [sugg, setSugg] = useState(null);       // adminSuggestSlots payload
+  const [sugg, setSugg] = useState(null);       // suggestSlotsWithDrive payload
+  const [dogSel, setDogSel] = useState(() => new Set(dogs.map((d) => d.id)));
   const [more, setMore] = useState(false);      // the manual fallback flow
   const [date, setDate] = useState(() => {
     const d = new Date(Date.now() + 86400000);
@@ -1436,7 +1439,8 @@ function BookVisitPanel({ clientId, clientName, onBooked }) {
 
   async function openPanel() {
     setOpen(true); setBusy(true); setErr(null);
-    try { setSugg(await adminSuggestSlots(clientId)); }
+    setDogSel(new Set(dogs.map((d) => d.id)));
+    try { setSugg(await suggestSlotsWithDrive(clientId)); }
     catch (e) { setErr(e.message || 'suggest_failed'); }
     finally { setBusy(false); }
   }
@@ -1452,8 +1456,12 @@ function BookVisitPanel({ clientId, clientName, onBooked }) {
 
   async function book(startISO, override = false) {
     setBusy(true); setErr(null);
+    // A proper subset of the roster rides as an explicit assignment; the full
+    // roster stays null (the everyone-goes default).
+    const dogIds = dogs.length > 1 && dogSel.size > 0 && dogSel.size < dogs.length
+      ? [...dogSel] : null;
     try {
-      const res = await adminBookAppointment(clientId, startISO, override);
+      const res = await adminBookAppointment(clientId, startISO, override, dogIds);
       if (res?.ok) {
         setBooked(res);
         setConflict(null);
@@ -1545,10 +1553,34 @@ function BookVisitPanel({ clientId, clientName, onBooked }) {
 
           {sugg?.next_booked && (
             <div style={{ fontSize: 13, padding: '8px 10px', borderRadius: 8, background: 'var(--ad-primary-container, #e6edfc)' }}>
-              Already booked: <strong>{new Date(sugg.next_booked).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</strong>
+              {sugg.next_booked_status === 'tentative' ? 'Penciled in (your calendar pencil, not client-official): ' : 'Already booked: '}
+              <strong>{new Date(sugg.next_booked).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</strong>
               {sugg.next_booked_offset_days != null && sugg.next_booked_offset_days !== 0 && (
                 <span style={{ opacity: 0.7 }}> ({offsetLabel(sugg.next_booked_offset_days)} against their rhythm)</span>
               )}
+            </div>
+          )}
+
+          {dogs.length > 1 && (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ fontSize: 12, opacity: 0.55 }}>Who's going:</span>
+              {dogs.map((d) => {
+                const on = dogSel.has(d.id);
+                return (
+                  <button key={d.id} type="button" disabled={busy}
+                    onClick={() => setDogSel((prev) => {
+                      const nx = new Set(prev);
+                      if (nx.has(d.id)) { if (nx.size > 1) nx.delete(d.id); } else nx.add(d.id);
+                      return nx;
+                    })}
+                    style={{ fontSize: 12, padding: '3px 10px', borderRadius: 999, cursor: 'pointer',
+                      border: '1px solid ' + (on ? 'var(--ad-primary, #2f5fd0)' : 'var(--ad-outline, #d8d8de)'),
+                      background: on ? 'var(--ad-primary-container, #e6edfc)' : 'transparent',
+                      opacity: on ? 1 : 0.6 }}>
+                    {d.name}
+                  </button>
+                );
+              })}
             </div>
           )}
 
@@ -1587,14 +1619,26 @@ function BookVisitPanel({ clientId, clientName, onBooked }) {
               <div style={{ fontSize: 11, opacity: 0.6, margin: '2px 0 6px' }}>
                 {(day.day_stops || []).length === 0
                   ? 'Nothing booked that day yet.'
-                  : 'That day so far: ' + day.day_stops.map((s) => `${fmtSlot(s.start)} ${s.client || 'a stop'}`).join(', ')}
+                  : 'That day so far: ' + day.day_stops.map((s) => `${fmtSlot(s.start)} ${s.client || 'a stop'}${s.tentative ? ' (penciled)' : ''}`).join(', ')}
               </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {(day.slots || []).map((s) => (
-                  <button key={s} className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => book(s)}>
-                    {fmtSlot(s)}
-                  </button>
-                ))}
+                {(day.slots || []).map((s) => {
+                  const start = typeof s === 'string' ? s : s.start;
+                  const drive = [];
+                  if (typeof s === 'object' && s.prev_stop) {
+                    drive.push(`${s.prev_stop.drive_minutes != null ? s.prev_stop.drive_minutes + ' min' : 'drive'} after ${(s.prev_stop.client || 'the stop before').split(' ')[0]}`);
+                  }
+                  if (typeof s === 'object' && s.next_stop) {
+                    drive.push(`${s.next_stop.drive_minutes != null ? s.next_stop.drive_minutes + ' min' : 'drive'} before ${(s.next_stop.client || 'the next stop').split(' ')[0]}`);
+                  }
+                  return (
+                    <button key={start} className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => book(start)}
+                      style={drive.length ? { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, lineHeight: 1.25 } : undefined}>
+                      <span>{fmtSlot(start)}</span>
+                      {drive.length > 0 && <span style={{ fontSize: 10, opacity: 0.65, fontWeight: 400 }}>{drive.join(' · ')}</span>}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}

@@ -16,6 +16,9 @@
 const INGEST_URL = 'https://urebdrosrxejhubpbxsa.supabase.co/functions/v1/calendar-ingest';
 const SECRET = 'd382120e23ba4ecfb70f4ba1f947ccd4a87fb1b7ee5c40388650c5c83ead870e';
 const BUSINESS_CALENDAR_NAME = 'Dog Gone Clean';
+// Banana is Paul's private pencil color: year-ahead placeholders the client
+// has never been told about. They sync as tentative, never as confirmed.
+const BANANA_COLOR = '5';
 
 function syncCalendar() {
   const calendars = [CalendarApp.getDefaultCalendar()];
@@ -51,7 +54,8 @@ function syncCalendar() {
         dog_count: dogs ? parseInt(dogs, 10) : null,
         service_type: /nail/i.test(title) ? 'nails' : 'full_groom',
         amount_cents: price ? Math.round(parseFloat(price) * 100) : null,
-        notes: e.getLocation() || null
+        notes: e.getLocation() || null,
+        tentative: e.getColor() === BANANA_COLOR
       });
     }
   }

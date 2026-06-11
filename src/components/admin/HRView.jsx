@@ -5,13 +5,16 @@
 // more, grind less). It scales to a team roster when he hires.
 
 import { useCallback, useEffect, useState } from 'react';
-import { hrSummary, listAgents } from './supabase.js';
+import { hrSummary, listAgents, listTeam, adminAgentCosts } from './supabase.js';
 
 function money(c) { return c == null ? '$0' : '$' + Math.round(c / 100).toLocaleString('en-US'); }
+function usd(n) { return '$' + Number(n || 0).toFixed(2); }
 
 export default function HRView() {
   const [data, setData] = useState(null);
   const [agents, setAgents] = useState([]);
+  const [team, setTeam] = useState([]);
+  const [costs, setCosts] = useState(null);
   const [windowDays, setWindowDays] = useState(30);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,8 +22,11 @@ export default function HRView() {
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const [d, a] = await Promise.all([hrSummary(windowDays), listAgents()]);
-      setData(d); setAgents(a);
+      const [d, a, t, c] = await Promise.all([
+        hrSummary(windowDays), listAgents(),
+        listTeam().catch(() => []), adminAgentCosts().catch(() => null),
+      ]);
+      setData(d); setAgents(a); setTeam(Array.isArray(t) ? t : []); setCosts(c);
     }
     catch (e) { setError(e.message || 'load_failed'); }
     finally { setLoading(false); }
@@ -45,7 +51,12 @@ export default function HRView() {
         <>
           <div className="ad-panel" style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>The team</div>
-            <div style={{ marginTop: 6, fontSize: 15 }}><strong>Paul</strong> <span style={{ opacity: 0.6 }}>· owner-operator (sole)</span></div>
+            {(team.length ? team : [{ id: 'paul', first_name: 'Paul', title: 'Owner and Hurricane Bath Operator', signed_in: true }]).map((m) => (
+              <div key={m.id} style={{ marginTop: 6, fontSize: 15 }}>
+                <strong>{m.first_name}{m.last_name ? ` ${m.last_name}` : ''}</strong>{' '}
+                <span style={{ opacity: 0.6 }}>· {m.title}{m.signed_in ? '' : ' · has not signed in yet'}</span>
+              </div>
+            ))}
           </div>
 
           <div className="ad-panel" style={{ marginBottom: 16 }}>
@@ -62,6 +73,33 @@ export default function HRView() {
                   {a.label}{a.is_active ? '' : ' · dormant'}
                 </span>
               ))}
+            </div>
+            <div style={{ marginTop: 12, borderTop: '1px solid var(--ad-outline, #e3e1dc)', paddingTop: 10 }}>
+              <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>What they cost</div>
+              {!costs ? (
+                <div style={{ fontSize: 13, opacity: 0.6 }}>No cost data yet.</div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 14 }}>
+                    <span><strong>{usd(costs.cost_30d)}</strong> <span style={{ opacity: 0.6 }}>last 30 days</span></span>
+                    <span><strong>{usd(costs.projected_month)}</strong> <span style={{ opacity: 0.6 }}>projected next month</span></span>
+                    <span><strong>{usd(costs.cost_all_time)}</strong> <span style={{ opacity: 0.6 }}>all time logged</span></span>
+                  </div>
+                  {(costs.agents || []).length > 0 && (
+                    <div style={{ marginTop: 8 }}>
+                      {(costs.agents || []).map((a) => (
+                        <div key={a.agent_key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '2px 0' }}>
+                          <span className="ad-mono">{a.agent_key}</span>
+                          <span style={{ opacity: 0.75 }}>{a.runs_30d} runs · {usd(a.cost_30d)} <span style={{ opacity: 0.6 }}>/ 30d</span></span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ fontSize: 12, opacity: 0.55, marginTop: 6 }}>
+                    Token usage logging started 2026-06-11, so all-time means since then. Agents that run as plain database jobs (the availability watcher, the charge cron, the calendar sync) cost effectively nothing and are not listed.
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

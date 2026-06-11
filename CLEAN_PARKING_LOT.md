@@ -765,16 +765,20 @@ walks the slide themselves and the person-shaped holes still work.
 ## Scheduling engine: committed next rounds (NOT parked indefinitely; Paul 2026-06-10)
 
 Order of work after the current stragglers:
-1. **Rolling duration recompute.** clients.visit_minutes (and the groom/nails splits) re-derived
-   automatically from recent real visits so every completed visit feeds the next booking's
-   length; today the values are a one-time 2026-06-07 snapshot. Includes the seeded-values
-   finding (2026-06-10): the seeds track the CYCLE median (inbound drive included) while pure
-   on-site medians run 15-30 min lower; Paul's call pending on drive-inclusive vs on-site +
-   separate drive, default recommendation is drive-inclusive until the route engine exists.
+1. **Rolling duration recompute. SHIPPED 2026-06-11** (`adaptive_visit_blocks`, 0153): blocks
+   are now the median of the last 5 recorded on-site visits per service (3+ samples) plus
+   `cities.hb_buffer_minutes` (default 15), with the static snapshot as the thin-history
+   fallback. Paul's breathing-room question on 2026-06-11 made the pending drive-inclusive
+   vs on-site call: blocks track ON-SITE reality, the buffer absorbs drive until round 2
+   reserves drive per stop, at which point the buffer can shrink toward zero.
 2. **Drive time as a first-class reservation.** EXPLICITLY COMMITTED, not procrastinated: when
    the route engine lands, blocks become true on-site time and inbound drive is computed and
    reserved per stop (the Oracle's original block-time intent). The new tracker stamps
-   (inbound -> arrived) are already capturing real per-stop drive times to feed it.
+   (inbound -> arrived) are already capturing real per-stop drive times to feed it. Progress
+   2026-06-11: `drive_cache` (home-pair drive seconds, cached forever) and the `suggest-drive`
+   annotator now exist and feed the booking panel, so the engine inherits a warm cache. The
+   route engine must also honor `fill_the_near_gap` (Paul, 2026-06-11): a near-future empty
+   slot relaxes ALL routing rules if the drive between neighbors is mathematically possible.
 3. **Per-dog durations** (Paul's spec, 2026-06-10): clients sometimes groom a subset (one dog
    today, not the other; a dog dies; a new dog arrives), so appointment length should follow
    the dogs actually being groomed. Time is Money only has per-visit totals, but visits carry
@@ -785,6 +789,9 @@ Order of work after the current stragglers:
    low confidence; (c) appointment duration = sum of the selected dogs' estimates + per-visit
    refinement as new data lands; (d) a NEW dog on a known client = known baseline + estimated
    increment for that dog, refined as it accrues history (never reset the client to a guess).
+   Progress 2026-06-11: appointments can now carry the explicit dog list
+   (`bath_appointments.dog_ids`, `appointment_dogs_explicit`), so the input side of per-dog
+   durations (which dogs are actually going) is captured at booking time.
 
 ## Orbit first-principles cleanup (assessed 2026-06-10; staged, behavior-preserving)
 

@@ -407,8 +407,40 @@ export async function adminSuggestSlots(clientId) {
 export async function adminOpenSlots(clientId, fromDate, days = 1) {
   return rpc('admin_open_slots', { p_client_id: clientId, p_from: fromDate, p_days: days });
 }
-export async function adminBookAppointment(clientId, startISO, override = false) {
-  return rpc('admin_book_appointment', { p_client_id: clientId, p_start: startISO, p_override: override });
+export async function adminBookAppointment(clientId, startISO, override = false, dogIds = null) {
+  return rpc('admin_book_appointment', { p_client_id: clientId, p_start: startISO, p_override: override, p_dog_ids: dogIds });
+}
+
+// Suggestions annotated with real drive minutes from the previous stop and to
+// the next stop per slot (suggest-drive edge fn, drive_cache behind it). Falls
+// back to the plain RPC so booking never breaks if the annotator is down.
+export async function suggestSlotsWithDrive(clientId) {
+  try {
+    const out = await callAdminEdge('suggest-drive', { client_id: clientId });
+    if (out && out.suggestions) return out.suggestions;
+  } catch { /* fall through to plain suggestions */ }
+  return rpc('admin_suggest_slots', { p_client_id: clientId });
+}
+
+// Reminders: time-based commitments. In through Riker or code, out on Today.
+export async function listReminders() {
+  return rpc('admin_list_reminders');
+}
+export async function addReminder(body, due, clientId = null) {
+  return rpc('admin_add_reminder', { p_body: body, p_due: due, p_client_id: clientId });
+}
+export async function setReminderDone(id, done = true) {
+  return rpc('admin_set_reminder_done', { p_id: id, p_done: done });
+}
+
+// What the AI staff actually costs, from logged token usage.
+export async function adminAgentCosts() {
+  return rpc('admin_agent_costs');
+}
+
+// The human team roster (Paul, Jake, whoever joins).
+export async function listTeam() {
+  return rpc('admin_list_team');
 }
 
 // The hours-ask briefing card's Save button: writes the panel reading
