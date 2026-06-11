@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -260,6 +260,11 @@ function ClientSheet({ clientId, onChanged }) {
         dogs={dogs}
         onLogged={() => { load(); onChanged?.(); }}
       />
+
+      {/* Book the next visit, in the system (admin booking; the engine's open
+          times sized to this client's real duration, with Paul's soft
+          override per operator_override_with_confirm). */}
+      <BookVisitPanel clientId={clientId} clientName={c.name} onBooked={() => { load(); onChanged?.(); }} />
 
       {/* Upcoming */}
       {upcoming.length > 0 && (
@@ -1394,6 +1399,168 @@ function NotifyPeoplePanel({ clientId }) {
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy}>{busy ? '...' : 'Save'}</button>
             <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setAdding(false); setErr(null); }} disabled={busy}>Cancel</button>
+          </div>
+        </div>
+      )}
+      {err && <div className="ad-error" style={{ marginTop: 6 }}>{err}</div>}
+    </div>
+  );
+}
+
+// ── Book the next visit ───────────────────────────────────────────────────
+// Pick a day, see the engine's open times sized to this client's own
+// duration, tap one, booked. A time the engine refuses (off-window evening,
+// off-week day, too tight) gets the soft override: the conflict is named and
+// one more tap books it anyway (operator_override_with_confirm). Clients
+// never get that tap; Paul does, because he knows things the engine cannot.
+// App-booked appointments live in the system as the source; until the
+// calendar flip, the "Add to Google Calendar" link keeps his working calendar
+// in the loop with one tap.
+function BookVisitPanel({ clientId, clientName, onBooked }) {
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState(() => {
+    const d = new Date(Date.now() + 86400000);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
+  const [slots, setSlots] = useState(null); // null = not loaded
+  const [durationMin, setDurationMin] = useState(null);
+  const [manualTime, setManualTime] = useState('');
+  const [conflict, setConflict] = useState(null); // { startISO, overlaps }
+  const [booked, setBooked] = useState(null); // success payload
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+
+  async function loadSlots() {
+    setBusy(true); setErr(null); setSlots(null); setConflict(null);
+    try {
+      const res = await adminOpenSlots(clientId, date, 1);
+      setSlots(res?.slots || []);
+      setDurationMin(res?.duration_minutes || null);
+    } catch (e) { setErr(e.message || 'slots_failed'); }
+    finally { setBusy(false); }
+  }
+
+  async function book(startISO, override = false) {
+    setBusy(true); setErr(null);
+    try {
+      const res = await adminBookAppointment(clientId, startISO, override);
+      if (res?.ok) {
+        setBooked(res);
+        setConflict(null);
+        onBooked?.();
+      } else if (res?.error === 'slot_conflict') {
+        setConflict({ startISO, overlaps: res.overlaps || [] });
+      } else if (res?.error === 'overlaps_existing') {
+        setErr('That time overlaps an existing stop minute for minute. Pick another.');
+        setConflict(null);
+      } else {
+        setErr(res?.error || 'booking_failed');
+      }
+    } catch (e) { setErr(e.message || 'booking_failed'); }
+    finally { setBusy(false); }
+  }
+
+  function manualISO() {
+    if (!manualTime) return null;
+    return new Date(`${date}T${manualTime}:00`).toISOString();
+  }
+  function fmtSlot(iso) {
+    return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+  function gcalLink(res) {
+    const f = (iso) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: clientName || 'Dog Gone Clean visit',
+      dates: `${f(res.scheduled_start)}/${f(res.scheduled_end)}`,
+      details: 'Booked in Orbit (Dog Gone Clean).',
+    });
+    return `https://calendar.google.com/calendar/render?${params}`;
+  }
+
+  if (!open) {
+    return (
+      <div className="ad-panel">
+        <button className="ad-btn ad-btn--sm" onClick={() => setOpen(true)}>Book next visit</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ad-panel">
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>
+        Book next visit{durationMin ? ` (${durationMin} min)` : ''}
+      </div>
+
+      {booked ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ fontSize: 14 }}>
+            Booked: <strong>{new Date(booked.scheduled_start).toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</strong>
+            {booked.overridden ? <span style={{ color: 'var(--ad-warn,#b9770a)' }}> (override)</span> : ''}
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <a className="ad-btn ad-btn--ghost ad-btn--sm" href={gcalLink(booked)} target="_blank" rel="noreferrer">
+              Add to Google Calendar
+            </a>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setBooked(null); setSlots(null); }}>Book another</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setBooked(null); setOpen(false); }}>Done</button>
+          </div>
+          <div style={{ fontSize: 11, opacity: 0.55 }}>
+            Until the calendar flip, tap Add to Google Calendar so your working calendar shows it too.
+          </div>
+        </div>
+      ) : conflict ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ fontSize: 14 }}>
+            The engine would not offer <strong>{fmtSlot(conflict.startISO)}</strong>
+            {conflict.overlaps.length > 0
+              ? <> because it brushes {conflict.overlaps.map((o) => `${o.client || 'another stop'} at ${fmtSlot(o.start)}`).join(', ')}.</>
+              : ' (outside the working windows for that day, or an off week).'}
+            {' '}You know things it does not. Book anyway?
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => book(conflict.startISO, true)}>
+              {busy ? '...' : 'Yes, book it'}
+            </button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => setConflict(null)}>No, pick another</button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <input type="date" value={date} disabled={busy} onChange={(e) => { setDate(e.target.value); setSlots(null); }}
+              style={{ fontSize: 14, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
+            <button className="ad-btn ad-btn--sm" disabled={busy || !date} onClick={loadSlots}>
+              {busy && slots === null ? '...' : 'Show open times'}
+            </button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)} disabled={busy}>Close</button>
+          </div>
+
+          {slots !== null && (
+            slots.length === 0 ? (
+              <div style={{ fontSize: 13, opacity: 0.65 }}>
+                No engine-open times that day (booked solid, outside working days, or an off week). Use a custom time below if you want it anyway.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {slots.map((s) => (
+                  <button key={s.start} className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy}
+                    onClick={() => book(s.start)}>
+                    {fmtSlot(s.start)}
+                  </button>
+                ))}
+              </div>
+            )
+          )}
+
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, opacity: 0.55 }}>Custom time:</span>
+            <input type="time" value={manualTime} disabled={busy} onChange={(e) => setManualTime(e.target.value)}
+              style={{ fontSize: 14, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy || !manualTime}
+              onClick={() => { const iso = manualISO(); if (iso) book(iso); }}>
+              Book this time
+            </button>
           </div>
         </div>
       )}

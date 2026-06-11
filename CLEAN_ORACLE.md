@@ -488,7 +488,11 @@ The app's schedule is the real booked appointments, imported from the calendar (
 Acuity appointment ID so re-imports never duplicate), never appointments synthesized from a
 client's cadence. `cadence_days` is a due/overdue signal that helps place the next booking, not
 an instruction to auto-create future appointments. After cutover the app becomes the source and
-writes bookings back to the calendar; before cutover it reads from the calendar. Because blindly
+writes bookings back to the calendar; before cutover it reads from the calendar, AND (2026-06-10,
+migration 0149) Paul can also book in-app from the client sheet: app-booked rows carry source
+null, which the sync and its prune never touch (they own only gcal_sync rows), and the booking
+panel offers a one-tap "Add to Google Calendar" link so the working calendar stays in the loop
+until the flip makes the write-back automatic. Because blindly
 booking every client out by frequency manufactures collisions, which is exactly why Paul books
 one ahead and only books far out when it genuinely fits; the app assists that judgment, it does
 not replace it. Pairs with `clients_not_subscribers`.
@@ -771,10 +775,12 @@ deliberate) and `no_fly_list` (an excluded person is never added as a recipient)
 Scheduling rules bind CLIENTS hard and bind PAUL softly: where a client-facing path refuses
 outright (a slot that does not fit their constraint window, a duration that overflows a hard
 window like Mary Jane's Thursday 12 to 3), an operator-facing scheduling surface shows Paul the
-conflict and asks "are you sure?", one tap yes or no, and yes proceeds. Recorded now; takes
-effect when an Orbit booking/scheduling surface exists (today Paul books in Google Calendar,
-which the sync imports without any gate, so he already has an ungated path; this rule makes the
-future in-app path match that freedom WITH a visible heads-up instead of silently allowing).
+conflict and asks "are you sure?", one tap yes or no, and yes proceeds. First live surface
+(2026-06-10, migration 0149): the client sheet's Book-next-visit panel over
+`admin_book_appointment`, where a refused time names its conflict and one tap books it anyway
+with p_override; the one thing override never crosses is the no-overlap exclusion constraint,
+because two stops in the same minutes is physics, not policy. Paul's Google Calendar remains an
+ungated path the sync imports.
 Because the rules encode his policies, not his physics: he holds knowledge the engine lacks (he
 knows he can get in and out of Mary Jane's window in time), and a system that hard-blocks its
 owner teaches the owner to route around it, which is worse, because the workaround leaves no
@@ -1933,8 +1939,10 @@ split follows the house pattern, an AI proposes and a click writes: the `riker` 
 Claude PARSE the utterance into a structured plan (proposes, never writes), and `admin_riker_apply`
 writes it under the admin gate; `admin_riker_context` feeds the parser only the client and dogs it may
 touch and doubles as the auth check. Supported writes: a visit (service, minutes, amount, payment,
-work done, visit notes) with per-dog vibe scores, a household note appended to `clients.note`, and
-per-dog notes appended to `dogs.notes`; every dog reference is validated to belong to the client.
+work done, visit notes) with per-dog vibe scores, a household note appended to `clients.note`,
+per-dog notes appended to `dogs.notes`, dog roster status changes ("Windsor moved away, archive
+him" sets roster_status, reversible, never a delete; 0149), and notify people ("text the sitter
+instead until July"; 0148); every dog reference is validated to belong to the client.
 Nothing is written until Paul taps Confirm once (one-tap confirm), so a misheard word never lands. It
 is on Today (Riker resolves the client name Paul says) and on each client sheet (the client is fixed).
 Because the moat is the proprietary per-client knowledge Paul carries, and the way to keep it is to
@@ -1959,7 +1967,13 @@ simplest intake that works on his Pixel (direct pick-and-upload) beats a Google 
 would add a dependency to untangle at sale. Per-dog tagging shipped 2026-06-10 (Paul: the upload
 assumed a one-dog household): `visit_photos.dog_id`, an "Of:" dog chip at upload for multi-dog
 clients, tap-the-label retro-tagging, and the dog's name on the Orbit, portal, and tracker photo
-labels; untagged stays legitimate (a whole-pack shot is real). The Riker "add the photos?" handoff
+labels; untagged stays legitimate (a whole-pack shot is real). Default visibility refined the
+same day (0149, the Michelle case): the standard kinds (before, after, with-operator) are SHARED
+the moment they upload, because appearing on the client's live tracker is the whole point of
+taking them mid-visit; 'extra' stays private until deliberately shared, since an extra can hold a
+skin observation Paul wants to deliver with words first; the per-photo toggle still un-shares
+anything. Uploads are also resized client-side (max 1600px JPEG) and queue in the background so
+Paul never waits between the after shot and the with-him shot. The Riker "add the photos?" handoff
 is the remaining later pass. Decided 2026-06-09.
 
 `dog_standing_instructions` (Clean: clients):

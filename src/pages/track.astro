@@ -420,12 +420,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   function headline(stage: string, dogs: string[]) {
     const d = cap(dogPhrase(dogs));
+    // "Bandit and Bruno ARE done", "Dory IS done": the pack size picks the verb.
+    const isAre = (dogs || []).length > 1 ? 'are' : 'is';
     switch (stage) {
       case 'on_the_way': return `${d}'s visit is rolling your way.`;
-      case 'arrived': return `We're here! ${d} is up soon.`;
+      case 'arrived': return `We're here! ${d} ${isAre} up soon.`;
       case 'underway': return `${d}'s visit is underway.`;
-      case 'returning': return `${d} is coming back to your door!`;
-      case 'done': return `${d} is done. Show someone.`;
+      case 'returning': return `${d} ${isAre} coming back to your door!`;
+      case 'done': return `${d} ${isAre} done. Show someone.`;
       default: return `${d}'s visit is on the books.`;
     }
   }
@@ -505,6 +507,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   let mapFitted = false;
   let etaTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // The home marker is a paw print, not a generic red pin: this is the dog's
+  // house. Same paw path as the stage dots, in the brand blue, white halo so
+  // it reads on any map tile.
+  const PAW_PATH = 'M12 11.5c2.6 0 4.8 2 4.8 4.3 0 1.9-1.5 2.9-3.2 2.9-1 0-1.2-.35-1.6-.35s-.6.35-1.6.35c-1.7 0-3.2-1-3.2-2.9 0-2.4 2.2-4.3 4.8-4.3zM6.2 8.7c1 0 1.9.9 1.9 2.1S7.2 13 6.2 13s-1.9-1-1.9-2.2.8-2.1 1.9-2.1zm11.6 0c1 0 1.9.9 1.9 2.1S18.8 13 17.8 13s-1.9-1-1.9-2.2.8-2.1 1.9-2.1zM9.3 4.6c1.1 0 2 1 2 2.3s-.9 2.3-2 2.3-2-1-2-2.3.9-2.3 2-2.3zm5.4 0c1.1 0 2 1 2 2.3s-.9 2.3-2 2.3-2-1-2-2.3.9-2.3 2-2.3z';
+  const PAW_ICON_URL = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="42" height="42">` +
+    `<circle cx="12" cy="12" r="11" fill="#ffffff" opacity="0.9"/>` +
+    `<path d="${PAW_PATH}" fill="#2563eb"/></svg>`,
+  );
+
   async function ensureMap(op: { lat: number; lng: number }, dest: { lat: number; lng: number }) {
     try {
       const gm = await loadGoogleMaps();
@@ -518,7 +530,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           disableDefaultUI: true, zoomControl: false, clickableIcons: false,
           gestureHandling: 'cooperative',
         });
-        homeMarker = new MarkerCtor({ map, position: dest, title: 'Your home' });
+        homeMarker = new MarkerCtor({
+          map, position: dest, title: 'Your home',
+          icon: { url: PAW_ICON_URL, scaledSize: new gm.Size(42, 42), anchor: new gm.Point(21, 21) },
+        });
         truckMarker = new MarkerCtor({
           map, position: op, title: 'Dog Gone Clean',
           icon: {

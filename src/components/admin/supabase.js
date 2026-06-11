@@ -97,10 +97,34 @@ export async function getClient(clientId) {
 // Visit photos: upload straight from the phone (the Android picker reaches Google
 // Photos), into the private visit-photos bucket, viewed via short-lived signed URLs.
 const PHOTO_BUCKET = 'visit-photos';
+// Phone camera files run 5 to 12 MB; on trailer-driveway signal that is the
+// "watching money fly out the window" wait Paul flagged. Resize to 1600px
+// max and re-encode as JPEG before upload: 20 to 30 times smaller, visually
+// identical at portal/tracker sizes. Falls back to the original on any
+// hiccup, and never inflates a file that is already small.
+async function compressForUpload(file) {
+  try {
+    if (!file.type?.startsWith('image/') || file.size < 400000) return file;
+    const bmp = await createImageBitmap(file);
+    const MAX = 1600;
+    const scale = Math.min(1, MAX / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bmp.width * scale));
+    canvas.height = Math.max(1, Math.round(bmp.height * scale));
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.82));
+    if (blob && blob.size < file.size) {
+      return new File([blob], (file.name || 'photo').replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
+    }
+  } catch { /* original is always a safe answer */ }
+  return file;
+}
+
 export async function uploadVisitPhoto(visitId, clientId, kind, file, dogId = null) {
-  const ext = (file.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const f = await compressForUpload(file);
+  const ext = (f.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
   const path = `${clientId}/${visitId}/${kind}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
-  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, file, { contentType: file.type || 'image/jpeg', upsert: false });
+  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, f, { contentType: f.type || 'image/jpeg', upsert: false });
   if (error) throw new Error(error.message);
   await rpc('admin_add_visit_photo', { p_visit_id: visitId, p_kind: kind, p_path: path, p_dog_id: dogId });
   return path;
@@ -369,6 +393,16 @@ export async function trackerLocation(appointmentId, lat, lng) {
 // Run the Availability watcher on demand (it also runs on its daily cron).
 export async function runCapacityCheck() {
   return rpc('admin_capacity_check');
+}
+
+// In-app booking for an existing client (admin side). Slots are sized to the
+// client's own duration; booking enforces the slot engine for everyone except
+// Paul, who can override with a confirm (operator_override_with_confirm).
+export async function adminOpenSlots(clientId, fromDate, days = 1) {
+  return rpc('admin_open_slots', { p_client_id: clientId, p_from: fromDate, p_days: days });
+}
+export async function adminBookAppointment(clientId, startISO, override = false) {
+  return rpc('admin_book_appointment', { p_client_id: clientId, p_start: startISO, p_override: override });
 }
 
 // The hours-ask briefing card's Save button: writes the panel reading

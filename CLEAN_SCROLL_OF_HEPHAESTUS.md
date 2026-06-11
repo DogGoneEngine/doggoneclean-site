@@ -2824,3 +2824,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   future Orbit booking surface, because a blocked owner routes around the system and that
   workaround leaves no record. Mary Jane's 220-minute capacity flag acknowledged by Paul as
   correct; he is refining her cycle time for the window.
+- **Field batch three (Paul, 2026-06-10 evening; migration 0149 + riker v4).** (1) IN-APP
+  BOOKING IS LIVE for existing clients: a Book-next-visit panel on every client sheet shows
+  the engine's open times sized to the client's real duration (Michelle 118 min at $100, Ginger
+  76 min at $80, straight from their records), one tap books, and a refused time names its
+  conflict and offers Paul the one-tap override (operator_override_with_confirm made real);
+  app-booked rows are source-null, untouchable by the calendar sync and its prune, and an
+  Add-to-Google-Calendar link bridges the working calendar until the flip. (2) Standard photos
+  (before / after / with-Paul) now SHARE BY DEFAULT and appear on the live tracker the moment
+  they upload, which is what Paul expected all along; the Michelle case (six invisible photos
+  behind the Share toggle) was the tell; extras stay private until shared; backfilled. (3)
+  Photo uploads resized client-side (1600px JPEG, 20 to 30x smaller) and queued in the
+  background, so the after shot and the with-him shot no longer wait on each other; "With dog"
+  relabeled "With Paul" off the signed-in operator. (4) Windsor (Chester Weber) archived as
+  moved per Paul; Riker v4 can now do that by voice (dog_status in the plan schema, reversible,
+  never a delete). (5) Tracker grammar fixed (Bandit and Bruno ARE done) and the home map pin is
+  now a paw print. (6) The tablet question answered: any always-on-screen Android device with
+  GPS and data running the Today floor keeps the live location flowing; an old Android phone
+  beats a tablet (better GPS, cheaper). The Android companion stays the real fix, parked.

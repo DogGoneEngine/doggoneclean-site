@@ -6,16 +6,31 @@
 // no capture, so the gallery is offered, not just the camera. See visit_photos_capture.
 
 import { useState, useEffect, useCallback } from 'react';
-import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoDog } from './supabase.js';
+import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoDog, adminSelf } from './supabase.js';
 
-const KIND_LABEL = { before: 'Before', after: 'After', with_dog: 'With dog', extra: 'Extra' };
-const SLOTS = [['before', 'Before'], ['after', 'After'], ['with_dog', 'With dog']];
+// "With dog" reads wrong; the photo is the dog WITH the person running the
+// appointment, so the label carries the operator's name (today: Paul; when
+// routes have operators this reads from the route's operator).
+let _operatorName = null;
+function useOperatorName() {
+  const [name, setName] = useState(_operatorName);
+  useEffect(() => {
+    if (_operatorName) return;
+    adminSelf().then((a) => { _operatorName = a?.first_name || 'me'; setName(_operatorName); }).catch(() => {});
+  }, []);
+  return name || 'me';
+}
+const kindLabels = (op) => ({ before: 'Before', after: 'After', with_dog: `With ${op}`, extra: 'Extra' });
 
 export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [], onChanged }) {
   const [urls, setUrls] = useState({});
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState(0);
   const [error, setError] = useState(null);
+  const operator = useOperatorName();
+  const KIND_LABEL = kindLabels(operator);
+  const SLOTS = [['before', 'Before'], ['after', 'After'], ['with_dog', `With ${operator}`]];
   // Which dog the next uploads are of. Only surfaces for multi-dog
   // households; null means untagged (a whole-pack or scene shot is real).
   const [tagDog, setTagDog] = useState(null);
@@ -32,14 +47,21 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
     return () => { alive = false; };
   }, [photos]);
 
-  const onPick = useCallback(async (kind, files) => {
+  // Fire-and-track: a pick starts uploading in the background and the next
+  // pick is available immediately (Paul should never sit watching a spinner
+  // between the after shot and the with-him shot). Each finished upload
+  // refreshes the sheet; failures surface without blocking the rest.
+  const onPick = useCallback((kind, files) => {
     if (!files || !files.length) return;
-    setBusy(true); setError(null);
-    try {
-      for (const f of Array.from(files)) await uploadVisitPhoto(visitId, clientId, kind, f, tagDog);
-      onChanged?.();
-    } catch (e) { setError(e.message || 'upload_failed'); }
-    finally { setBusy(false); }
+    setError(null);
+    const dog = tagDog;
+    for (const f of Array.from(files)) {
+      setPending((n) => n + 1);
+      uploadVisitPhoto(visitId, clientId, kind, f, dog)
+        .then(() => onChanged?.())
+        .catch((e) => setError(e.message || 'upload_failed'))
+        .finally(() => setPending((n) => n - 1));
+    }
   }, [visitId, clientId, tagDog, onChanged]);
 
   // Tap the label to cycle which dog a photo shows: none -> dog 1 -> dog 2
@@ -135,15 +157,15 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
           {SLOTS.map(([kind, label]) => (
             <label key={kind} className="ad-btn ad-btn--ghost ad-btn--sm" style={{ cursor: 'pointer' }}>
               + {label}
-              <input type="file" accept="image/*" style={{ display: 'none' }} disabled={busy} onChange={(e) => onPick(kind, e.target.files)} />
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => { onPick(kind, e.target.files); e.target.value = ''; }} />
             </label>
           ))}
           <label className="ad-btn ad-btn--ghost ad-btn--sm" style={{ cursor: 'pointer' }}>
             + Extras
-            <input type="file" accept="image/*" multiple style={{ display: 'none' }} disabled={busy} onChange={(e) => onPick('extra', e.target.files)} />
+            <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={(e) => { onPick('extra', e.target.files); e.target.value = ''; }} />
           </label>
-          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)} disabled={busy}>Done</button>
-          {busy && <span style={{ fontSize: 12, opacity: 0.6 }}>Uploading…</span>}
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)}>Done</button>
+          {pending > 0 && <span style={{ fontSize: 12, opacity: 0.6 }}>Uploading {pending}…</span>}
         </div>
       ) : (
         <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(true)}>+ Photos</button>

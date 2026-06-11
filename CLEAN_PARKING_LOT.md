@@ -828,3 +828,13 @@ chimes (so a locked phone still dings at the doorbell moment) would ride in the 
 arrive earlier via a service worker + Notification permission prompt. Neither blocks anything
 gated on Twilio: the SMS at each stage is the guaranteed channel regardless of what the open
 tab can do.
+
+## Portal self-booking for existing clients (committed next slice; Paul 2026-06-10)
+
+Admin booking shipped 2026-06-10 (the client-sheet Book-next-visit panel). The client half:
+a "Book a visit" flow in the portal for claimed clients, offering bath_open_slots sized to
+their own duration, hard-gated (no override; clients never see "book anyway"), honoring
+hardness windows once those are structured, writing source-null appointments exactly like
+admin booking. Confirmations ride the existing trigger (live once Resend lands + Acuity is
+cancelled). Gate it on nothing else: legacy clients pay in person, so Stripe is NOT required
+for this slice. Build after the tracker settles.
