@@ -37,10 +37,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
              who is coming to their driveway. Today that is Paul, the sole
              operator; when routes get operators this reads from the route. -->
         <div class="trk-who">
-          <img src="/photos/paul-specialist.jpg" width="56" height="56" alt="Paul Nickerson with a client's dog in the Hurricane Bath trailer" />
+          <img src="/photos/paul-specialist.jpg" width="56" height="56" alt="Your Hurricane Bath Operator with a client's dog in the trailer" />
           <div>
-            <strong>Paul Nickerson</strong>
-            <p>Owner and Hurricane Bath Operator. The one rolling up to your driveway.</p>
+            <strong id="trk-who-name">Paul Nickerson</strong>
+            <p id="trk-who-role">Owner and Hurricane Bath Operator. The one rolling up to your driveway.</p>
           </div>
         </div>
 
@@ -87,7 +87,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <img id="trk-meet-img" src="/photos/og-cover.jpg" alt="Paul Nickerson, smiling, with a client's freshly bathed dog over his shoulder" />
         <div class="trk-meet__text">
           <p class="trk-meet__eyebrow">Who's coming to your door</p>
-          <strong>Paul Nickerson</strong>
+          <strong id="trk-meet-name">Paul Nickerson</strong>
           <p>Owner and Hurricane Bath Operator. Over 20 years of Ocala's dogs,
           one driveway at a time. Your dog is in good hands.</p>
         </div>
@@ -638,6 +638,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     cardEl.hidden = false;
     meetEl.hidden = false;
 
+    applyOperator(data.operator);
     titleEl.textContent = headline(stage, data.dogs || []);
     subEl.textContent = data.first_name ? `Hi ${data.first_name}. This page updates on its own; keep it open or check back any time.` : 'This page updates on its own; keep it open or check back any time.';
 
@@ -671,7 +672,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   // server-side; only deliberately shared photos for this one visit return).
   // Today the operator is Paul; when routes carry operators this reads from
   // the route (specialist_named_not_promised), same as the who-block above.
-  const OPERATOR_FIRST = 'Paul';
+  let OPERATOR_FIRST = 'Paul';
+  // The appointment carries its operator (Paul or Jake or whoever rolls);
+  // the page names and labels follow it, switchable up to the last minute.
+  function applyOperator(op: any) {
+    if (!op || !op.first) return;
+    OPERATOR_FIRST = op.first;
+    const whoName = document.getElementById('trk-who-name');
+    const meetName = document.getElementById('trk-meet-name');
+    if (op.name && whoName) whoName.textContent = op.name;
+    if (op.name && meetName) meetName.textContent = op.name;
+    if (op.title && op.title.indexOf('Owner') < 0) {
+      const whoRole = document.getElementById('trk-who-role');
+      if (whoRole) whoRole.textContent = op.title + '. The one rolling up to your driveway.';
+    }
+  }
   const PHOTO_LABELS: Record<string, string> = { before: 'Before', after: 'After', with_dog: `With ${OPERATOR_FIRST}`, extra: 'Extra' };
   function photoLabel(p: { kind: string; dog_name?: string | null }) {
     if (p.kind === 'with_dog') return p.dog_name ? `${OPERATOR_FIRST} and ${p.dog_name}` : `With ${OPERATOR_FIRST}`;

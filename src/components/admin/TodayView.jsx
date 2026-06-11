@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam } from './supabase.js';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
@@ -211,6 +211,34 @@ function StopCard({ appt, onOpenClient }) {
   const [err, setErr] = useState(false);
   const [shareState, setShareState] = useState(null); // null | 'shared' | 'copied'
   const [showTimes, setShowTimes] = useState(false);
+  const [meta, setMeta] = useState(null);   // { tracker_token, operator_admin_id, operator_name }
+  const [team, setTeam] = useState(null);
+  const [opOpen, setOpOpen] = useState(false);
+
+  async function loadMeta() {
+    try { const m = await appointmentMeta(appt.id); setMeta(m); return m; }
+    catch { return null; }
+  }
+  useEffect(() => { if (clickable || appt.id) loadMeta(); }, [appt.id]);
+
+  // The tracker link is never fleeting: this works at ANY stage, shares on
+  // phones with a share sheet and copies everywhere else, as many times as
+  // needed (Jake's iPhone got no sheet on the step tap and the link was gone).
+  async function shareTracker() {
+    const m = meta || await loadMeta();
+    if (!m || !m.tracker_token) { setErr(true); return; }
+    const url = `https://hurricanebath.com/track?t=${m.tracker_token}`;
+    const text = `Dog Gone Clean is rolling your way. Follow along: ${url}`;
+    if (navigator.share) {
+      try { await navigator.share({ text }); setShareState('shared'); return; }
+      catch { /* sheet closed; fall through to copy */ }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setShareState('copied');
+      setTimeout(() => setShareState(null), 2500);
+    } catch { setErr(true); }
+  }
 
   const clickable = !!appt.client_id;
   const followups = appt.followups || [];
@@ -320,6 +348,34 @@ function StopCard({ appt, onOpenClient }) {
         {!wrapped && stepHint && (
           <div style={{ fontSize: 11, opacity: 0.5, textAlign: 'center' }}>{stepHint}</div>
         )}
+
+        {/* Always-available tracker link + the operator on this stop. */}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button type="button" className="ad-btn ad-btn--ghost ad-btn--sm" onClick={shareTracker}>
+            {shareState === 'copied' ? 'Link copied' : shareState === 'shared' ? 'Link shared' : 'Tracker link'}
+          </button>
+          {meta && (opOpen && team ? (
+            <select className="ad-select" value={meta.operator_admin_id || ''}
+              onChange={async (e) => {
+                try {
+                  await setAppointmentOperator(appt.id, e.target.value || null);
+                  setOpOpen(false);
+                  loadMeta();
+                } catch { setErr(true); }
+              }}>
+              <option value="">Paul (default)</option>
+              {team.map((t) => <option key={t.id} value={t.id}>{t.first_name}{t.last_name ? ` ${t.last_name}` : ''}</option>)}
+            </select>
+          ) : (
+            <button type="button" className="ad-btn ad-btn--ghost ad-btn--sm"
+              onClick={async () => {
+                if (!team) { try { setTeam(await listTeam()); } catch { setTeam([]); } }
+                setOpOpen(true);
+              }}>
+              Operator: {meta.operator_name ? meta.operator_name.split(' ')[0] : 'Paul'}
+            </button>
+          ))}
+        </div>
 
         <button
           type="button"

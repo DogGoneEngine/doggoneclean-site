@@ -450,6 +450,15 @@ export async function listTeam() {
   return rpc('admin_list_team');
 }
 
+// Per-appointment essentials any time: the tracker token (so the share link
+// is never fleeting) and the assigned operator.
+export async function appointmentMeta(appointmentId) {
+  return rpc('admin_appointment_meta', { p_appointment: appointmentId });
+}
+export async function setAppointmentOperator(appointmentId, adminId) {
+  return rpc('admin_set_appointment_operator', { p_appointment: appointmentId, p_admin: adminId });
+}
+
 // Live infrastructure usage (database, storage) against plan limits. The
 // daily infra watcher cards Today at 70% of a limit; this is the live view.
 export async function adminInfraStatus() {
