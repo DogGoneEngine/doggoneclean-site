@@ -2842,3 +2842,29 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   now a paw print. (6) The tablet question answered: any always-on-screen Android device with
   GPS and data running the Today floor keeps the live location flowing; an old Android phone
   beats a tablet (better GPS, cheaper). The Android companion stays the real fix, parked.
+- **Field batch four (Paul, 2026-06-10/11; migrations 0150-0151).** (1) BOOKING GOT ITS BRAIN:
+  Paul's verdict on the bare date picker was "completely not usable," so the Book-next-visit
+  panel now leads with intelligence: due date from the client's real cadence and last PAST
+  visit (a live-verification catch: Michelle and Ginger carry July 24 calendar bookings the
+  engine was wrongly counting as their "last visit"; due now anchors on what happened, and an
+  already-booked future visit is surfaced with its own off-rhythm offset instead of silently
+  absorbed), candidate days filtered by their parsed hard windows and not-days, each day
+  labeled with its offset ("on time", "2 days late"), showing what is already booked that day,
+  with tappable engine-open times; the manual any-day-any-time + override flow lives under
+  More options. Verified live: Michelle (due Jul 8) suggests Jul 9 evening slots inside her
+  after-5:15-weekdays-not-Tuesday window. Booking horizon raised to 60 days so 6-week cadences
+  fit. (2) THE + IS RIKER NOW (Paul's call): the floating button on every floor routes
+  everything through Riker, with a wisdom fallback for ideas and rules (no client needed), so
+  one habit files everything; the living "What can I tell Riker?" manual renders wherever
+  Riker listens. (3) ORBIT ROLES founded (`orbit_roles_operator_masked`): admins.role,
+  adopt-by-email onboarding, operator floor allowlist, and server-side masking (contact +
+  money stripped, click-to-text link instead of a number); Jake is the intended first test
+  operator, pending his Gmail. (4) CALENDAR PARALLEL BRIDGE (Paul's amendment to
+  calendar_flip_order): the Apps Script now reads the default calendar AND a "Dog Gone Clean"
+  calendar, deduped, so the moment Paul creates it he can book there while everything stays
+  visible; the final flip shrinks to move-stragglers + drop-default, on his trust. He
+  re-pastes the updated script. (5) Tracker: before/after COLLAGES (side by side, thin white
+  divider, tap to share, one per tagged dog, at the top of the strip) and operator-named
+  labels ("Paul and Bruno"); the map's home pin became a paw print in the prior commit.
+  (6) Cycle-time method locked in the parking lot: median of the last 5 visits per service,
+  recency by window rather than stddev machinery.

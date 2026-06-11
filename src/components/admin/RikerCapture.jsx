@@ -42,7 +42,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
   function cancel() { setPlan(null); setPhase('idle'); setError(null); }
 
   const v = plan?.visit;
-  const canApply = plan && plan.matched !== false && plan.client_id;
+  const canApply = plan && plan.matched !== false && (plan.client_id || plan.wisdom);
 
   return (
     <div className="ad-panel" style={{ marginBottom: 16, borderLeft: '4px solid var(--ad-primary, #2563d8)' }}>
@@ -71,6 +71,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
             </button>
             {done && <span style={{ fontSize: 12, color: 'var(--ad-good, #1f8a4b)' }}>Recorded.</span>}
           </div>
+          <RikerManual />
         </>
       )}
 
@@ -94,7 +95,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
             </div>
           ) : (
             <div style={{ fontSize: 14, lineHeight: 1.5 }}>
-              <div><strong>{plan.client_name || 'Client'}</strong></div>
+              <div><strong>{plan.client_name || (plan.wisdom ? 'Business wisdom' : 'Client')}</strong></div>
               {plan.summary && <div style={{ opacity: 0.8, margin: '2px 0 8px' }}>{plan.summary}</div>}
               <ul style={{ margin: '6px 0', paddingLeft: 18, fontSize: 13 }}>
                 {v && (
@@ -120,6 +121,9 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                     {s.note ? ` (${s.note})` : ''}
                   </li>
                 ))}
+                {plan.wisdom && (
+                  <li>To the wisdom inbox (the Archivist files it): {plan.wisdom}</li>
+                )}
                 {plan.notify_person && (
                   <li>
                     {plan.notify_person.mode === 'instead' ? 'Send the appointment messages to ' : 'Also send the appointment messages to '}
@@ -145,5 +149,26 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
         </div>
       )}
     </div>
+  );
+}
+
+
+// The living instruction manual: what Riker can hear and file today. One
+// list, shown everywhere Riker takes input, updated in the same commit as
+// each new power so it can never drift from reality.
+export function RikerManual() {
+  return (
+    <details style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>
+      <summary style={{ cursor: 'pointer' }}>What can I tell Riker?</summary>
+      <ul style={{ margin: '6px 0 0', paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <li><strong>Log a visit:</strong> "Bella was a five today, full groom, 90 minutes, collected 120 cash." Service, minutes, money, payment method, what was done.</li>
+        <li><strong>Vibe scores:</strong> per dog, 1 to 5, only when you actually give one.</li>
+        <li><strong>Notes:</strong> household notes ("gate code is now 4411") and per-dog notes ("Bruno hates the dryer").</li>
+        <li><strong>Dog roster:</strong> "Windsor moved away, archive him." Moved, passed away, no longer groomed, sometimes, or back on the roster. Reversible, never deleted.</li>
+        <li><strong>People to notify:</strong> "Jane wants her husband Tom texted too, 352-555-0101" or "text the dog sitter Maria instead of Jane until July 10."</li>
+        <li><strong>Anything else:</strong> ideas, rules, decisions, business thoughts. If it is not about one client's record, it lands in the wisdom inbox and the Archivist files it. Say "because" so the reason rides along.</li>
+      </ul>
+      <div style={{ marginTop: 4, opacity: 0.8 }}>Nothing is written until you tap Confirm. Riker cannot touch schedules, prices, or rules; those go through Claude.</div>
+    </details>
   );
 }

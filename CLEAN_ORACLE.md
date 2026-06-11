@@ -786,6 +786,22 @@ knows he can get in and out of Mary Jane's window in time), and a system that ha
 owner teaches the owner to route around it, which is worse, because the workaround leaves no
 record and the system stops reflecting reality (Paul, 2026-06-10).
 
+`orbit_roles_operator_masked` (Clean: engineering):
+Orbit has roles: 'owner' (Paul, everything) and 'operator' (a Hurricane Bath Operator running a
+route). An operator signs in with their own Google account (onboarding: insert an `admins` row
+with their email and role; their first sign-in binds it via admin_self's adopt-by-email), sees
+only the floors the route needs (Today, Calendar, Clients), and the MASKING IS SERVER-SIDE
+where a redesign cannot drop it: admin_get_client and admin_today_appointments strip contact
+details and money for the operator role and hand back a click-to-text link instead of a phone
+number. Honest limit until Twilio: an sms: link necessarily carries the number inside the href
+(not displayed, but inspectable by a technical person); true number-hiding is the Twilio relay,
+which slots in without changing the UI. Jake is the intended first test operator. Because the
+console is being built emperor-mode for Paul but the business is built to run without him
+(prime directive), more people are coming, and an operator needs the day's work without holding
+every client's personal contact and the business's money numbers; masking in the RPC instead of
+the page means no future floor can accidentally leak what the role should not see. Paul,
+2026-06-10. Foundation shipped in migration 0150.
+
 `villages_only_in_copy` (Hurricane Bath: copy):
 (Name kept for continuity; the rule now means served-cities-only.) The Hurricane
 Bath surface names only Clean's served cities, The Villages and Ocala, in
@@ -1863,14 +1879,16 @@ Until a deliberate cutover, Paul's single Google calendar (his default calendar)
 working source of truth he books and works out of; the Orbit admin Calendar floor is a
 read-only mirror he uses to test the sync against that calendar, never a replacement, and
 Acuity stays the system that actually sends client reminders until our own reminder send is
-built and verified. The cutover to a dedicated "Dog Gone Clean" calendar happens as ONE
-coordinated switch, in this exact order, never piecemeal: (1) Paul creates a "Dog Gone Clean"
-calendar in Google Calendar; (2) Claude repoints the Apps Script
-(`supabase/apps-script-calendar.gs`) from `getDefaultCalendar()` to the Dog Gone Clean calendar
-by id; (3) Claude moves the existing upcoming client events from the default calendar onto the
-Dog Gone Clean calendar via the Calendar API. The flip is complete only after all three; any
-step alone breaks the sync (a calendar the script does not read, or a repointed script with no
-events). After the flip two pieces unlock: per-business calendars give perfect Nails/Clean
+built and verified. The cutover to a dedicated "Dog Gone Clean" calendar now runs as a
+PARALLEL BRIDGE first (Paul's amendment, 2026-06-10): the Apps Script reads BOTH the default
+calendar AND a calendar named "Dog Gone Clean" (deduped), so the moment Paul creates that
+calendar he can start booking new appointments into it while the old ones stay on the default,
+and the app sees everything throughout. The original all-at-once failure this rule guarded
+against (a repointed script with no events, or a calendar the script cannot see) cannot occur
+under the bridge, because nothing is ever unread. The FINAL flip, on Paul's go once he trusts
+it: (1) move any remaining upcoming client events onto the Dog Gone Clean calendar; (2) drop
+the default calendar from the script's read list. Acuity keeps sending reminders until our
+Resend send is live, unchanged. After the flip two pieces unlock: per-business calendars give perfect Nails/Clean
 separation (each business's script reads only its own calendar, personal stays unread), and
 two-way enrichment can stamp each appointment's service address and gate code back into the
 calendar event for the field. No step starts until Paul says go. Because the calendar is Paul's
@@ -1941,8 +1959,16 @@ writes it under the admin gate; `admin_riker_context` feeds the parser only the 
 touch and doubles as the auth check. Supported writes: a visit (service, minutes, amount, payment,
 work done, visit notes) with per-dog vibe scores, a household note appended to `clients.note`,
 per-dog notes appended to `dogs.notes`, dog roster status changes ("Windsor moved away, archive
-him" sets roster_status, reversible, never a delete; 0149), and notify people ("text the sitter
-instead until July"; 0148); every dog reference is validated to belong to the client.
+him" sets roster_status, reversible, never a delete; 0149), notify people ("text the sitter
+instead until July"; 0148), and a WISDOM FALLBACK (0150): anything that is not about one
+client's record (an idea, a rule, a decision) lands in the wisdom inbox for the Archivist, with
+no client required; every dog reference is validated to belong to the client. THE ONE GATEWAY
+(Paul, 2026-06-10): the floating + on every Orbit floor now sends everything through Riker,
+who routes it; there is no separate Oracle-capture or per-purpose entry point, because one
+habit (hit +, say it) beats remembering which button files what, and the wisdom fallback means
+nothing said can fall on the floor. The living user manual is the "What can I tell Riker?"
+list rendered wherever Riker takes input (RikerManual in RikerCapture.jsx), updated in the
+same commit as each new power so it cannot drift from reality.
 Nothing is written until Paul taps Confirm once (one-tap confirm), so a misheard word never lands. It
 is on Today (Riker resolves the client name Paul says) and on each client sheet (the client is fixed).
 Because the moat is the proprietary per-client knowledge Paul carries, and the way to keep it is to

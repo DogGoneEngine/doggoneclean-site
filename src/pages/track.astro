@@ -67,6 +67,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <p class="trk-block" id="trk-block"></p>
         <div class="trk-photos" id="trk-photos" hidden>
           <p class="trk-photos__label">Photos from this visit</p>
+          <!-- The shareable moment: once a before and an after both exist,
+               a clean side-by-side collage (thin white divider, nothing
+               flowery) leads the strip. Tap to share or save. -->
+          <div class="trk-collages" id="trk-collages" hidden></div>
           <div class="trk-photos__grid" id="trk-photos-grid"></div>
         </div>
       </div>
@@ -358,6 +362,25 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     text-transform: uppercase;
     color: var(--accent);
   }
+  .trk-collages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+  .trk-collages img {
+    width: 100%;
+    border-radius: 12px;
+    display: block;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+  }
+  .trk-collages .trk-collage__hint {
+    margin: 2px 0 0;
+    font-size: var(--text-xs);
+    color: var(--soft);
+    text-align: center;
+  }
   .trk-photos__grid {
     display: flex;
     gap: var(--space-sm);
@@ -643,9 +666,85 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   // Photos Paul shared from this visit, via the tracker-photos edge function
   // (a token visitor has no auth for storage RLS, so URLs are signed
   // server-side; only deliberately shared photos for this one visit return).
-  const PHOTO_LABELS: Record<string, string> = { before: 'Before', after: 'After', with_dog: 'Together', extra: 'Extra' };
+  // Today the operator is Paul; when routes carry operators this reads from
+  // the route (specialist_named_not_promised), same as the who-block above.
+  const OPERATOR_FIRST = 'Paul';
+  const PHOTO_LABELS: Record<string, string> = { before: 'Before', after: 'After', with_dog: `With ${OPERATOR_FIRST}`, extra: 'Extra' };
+  function photoLabel(p: { kind: string; dog_name?: string | null }) {
+    if (p.kind === 'with_dog') return p.dog_name ? `${OPERATOR_FIRST} and ${p.dog_name}` : `With ${OPERATOR_FIRST}`;
+    const base = PHOTO_LABELS[p.kind] || 'Photo';
+    return p.dog_name ? `${base}, ${p.dog_name}` : base;
+  }
   const photosEl = document.getElementById('trk-photos')!;
   const photosGrid = document.getElementById('trk-photos-grid')!;
+  const collagesEl = document.getElementById('trk-collages')!;
+
+  // Before-and-after, side by side, thin white divider, nothing flowery:
+  // the thing a proud client actually shares. Built right here on the page
+  // (the signed URLs allow it), one collage per dog when photos are tagged.
+  const builtCollages = new Set<string>();
+  function loadImg(url: string): Promise<HTMLImageElement> {
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => res(img);
+      img.onerror = rej;
+      img.src = url;
+    });
+  }
+  function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
+    const s = Math.max(w / img.width, h / img.height);
+    const sw = w / s; const sh = h / s;
+    const sx = (img.width - sw) / 2; const sy = (img.height - sh) / 2;
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  }
+  async function buildCollages(photos: Array<{ id: string; kind: string; url: string; dog_name?: string | null }>) {
+    const groups = new Map<string, { before?: any; after?: any }>();
+    for (const p of photos) {
+      if (p.kind !== 'before' && p.kind !== 'after') continue;
+      const key = p.dog_name || '';
+      if (!groups.has(key)) groups.set(key, {});
+      const g = groups.get(key)!;
+      if (!(g as any)[p.kind]) (g as any)[p.kind] = p;
+    }
+    for (const [dog, g] of groups) {
+      if (!g.before || !g.after) continue;
+      const key = `${g.before.id}|${g.after.id}`;
+      if (builtCollages.has(key)) continue;
+      builtCollages.add(key);
+      try {
+        const [bi, ai] = await Promise.all([loadImg(g.before.url), loadImg(g.after.url)]);
+        const S = 800; const GAP = 8;
+        const canvas = document.createElement('canvas');
+        canvas.width = S * 2 + GAP; canvas.height = S;
+        const ctx = canvas.getContext('2d')!;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawCover(ctx, bi, 0, 0, S, S);
+        drawCover(ctx, ai, S + GAP, 0, S, S);
+        const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.9));
+        if (!blob) continue;
+        const url = URL.createObjectURL(blob);
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = dog ? `${dog}, before and after` : 'Before and after';
+        img.title = 'Tap to share';
+        img.addEventListener('click', async () => {
+          const file = new File([blob], `${(dog || 'before-after').toLowerCase().replace(/\s+/g, '-')}.jpg`, { type: 'image/jpeg' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try { await navigator.share({ files: [file] }); return; } catch { /* closed the sheet */ }
+          } else {
+            window.open(url, '_blank');
+          }
+        });
+        const hint = document.createElement('p');
+        hint.className = 'trk-collage__hint';
+        hint.textContent = `${dog ? dog + ': ' : ''}before and after. Tap to share.`;
+        collagesEl.append(img, hint);
+        collagesEl.hidden = false;
+      } catch { /* a collage is a bonus; the strip stands on its own */ }
+    }
+  }
 
   async function refreshPhotos() {
     if (!token) return;
@@ -667,13 +766,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         const img = document.createElement('img');
         img.src = p.url;
         img.loading = 'lazy';
-        img.alt = PHOTO_LABELS[p.kind] || 'Visit photo';
+        img.alt = photoLabel(p);
         const label = document.createElement('span');
-        label.textContent = (PHOTO_LABELS[p.kind] || 'Photo') + (p.dog_name ? `, ${p.dog_name}` : '');
+        label.textContent = photoLabel(p);
         a.append(img, label);
         return a;
       }));
       photosEl.hidden = false;
+      buildCollages(photos);
     } catch { /* photos are a bonus; the tracker never breaks over them */ }
   }
 

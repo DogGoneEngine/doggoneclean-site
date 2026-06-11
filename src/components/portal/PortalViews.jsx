@@ -512,7 +512,15 @@ function ApptsView({ ctx }) {
 // visit date, newest first. Before, after, the extras worth seeing (a skin
 // spot he flagged, a moment worth keeping). Renders nothing until at least
 // one photo is shared, so the tab stays clean for clients without any.
-const PHOTO_KIND_LABEL = { before: 'Before', after: 'After', with_dog: 'Together', extra: 'Extra' };
+// Today the operator is Paul; when routes carry operators this reads from
+// the route (specialist_named_not_promised).
+const OPERATOR_FIRST = 'Paul';
+const PHOTO_KIND_LABEL = { before: 'Before', after: 'After', with_dog: `With ${OPERATOR_FIRST}`, extra: 'Extra' };
+function photoKindLabel(p) {
+  if (p.kind === 'with_dog') return p.dog_name ? `${OPERATOR_FIRST} and ${p.dog_name}` : `With ${OPERATOR_FIRST}`;
+  const base = PHOTO_KIND_LABEL[p.kind] || 'Photo';
+  return p.dog_name ? `${base}, ${p.dog_name}` : base;
+}
 
 function VisitPhotosSection({ city }) {
   const [groups, setGroups] = useState(null); // null = loading, [] = none
@@ -556,12 +564,12 @@ function VisitPhotosSection({ city }) {
               <a key={p.id} href={p.url} target="_blank" rel="noreferrer" style={{ position: 'relative', display: 'block' }}>
                 <img
                   src={p.url}
-                  alt={PHOTO_KIND_LABEL[p.kind] || 'Visit photo'}
+                  alt={photoKindLabel(p)}
                   loading="lazy"
                   style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, display: 'block' }}
                 />
                 <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, fontSize: 10, textAlign: 'center', background: 'rgba(12,19,34,0.55)', color: '#fff', borderRadius: '0 0 10px 10px', padding: '1px 0' }}>
-                  {(PHOTO_KIND_LABEL[p.kind] || 'Photo') + (p.dog_name ? `, ${p.dog_name}` : '')}
+                  {photoKindLabel(p)}
                 </span>
               </a>
             ))}

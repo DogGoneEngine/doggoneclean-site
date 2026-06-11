@@ -398,6 +398,12 @@ export async function runCapacityCheck() {
 // In-app booking for an existing client (admin side). Slots are sized to the
 // client's own duration; booking enforces the slot engine for everyone except
 // Paul, who can override with a confirm (operator_override_with_confirm).
+// The intelligent half of booking: due date from the client's real cadence
+// and last visit, candidate days around it filtered by THEIR constraints,
+// each with its offset from due and the stops already on that day.
+export async function adminSuggestSlots(clientId) {
+  return rpc('admin_suggest_slots', { p_client_id: clientId });
+}
 export async function adminOpenSlots(clientId, fromDate, days = 1) {
   return rpc('admin_open_slots', { p_client_id: clientId, p_from: fromDate, p_days: days });
 }

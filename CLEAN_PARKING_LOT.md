@@ -46,16 +46,16 @@ The Orbit admin Calendar floor is a READ-ONLY MIRROR he uses to test the sync ag
 calendar, never a replacement. Acuity still sends the client reminders. Nothing about the sync
 changes Paul's calendar or his Acuity workflow.
 
-**The flip is ONE coordinated switch, in THIS EXACT ORDER, never piecemeal:**
-1. **Paul** creates a "Dog Gone Clean" calendar in Google Calendar.
-2. **Claude** repoints the Apps Script (`supabase/apps-script-calendar.gs`) from
-   `CalendarApp.getDefaultCalendar()` to the Dog Gone Clean calendar by id.
-3. **Claude** moves the existing upcoming client events from the default calendar onto the
-   Dog Gone Clean calendar (via the Calendar API).
-
-Why the order and the all-at-once: a new calendar the script does not yet read is invisible to
-the system; a repointed script with no events moved sees nothing. Either step alone silently
-drops appointments out of Paul's view. Do all three in one sitting, on Paul's go.
+**AMENDED 2026-06-10 (Paul): the flip now runs as a PARALLEL BRIDGE first.** The Apps Script
+(`supabase/apps-script-calendar.gs`) reads the default calendar AND a calendar named
+"Dog Gone Clean" (deduped). So the runway is:
+1. **Paul** creates a "Dog Gone Clean" calendar in Google Calendar and re-pastes the updated
+   Apps Script (the repo file changed 2026-06-10; same trigger, no other setup).
+2. **Paul books new appointments straight into the Dog Gone Clean calendar from then on**,
+   while old ones stay on the default. The app sees both the whole time; nothing can go
+   unread, which was the failure the old all-at-once order guarded against.
+3. **The final flip, whenever Paul trusts it:** Claude moves any remaining upcoming client
+   events onto the Dog Gone Clean calendar and drops the default from the script's read list.
 
 **Unlocks AFTER the flip (not before):**
 - **Per-business separation:** when Nails gets the same sync it reads only the Nails calendar;
@@ -838,3 +838,15 @@ hardness windows once those are structured, writing source-null appointments exa
 admin booking. Confirmations ride the existing trigger (live once Resend lands + Acuity is
 cancelled). Gate it on nothing else: legacy clients pay in person, so Stripe is NOT required
 for this slice. Build after the tracker settles.
+
+## Rolling duration recompute: method locked (Paul's cycle-time question, 2026-06-10)
+
+The right question is not "what is the average?" but "what does THIS dog take NOW?" A dog that
+fought the system for six visits and then learned it has two eras, and a whole-history average
+straddles them. Decision: per client per service, the working duration is the MEDIAN OF THE
+LAST 5 real visits (minimum 3; below that, blend with the seeded value). A short recent window
+IS the heavier weighting on recent visits, the median shrugs off the one chaotic day a mean
+would absorb, and no standard-deviation machinery is needed (elons_algorithm: that would be
+optimizing a part that should not exist). Implementation rides the committed rolling-recompute
+round: every completed visit updates clients.visit_minutes (and the groom/nails splits) from
+that window.

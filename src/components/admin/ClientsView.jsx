@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, adminSuggestSlots } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import VisitPhotos from './VisitPhotos.jsx';
 
@@ -206,6 +206,9 @@ function ClientSheet({ clientId, onChanged }) {
           <LocationField client={c} />
           <Field label="Geo notes" value={c.location_geo_notes} />
           <Field label="Phone" value={c.phone_e164} />
+          {data.contact_links?.sms && (
+            <Field label="Contact" value={<a className="ad-btn ad-btn--ghost ad-btn--sm" href={data.contact_links.sms}>Text the client</a>} />
+          )}
           <Field label="Flags" value={(c.flags || []).join(', ')} />
           <Field label="Data gaps" value={(c.data_gaps || []).join(', ')} />
         </dl>
@@ -1418,24 +1421,31 @@ function NotifyPeoplePanel({ clientId }) {
 // in the loop with one tap.
 function BookVisitPanel({ clientId, clientName, onBooked }) {
   const [open, setOpen] = useState(false);
+  const [sugg, setSugg] = useState(null);       // adminSuggestSlots payload
+  const [more, setMore] = useState(false);      // the manual fallback flow
   const [date, setDate] = useState(() => {
     const d = new Date(Date.now() + 86400000);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   });
-  const [slots, setSlots] = useState(null); // null = not loaded
-  const [durationMin, setDurationMin] = useState(null);
+  const [slots, setSlots] = useState(null);
   const [manualTime, setManualTime] = useState('');
-  const [conflict, setConflict] = useState(null); // { startISO, overlaps }
-  const [booked, setBooked] = useState(null); // success payload
+  const [conflict, setConflict] = useState(null);
+  const [booked, setBooked] = useState(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
+
+  async function openPanel() {
+    setOpen(true); setBusy(true); setErr(null);
+    try { setSugg(await adminSuggestSlots(clientId)); }
+    catch (e) { setErr(e.message || 'suggest_failed'); }
+    finally { setBusy(false); }
+  }
 
   async function loadSlots() {
     setBusy(true); setErr(null); setSlots(null); setConflict(null);
     try {
       const res = await adminOpenSlots(clientId, date, 1);
       setSlots(res?.slots || []);
-      setDurationMin(res?.duration_minutes || null);
     } catch (e) { setErr(e.message || 'slots_failed'); }
     finally { setBusy(false); }
   }
@@ -1460,12 +1470,12 @@ function BookVisitPanel({ clientId, clientName, onBooked }) {
     finally { setBusy(false); }
   }
 
+  const fmtSlot = (iso) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const fmtDay = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const offsetLabel = (n) => n == null ? 'soonest' : n === 0 ? 'on time' : n > 0 ? `${n} day${n === 1 ? '' : 's'} late` : `${-n} day${n === -1 ? '' : 's'} early`;
   function manualISO() {
     if (!manualTime) return null;
     return new Date(`${date}T${manualTime}:00`).toISOString();
-  }
-  function fmtSlot(iso) {
-    return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
   function gcalLink(res) {
     const f = (iso) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
@@ -1481,19 +1491,24 @@ function BookVisitPanel({ clientId, clientName, onBooked }) {
   if (!open) {
     return (
       <div className="ad-panel">
-        <button className="ad-btn ad-btn--sm" onClick={() => setOpen(true)}>Book next visit</button>
+        <button className="ad-btn ad-btn--sm" onClick={openPanel}>Book next visit</button>
       </div>
     );
   }
 
+  const cadWeeks = sugg?.cadence_days && sugg.cadence_days % 7 === 0 ? sugg.cadence_days / 7 : null;
+
   return (
     <div className="ad-panel">
-      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>
-        Book next visit{durationMin ? ` (${durationMin} min)` : ''}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>
+          Book next visit{sugg?.duration_minutes ? ` (${sugg.duration_minutes} min)` : ''}
+        </div>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setOpen(false); setBooked(null); setMore(false); setConflict(null); }}>Close</button>
       </div>
 
       {booked ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
           <div style={{ fontSize: 14 }}>
             Booked: <strong>{new Date(booked.scheduled_start).toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</strong>
             {booked.overridden ? <span style={{ color: 'var(--ad-warn,#b9770a)' }}> (override)</span> : ''}
@@ -1502,15 +1517,14 @@ function BookVisitPanel({ clientId, clientName, onBooked }) {
             <a className="ad-btn ad-btn--ghost ad-btn--sm" href={gcalLink(booked)} target="_blank" rel="noreferrer">
               Add to Google Calendar
             </a>
-            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setBooked(null); setSlots(null); }}>Book another</button>
-            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setBooked(null); setOpen(false); }}>Done</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setBooked(null); openPanel(); }}>Book another</button>
           </div>
           <div style={{ fontSize: 11, opacity: 0.55 }}>
             Until the calendar flip, tap Add to Google Calendar so your working calendar shows it too.
           </div>
         </div>
       ) : conflict ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
           <div style={{ fontSize: 14 }}>
             The engine would not offer <strong>{fmtSlot(conflict.startISO)}</strong>
             {conflict.overlaps.length > 0
@@ -1526,42 +1540,106 @@ function BookVisitPanel({ clientId, clientName, onBooked }) {
           </div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-            <input type="date" value={date} disabled={busy} onChange={(e) => { setDate(e.target.value); setSlots(null); }}
-              style={{ fontSize: 14, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
-            <button className="ad-btn ad-btn--sm" disabled={busy || !date} onClick={loadSlots}>
-              {busy && slots === null ? '...' : 'Show open times'}
-            </button>
-            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)} disabled={busy}>Close</button>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+          {busy && !sugg && <div style={{ fontSize: 13, opacity: 0.6 }}>Working out when they are due...</div>}
 
-          {slots !== null && (
-            slots.length === 0 ? (
-              <div style={{ fontSize: 13, opacity: 0.65 }}>
-                No engine-open times that day (booked solid, outside working days, or an off week). Use a custom time below if you want it anyway.
+          {sugg?.next_booked && (
+            <div style={{ fontSize: 13, padding: '8px 10px', borderRadius: 8, background: 'var(--ad-primary-container, #e6edfc)' }}>
+              Already booked: <strong>{new Date(sugg.next_booked).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</strong>
+              {sugg.next_booked_offset_days != null && sugg.next_booked_offset_days !== 0 && (
+                <span style={{ opacity: 0.7 }}> ({offsetLabel(sugg.next_booked_offset_days)} against their rhythm)</span>
+              )}
+            </div>
+          )}
+
+          {sugg && (
+            <div style={{ fontSize: 13 }}>
+              {sugg.due_date ? (
+                <>Due <strong>{fmtDay(sugg.due_date)}</strong>
+                  {cadWeeks ? ` (every ${cadWeeks} week${cadWeeks === 1 ? '' : 's'}` : sugg.cadence_days ? ` (every ${sugg.cadence_days} days` : ''}
+                  {sugg.last_visit ? `; last visit ${fmtDay(sugg.last_visit)})` : ')'}
+                </>
+              ) : (
+                <>No cadence on file; showing the soonest open times.</>
+              )}
+              {sugg.window_note && (
+                <div style={{ opacity: 0.65, marginTop: 2 }}>Their window: {sugg.window_note}</div>
+              )}
+            </div>
+          )}
+
+          {sugg && (sugg.days || []).length === 0 && (
+            <div style={{ fontSize: 13, opacity: 0.7 }}>
+              Nothing fits their window near the due date (booked solid, off weeks, or the visit is too long for their hours). Use More options to force a time.
+            </div>
+          )}
+
+          {(sugg?.days || []).map((day) => (
+            <div key={day.date} style={{ border: '1px solid var(--ad-outline, #ececf1)', borderRadius: 10, padding: '8px 10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                <strong style={{ fontSize: 14 }}>{fmtDay(day.date)}</strong>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 8px', borderRadius: 999,
+                  color: day.offset_days === 0 ? '#1f8a4b' : 'var(--ad-warn,#b9770a)',
+                  background: day.offset_days === 0 ? 'rgba(31,138,75,0.1)' : 'rgba(185,119,10,0.1)' }}>
+                  {offsetLabel(day.offset_days)}
+                </span>
               </div>
-            ) : (
+              <div style={{ fontSize: 11, opacity: 0.6, margin: '2px 0 6px' }}>
+                {(day.day_stops || []).length === 0
+                  ? 'Nothing booked that day yet.'
+                  : 'That day so far: ' + day.day_stops.map((s) => `${fmtSlot(s.start)} ${s.client || 'a stop'}`).join(', ')}
+              </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {slots.map((s) => (
-                  <button key={s.start} className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy}
-                    onClick={() => book(s.start)}>
-                    {fmtSlot(s.start)}
+                {(day.slots || []).map((s) => (
+                  <button key={s} className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => book(s)}>
+                    {fmtSlot(s)}
                   </button>
                 ))}
               </div>
-            )
-          )}
+            </div>
+          ))}
 
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, opacity: 0.55 }}>Custom time:</span>
-            <input type="time" value={manualTime} disabled={busy} onChange={(e) => setManualTime(e.target.value)}
-              style={{ fontSize: 14, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
-            <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy || !manualTime}
-              onClick={() => { const iso = manualISO(); if (iso) book(iso); }}>
-              Book this time
-            </button>
-          </div>
+          <button type="button" onClick={() => setMore((v) => !v)}
+            style={{ alignSelf: 'flex-start', background: 'transparent', border: 0, padding: 0,
+              fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', textDecoration: 'underline', cursor: 'pointer' }}>
+            {more ? 'hide more options' : 'More options (any day, any time)'}
+          </button>
+
+          {more && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                <input type="date" value={date} disabled={busy} onChange={(e) => { setDate(e.target.value); setSlots(null); }}
+                  style={{ fontSize: 14, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
+                <button className="ad-btn ad-btn--sm" disabled={busy || !date} onClick={loadSlots}>
+                  Show open times
+                </button>
+              </div>
+              {slots !== null && (
+                slots.length === 0 ? (
+                  <div style={{ fontSize: 13, opacity: 0.65 }}>
+                    No engine-open times that day. Use a custom time below if you want it anyway.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {slots.map((s) => (
+                      <button key={s.start} className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => book(s.start)}>
+                        {fmtSlot(s.start)}
+                      </button>
+                    ))}
+                  </div>
+                )
+              )}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 12, opacity: 0.55 }}>Custom time:</span>
+                <input type="time" value={manualTime} disabled={busy} onChange={(e) => setManualTime(e.target.value)}
+                  style={{ fontSize: 14, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
+                <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy || !manualTime}
+                  onClick={() => { const iso = manualISO(); if (iso) book(iso); }}>
+                  Book this time
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
       {err && <div className="ad-error" style={{ marginTop: 6 }}>{err}</div>}

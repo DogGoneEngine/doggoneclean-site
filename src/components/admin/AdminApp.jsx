@@ -67,6 +67,12 @@ const SECTIONS = [
 
 const READY = SECTIONS.filter((s) => s.ready).map((s) => s.key);
 
+// A Hurricane Bath Operator sees the floors the route needs and nothing
+// else; the data inside them is masked server-side (admin_get_client and
+// admin_today_appointments strip contact and money for the operator role),
+// so this list is navigation, not the security boundary.
+const OPERATOR_FLOORS = ['today', 'calendar', 'clients'];
+
 export default function AdminApp() {
   const [session, setSession] = useState(null);
   const [authReady, setAuthReady] = useState(false);
@@ -154,7 +160,10 @@ export default function AdminApp() {
     );
   }
 
-  const active = SECTIONS.find((s) => s.key === section);
+  const isOperator = me.role === 'operator';
+  const visibleSections = isOperator ? SECTIONS.filter((s) => OPERATOR_FLOORS.includes(s.key)) : SECTIONS;
+  const effectiveSection = isOperator && !OPERATOR_FLOORS.includes(section) ? 'today' : section;
+  const active = SECTIONS.find((s) => s.key === effectiveSection);
   const activeLabel = active?.label || 'Orbit';
 
   return (
@@ -192,12 +201,12 @@ export default function AdminApp() {
           </button>
         </div>
         <nav className="ad-side__nav">
-          {SECTIONS.map((s) => (
+          {visibleSections.map((s) => (
             <button
               key={s.key}
               className={
                 'ad-side__item ' +
-                (section === s.key ? 'ad-side__item--on ' : '') +
+                (effectiveSection === s.key ? 'ad-side__item--on ' : '') +
                 (s.ready ? '' : 'ad-side__item--disabled')
               }
               onClick={() => pickSection(s.key)}
@@ -221,23 +230,23 @@ export default function AdminApp() {
       </aside>
 
       <main className="ad-main">
-        {section === 'today' && <TodayView onOpenClient={openClient} />}
-        {section === 'clients' && <ClientsView focus={clientFocus} />}
-        {section === 'schedule' && <ScheduleView />}
-        {section === 'finance' && <FinanceView />}
-        {section === 'reports' && <ReportsView />}
-        {section === 'compliance' && <ComplianceView />}
-        {section === 'settings' && <SettingsView />}
-        {section === 'audit' && <AuditView />}
-        {section === 'pricing' && <PricingView />}
-        {section === 'operations' && <OperationsView />}
-        {section === 'knowledge' && <KnowledgeView />}
-        {section === 'vendors' && <VendorsView />}
-        {section === 'growth' && <GrowthView />}
-        {section === 'calendar' && <CalendarView />}
-        {section === 'hr' && <HRView />}
-        {section === 'geography' && <GeographyView />}
-        {!READY.includes(section) && <RoadmapPanel section={active} />}
+        {effectiveSection === 'today' && <TodayView onOpenClient={openClient} />}
+        {effectiveSection === 'clients' && <ClientsView focus={clientFocus} />}
+        {effectiveSection === 'schedule' && <ScheduleView />}
+        {effectiveSection === 'finance' && <FinanceView />}
+        {effectiveSection === 'reports' && <ReportsView />}
+        {effectiveSection === 'compliance' && <ComplianceView />}
+        {effectiveSection === 'settings' && <SettingsView />}
+        {effectiveSection === 'audit' && <AuditView />}
+        {effectiveSection === 'pricing' && <PricingView />}
+        {effectiveSection === 'operations' && <OperationsView />}
+        {effectiveSection === 'knowledge' && <KnowledgeView />}
+        {effectiveSection === 'vendors' && <VendorsView />}
+        {effectiveSection === 'growth' && <GrowthView />}
+        {effectiveSection === 'calendar' && <CalendarView />}
+        {effectiveSection === 'hr' && <HRView />}
+        {effectiveSection === 'geography' && <GeographyView />}
+        {!READY.includes(effectiveSection) && <RoadmapPanel section={active} />}
       </main>
 
       <QuickCapture />

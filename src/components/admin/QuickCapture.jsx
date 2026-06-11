@@ -1,17 +1,21 @@
 // src/components/admin/QuickCapture.jsx
 //
-// The speed dial. A floating button on every Orbit floor: hit it the moment an
-// idea lands and dump it by typing or by voice. It goes straight to the wisdom
-// inbox (Knowledge Base) to be absorbed into the Oracle or a client record. The
-// whole point is zero friction between having a thought and capturing it.
+// The speed dial, now the one gateway (Paul 2026-06-10): the floating + on
+// every Orbit floor sends whatever Paul says THROUGH RIKER, who routes it to
+// its real home: a client's visit, a note, a roster change, a notify person,
+// or (for ideas, rules, and business thoughts) the wisdom inbox for the
+// Archivist. One button, one habit, everything filed. Nothing writes until
+// the one-tap Confirm.
 
 import { useEffect, useRef, useState } from 'react';
-import { captureWisdom } from './supabase.js';
+import { rikerParse, rikerApply } from './supabase.js';
+import { RikerManual } from './RikerCapture.jsx';
 
 export default function QuickCapture() {
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState('');
-  const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState('idle'); // idle | parsing | review | applying
+  const [plan, setPlan] = useState(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
   const [listening, setListening] = useState(false);
@@ -38,19 +42,29 @@ export default function QuickCapture() {
     try { rec.start(); setListening(true); } catch { setListening(false); }
   }
 
-  async function save() {
+  async function send() {
     if (!body.trim()) return;
-    setBusy(true); setError(null);
+    setPhase('parsing'); setError(null);
     try {
-      await captureWisdom(body.trim());
-      setBody(''); setSaved(true); setTimeout(() => { setSaved(false); setOpen(false); }, 900);
-    } catch (e) { setError(e.message || 'save_failed'); }
-    finally { setBusy(false); }
+      setPlan(await rikerParse(body.trim(), null));
+      setPhase('review');
+    } catch (e) { setError(e.message || 'parse_failed'); setPhase('idle'); }
   }
+
+  async function confirm() {
+    setPhase('applying'); setError(null);
+    try {
+      await rikerApply(plan);
+      setPlan(null); setBody(''); setPhase('idle'); setSaved(true);
+      setTimeout(() => { setSaved(false); setOpen(false); }, 900);
+    } catch (e) { setError(e.message || 'apply_failed'); setPhase('review'); }
+  }
+
+  const canApply = plan && plan.matched !== false && (plan.client_id || plan.wisdom);
 
   return (
     <>
-      <button onClick={() => setOpen(true)} title="Capture an idea (text or voice)"
+      <button onClick={() => setOpen(true)} title="Tell Riker (text or voice); he files it where it belongs"
         style={{
           position: 'fixed', right: 20, bottom: 20, zIndex: 50, width: 52, height: 52, borderRadius: '50%',
           border: 'none', cursor: 'pointer', fontSize: 22, color: '#fff',
@@ -58,28 +72,69 @@ export default function QuickCapture() {
         }}>+</button>
 
       {open && (
-        <div onClick={() => !busy && setOpen(false)} style={{
+        <div onClick={() => phase === 'idle' && setOpen(false)} style={{
           position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.35)',
           display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: 16,
         }}>
           <div onClick={(e) => e.stopPropagation()} className="ad-panel" style={{ width: '100%', maxWidth: 560, marginBottom: 60 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <strong style={{ fontSize: 15 }}>Capture an idea</strong>
-              <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)} disabled={busy}>Close</button>
+              <strong style={{ fontSize: 15 }}>Tell Riker</strong>
+              <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)} disabled={phase === 'applying'}>Close</button>
             </div>
-            <p style={{ fontSize: 12, opacity: 0.65, margin: '0 0 8px' }}>Just dump the idea, and try to say "because." The Archivist files it and picks the category for you.</p>
-            <textarea value={body} onChange={(e) => setBody(e.target.value)} disabled={busy} rows={4} autoFocus
-              placeholder="The idea, and the because behind it…"
-              style={{ width: '100%', fontSize: 14, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
-              {speechOk && (
-                <button className={'ad-btn ad-btn--sm ' + (listening ? '' : 'ad-btn--ghost')} onClick={toggleVoice} disabled={busy}>
-                  {listening ? '● listening… tap to stop' : '🎤 voice'}
-                </button>
-              )}
-              <div style={{ flex: 1 }} />
-              <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy || !body.trim()}>{saved ? 'Saved' : 'Capture'}</button>
-            </div>
+
+            {phase !== 'review' ? (
+              <>
+                <p style={{ fontSize: 12, opacity: 0.65, margin: '0 0 8px' }}>
+                  Anything: a visit, a note, a roster change, who to text, or just an idea. Riker files it where it belongs. Say "because" so the reason rides along.
+                </p>
+                <textarea value={body} onChange={(e) => setBody(e.target.value)} disabled={phase === 'parsing'} rows={4} autoFocus
+                  placeholder="e.g. Windsor moved away, archive him. Or: idea for the portal, because..."
+                  style={{ width: '100%', fontSize: 14, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
+                  {speechOk && (
+                    <button className={'ad-btn ad-btn--sm ' + (listening ? '' : 'ad-btn--ghost')} onClick={toggleVoice} disabled={phase === 'parsing'}>
+                      {listening ? '\u25cf listening\u2026 tap to stop' : '\ud83c\udfa4 voice'}
+                    </button>
+                  )}
+                  <div style={{ flex: 1 }} />
+                  <button className="ad-btn ad-btn--sm" onClick={send} disabled={phase === 'parsing' || !body.trim()}>
+                    {saved ? 'Filed' : phase === 'parsing' ? 'Riker is listening\u2026' : 'Send to Riker'}
+                  </button>
+                </div>
+                <RikerManual />
+              </>
+            ) : (
+              <div style={{ fontSize: 14, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>
+                  Riker will record
+                </div>
+                {plan.matched === false && !plan.wisdom ? (
+                  <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
+                    {plan.summary || 'Could not tell which client you meant.'}
+                    {(plan.candidates || []).length > 0 && (
+                      <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>
+                        Did you mean: {plan.candidates.map((c) => c.name).join(', ')}?
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <div><strong>{plan.client_name || (plan.wisdom ? 'Business wisdom' : 'Client')}</strong></div>
+                    {plan.summary && <div style={{ opacity: 0.8, margin: '2px 0 8px' }}>{plan.summary}</div>}
+                  </>
+                )}
+                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                  {canApply && (
+                    <button className="ad-btn ad-btn--sm" onClick={confirm} disabled={phase === 'applying'}>
+                      {phase === 'applying' ? 'Saving\u2026' : 'Confirm'}
+                    </button>
+                  )}
+                  <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setPlan(null); setPhase('idle'); }} disabled={phase === 'applying'}>
+                    {canApply ? 'Cancel' : 'Back'}
+                  </button>
+                </div>
+              </div>
+            )}
             {error && <div className="ad-error" style={{ marginTop: 6 }}>{error}</div>}
           </div>
         </div>
