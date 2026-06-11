@@ -3053,3 +3053,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the LATEST-scheduled rolling stop, the one Paul is actually driving to, so a forgotten stale
   stop can never hijack the broadcast again. Google keys were fine; the ETA had computed
   normally at 12:44pm right before the hijack.
+
+### Jake's first sign-in found the auth Site URL bug (Jun 11 afternoon)
+
+- Jake (on Safari) signed into Orbit with jakewnickerson@gmail.com; Google auth SUCCEEDED four
+  times in the logs, then the post-login redirect dead-ended at "couldn't connect to the
+  server." Root cause: the Supabase Auth Site URL is still the developer default
+  http://localhost:3000, so any sign-in whose redirect target is not carried lands on a server
+  that does not exist. Paul's own access never broke because his session rides refresh tokens
+  and has not done a fresh OAuth dance from production. This is a launch-blocker class find
+  (every new portal client would have hit the same wall); filed as launch blocker 0b with the
+  one-minute dashboard fix. Once set, Jake signs in again and adopt-by-email binds his
+  operator row automatically.

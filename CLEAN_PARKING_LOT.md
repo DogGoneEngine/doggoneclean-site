@@ -13,6 +13,13 @@ These gate the v2.0 online path and the Acuity/Squarespace cutover. Only Paul ca
    restrictions and confirmed autocomplete works in the funnel. (History: diagnosed 2026-06-10
    as 403 API_KEY_SERVICE_BLOCKED; the funnel now also probes Places on load and names this
    failure in a banner if it ever regresses.)
+0b. **Supabase Auth URL configuration (one minute, dashboard only).** Found by Jake 2026-06-11:
+   fresh Google sign-ins authenticate fine, then bounce to the Site URL, which is still the
+   developer default http://localhost:3000, so the browser shows "can't connect to the server."
+   Fix in supabase.com dashboard > project dgc-prod > Authentication > URL Configuration:
+   set Site URL to https://hurricanebath.com and add https://hurricanebath.com/** to Redirect
+   URLs. Until this is set, EVERY new sign-in (Jake's operator login, every future portal
+   client) dead-ends; existing remembered sessions (Paul's) keep working, which is why it hid.
 1. **iPostal1 mailing address.** A real business mailing address. Feeds the Resend sender
    verification, the address drop-in on the privacy + terms pages, and the bank / Stripe / Twilio
    registrations that all want a business address. Paul is going in person (week of 2026-06-08).
