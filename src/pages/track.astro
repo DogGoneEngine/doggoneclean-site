@@ -84,7 +84,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <!-- Who is coming to your house: the full-size photo card. The header
            thumbnail says "a person named Paul"; this says "THIS person". -->
       <div class="trk-card trk-meet" id="trk-meet" hidden>
-        <img src="/photos/og-cover.jpg" alt="Paul Nickerson, smiling, with a client's freshly bathed dog over his shoulder" />
+        <img id="trk-meet-img" src="/photos/og-cover.jpg" alt="Paul Nickerson, smiling, with a client's freshly bathed dog over his shoulder" />
         <div class="trk-meet__text">
           <p class="trk-meet__eyebrow">Who's coming to your door</p>
           <strong>Paul Nickerson</strong>
@@ -559,10 +559,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         });
         truckMarker = new MarkerCtor({
           map, position: op, title: 'Dog Gone Clean',
+          // The truck is the brand: the shaking-dog mark on a round badge
+          // (public/tracker-dog-marker.png, cut from the logo), not a generic
+          // blue dot. The home stays the paw print.
           icon: {
-            path: gm.SymbolPath.CIRCLE, scale: 9,
-            fillColor: '#2563eb', fillOpacity: 1,
-            strokeColor: '#ffffff', strokeWeight: 3,
+            url: '/tracker-dog-marker.png',
+            scaledSize: new gm.Size(48, 48),
+            anchor: new gm.Point(24, 24),
           },
         });
       } else {
@@ -756,6 +759,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       });
       if (!r.ok) return;
       const data = await r.json();
+      // Returning clients see Paul with THEIR dog on the who's-coming card,
+      // from their own shared visit history; new clients keep the cover.
+      const who = data && data.who_is_coming;
+      if (who && who.url) {
+        const meetImg = document.getElementById('trk-meet-img') as HTMLImageElement | null;
+        if (meetImg && meetImg.src !== who.url) {
+          meetImg.src = who.url;
+          meetImg.alt = who.dog_name ? `Paul with ${who.dog_name}` : 'Paul with your dog';
+        }
+      }
       const photos = (data && data.photos) || [];
       if (photos.length === 0) return;
       photosGrid.replaceChildren(...photos.map((p: { id: string; kind: string; url: string; dog_name?: string }) => {

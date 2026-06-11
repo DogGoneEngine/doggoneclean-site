@@ -3075,3 +3075,20 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   appointment dog list -> bath_dogs -> the client's regular roster in public.dogs, plus a
   first-name fallback from the client record. The is/are grammar was never broken; it had no
   names to inflect. Verified live: her token now returns Maverick and Sammy.
+
+### Tracker brand polish + Jake as the first comp client (Jun 11 evening)
+
+- **The truck marker is the brand now**: the shaking-dog mark from the logo, cut into a round
+  badge with a brand-blue ring (public/tracker-dog-marker.png, generated from favicon.png),
+  replaces the generic blue dot on the live map. The home stays the paw print.
+- **Who's coming, personalized** (Paul's idea): for a returning client the bottom card now
+  shows the latest SHARED Paul-with-their-own-dog photo from their visit history
+  (tracker-photos v5 returns who_is_coming; the page swaps the cover image). New clients keep
+  the generic cover. Verified from data: Michelle gets Paul-with-Bandit, Becky gets
+  Paul-with-Maverick from today's visit.
+- **Jake Nickerson set up as a client** (also an operator in HR; no conflict, different
+  tables): 4411 E Fort King St Ocala, flags family+comp, win-back suppressed, dogs Iroh
+  (American Bulldog mix) and Nala (Bullmastiff) at $0. Comp = real appointment, zero amount,
+  comp note; nothing special-cased in the engine. First appointment booked for TODAY 6:00 to
+  7:30 pm ET (operator override), both dogs assigned, tracker verified returning Iroh and
+  Nala. Emily Walker's appointment left sitting pending her new date, per Paul.

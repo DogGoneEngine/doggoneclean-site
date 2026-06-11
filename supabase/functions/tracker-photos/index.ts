@@ -7,6 +7,11 @@
 // its client_visible photos -> short-lived signed URLs. Only photos Paul
 // deliberately shared (visit_photos.client_visible, the Orbit Share toggle)
 // ever leave, and only for the one visit the token belongs to.
+//
+// who_is_coming: for a returning client, the latest shared with-dog photo
+// from THEIR OWN visit history, so the "Who's coming to your door" card
+// shows Paul with the client's actual dog instead of the generic cover
+// (Paul, 2026-06-11). New clients keep the cover photo.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
@@ -44,7 +49,7 @@ Deno.serve(async (req) => {
 
   const { data: appt } = await sb
     .from('bath_appointments')
-    .select('id, scheduled_end')
+    .select('id, scheduled_end, subscriber_id')
     .eq('tracker_token', token)
     .maybeSingle();
   if (!appt) return json({ photos: [] });
@@ -54,12 +59,40 @@ Deno.serve(async (req) => {
     return json({ photos: [] });
   }
 
+  // Who's coming: the most recent shared Paul-with-their-dog photo across
+  // the client's whole history. Computed even before this visit has photos,
+  // which is exactly when the card matters most.
+  let who: { url: string; dog_name: string | null } | null = null;
+  const { data: sub } = await sb
+    .from('bath_subscribers')
+    .select('client_id')
+    .eq('id', appt.subscriber_id)
+    .maybeSingle();
+  if (sub?.client_id) {
+    const { data: w } = await sb
+      .from('visit_photos')
+      .select('storage_path, created_at, dogs(name), visits!inner(client_id)')
+      .eq('visits.client_id', sub.client_id)
+      .eq('kind', 'with_dog')
+      .eq('client_visible', true)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (w && w[0]) {
+      const { data: signed } = await sb.storage
+        .from('visit-photos')
+        .createSignedUrl(w[0].storage_path, SIGNED_URL_SECONDS);
+      if (signed?.signedUrl) {
+        who = { url: signed.signedUrl, dog_name: (w[0] as any).dogs?.name ?? null };
+      }
+    }
+  }
+
   const { data: visits } = await sb
     .from('visits')
     .select('id')
     .eq('appointment_id', appt.id);
   const visitIds = (visits ?? []).map((v) => v.id);
-  if (visitIds.length === 0) return json({ photos: [] });
+  if (visitIds.length === 0) return json({ photos: [], who_is_coming: who });
 
   const { data: photos } = await sb
     .from('visit_photos')
@@ -67,7 +100,7 @@ Deno.serve(async (req) => {
     .in('visit_id', visitIds)
     .eq('client_visible', true)
     .order('created_at', { ascending: true });
-  if (!photos || photos.length === 0) return json({ photos: [] });
+  if (!photos || photos.length === 0) return json({ photos: [], who_is_coming: who });
 
   const out: { id: string; kind: string; url: string; dog_name: string | null }[] = [];
   for (const p of photos) {
@@ -78,5 +111,5 @@ Deno.serve(async (req) => {
       out.push({ id: p.id, kind: p.kind, url: signed.signedUrl, dog_name: (p as any).dogs?.name ?? null });
     }
   }
-  return json({ photos: out });
+  return json({ photos: out, who_is_coming: who });
 });
