@@ -3110,3 +3110,27 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   $46,600 to $73,600 (revenue method: $68,306 TTM collected, 91% recurring share, +0.5%
   growth, multiples 0.68 to 1.08). Switches itself to the SDE method when the expense ledger
   reaches 5% of revenue. Inputs display so the number shows its work.
+
+### Batch eleven: two operators in the field for real (Jun 11 night; migrations 0160-0161)
+
+- **The tracker link is never fleeting** (Jake's iPhone showed no share sheet and the link
+  vanished): every stop card now carries a permanent "Tracker link" button that shares where
+  a share sheet exists and copies everywhere else, repeatable any time at any stage.
+  admin_appointment_meta serves the token on demand.
+- **Appointments carry their operator** (`bath_appointments.operator_admin_id`, 0160):
+  switchable last minute from the stop card ("Operator: Paul/Jake"); the tracker's
+  who's-coming names, role line, and photo labels follow the assignment (tracker_status
+  returns the operator). Tonight's test visit assigned to Jake, so the tracker says Jake with
+  Iroh and Nala, not Paul.
+- **Two-phone GPS guard**: only the assigned operator's phone resumes the live-location
+  broadcast; the owner covers unassigned stops. Without this, Paul opening Orbit at home
+  while Jake drives would overwrite the truck's position with Paul's living room.
+- **The Valuation coach is hired** (0161 + value-coach edge fn, weekly Mondays): reads the
+  live valuation and its levers (recurring share, growth, expense coverage, top-3 client
+  concentration, receivables, open capacity/win-back cards) and cards the two or three
+  highest-leverage moves to raise the price. First real card live: "One expense receipt
+  unlocks a higher valuation method" plus working the six open win-backs. Logs its tokens to
+  agent_costs like every LLM agent.
+- **Concurrency posture stated**: simultaneous Paul+Jake editing is safe by construction
+  (row-level RPCs, one-visit-per-day merge discipline, photo rows append to the same visit,
+  score upserts); the GPS broadcast was the one true conflict and is now operator-gated.

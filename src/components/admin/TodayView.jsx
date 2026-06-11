@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf } from './supabase.js';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
@@ -62,7 +62,7 @@ function money(c) { return c == null ? null : '$' + (c / 100).toFixed(2).replace
 const SEV_RANK = { alert: 0, signal: 1, info: 2 };
 const AGENT_RANK = {
   tomorrow: 0, capacity: 1, winback: 2, pricing: 3, retention: 4,
-  cfo: 5, chief_of_staff: 6, bookkeeper: 7, growth: 8,
+  cfo: 5, value_coach: 6, chief_of_staff: 7, bookkeeper: 8, growth: 9,
   compliance: 9, infra: 10, maintenance: 11, reorder: 12,
 };
 function sortByValue(cards) {
@@ -101,11 +101,25 @@ export default function TodayView({ onOpenClient }) {
   // than one stop is somehow still rolling (a forgotten test booking did this
   // on 2026-06-11 and hijacked Becky's tracker mid-route), resume the LATEST
   // scheduled one: that is the stop Paul is actually driving to.
+  // Two-operator guard: only the phone of the ASSIGNED operator resumes the
+  // broadcast (an unassigned stop belongs to the owner). Otherwise Paul
+  // opening Orbit at home while Jake drives would overwrite Jake's live
+  // position with Paul's living room.
   useEffect(() => {
     const rolling = appts
       .filter((x) => x.status === 'on_the_way')
       .sort((a, b) => new Date(b.scheduled_start) - new Date(a.scheduled_start))[0];
-    if (rolling) startLocationShare(rolling.id);
+    if (!rolling) return;
+    let alive = true;
+    (async () => {
+      try {
+        const [me, m] = await Promise.all([adminSelf(), appointmentMeta(rolling.id)]);
+        if (!alive || !me) return;
+        const mine = m?.operator_admin_id ? m.operator_admin_id === me.id : me.role === 'owner';
+        if (mine) startLocationShare(rolling.id);
+      } catch { /* no resume is safer than a wrong-phone broadcast */ }
+    })();
+    return () => { alive = false; };
   }, [appts]);
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
