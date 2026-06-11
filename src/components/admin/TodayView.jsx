@@ -97,9 +97,14 @@ export default function TodayView({ onOpenClient }) {
   useEffect(() => { load(); }, [load]);
 
   // If a stop was already on_the_way when the floor loaded (page reload mid
-  // drive), resume the live-location broadcast without another tap.
+  // drive), resume the live-location broadcast without another tap. When more
+  // than one stop is somehow still rolling (a forgotten test booking did this
+  // on 2026-06-11 and hijacked Becky's tracker mid-route), resume the LATEST
+  // scheduled one: that is the stop Paul is actually driving to.
   useEffect(() => {
-    const rolling = appts.find((x) => x.status === 'on_the_way');
+    const rolling = appts
+      .filter((x) => x.status === 'on_the_way')
+      .sort((a, b) => new Date(b.scheduled_start) - new Date(a.scheduled_start))[0];
     if (rolling) startLocationShare(rolling.id);
   }, [appts]);
 

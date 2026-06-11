@@ -3040,3 +3040,16 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - Also in 0158: bath_start_subscription's sms_opt_in insert default flipped to false
   (sms_consent_unchecked now holds server-side too). The "Tell us about Cooper" name
   personalization Paul liked from Nails was already in this funnel, confirmed.
+
+### Tracker outage mid-route diagnosed and fixed (Jun 11, while Paul rolled to Becky)
+
+- Symptom: no map, no ETA on the live tracker. Root cause from the data, not the code shipped
+  today: TWO appointments were in on_the_way at once (Becky's real stop and Paul's own Jun 7
+  funnel TEST booking, scheduled 10am, never closed). Orbit's auto-resume picked the FIRST
+  rolling stop after any reload and silently redirected the GPS broadcast to the test booking
+  at 12:45pm; Becky's fixes went stale (>5 min) and the tracker honestly hid the live panel.
+- Fixes: the test booking cancelled and its location rows deleted (broadcast released
+  immediately; Becky's tracker revives on Paul's next Orbit load), and auto-resume now picks
+  the LATEST-scheduled rolling stop, the one Paul is actually driving to, so a forgotten stale
+  stop can never hijack the broadcast again. Google keys were fine; the ETA had computed
+  normally at 12:44pm right before the hijack.
