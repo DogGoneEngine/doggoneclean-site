@@ -3065,3 +3065,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   (every new portal client would have hit the same wall); filed as launch blocker 0b with the
   one-minute dashboard fix. Once set, Jake signs in again and adopt-by-email binds his
   operator row automatically.
+
+### Tracker dog names for legacy clients (Jun 11, found live on Becky's visit)
+
+- Becky's tracker said "your dog's visit" instead of "Maverick and Sammy": tracker_status read
+  dog names only from bath_dogs (funnel signups), and her subscriber row was created by the
+  calendar sync, which carries no dogs. Michelle's worked because her subscriber happened to
+  have bath_dogs rows from earlier setup. 0158 adds the missing fallback chain: explicit
+  appointment dog list -> bath_dogs -> the client's regular roster in public.dogs, plus a
+  first-name fallback from the client record. The is/are grammar was never broken; it had no
+  names to inflect. Verified live: her token now returns Maverick and Sammy.
