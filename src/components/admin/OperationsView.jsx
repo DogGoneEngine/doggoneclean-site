@@ -5,7 +5,7 @@
 // fails on a route. Set the last-service date and interval and it watches.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listEquipment, upsertEquipment, deleteEquipment, runMaintenanceCheck } from './supabase.js';
+import { listEquipment, upsertEquipment, deleteEquipment, runMaintenanceCheck, adminInfraStatus } from './supabase.js';
 import GeneratorsPanel from './GeneratorsPanel.jsx';
 import MaintenancePanel from './MaintenancePanel.jsx';
 
@@ -53,6 +53,8 @@ export default function OperationsView() {
           {checkMsg && <span style={{ fontSize: 13, opacity: 0.7 }}>{checkMsg}</span>}
         </div>
       )}
+
+      <InfraPanel />
 
       <h2 style={{ marginBottom: 4 }}>Generators and power</h2>
       <p className="ad-sub" style={{ marginTop: 0 }}>Tracked by engine hours. Enter the watts each appliance draws to see how much capacity is free on each generator.</p>
@@ -138,6 +140,45 @@ function Row({ item, onChanged, onCancel }) {
       {item && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={remove} disabled={busy}>Remove</button>}
       {!item && onCancel && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={onCancel}>Cancel</button>}
       {error && <span className="ad-error" style={{ fontSize: 12 }}>{error}</span>}
+    </div>
+  );
+}
+
+// Live infrastructure usage against plan limits: the database and storage
+// behind everything. The daily infra watcher cards Today at 70% of a limit;
+// this panel is the always-current view (with the droplet noted honestly as
+// not yet instrumented).
+function InfraPanel() {
+  const [infra, setInfra] = useState(null);
+  const [err, setErr] = useState(null);
+  useEffect(() => {
+    adminInfraStatus().then(setInfra).catch((e) => setErr(e.message || 'infra_failed'));
+  }, []);
+  const mb = (b) => b == null ? null : (b / 1048576);
+  const fmt = (b) => {
+    const m = mb(b);
+    if (m == null) return 'n/a';
+    return m >= 1024 ? `${(m / 1024).toFixed(1)} GB` : `${Math.max(1, Math.round(m))} MB`;
+  };
+  const pct = (b, limitMb) => {
+    const m = mb(b);
+    return m == null || !limitMb ? null : Math.round((m / limitMb) * 100);
+  };
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Infrastructure</div>
+      {err && <div className="ad-error">{err}</div>}
+      {!infra ? (!err && <div style={{ fontSize: 13, opacity: 0.6 }}>Measuring…</div>) : (
+        <>
+          <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 14 }}>
+            <span><strong>{fmt(infra.db_bytes)}</strong> <span style={{ opacity: 0.6 }}>database ({pct(infra.db_bytes, infra.db_limit_mb)}% of {Math.round(infra.db_limit_mb)} MB plan)</span></span>
+            <span><strong>{fmt(infra.storage_bytes)}</strong> <span style={{ opacity: 0.6 }}>photo storage, {infra.storage_objects} files ({pct(infra.storage_bytes, infra.storage_limit_mb)}% of {Math.round(infra.storage_limit_mb)} MB plan)</span></span>
+          </div>
+          <div style={{ fontSize: 12, opacity: 0.55, marginTop: 6 }}>
+            The infra watcher checks daily and cards Today at 70% of a plan limit. The web droplet (50 GB disk, serves the static site) is not instrumented yet; the site build is a few MB, so the risk there is low.
+          </div>
+        </>
+      )}
     </div>
   );
 }

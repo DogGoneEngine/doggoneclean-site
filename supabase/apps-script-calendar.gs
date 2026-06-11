@@ -26,8 +26,11 @@ function syncCalendar() {
   for (const c of named) calendars.push(c);
 
   const now = new Date();
-  const from = new Date(now.getTime() - 2 * 86400000);   // 2 days back
-  const to = new Date(now.getTime() + 45 * 86400000);    // 45 days forward
+  const from = new Date(now.getTime() - 2 * 86400000);    // 2 days back
+  // A full year forward: Paul pencils next visits up to a year ahead (banana
+  // color). They sync as tentative so the app can plan around them, the
+  // capacity watcher counts them, and clients never see them.
+  const to = new Date(now.getTime() + 366 * 86400000);
   const rows = [];
   const seen = {};
   for (const cal of calendars) {

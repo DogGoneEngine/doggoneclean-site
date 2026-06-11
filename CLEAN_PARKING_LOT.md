@@ -857,3 +857,18 @@ would absorb, and no standard-deviation machinery is needed (elons_algorithm: th
 optimizing a part that should not exist). Implementation rides the committed rolling-recompute
 round: every completed visit updates clients.visit_minutes (and the groom/nails splits) from
 that window.
+
+## Mount Olympus dashboard at mountolympusops.com (parked 2026-06-11, pending Paul's go)
+
+Paul set up n8n during early stack planning, but every automation ended up as custom code:
+Supabase edge functions, pg_cron SQL agents, and the GitHub Actions deploy. Nothing calls the
+n8n container (`engine-n8n-1` on the droplet, bound to localhost:5678); for this project it is
+obsolete. The domain he attached to it, mountolympusops.com, is the natural home for the
+cross-business owner dashboard ("emperor mode"): one page with both businesses' run rate,
+today's stops, open cards, and agent costs. Setup when greenlit: build a small static dashboard
+(its own repo or a directory in one of these), serve it from the droplet by repointing the
+mountolympusops.com Caddy site block from the n8n proxy to the dashboard directory, and stop
+the n8n container. Data separation stays clean because the dashboard only READS each business's
+own Supabase project with its own keys; nothing merges. Until then the interim emperor view is
+Orbit's Finance floor (annual run rate stat shipped 2026-06-11). Decommissioning n8n (stop
+container, drop its Caddy block) is one droplet session, on Paul's go.

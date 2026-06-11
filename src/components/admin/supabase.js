@@ -443,6 +443,12 @@ export async function listTeam() {
   return rpc('admin_list_team');
 }
 
+// Live infrastructure usage (database, storage) against plan limits. The
+// daily infra watcher cards Today at 70% of a limit; this is the live view.
+export async function adminInfraStatus() {
+  return rpc('admin_infra_status');
+}
+
 // The hours-ask briefing card's Save button: writes the panel reading
 // straight onto the named equipment (never a free-text reply into the void).
 export async function setEquipmentHoursByName(name, hours) {

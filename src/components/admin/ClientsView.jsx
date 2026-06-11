@@ -1631,10 +1631,14 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
                   if (typeof s === 'object' && s.next_stop) {
                     drive.push(`${s.next_stop.drive_minutes != null ? s.next_stop.drive_minutes + ' min' : 'drive'} before ${(s.next_stop.client || 'the next stop').split(' ')[0]}`);
                   }
+                  const tight = typeof s === 'object' && s.tightest;
                   return (
                     <button key={start} className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => book(start)}
-                      style={drive.length ? { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, lineHeight: 1.25 } : undefined}>
-                      <span>{fmtSlot(start)}</span>
+                      style={{
+                        ...(drive.length ? { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, lineHeight: 1.25 } : {}),
+                        ...(tight ? { borderColor: 'var(--ad-good, #1f8a4b)' } : {}),
+                      }}>
+                      <span>{fmtSlot(start)}{tight ? <span style={{ fontSize: 10, color: 'var(--ad-good, #1f8a4b)', fontWeight: 700 }}> · tightest fit</span> : null}</span>
                       {drive.length > 0 && <span style={{ fontSize: 10, opacity: 0.65, fontWeight: 400 }}>{drive.join(' · ')}</span>}
                     </button>
                   );

@@ -111,15 +111,20 @@ Deno.serve(async (req) => {
   if (!dest && sub?.client_id) {
     const { data: cl } = await sb
       .from('clients')
-      .select('id, geo_lat, geo_lng, location_address')
+      .select('id, geo_lat, geo_lng, location_address, location_plus')
       .eq('id', sub.client_id)
       .maybeSingle();
+    // Plus code first: it is the precise pin Paul kept per client, while a
+    // few address fields are placeholders that geocode to a city centroid.
+    const geoQuery = cl?.location_plus
+      ? (cl.location_plus.includes(',') ? cl.location_plus : `${cl.location_plus} Ocala, FL`)
+      : cl?.location_address;
     if (cl?.geo_lat != null && cl?.geo_lng != null) {
       dest = { lat: Number(cl.geo_lat), lng: Number(cl.geo_lng) };
-    } else if (cl?.location_address) {
+    } else if (geoQuery) {
       const key = await getMapsKey(sb);
       if (key) {
-        const g = await geocode(cl.location_address, key);
+        const g = await geocode(geoQuery, key);
         if (g) {
           dest = g;
           await sb.from('clients').update({ geo_lat: g.lat, geo_lng: g.lng }).eq('id', cl.id);

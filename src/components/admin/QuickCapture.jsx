@@ -9,14 +9,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { rikerParse, rikerApply } from './supabase.js';
-import { RikerManual } from './RikerCapture.jsx';
+import { RikerManual, describeApplied } from './RikerCapture.jsx';
 
 export default function QuickCapture() {
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState('');
   const [phase, setPhase] = useState('idle'); // idle | parsing | review | applying
   const [plan, setPlan] = useState(null);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(null); // describeApplied() output after a confirm
   const [error, setError] = useState(null);
   const [listening, setListening] = useState(false);
   const recRef = useRef(null);
@@ -44,19 +44,21 @@ export default function QuickCapture() {
 
   async function send() {
     if (!body.trim()) return;
-    setPhase('parsing'); setError(null);
+    setPhase('parsing'); setError(null); setSaved(null);
     try {
       setPlan(await rikerParse(body.trim(), null));
       setPhase('review');
     } catch (e) { setError(e.message || 'parse_failed'); setPhase('idle'); }
   }
 
+  // After Confirm, say exactly what landed and stay open until Paul closes;
+  // a silent auto-close read as "it went into the void".
   async function confirm() {
     setPhase('applying'); setError(null);
     try {
-      await rikerApply(plan);
-      setPlan(null); setBody(''); setPhase('idle'); setSaved(true);
-      setTimeout(() => { setSaved(false); setOpen(false); }, 900);
+      const res = await rikerApply(plan);
+      setPlan(null); setBody(''); setPhase('idle');
+      setSaved(describeApplied(res));
     } catch (e) { setError(e.message || 'apply_failed'); setPhase('review'); }
   }
 
@@ -98,9 +100,19 @@ export default function QuickCapture() {
                   )}
                   <div style={{ flex: 1 }} />
                   <button className="ad-btn ad-btn--sm" onClick={send} disabled={phase === 'parsing' || !body.trim()}>
-                    {saved ? 'Filed' : phase === 'parsing' ? 'Riker is listening\u2026' : 'Send to Riker'}
+                    {phase === 'parsing' ? 'Riker is listening\u2026' : 'Send to Riker'}
                   </button>
                 </div>
+                {saved && (
+                  <div style={{ fontSize: 13, marginTop: 8, lineHeight: 1.45, color: 'var(--ad-good, #1f8a4b)' }}>
+                    Understood. Recorded: {saved.bits.length ? saved.bits.join(', ') : 'nothing actionable'}.
+                    {saved.missed && (
+                      <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
+                        Could not find the visit you wanted corrected; open the sheet and check the visit history.
+                      </div>
+                    )}
+                  </div>
+                )}
                 <RikerManual />
               </>
             ) : (

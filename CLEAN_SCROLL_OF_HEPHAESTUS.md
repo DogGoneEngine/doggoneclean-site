@@ -2930,3 +2930,46 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **HR shows the real roster**: `admin_list_team` (0155) replaces the hardcoded "Paul · sole"
   line; titles come from the role (Owner and Hurricane Bath Operator / Hurricane Bath
   Operator).
+
+### Batch seven: field feedback round two (late evening; migration 0156, riker v6, suggest-drive v2, tracker-eta v2)
+
+- **Riker round two.** Both new failures fixed in data AND in powers. Mary Brantley's phone
+  (+1 352 875 4172) is on the record (phone data gap closed) and the 2025-05-14 visit is
+  corrected to nails with Riker's accidental duplicate deleted. New powers: `client_update`
+  (phone/email/address land in contact fields, never notes; moved-away + win-back suppression),
+  `visit_update` (corrects the EXISTING visit by date instead of inventing a new one; context
+  now carries recent_visits), and every Confirm now speaks back "Understood. Recorded: ..."
+  listing exactly what landed; the + gateway stays open until dismissed instead of silently
+  auto-closing (the "void" feeling, twice reported, is gone).
+- **Brooksley Sheehe closed out**: status moved_away, suppress_winback true, note carries
+  Paul's words; the win-back card resolved with the reason. Root cause of the repeat card:
+  Riker had recorded only a note; the suppression flag is the part with teeth.
+- **Capacity false alarm (Mary Jane Hunt) resolved**: her future appointments live in Paul's
+  Google Calendar beyond the old 45-day sync window. The Apps Script now reads 366 days (the
+  year of banana pencils flows in as tentative, which the scan already counts), and the card
+  closed with that explanation. Paul re-pastes the script (one paste covers banana + the year
+  window + everything since).
+- **Calendar sync is two-way in effect** (`calendar_sync_moves_orbit`): moving an event in
+  Google Calendar moves the appointment in Orbit; app bookings Paul adds to the calendar get
+  ADOPTED (external_id stamped on the existing row) instead of duplicated; adopted rows keep
+  source null so the prune can never delete an app booking; one overlap collision skips that
+  event instead of killing the whole sync run.
+- **Drive chips made honest** (`drive_time_in_suggestions` amended): the all-15-minutes screen
+  was one cached pair (Amy Blessing to Michelle, 909 s) repeated on every slot after a distant
+  stop. Now a neighbor only counts when the slot is adjacent (within ~100 min idle), slots
+  sort tightest-fit first with the best one flagged (first slice of String of Pearls in the
+  panel), and three clients whose address column literally said "PlusCode Ocala" (all
+  geocoded to one identical centroid) had their bogus coordinates cleared; geocoding is now
+  plus-code first everywhere (suggest-drive + tracker-eta) and persists back.
+- **Infrastructure watcher** (`infra_usage_watched`): daily `_infra_scan` snapshots DB +
+  storage into `infra_metrics`, cards Today at 70% of plan limits (limits in app_secrets,
+  free-tier defaults), live panel on Operations (today: 17 MB database, 35 MB photos). The
+  droplet's 50 GB disk is named as not yet instrumented, low risk.
+- **Annual run rate** stat added to Finance (window revenue held for a year), per Paul's
+  emperor-mode ask; the full cross-business Mount Olympus dashboard stays parked.
+- **Booking funnel**: the generic Book button no longer skips the city chooser (a remembered
+  session city only sticks when that session actually progressed past step 1), and the
+  address box now PROBES Places on mount and shows an honest banner when suggestions are
+  blocked. Root cause stands as diagnosed 2026-06-10: the Maps browser key needs "Places API
+  (New)" in its Google Cloud API restrictions; that toggle is Paul's, in the DGC Google Cloud
+  project.

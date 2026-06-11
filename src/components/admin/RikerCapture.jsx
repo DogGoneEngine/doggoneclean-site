@@ -13,6 +13,26 @@ const SERVICE = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const PAY = { square_in_person: 'Square', stripe_card: 'Stripe', cash: 'Cash', wallet: 'Wallet' };
 function money(c) { return c == null ? null : '$' + (c / 100).toFixed(2).replace(/\.00$/, ''); }
 
+// Turn the apply result into the plain acknowledgment Paul asked for: after
+// Confirm he hears exactly what landed, never a silent void.
+export function describeApplied(res) {
+  const n = (x) => Number(x || 0);
+  const bits = [];
+  if (res.visit_id) bits.push('visit logged');
+  if (res.visit_corrected) bits.push('the existing visit record corrected');
+  if (n(res.scores_applied) > 0) bits.push(`${n(res.scores_applied)} vibe score${n(res.scores_applied) === 1 ? '' : 's'} saved`);
+  if (n(res.dogs_added) > 0) bits.push(`${n(res.dogs_added)} dog card${n(res.dogs_added) === 1 ? '' : 's'} created`);
+  if (n(res.dogs_updated) > 0) bits.push(`${n(res.dogs_updated)} dog card${n(res.dogs_updated) === 1 ? '' : 's'} changed`);
+  if (res.client_updated) bits.push('contact sheet facts updated');
+  if (res.client_note_appended) bits.push('household note added');
+  if (n(res.dog_notes_appended) > 0) bits.push(`${n(res.dog_notes_appended)} dog note${n(res.dog_notes_appended) === 1 ? '' : 's'} added`);
+  if (n(res.dog_status_changes) > 0) bits.push('dog roster updated');
+  if (res.notify_person_id) bits.push('notify person saved');
+  if (res.reminder_id) bits.push('reminder set, it will surface on Today when due');
+  if (res.wisdom_saved) bits.push('filed to the wisdom inbox');
+  return { bits, missed: !!res.visit_update_missed };
+}
+
 export default function RikerCapture({ clientId = null, clientName = null, onApplied }) {
   const [text, setText] = useState('');
   const [phase, setPhase] = useState('idle'); // idle | parsing | review | applying
@@ -33,7 +53,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
     setPhase('applying'); setError(null);
     try {
       const res = await rikerApply(plan);
-      setDone(res);
+      setDone(describeApplied(res));
       setPlan(null); setText(''); setPhase('idle');
       onApplied?.();
     } catch (e) { setError(e.message || 'apply_failed'); setPhase('review'); }
@@ -69,8 +89,17 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
             <button className="ad-btn ad-btn--sm" onClick={send} disabled={phase === 'parsing' || !text.trim()}>
               {phase === 'parsing' ? 'Riker is listening…' : 'Send to Riker'}
             </button>
-            {done && <span style={{ fontSize: 12, color: 'var(--ad-good, #1f8a4b)' }}>Recorded.</span>}
           </div>
+          {done && (
+            <div style={{ fontSize: 13, marginTop: 8, lineHeight: 1.45, color: 'var(--ad-good, #1f8a4b)' }}>
+              Understood. Recorded: {done.bits.length ? done.bits.join(', ') : 'nothing actionable'}.
+              {done.missed && (
+                <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
+                  Could not find the visit you wanted corrected; open the sheet and check the visit history.
+                </div>
+              )}
+            </div>
+          )}
           <RikerManual />
         </>
       )}
@@ -125,6 +154,24 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                 ))}
                 {v?.work_done && <li>What was done: {v.work_done}</li>}
                 {v?.visit_notes && <li>Visit note: {v.visit_notes}</li>}
+                {plan.client_update && (
+                  <li>
+                    Contact sheet facts:
+                    {plan.client_update.phone ? ` phone ${plan.client_update.phone}` : ''}
+                    {plan.client_update.email ? ` email ${plan.client_update.email}` : ''}
+                    {plan.client_update.address ? ` address ${plan.client_update.address}` : ''}
+                    {plan.client_update.status ? ` status ${plan.client_update.status.replace('_', ' ')}` : ''}
+                    {plan.client_update.suppress_winback ? ' no win-back outreach' : ''}
+                  </li>
+                )}
+                {plan.visit_update && (
+                  <li>
+                    Correct the {plan.visit_update.date} visit:
+                    {plan.visit_update.service_type ? ` service to ${SERVICE[plan.visit_update.service_type] || plan.visit_update.service_type}` : ''}
+                    {plan.visit_update.amount_cents != null ? ` amount to ${money(plan.visit_update.amount_cents)}` : ''}
+                    {plan.visit_update.actual_minutes ? ` minutes to ${plan.visit_update.actual_minutes}` : ''}
+                  </li>
+                )}
                 {plan.client_note && <li>Add to the contact sheet: {plan.client_note}</li>}
                 {(plan.dog_notes || []).map((d, i) => (
                   <li key={i}>Note on {d.dog_name || 'dog'}: {d.text}</li>
@@ -182,6 +229,9 @@ export function RikerManual() {
         <li><strong>Vibe scores:</strong> per dog, 1 to 5, only when you actually give one.</li>
         <li><strong>New dogs:</strong> "Add Maverick, French Bulldog, 75 dollars, and Sammy, mini Aussie, 105." Real dog cards with breed and price.</li>
         <li><strong>Price and breed changes:</strong> "Change the price to 50 dollars each." Lands on the dog cards, not as a note.</li>
+        <li><strong>Contact facts:</strong> "Her phone number is 352-875-4172" or a new email or address. Lands in the contact fields, not as a note.</li>
+        <li><strong>Corrections:</strong> "That last visit should have been nails, not a full groom." Fixes the existing visit record instead of creating a new one.</li>
+        <li><strong>Moved away or paused:</strong> "She moved away, may or may not be back, no need to chase her." Marks the client moved away and turns off win-back outreach.</li>
         <li><strong>Notes:</strong> household notes ("gate code is now 4411") and per-dog notes ("Bruno hates the dryer").</li>
         <li><strong>Dog roster:</strong> "Windsor moved away, archive him." Moved, passed away, no longer groomed, sometimes, or back on the roster. Reversible, never deleted.</li>
         <li><strong>People to notify:</strong> "Jane wants her husband Tom texted too, 352-555-0101" or "text the dog sitter Maria instead of Jane until July 10."</li>

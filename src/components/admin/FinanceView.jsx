@@ -77,6 +77,8 @@ function FinanceBody({ d }) {
         <Stat label="Revenue / hour" value={rph != null ? `$${rph}` : 'n/a'}
           sub={delta != null ? `${delta >= 0 ? '+' : ''}$${delta} vs prior` : null}
           tone={delta == null ? 'flat' : delta >= 0 ? 'good' : 'bad'} big />
+        <Stat label="Annual run rate" value={money(Math.round((d.revenue_cents || 0) / Math.max(1, d.window_days || 90) * 365))}
+          sub={`this window's pace held for a year`} />
         <Stat label="Collected" value={money(d.revenue_cents)} sub={`${d.priced_visits} priced visits`} />
         <Stat label="Visits" value={String(d.visits)} sub={`${d.clients} clients`} />
         <Stat label="A/R outstanding" value={money(d.ar_cents)} sub={`${d.ar_count} appt(s) past due`} tone={d.ar_count > 0 ? 'bad' : 'good'} />

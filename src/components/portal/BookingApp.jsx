@@ -140,22 +140,26 @@ function loadStored() {
 }
 
 // Which city this funnel run is for. Priority: explicit ?city= param, then
-// params that only exist on Villages links (founders / plan), then whatever
-// a restored session chose, else null (show the chooser).
-function initialCitySlug(restoredSlug) {
+// params that only exist on Villages links (founders / plan), then a restored
+// session's city ONLY when that session actually progressed (mid-funnel
+// refresh). A remembered city from idle browsing must NOT skip the chooser:
+// that is how the generic Book button went "straight to The Villages".
+function initialCitySlug(restored) {
+  const restoredSlug = restored && restored.citySlug;
   if (typeof window === 'undefined') return restoredSlug || null;
   const params = new URLSearchParams(window.location.search);
   const fromParam = params.get('city');
   if (FUNNEL_CITIES.some(([slug]) => slug === fromParam)) return fromParam;
   if (params.get('founders') || params.get('plan')) return CITY_SLUG;
-  return restoredSlug || null;
+  const progressed = restored && ((restored.step || 1) > 1 || restored.eligibilityAcked);
+  return progressed ? (restoredSlug || null) : null;
 }
 
 export default function BookingApp() {
   const restored = useRef(loadStored());
   const init = restored.current || BLANK;
 
-  const [citySlug, setCitySlug] = useState(() => initialCitySlug(init.citySlug));
+  const [citySlug, setCitySlug] = useState(() => initialCitySlug(restored.current));
   const [city, setCity] = useState(null);
   const [cityError, setCityError] = useState(null);
   const [step, setStep] = useState(init.step || 1);
@@ -302,6 +306,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
   const elRef = useRef(null);
   const [mapsReady, setMapsReady] = useState(false);
   const [mapsFailed, setMapsFailed] = useState(false);
+  const [probeError, setProbeError] = useState(null);
   const [areaStatus, setAreaStatus] = useState(place.serviceLat != null ? 'pass' : null); // null | pass | fail
   const [returning, setReturning] = useState(null); // null | { firstName }
 
@@ -366,6 +371,21 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
     // gmp-select is the current event; gmp-placeselect covers older builds.
     el.addEventListener('gmp-select', onSelect);
     el.addEventListener('gmp-placeselect', onSelect);
+
+    // Probe one real suggestion request so a key blocked from the Places API
+    // (API_KEY_SERVICE_BLOCKED, diagnosed 2026-06-10) shows an honest banner
+    // instead of a silently dead box that looks like it should work.
+    (async () => {
+      try {
+        if (!places.AutocompleteSuggestion) return;
+        await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+          input: '100 Main St', includedRegionCodes: ['us'], ...(bias ? { locationBias: bias } : {}),
+        });
+        setProbeError(null);
+      } catch (e) {
+        setProbeError('Address suggestions are not coming back from Google. Usual cause: the Maps browser key is missing "Places API (New)" in its Google Cloud API restrictions. (' + ((e && e.message) || 'request rejected') + ')');
+      }
+    })();
 
     // Tear down when the address stage unmounts (eligibility unchecked). Without
     // this, elRef kept pointing at the detached element, so re-checking the box
@@ -443,6 +463,11 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
             <Field label="Service address">
               {!mapsReady && <input type="text" className="pt-input" placeholder="Loading address search..." disabled />}
               <div ref={boxRef} className="bk-place-box" />
+              {probeError && (
+                <div className="bk-area bk-area--out" style={{ marginTop: 8 }}>
+                  <span className="bk-area__icon">!</span> {probeError}
+                </div>
+              )}
             </Field>
           ) : (
             <div className="bk-notice">

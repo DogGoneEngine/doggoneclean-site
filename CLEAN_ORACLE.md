@@ -739,12 +739,17 @@ then the drive-time annotations in the suggestion panel are the manual version o
 
 `drive_time_in_suggestions` (scheduling):
 Every suggested booking slot shows the real drive minutes from the stop before it and to the
-stop after it (suggest-drive edge function annotating `admin_suggest_slots`); a slot at the
-start or end of the day, or with nothing else booked, shows nothing because the drive is
-irrelevant there. Drive seconds between two clients' homes are computed once via Distance
-Matrix and cached forever in `drive_cache`, since homes do not move. Because Paul picks the
-slot that fits tightest into the route, and the suggestion panel can only earn that choice by
-showing the real drives, not guesses.
+stop after it (suggest-drive edge function annotating `admin_suggest_slots`), and only when the
+slot is actually ADJACENT to that stop (within about 100 minutes of idle): a stop hours earlier
+is not "15 minutes away" in any useful sense, so it shows nothing (field correction,
+2026-06-11, after every chip on a day read the same 15 minutes from one distant stop). Within
+each day the slots are ordered tightest fit first (least added drive) with the best one
+flagged, the first slice of String of Pearls thinking in the booking panel. Drive seconds
+between two clients' homes are computed once via Distance Matrix and cached forever in
+`drive_cache`, since homes do not move; missing coordinates geocode from the client's plus
+code first (some address fields are placeholders that all geocoded to one city centroid) and
+persist back. Because Paul picks the slot that fits tightest into the route, and the panel can
+only earn that choice by showing real, honest drives, not one stale number repeated.
 
 `appointment_dogs_explicit` (scheduling):
 An appointment can carry an explicit list of which dogs are going (`bath_appointments.dog_ids`);
@@ -1760,6 +1765,34 @@ rates. Agents that run as plain database jobs (the availability watcher, the
 charge cron, the calendar sync) cost effectively nothing and log nothing.
 Because Paul asked to see what his AI staff costs, and `agent_when_value_beats_cost`
 is only checkable when the cost side is a number on a screen instead of a guess.
+
+`infra_usage_watched` (Clean: operations):
+The infrastructure under the business is watched like everything else: a daily
+scan snapshots database and storage usage into `infra_metrics` and cards Today
+when either passes 70% of the plan limit, and the Operations floor shows the
+live numbers. Plan limits live in `app_secrets` (`infra_db_limit_mb`,
+`infra_storage_limit_mb`, defaulting to the Supabase free-tier 500 MB / 1 GB)
+so a plan upgrade is one row, not a deploy. The DigitalOcean droplet (50 GB
+disk serving the static site) is named honestly as not yet instrumented; its
+risk is low because the deployed site is a few MB. Because Paul asked to know
+about server limits and storage space before they bite, and a surprise
+full-disk or full-database is exactly the kind of 2 a.m. problem this app
+exists to prevent.
+
+`calendar_sync_moves_orbit` (Clean: calendar):
+The Google Calendar sync is two-way in effect for every appointment it knows:
+moving an event in the calendar moves the appointment in Orbit (the sync
+updates times by external_id), and an app-booked appointment that Paul added
+to the calendar gets ADOPTED on the next sync (the overlapping event stamps
+its external_id onto the existing row instead of inserting a duplicate), so
+from then on calendar moves carry it too. Adopted rows keep source null, so
+the prune (which only deletes source='gcal_sync' rows) can never remove an
+app booking even if the calendar event is deleted. The sync window is 366
+days, covering Paul's year-ahead pencils, and a single overlap collision
+skips that one event instead of aborting the whole run. Because during the
+bridge period the calendar is still Paul's working surface, and a sync that
+duplicated his own bookings back at him, or died whole on one collision,
+would make the bridge worse than no sync.
 
 `reminders_one_gateway` (Clean: operations):
 A time-based commitment ("contact her in 2 weeks", "follow up after the
