@@ -597,6 +597,24 @@ the same for every dog while Clean has two, the difference was not being
 explained, and a category a visitor cannot confidently place their own dog in
 stalls the funnel exactly where it should accelerate. Paul, 2026-06-10.
 
+`breed_pick_sets_tier` (Hurricane Bath: product):
+In the booking funnel the breed list is the authority, per dog: each dog card
+carries a breed dropdown (`src/components/portal/breeds.js`), and picking a
+listed breed SETS that dog's coat tier itself, shown as a locked confirmation
+("A Golden Retriever books as Doublecoat"), never offered as a choice the
+client can downgrade. Picking an excluded breed (the
+`excluded_breeds_are_slide_holes` set, mirrored exactly in the list) shows the
+kind decline the moment it is picked. Mixed breeds pick "Mixed breed" and
+answer the resemblance question (which coat does their mix most resemble,
+described by real coat traits with example breeds) plus an optional what's-in-
+the-mix note; rare breeds use "Other / not listed" with free text, still gated
+by the exclusion check here and server-side. Because a household can have one
+smoothcoat and one doublecoat dog (the tier was always per dog and stays so),
+because "is your dog the easy kind?" invites honest confusion and dishonest
+discounts, and because a Siberian Husky owner rushing the form should learn at
+the breed pick, kindly, that we are not built for that coat, not slip through
+by clicking the cheaper card. Paul, 2026-06-11.
+
 `excluded_breeds_are_slide_holes` (product):
 The funnel is a slide with person-shaped holes: right-fit visitors are pulled
 down into signup, and wrong-fit dogs fall out gracefully and early, declined

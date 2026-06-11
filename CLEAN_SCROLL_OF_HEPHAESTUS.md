@@ -3004,3 +3004,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   merge to main on his "ship it." Workflow committed and inert until the one-time droplet
   setup (DNS + Caddy block, parked); the flip happens per surface on Paul's word. Database
   migrations stay careful in both modes (no preview copy of schema).
+
+### Batch nine: the breed list becomes the authority; Riker card retired from Today
+
+- **Breed pick sets the tier** (`breed_pick_sets_tier`): each dog card now carries a breed
+  dropdown backed by a curated list (src/components/portal/breeds.js, ~50 breeds with a tier
+  each, the excluded set mirrored exactly). A listed breed LOCKS its tier with a friendly
+  confirmation line; an excluded breed (husky, doodle, Pyrenees, Dane) gets the kind decline
+  the moment it is picked, killing the rush-through-and-click-the-cheap-card slip Paul
+  described. Mixed breeds answer "which coat does their mix most resemble" (real coat traits
+  with example breeds) plus an optional what's-in-the-mix note; rare breeds use Other with
+  free text, still gated by the regex and the server. The per-dog tier was already per dog;
+  what changed is who decides it. Paul reviews the tier-per-breed calls in the data file.
+- **Riker's inline card removed from Today**: the + button is the one gateway; the client
+  sheet keeps its fixed-client box.

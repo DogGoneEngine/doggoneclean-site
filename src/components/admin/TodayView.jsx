@@ -8,7 +8,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft } from './supabase.js';
-import RikerCapture from './RikerCapture.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
@@ -147,7 +146,10 @@ export default function TodayView({ onOpenClient }) {
         </div>
       )}
 
-      <RikerCapture onApplied={load} />
+      {/* Riker's inline card retired from Today (Paul, 2026-06-11): the
+          floating + button is the one gateway everywhere, and two boxes for
+          the same agent on one screen read as clutter. The client sheet
+          keeps its fixed-client Riker box. */}
 
       {error && <div className="ad-error">{error}</div>}
 

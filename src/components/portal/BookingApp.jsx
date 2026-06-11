@@ -29,6 +29,7 @@ import {
   signInWithGoogle, toE164US, looksLikeEmail, lookupSubscriberByPhone,
 } from './supabase.js';
 import { loadGoogleMaps, parsePlace, isInServiceArea, polygonBounds, lastMapsError } from './maps.js';
+import { BREEDS, TIER_LABEL, breedByName } from './breeds.js';
 
 const CITY_SLUG = 'the-villages';
 const STORE_KEY = 'dgc_booking_v2';
@@ -123,7 +124,7 @@ function breedNotAFit(breed) {
   return EXCLUDED_BREED_RE.test(breed || '');
 }
 
-const BLANK_DOG = { name: '', breed: '', coat_tier: '', dobMonth: '', dobDay: '', dobYear: '', dobApproximate: false };
+const BLANK_DOG = { name: '', breed: '', breedPick: '', mixDetail: '', coat_tier: '', dobMonth: '', dobDay: '', dobYear: '', dobApproximate: false };
 const BLANK = {
   step: 1,
   eligibilityAcked: false,
@@ -584,6 +585,9 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
 function DogCard({ idx, dog, showNumber, onChange }) {
   const age = computeDogAge(dog.dobMonth, dog.dobDay, dog.dobYear);
   const notAFit = breedNotAFit(dog.breed);
+  // Sessions saved before the breed list existed carry a typed breed with no
+  // pick; show them as "Other / not listed" so their text stays visible.
+  const pick = dog.breedPick || (dog.breed ? 'other' : '');
   return (
     <div className="bk-dog">
       <div className="bk-dog__head">
@@ -591,7 +595,48 @@ function DogCard({ idx, dog, showNumber, onChange }) {
         <span className="bk-dog__name">Tell us about {dog.name || 'your dog'}</span>
       </div>
       <Field label="Name"><input className="pt-input" value={dog.name} onChange={(e) => onChange('name', e.target.value)} autoComplete="off" /></Field>
-      <Field label="Breed"><input className="pt-input" value={dog.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="e.g. Lab, German Shepherd, or Boxer mix" autoComplete="off" /></Field>
+
+      {/* The breed pick is the authority: it sets the coat tier itself, so
+          nobody self-selects into the cheaper visit, and an excluded breed
+          finds out here, kindly, instead of at the door. */}
+      <Field label="Breed">
+        <select className="pt-input" value={pick} onChange={(e) => {
+          const v = e.target.value;
+          onChange('breedPick', v);
+          if (v === 'mixed') {
+            onChange('breed', dog.mixDetail ? `Mixed breed (${dog.mixDetail})` : 'Mixed breed');
+            onChange('coat_tier', '');
+          } else if (v === 'other') {
+            onChange('breed', '');
+            onChange('coat_tier', '');
+          } else {
+            const b = breedByName(v);
+            onChange('breed', v);
+            onChange('coat_tier', b && b.tier !== 'excluded' ? b.tier : '');
+          }
+        }}>
+          <option value="">Pick their breed…</option>
+          <option value="mixed">Mixed breed</option>
+          {[...BREEDS].sort((a, b) => a.name.localeCompare(b.name)).map((b) => (
+            <option key={b.name} value={b.name}>{b.name}</option>
+          ))}
+          <option value="other">Other / not listed</option>
+        </select>
+      </Field>
+
+      {pick === 'mixed' && (
+        <Field label="What's in the mix? (optional)">
+          <input className="pt-input" value={dog.mixDetail} placeholder="e.g. Lab and shepherd, shelter guess is fine"
+            onChange={(e) => { onChange('mixDetail', e.target.value); onChange('breed', e.target.value ? `Mixed breed (${e.target.value})` : 'Mixed breed'); }}
+            autoComplete="off" />
+        </Field>
+      )}
+      {pick === 'other' && (
+        <Field label="Tell us the breed">
+          <input className="pt-input" value={dog.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="e.g. Plott Hound" autoComplete="off" />
+        </Field>
+      )}
+
       {notAFit && (
         <div className="bk-area bk-area--out">
           <span className="bk-area__icon">!</span> We have to be honest up front: we are not built for this one.
@@ -600,19 +645,29 @@ function DogCard({ idx, dog, showNumber, onChange }) {
           is the right home for that coat, and we would rather tell you here, kindly, than at your door.
         </div>
       )}
-      <Field label="Which kind of dog?">
-        <div className="bk-tier-row">
-          {[
-            ['smoothcoat', 'Smoothcoat', 'The easy kind. Smooth, short coat: pit bulls, Boxers, Labs.'],
-            ['doublecoat', 'Doublecoat', 'The full-coat kind. Thick double coat: Golden Retrievers, German Shepherds, Australian Shepherds. Longer visit, deeper deshed, priced for it.'],
-          ].map(([val, lab, sub]) => (
-            <button key={val} type="button" className={`bk-tier${dog.coat_tier === val ? ' is-on' : ''}`} onClick={() => onChange('coat_tier', val)}>
-              <span className="bk-tier__lab">{lab}</span><span className="bk-tier__sub">{sub}</span>
-            </button>
-          ))}
+
+      {/* A listed breed locks its tier; mixed and other pick by the coat the
+          dog actually wears (the resemblance question). */}
+      {!notAFit && pick && pick !== 'mixed' && pick !== 'other' && dog.coat_tier && (
+        <div className="bk-area bk-area--in">
+          <span className="bk-area__icon">✓</span> A {pick.replace(/\s*\(.*\)$/, '')} books as <strong>{TIER_LABEL[dog.coat_tier]}</strong>{dog.coat_tier === 'doublecoat' ? ': thick coat, longer visit, deeper deshed, priced for it.' : ': smooth short coat, the quicker visit.'}
         </div>
-        <p className="bk-fineprint">Mixed breed? Pick by the coat your dog actually wears: smooth and short, or thick double coat. No haircut either way; that is the point.</p>
-      </Field>
+      )}
+      {(pick === 'mixed' || pick === 'other') && (
+        <Field label={dog.breedPick === 'mixed' ? 'Which coat does their mix most resemble?' : 'Which kind of coat?'}>
+          <div className="bk-tier-row">
+            {[
+              ['smoothcoat', 'Smoothcoat', 'Smooth, short coat: like a pit bull, Boxer, or Beagle.'],
+              ['doublecoat', 'Doublecoat', 'Thick or heavy-shedding coat: like a Golden, German Shepherd, or Aussie. Longer visit, deeper deshed, priced for it.'],
+            ].map(([val, lab, sub]) => (
+              <button key={val} type="button" className={`bk-tier${dog.coat_tier === val ? ' is-on' : ''}`} onClick={() => onChange('coat_tier', val)}>
+                <span className="bk-tier__lab">{lab}</span><span className="bk-tier__sub">{sub}</span>
+              </button>
+            ))}
+          </div>
+          <p className="bk-fineprint">Go by the coat your dog actually wears, not the label. No haircut either way; that is the point.</p>
+        </Field>
+      )}
       <Field label="Date of birth">
         <div className="bk-dob-row">
           <select className="pt-input" value={dog.dobMonth} onChange={(e) => onChange('dobMonth', e.target.value)} aria-label="Birth month">
