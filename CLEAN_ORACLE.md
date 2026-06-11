@@ -1794,6 +1794,45 @@ bridge period the calendar is still Paul's working surface, and a sync that
 duplicated his own bookings back at him, or died whole on one collision,
 would make the bridge worse than no sync.
 
+`today_feed_by_value` (Clean: operations):
+The Today feed is ordered by value, never by arrival time: severity first (an
+alert outranks counsel), then by how asymmetric the card's payoff usually is.
+Revenue actions lead (capacity, win-back, pricing, retention: each is a
+one-tap action worth a whole visit), money counsel reads next (CFO, chief of
+staff, bookkeeper), housekeeping waits politely (compliance, infrastructure,
+maintenance, reorders). Within the info tier the day-before route brief leads
+because Paul acts on it every single evening. Because Paul asked for the
+highest-value, smallest-effort-biggest-win things on top, and a feed sorted
+by timestamp buries a win-back under a filter reminder.
+
+`day_before_brief` (Clean: operations):
+Every evening an agent writes ONE card with tomorrow's route in stop order:
+time, client, the dogs going, how to get in (access notes), standing
+instructions per dog, and open follow-ups; penciled stops are included and
+labeled. It supersedes its own previous card so the feed never stacks stale
+briefs, and it costs nothing (pure SQL). Because the brief turns Paul's
+morning prep into zero minutes: everything he used to assemble from memory
+and contact sheets is already on one card the night before.
+
+`sms_consent_unchecked` (Clean: compliance):
+The SMS consent checkbox in the booking funnel starts UNCHECKED, always, and
+booking proceeds fine without it (email carries the notifications). Because
+consent that was pre-checked is not consent: A2P registration expects opt-in,
+and a client who never noticed the box did not agree to anything.
+
+`preview_before_live` (Clean: engineering):
+Two release modes, switched by whether real clients are using the surface.
+Pre-traffic (today): ship straight to main, fast and bold, because there is
+nobody to break. Once a surface carries real client traffic, user-facing
+changes go out for a look first: push the candidate to the `preview` branch,
+which publishes the whole site to preview.hurricanebath.com (same audit gate,
+separate directory), Paul clicks through it, says ship, and only then does it
+merge to main and reach clients. Database migrations are the exception that
+stays careful in BOTH modes, because schema has no preview copy. The flip to
+preview-first happens per surface on Paul's word, not on a date. Because
+recklessness is free before launch and expensive after it, and Paul wants to
+see a change with his own eyes before clients do.
+
 `reminders_one_gateway` (Clean: operations):
 A time-based commitment ("contact her in 2 weeks", "follow up after the
 holidays") goes in through Riker like everything else and lands in `reminders`

@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -54,6 +54,25 @@ const SEV = {
 };
 function money(c) { return c == null ? null : '$' + (c / 100).toFixed(2).replace(/\.00$/, ''); }
 
+// The feed is ordered by value, not arrival time: severity first (an alert
+// outranks counsel), then by how asymmetric the card's payoff usually is. A
+// capacity or win-back card is a one-tap action worth a whole visit's revenue;
+// money counsel reads next; housekeeping (filters, reorders) waits politely.
+// Within the info tier the day-before route brief leads, because it is the
+// card Paul acts on every single evening.
+const SEV_RANK = { alert: 0, signal: 1, info: 2 };
+const AGENT_RANK = {
+  tomorrow: 0, capacity: 1, winback: 2, pricing: 3, retention: 4,
+  cfo: 5, chief_of_staff: 6, bookkeeper: 7, growth: 8,
+  compliance: 9, infra: 10, maintenance: 11, reorder: 12,
+};
+function sortByValue(cards) {
+  return [...cards].sort((a, b) =>
+    (SEV_RANK[a.severity] ?? 1) - (SEV_RANK[b.severity] ?? 1)
+    || (AGENT_RANK[a.agent_key] ?? 99) - (AGENT_RANK[b.agent_key] ?? 99)
+    || new Date(b.created_at) - new Date(a.created_at));
+}
+
 export default function TodayView({ onOpenClient }) {
   const [briefings, setBriefings] = useState([]);
   const [agents, setAgents] = useState([]);
@@ -69,7 +88,7 @@ export default function TodayView({ onOpenClient }) {
         listBriefings(), listAgents(), todayAppointments(),
         listReminders().catch(() => null),
       ]);
-      setBriefings(b.filter((x) => x.status === 'new' || x.status === 'read'));
+      setBriefings(sortByValue(b.filter((x) => x.status === 'new' || x.status === 'read')));
       setAgents(a);
       setAppts(t);
       setReminders(r && Array.isArray(r.open) ? r.open : []);
@@ -272,9 +291,12 @@ function StopCard({ appt, onOpenClient }) {
 
       <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {wrapped ? (
-          <div style={{ fontSize: 13, color: 'var(--ad-text-dim,#565b6c)' }}>
-            Wrapped{times.departed ? ` at ${fmtClock(times.departed)}` : ''}.
-          </div>
+          <>
+            <div style={{ fontSize: 13, color: 'var(--ad-text-dim,#565b6c)' }}>
+              Wrapped{times.departed ? ` at ${fmtClock(times.departed)}` : ''}.
+            </div>
+            {clickable && <ThankYouDraft clientId={appt.client_id} sms={appt.contact_links?.sms} />}
+          </>
         ) : (
           <button
             type="button"
@@ -473,6 +495,66 @@ function BriefingCard({ b, onChanged, onError }) {
         <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doDismiss} disabled={busy}>Dismiss</button>
         {b.status === 'new' && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => run(() => setBriefingStatus(b.id, 'read'))} disabled={busy}>Mark read</button>}
       </div>
+    </div>
+  );
+}
+
+// After a stop wraps: one tap turns the visit into a warm personal message.
+// The drafter (message-draft edge fn) writes it from whatever Paul wants to
+// mention; he edits, copies, and sends it from his own messages app. This is
+// the grateful-clients moat in its smallest possible form.
+function ThankYouDraft({ clientId, sms }) {
+  const [open, setOpen] = useState(false);
+  const [thoughts, setThoughts] = useState('');
+  const [draft, setDraft] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  async function go() {
+    setBusy(true); setErr(null);
+    try {
+      const out = await messageDraft(clientId, thoughts.trim() || "Write a short warm thank-you for today's visit; the dogs did great.");
+      setDraft(out.draft || '');
+    } catch (e) { setErr(e.message || 'draft_failed'); }
+    finally { setBusy(false); }
+  }
+  async function copy() {
+    try { await navigator.clipboard.writeText(draft || ''); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* noop */ }
+  }
+
+  if (!open) {
+    return (
+      <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ alignSelf: 'flex-start' }} onClick={() => setOpen(true)}>
+        Send a thank-you?
+      </button>
+    );
+  }
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {draft === null ? (
+        <>
+          <textarea rows={2} value={thoughts} onChange={(e) => setThoughts(e.target.value)}
+            placeholder="Anything to mention? (optional: how the dogs did, something you noticed)"
+            style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="ad-btn ad-btn--sm" onClick={go} disabled={busy}>{busy ? 'Writing…' : 'Draft it'}</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)}>Never mind</button>
+          </div>
+        </>
+      ) : (
+        <>
+          <textarea rows={4} value={draft} onChange={(e) => setDraft(e.target.value)}
+            style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button className="ad-btn ad-btn--sm" onClick={copy}>{copied ? 'Copied' : 'Copy'}</button>
+            {sms && <a className="ad-btn ad-btn--ghost ad-btn--sm" href={sms}>Text the client</a>}
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setDraft(null)} disabled={busy}>Redo</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setOpen(false); setDraft(null); }}>Done</button>
+          </div>
+        </>
+      )}
+      {err && <div className="ad-error" style={{ fontSize: 12 }}>{err}</div>}
     </div>
   );
 }

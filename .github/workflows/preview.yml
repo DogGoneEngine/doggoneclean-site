@@ -1,0 +1,54 @@
+name: Deploy preview
+
+# Paul's look-before-it-goes-live channel. Push a candidate to the `preview`
+# branch and this publishes it to /srv/doggoneclean-preview on the droplet,
+# where a Caddy block serves it at preview.hurricanebath.com. Paul looks at
+# the whole site with the change in place, says "ship it," and only then does
+# the change merge to main and reach the real site. Inert until the one-time
+# droplet setup exists (DNS A record for preview.hurricanebath.com plus the
+# Caddy site block; see the parking lot). Same audit gate as production: a
+# failing check.py never publishes anywhere, preview included.
+
+on:
+  push:
+    branches:
+      - preview
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python3 scripts/check.py
+
+  deploy:
+    needs: audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci --omit=dev
+
+      - run: npm run build
+
+      - name: Publish dist to the preview directory
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H 178.128.144.219 >> ~/.ssh/known_hosts 2>/dev/null
+          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" dist/ cleandeploy@178.128.144.219:/srv/doggoneclean-preview/

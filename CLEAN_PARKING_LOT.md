@@ -9,13 +9,10 @@ when it becomes active.
 These gate the v2.0 online path and the Acuity/Squarespace cutover. Only Paul can do them
 (credentials, legal entity, physical-world); none are tool-accessible. Rough dependency order:
 
-0. **Maps key: add "Places API (New)" to the BROWSER key's API restrictions.** One minute in
-   Google Cloud console (project dog-gone-clean > Credentials > the browser key > API
-   restrictions: add Places API (New) to the allowed list, keep the referrer lock). Diagnosed
-   2026-06-10 with a live request: the booking funnel's address autocomplete renders but every
-   suggestion request returns 403 API_KEY_SERVICE_BLOCKED, which is why the box "just doesn't
-   work." The API is enabled on the PROJECT; the KEY still blocks it. This is the only thing
-   between the funnel and a working address gate; nothing else is queued behind it.
+0. **DONE 2026-06-11: Maps key fixed.** Paul added Places API (New) to the browser key's
+   restrictions and confirmed autocomplete works in the funnel. (History: diagnosed 2026-06-10
+   as 403 API_KEY_SERVICE_BLOCKED; the funnel now also probes Places on load and names this
+   failure in a banner if it ever regresses.)
 1. **iPostal1 mailing address.** A real business mailing address. Feeds the Resend sender
    verification, the address drop-in on the privacy + terms pages, and the bank / Stripe / Twilio
    registrations that all want a business address. Paul is going in person (week of 2026-06-08).

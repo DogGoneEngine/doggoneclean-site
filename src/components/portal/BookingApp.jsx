@@ -128,7 +128,7 @@ const BLANK = {
   step: 1,
   eligibilityAcked: false,
   place: { firstName: '', lastName: '', email: '', phone: '', addressLine1: '', addressCity: '', addressState: 'FL', addressZip: '', gateCode: '', serviceLat: null, serviceLng: null },
-  smsConsent: true,
+  smsConsent: false,
   dogs: [{ ...BLANK_DOG }],
   cadence: '4wk',
   chosenSlot: null,
@@ -165,7 +165,9 @@ export default function BookingApp() {
   const [step, setStep] = useState(init.step || 1);
   const [eligibilityAcked, setEligibilityAcked] = useState(!!init.eligibilityAcked);
   const [place, setPlace] = useState(init.place || BLANK.place);
-  const [smsConsent, setSmsConsent] = useState(init.smsConsent ?? true);
+  // SMS consent is OPT-IN: it starts unchecked, always. A pre-checked consent
+  // box is not real consent (A2P rules and plain honesty agree).
+  const [smsConsent, setSmsConsent] = useState(init.smsConsent ?? false);
   const [dogs, setDogs] = useState(init.dogs || BLANK.dogs);
   const [cadence, setCadence] = useState(init.cadence || '4wk');
   const [chosenSlot, setChosenSlot] = useState(init.chosenSlot || null);
@@ -416,6 +418,36 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
     && d.dobMonth && d.dobDay && d.dobYear);
   const canContinue = stage1 && stage2done && contactValid && dogsValid;
 
+  // What still needs filling, by name and by spot on the page. The continue
+  // button is NEVER disabled: a dead button with no explanation is exactly the
+  // hunt-up-and-down-the-page experience Paul hit (blank phone, nothing said).
+  const [missing, setMissing] = useState(() => new Set());
+  const miss = (id) => (missing.has(id) ? { borderColor: '#dc2626', boxShadow: '0 0 0 1px #dc2626' } : undefined);
+  function missingItems() {
+    const items = [];
+    if (!stage1) items.push({ id: 'bk-fit', label: 'the fit check' });
+    else if (!stage2done) items.push({ id: 'bk-address', label: 'a verified service address (pick one from the suggestions)' });
+    if (!place.firstName.trim()) items.push({ id: 'bk-first', label: 'first name' });
+    if (!place.lastName.trim()) items.push({ id: 'bk-last', label: 'last name' });
+    if (!looksLikeEmail(place.email)) items.push({ id: 'bk-email', label: 'email address' });
+    if (!toE164US(place.phone)) items.push({ id: 'bk-phone', label: 'mobile number' });
+    dogs.forEach((d, i) => {
+      const ok = d.name.trim() && d.breed.trim() && !breedNotAFit(d.breed)
+        && (d.coat_tier === 'smoothcoat' || d.coat_tier === 'doublecoat')
+        && d.dobMonth && d.dobDay && d.dobYear;
+      if (!ok) items.push({ id: `bk-dog-${i}`, label: `${d.name.trim() || `dog ${i + 1}`}'s details (name, breed, coat, birthday)` });
+    });
+    return items;
+  }
+  function tryAdvance() {
+    const items = missingItems();
+    if (items.length === 0) { setMissing(new Set()); setError(null); onAdvance(); return; }
+    setMissing(new Set(items.map((x) => x.id)));
+    setError('Still needed: ' + items.map((x) => x.label).join(', ') + '.');
+    const el = document.getElementById(items[0].id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   async function googlePrefill() {
     try { await signInWithGoogle('/book/'); } catch { /* user can type manually */ }
   }
@@ -448,7 +480,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
         ))}
       </ul>
       <p className="bk-fineprint">You don't need to clear your driveway. We can park on the street when it's safe and legal.</p>
-      <label className="bk-fit">
+      <label className="bk-fit" id="bk-fit" style={missing.has('bk-fit') ? { outline: '2px solid #dc2626', outlineOffset: 4, borderRadius: 8 } : undefined}>
         <input type="checkbox" checked={eligibilityAcked} onChange={(e) => setEligibilityAcked(e.target.checked)} />
         <span>My location fits these requirements and my dog is friendly toward people.</span>
       </label>
@@ -460,6 +492,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
           <div className="bk-stage__heading">Are you in our service area?</div>
 
           {!mapsFailed ? (
+            <div id="bk-address" style={missing.has('bk-address') ? { outline: '2px solid #dc2626', outlineOffset: 4, borderRadius: 8 } : undefined}>
             <Field label="Service address">
               {!mapsReady && <input type="text" className="pt-input" placeholder="Loading address search..." disabled />}
               <div ref={boxRef} className="bk-place-box" />
@@ -469,6 +502,7 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
                 </div>
               )}
             </Field>
+            </div>
           ) : (
             <div className="bk-notice">
               Online booking for The Villages is being set up and opens shortly. <a href="/the-villages">Reserve your founders spot</a> and we will let you know the moment it is live.
@@ -503,11 +537,11 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
           )}
 
           <div className="bk-grid-2">
-            <Field label="First name"><input className="pt-input" value={place.firstName} onChange={set('firstName')} autoComplete="given-name" /></Field>
-            <Field label="Last name"><input className="pt-input" value={place.lastName} onChange={set('lastName')} autoComplete="family-name" /></Field>
+            <Field label="First name"><input id="bk-first" className="pt-input" style={miss('bk-first')} value={place.firstName} onChange={set('firstName')} autoComplete="given-name" /></Field>
+            <Field label="Last name"><input id="bk-last" className="pt-input" style={miss('bk-last')} value={place.lastName} onChange={set('lastName')} autoComplete="family-name" /></Field>
           </div>
-          <Field label="Email address"><input className="pt-input" type="email" value={place.email} onChange={set('email')} autoComplete="email" placeholder="you@example.com" /></Field>
-          <Field label="Mobile number"><input className="pt-input" type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} onBlur={onPhoneBlur} autoComplete="tel" /></Field>
+          <Field label="Email address"><input id="bk-email" className="pt-input" style={miss('bk-email')} type="email" value={place.email} onChange={set('email')} autoComplete="email" placeholder="you@example.com" /></Field>
+          <Field label="Mobile number"><input id="bk-phone" className="pt-input" style={miss('bk-phone')} type="tel" inputMode="tel" placeholder="(352) 555-0100" value={place.phone} onChange={set('phone')} onBlur={onPhoneBlur} autoComplete="tel" /></Field>
           {returning && (
             <div className="bk-area bk-area--in">
               <span className="bk-area__icon">✓</span> Welcome back{returning.firstName ? `, ${returning.firstName}` : ''}. We already have you on file. Fill in your current information and we'll make sure everything is up to date.
@@ -528,7 +562,9 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
           </div>
 
           {dogs.map((d, i) => (
-            <DogCard key={i} idx={i} dog={d} showNumber={dogs.length > 1} onChange={(f, v) => updateDog(i, f, v)} />
+            <div key={i} id={`bk-dog-${i}`} style={missing.has(`bk-dog-${i}`) ? { outline: '2px solid #dc2626', outlineOffset: 4, borderRadius: 12 } : undefined}>
+              <DogCard idx={i} dog={d} showNumber={dogs.length > 1} onChange={(f, v) => updateDog(i, f, v)} />
+            </div>
           ))}
         </div>
       )}
@@ -536,8 +572,8 @@ function Step1({ city, eligibilityAcked, setEligibilityAcked, place, setPlace, s
       {error && <div className="pt-error-msg bk-error">{error}</div>}
       <button
         className="pt-btn pt-btn-primary bk-continue"
-        disabled={!canContinue}
-        onClick={() => { if (!canContinue) { setError('Fill in the fit check, a verified address, your name, email and phone, and each dog (name, breed, coat, date of birth).'); return; } onAdvance(); }}
+        style={canContinue ? undefined : { opacity: 0.85 }}
+        onClick={tryAdvance}
       >
         Choose Your Appointment →
       </button>
@@ -603,7 +639,7 @@ function DogCard({ idx, dog, showNumber, onChange }) {
 function Step2({ city, dogs, cadence, setCadence, onAdvance }) {
   const options = [
     { key: '4wk', label: 'Every 4 weeks', hook: 'It just gets done.', sub: 'Book once. We show up every 4 weeks automatically.', badge: 'Founders rate' },
-    { key: '2wk', label: 'Every 2 weeks', hook: 'Extra fresh.', sub: 'Same price as every 4 weeks. Heavy shedders love it.', badge: 'Same price' },
+    { key: '2wk', label: 'Every 2 weeks', hook: 'Extra fresh.', sub: 'Same price per visit as every 4 weeks. Heavy shedders love it.', badge: 'Same price per visit' },
     { key: 'oneoff', label: 'Single visit', hook: 'Just this once.', sub: 'One visit, one charge. No subscription.', badge: null },
   ];
   const total = visitPriceCents(city, dogs, cadence);
@@ -612,7 +648,7 @@ function Step2({ city, dogs, cadence, setCadence, onAdvance }) {
   return (
     <div className="bk-card">
       <h2 className="bk-step__title">Choose your <span className="grad">plan</span></h2>
-      <p className="bk-step__sub">Every 4 and every 2 weeks are the same price; pick the freshness you want. Cancel any time in two taps.</p>
+      <p className="bk-step__sub">Every 4 and every 2 weeks are the same price per visit; pick the freshness you want. Cancel any time in two taps.</p>
       <div className="bk-octane">
         <span className="bk-octane__q">Want your dog fresher?</span>
         <span className="bk-octane__arrow" aria-hidden="true">→</span>
@@ -631,8 +667,10 @@ function Step2({ city, dogs, cadence, setCadence, onAdvance }) {
           );
         })}
       </div>
+      {/* Running total, styled as a summary line so it cannot read as a
+          fourth plan card (Paul mistook "Every 4 weeks · $X" for a duplicate). */}
       <div className="bk-livetotal">
-        <div><div className="bk-livetotal__label">{periodLabel}</div><div className="bk-livetotal__sub">{dogLabel}{dogs.length > 1 ? ', each priced for its own coat' : ''}</div></div>
+        <div><div className="bk-livetotal__label">Your total per visit</div><div className="bk-livetotal__sub">{periodLabel.toLowerCase()} · {dogLabel}{dogs.length > 1 ? ', each priced for its own coat' : ''}</div></div>
         <div className="bk-livetotal__amount">{dollars(total) ?? '--'}</div>
       </div>
       <button className="pt-btn pt-btn-primary bk-continue" onClick={onAdvance}>Choose your time →</button>

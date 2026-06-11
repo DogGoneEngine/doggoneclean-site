@@ -2973,3 +2973,34 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   blocked. Root cause stands as diagnosed 2026-06-10: the Maps browser key needs "Places API
   (New)" in its Google Cloud API restrictions; that toggle is Paul's, in the DGC Google Cloud
   project.
+
+### Batch eight: funnel polish after Paul's first full walkthrough, two new agents, preview channel (night; migration 0157)
+
+- **Autocomplete confirmed working** after Paul added Places API (New) to the browser key
+  (launch blocker 0 closed). His walkthrough then surfaced four funnel fixes, all shipped:
+  (1) SMS consent now starts UNCHECKED (`sms_consent_unchecked`): a pre-checked box is not
+  consent. (2) The continue button is never disabled anymore: tapping it with anything
+  missing lists exactly what is still needed by name, outlines the offending fields in red,
+  and scrolls to the first one (the blank-phone dead-button hunt can never happen to a
+  client). (3) "Extra fresh" now says "Same price per visit as every 4 weeks" (badge too),
+  so nobody reads it as twice the visits for the same money. (4) The fourth "card" was the
+  running total panel reading as a duplicate plan; it is now clearly a summary line ("Your
+  total per visit · every 4 weeks · 2 dogs").
+- **"Structured. Reliable. Personal." removed** from the home hero on Paul's call; the
+  headline and lede carry the page.
+- **Calendar script paste VERIFIED working** from the data: 171 appointments now synced
+  beyond the old 45-day window (out to June 2027) and 110 banana pencils arrived as
+  tentative. Mary Jane Hunt's real Aug 13 appointment is in, killing that false alarm class.
+- **Today feed ordered by value** (`today_feed_by_value`): severity, then payoff asymmetry
+  (capacity/win-back/pricing first, counsel next, housekeeping last), day-before brief tops
+  the info tier.
+- **Two new agents shipped on Paul's go**: the Day-before brief (`day_before_brief`, 0157,
+  pure SQL, verified live with a real 4-stop card for Jun 12) and the post-visit thank-you
+  pipeline (ThankYouDraft on every wrapped stop: optional thoughts, draft, edit, copy, text
+  link; drafts only, Paul sends).
+- **Preview-before-live channel founded** (`preview_before_live`): two release modes. Fast
+  to main while a surface has no client traffic (today); once real clients use it, changes
+  push to the `preview` branch -> preview.hurricanebath.com for Paul's click-through, then
+  merge to main on his "ship it." Workflow committed and inert until the one-time droplet
+  setup (DNS + Caddy block, parked); the flip happens per surface on Paul's word. Database
+  migrations stay careful in both modes (no preview copy of schema).
