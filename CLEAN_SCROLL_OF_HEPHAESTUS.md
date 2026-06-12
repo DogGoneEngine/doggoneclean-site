@@ -3208,3 +3208,24 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   departments (social is a channel); the department taxonomy is a visualization skin over
   processes and agents and is expected to evolve as Paul gets used to the framework, not a
   hierarchy to preserve.
+
+### Batch fifteen: the Prospectus gets its hype, and every limit gets a row (Jun 12; migration 0166)
+
+- **Prospectus v2** (`living_prospectus`): four new receipted sections on Paul's instruction.
+  The Hurricane Bath (the full driveway grooming visit, average on-site minutes as the
+  receipt), String of Pearls scheduling plus the Dog Gone Tracker (scheduler-as-a-service
+  edge functions, drive-time perimeter gate, tracker arrival stamps feeding the adherence
+  gauge), the AI department heads by name (all 12 from the agents table with their one-line
+  jobs, costed on the HR floor), the rolling plant (13 equipment items, 2 hour-metered
+  generators, 9 recurring maintenance tasks: a service discipline, not a mystery in a
+  trailer; book value flagged as a data gap until receipts are loaded), and the knowledge
+  base (field manual + Oracle + wisdom entries: twenty years written down, the un-promptable
+  moat per dig_the_moat).
+- **Know your limits** (`know_your_limits`): infra_limits seeded with every ceiling in the
+  stack (Supabase free-plan database/storage/egress/edge-calls/MAU and the 50MB upload cap,
+  the shared droplet's 50GB disk / 2GB RAM / 2TB transfer, Resend's 3,000-a-month and
+  100-a-day, Anthropic usage billing, Google Maps free tier, GitHub Actions minutes).
+  admin_infra_status v2 attaches live usage where the app can measure it (today: database
+  18MB of 500, storage 39MB of 1000, Anthropic $0.13 this month) and says "dashboard only"
+  where it cannot; the Operations infra panel renders the whole inventory. When a plan
+  changes, the row changes; no limit is discovered by hitting it.

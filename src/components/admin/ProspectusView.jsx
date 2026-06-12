@@ -27,6 +27,8 @@ export default function ProspectusView() {
   const book = p.book || {};
   const m = p.money || {};
   const mach = p.machine || {};
+  const fleet = p.fleet || {};
+  const agents = p.agents_list || [];
   const ttm = v.ttm_revenue_cents;
 
   return (
@@ -73,12 +75,70 @@ export default function ProspectusView() {
       </div>
 
       <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <Cap>The Hurricane Bath</Cap>
+        <p style={{ fontSize: 14, marginTop: 8, marginBottom: 8 }}>
+          The product is not a bath; it is a complete dog grooming visit delivered in the client's driveway in a climate-controlled trailer: the Hurricane Bath wash system with dual submersible pumps and a recirculating freshwater supply, high-velocity climate-controlled drying, deshedding, foot-pad hair, and nail care included, every visit, no add-on menu to upsell. The dog never leaves home, never sits in a cage, and never waits at a salon. Clients do not compare it to other dog groomers because nobody else around offers the thing itself.
+        </p>
+        <Receipt>
+          Average {m.avg_on_site_min} minutes on site per visit (recorded visit minutes, trailing 365 days). The full craft SOP, water, power, and climate systems are documented in the field manual (CLEAN_FIELD_MANUAL.md), which transfers with the business.
+        </Receipt>
+      </div>
+
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <Cap>String of Pearls scheduling and the Dog Gone Tracker</Cap>
+        <p style={{ fontSize: 14, marginTop: 8, marginBottom: 8 }}>
+          Routing is the whole economics of a mobile business, and this one treats it as a product. The String of Pearls scheduler is a backend service, not a human with a calendar: booking runs through edge functions that gate every new client by real drive time from the route's perimeter, and day plans string stops like pearls so the trailer earns instead of drives. On the client side, the Dog Gone Tracker is the pizza tracker for dog grooming: a live page showing who is coming (name, face, bio), where the visit stands step by step, and when the truck is on the way. Clients watch it instead of calling to ask.
+        </p>
+        <Receipt>
+          Scheduler-as-a-service is a standing engineering rule (string_of_pearls_is_a_service): get-available-slots, create-booking, reschedule, skip, and stop all run as CORS-locked edge functions; the ocala-service-area function enforces the drive-time perimeter. The tracker stamps arrival and departure on every visit ({mach.tracked_visits} stamped so far; live since June 9) and feeds the schedule-adherence gauge, a metric most route businesses never measure.
+        </Receipt>
+      </div>
+
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
         <Cap>The operating system comes with it</Cap>
         <p style={{ fontSize: 14, marginTop: 8, marginBottom: 8 }}>
           The business runs on its own software, built for exactly this route: a booking funnel with card on file, a client portal, a live arrival tracker clients can watch, an operations console covering scheduling, finance, HR, compliance, and maintenance, and {mach.active_agents} AI department heads that brief the owner daily and log every dollar they cost. A buyer does not hire a back office; it is already here, documented, and it transfers.
         </p>
         <Receipt>
-          {mach.client_records} client records, {mach.dog_records} dog records, {mach.briefings_on_record} agent briefings on file, {mach.riker_parses} voice-note captures parsed into structured records, {mach.wisdom_entries} entries in the operating knowledge base. Schedule adherence is instrumented live (plan vs actual arrival per stop), a metric most route businesses never measure.
+          {mach.client_records} client records, {mach.dog_records} dog records, {mach.briefings_on_record} agent briefings on file, {mach.riker_parses} voice-note captures parsed into structured records, {mach.notifications_sent} automated client notifications sent. All of it in the business's own database, none of it in anyone's head.
+        </Receipt>
+      </div>
+
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <Cap>The AI department heads, by name</Cap>
+        <p style={{ fontSize: 14, marginTop: 8, marginBottom: 8 }}>
+          These are not chatbots; they are watchers wired to the live data, each owning one asymmetric risk, and they work for whoever owns the business. The deepest moat is the proprietary context they run on: years of this route's own clients, dogs, prices, and timings, which no competitor can prompt their way into.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 8, marginBottom: 8 }}>
+          {agents.map((a) => (
+            <div key={a.label} style={{ fontSize: 12, padding: '8px 10px', borderRadius: 8, background: 'var(--ad-surface-container, #f5f4f1)' }}>
+              <strong>{a.label}</strong> <span style={{ opacity: 0.5 }}>{a.department}</span>
+              <div style={{ opacity: 0.75, marginTop: 2 }}>{a.description}</div>
+            </div>
+          ))}
+        </div>
+        <Receipt>
+          The agents table, live: {agents.length} active heads. Every Anthropic call each one makes is logged to agent_costs with tokens and model, priced on the HR floor; the whole staff costs less per month than one tank of gas.
+        </Receipt>
+      </div>
+
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <Cap>The rolling plant</Cap>
+        <p style={{ fontSize: 14, marginTop: 8, marginBottom: 8 }}>
+          The trailer is a self-contained dog grooming facility: {fleet.equipment_items} tracked pieces of equipment including the climate-controlled trailer itself, the Hurricane Bath water system, dual generators with per-unit hour meters, dryer, and climate gear. Maintenance is not a memory; it is a program: {fleet.maintenance_tasks} recurring tasks (oil, spark plugs, filters, service intervals) tracked by engine hours and calendar days, with a Maintenance watcher agent that flags anything overdue before it fails on a route. A buyer inherits machines with a service discipline attached, not a mystery in a trailer.
+        </p>
+        <Receipt>
+          equipment and maintenance_tasks tables, live counts: {fleet.equipment_items} items, {fleet.generators} generators ({fleet.hour_tracked} hour-metered), {fleet.maintenance_tasks} active maintenance tasks with defined intervals. The hands-on SOPs live in the field manual. Equipment book value is a data gap until receipts are loaded; the discipline, not the depreciation schedule, is the claim here.
+        </Receipt>
+      </div>
+
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <Cap>The knowledge base: twenty years you cannot google</Cap>
+        <p style={{ fontSize: 14, marginTop: 8, marginBottom: 8 }}>
+          The hardest thing to buy in a service business is the operator's head, and this one has been written down. The field manual holds the craft: how to wash, dry, and handle real dogs, run the water and power systems, and keep the trailer alive. The Oracle holds the rules: every operating decision recorded with its reason, so a new owner inherits the why, not just the what. The wisdom inbox keeps absorbing more on every route. This is polish a buyer cannot get from any franchise manual, because it was learned one driveway at a time.
+        </p>
+        <Receipt>
+          CLEAN_FIELD_MANUAL.md (craft, equipment, power, climate SOPs) and CLEAN_ORACLE.md (every rule in because-form) ship in the repo; {mach.wisdom_entries} wisdom entries captured in the database and growing. Per-client knowledge (gate codes, dog temperaments, hard availability windows) lives on the client records themselves.
         </Receipt>
       </div>
 

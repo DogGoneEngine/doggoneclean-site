@@ -1954,6 +1954,18 @@ that only reads stronger when the business actually gets stronger is a
 compass, while a stale or padded one is a lie waiting to be discovered.
 Paul, 2026-06-12.
 
+`know_your_limits` (Clean: operations):
+Everything the business pays for that has a ceiling lives as a row in
+infra_limits (service, what is limited, the limit, and a note on where to
+check it), and admin_infra_status attaches live usage to every limit the app
+can measure (database, storage, auth accounts, emails sent, Anthropic spend)
+and says "dashboard only" for the rest, all shown on the Operations floor
+under the infrastructure panel. When a plan changes, the row changes.
+Because a limit you are not tracking is discovered by hitting it, in
+production, on a route day; the Supabase watcher proved the pattern and the
+rest of the stack (droplet disk, Resend's 100-a-day, the 50MB upload cap)
+deserves the same eyes. Paul, 2026-06-12.
+
 `riker_parses_on_the_record` (Clean: engineering):
 Every Riker parse is logged (riker_log: utterance, client, full plan), so a
 "Riker would not cooperate" report is diagnosed from the actual parses, not

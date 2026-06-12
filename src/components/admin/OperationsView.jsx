@@ -175,8 +175,35 @@ function InfraPanel() {
             <span><strong>{fmt(infra.storage_bytes)}</strong> <span style={{ opacity: 0.6 }}>photo storage, {infra.storage_objects} files ({pct(infra.storage_bytes, infra.storage_limit_mb)}% of {Math.round(infra.storage_limit_mb)} MB plan)</span></span>
           </div>
           <div style={{ fontSize: 12, opacity: 0.55, marginTop: 6 }}>
-            The infra watcher checks daily and cards Today at 70% of a plan limit. The web droplet (50 GB disk, serves the static site) is not instrumented yet; the site build is a few MB, so the risk there is low.
+            The infra watcher checks daily and cards Today at 70% of a plan limit.
           </div>
+          {(infra.inventory || []).length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 4 }}>Every limit we live under</div>
+              <table className="ad-table" style={{ fontSize: 13 }}>
+                <tbody>
+                  {(infra.inventory || []).map((l, i) => (
+                    <tr key={i} title={l.note || ''}>
+                      <td style={{ whiteSpace: 'nowrap' }}><strong>{l.service}</strong></td>
+                      <td>{l.item}</td>
+                      <td className="ad-mono" style={{ whiteSpace: 'nowrap' }}>{l.limit_label}</td>
+                      <td className="ad-mono" style={{ textAlign: 'right', whiteSpace: 'nowrap',
+                        color: l.pct == null ? 'inherit' : l.pct >= 70 ? 'var(--ad-bad, #dc2626)' : 'var(--ad-good, #1f8a4b)' }}>
+                        {l.used == null
+                          ? <span style={{ opacity: 0.5 }}>dashboard only</span>
+                          : l.unit === 'usd'
+                            ? `$${l.used}${l.period ? ' this ' + l.period : ''}`
+                            : `${Number(l.used).toLocaleString('en-US')}${l.unit === 'mb' ? ' MB' : ''}${l.pct != null ? ` (${l.pct}%)` : ''}`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ fontSize: 12, opacity: 0.55, marginTop: 4 }}>
+                Long-press a row for the note. "Dashboard only" rows cannot be measured from inside the app; their limits are tracked here so none is discovered by hitting it.
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
