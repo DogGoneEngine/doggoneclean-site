@@ -382,6 +382,12 @@ export async function adminArrived(appointmentId) {
 export async function adminReturning(appointmentId) {
   return rpc('admin_returning', { p_appointment: appointmentId });
 }
+// One deliberate step back: reverts the appointment status and clears the
+// matching time_is_money stamp so the button, the client tracker, and the
+// clocks agree again after a fat-fingered tap (tracker_undo_is_deliberate).
+export async function trackerUndo(appointmentId) {
+  return rpc('admin_tracker_undo', { p_appointment: appointmentId });
+}
 
 // The Today sheet's geolocation watch pushes the truck's position here while
 // a stop is on_the_way; the tracker-eta edge function serves it (token-scoped)
@@ -502,6 +508,29 @@ export async function setInboxStatus(id, status) {
 // operating tables on each call, so the pitch can never go stale.
 export async function prospectus() {
   return rpc('admin_prospectus');
+}
+
+// Tasks (tasks_with_receipts): Paul assigns, the assignee's Today shows it,
+// done can carry a photo receipt when the task demands one.
+export async function listTasks() {
+  return rpc('admin_list_tasks');
+}
+export async function addTask(title, assigneeId, details = null, needsProof = false) {
+  return rpc('admin_add_task', { p_title: title, p_assignee: assigneeId, p_details: details, p_needs_proof: needsProof });
+}
+export async function completeTask(id, proofPath = null) {
+  return rpc('admin_complete_task', { p_id: id, p_proof_path: proofPath });
+}
+export async function dropTask(id) {
+  return rpc('admin_drop_task', { p_id: id });
+}
+export async function uploadTaskProof(taskId, file) {
+  const f = await compressForUpload(file);
+  const ext = (f.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `tasks/${taskId}/proof-${Date.now()}.${ext}`;
+  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, f, { contentType: f.type || 'image/jpeg', upsert: false });
+  if (error) throw new Error(error.message);
+  return path;
 }
 
 // Live infrastructure usage (database, storage) against plan limits. The

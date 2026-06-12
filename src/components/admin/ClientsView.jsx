@@ -186,11 +186,14 @@ function ClientSheet({ clientId, onChanged }) {
   const c = data.client || {};
   const dogs = data.dogs || [];
   const visits = data.visits || [];
-  // The visit being worked right now pins to the top of the sheet; once the
-  // day passes it rejoins the history on its own (date-based, no cleanup).
+  // The visit being worked right now pins to the top of the sheet. It unpins
+  // the moment Departed is stamped (Paul, 2026-06-12: once we roll out, the
+  // card belongs down in the history), or when the day passes, whichever
+  // comes first. Undoing the Departed stamp re-pins it on the next load.
   const todayKey = easternDay(Date.now());
-  const todayVisits = visits.filter((v) => easternDay(v.visited_at) === todayKey);
-  const pastVisits = visits.filter((v) => easternDay(v.visited_at) !== todayKey);
+  const isPinned = (v) => easternDay(v.visited_at) === todayKey && !v.departed_at;
+  const todayVisits = visits.filter(isPinned);
+  const pastVisits = visits.filter((v) => !isPinned(v));
   const upcoming = data.upcoming || [];
 
   return (

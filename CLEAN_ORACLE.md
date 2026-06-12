@@ -1966,6 +1966,40 @@ production, on a route day; the Supabase watcher proved the pattern and the
 rest of the stack (droplet disk, Resend's 100-a-day, the 50MB upload cap)
 deserves the same eyes. Paul, 2026-06-12.
 
+`tracker_undo_is_deliberate` (Clean: operations):
+Every forward tap on the Today stop card (On my way, I'm here, Bringing them
+back, All done) can be rolled back exactly one step by admin_tracker_undo,
+which reverts the appointment status and clears the matching time stamp so
+the button, the client's tracker page, and the clocks agree again. The
+control is deliberately quiet (a small "undo step" text link) and
+deliberately two-stage (tap, then confirm with the step named), the opposite
+of the big forward button. Because fast fingers happen mid-route and a wrong
+stage lies to the client watching the tracker, but an undo that is itself
+fat-fingerable would just move the problem. Paul, 2026-06-12.
+
+`tasks_with_receipts` (Clean: operations):
+Work gets assigned, not remembered: the owner assigns a task to any operator
+from the Tasks panel on Today, the assignee sees it on their own Today, and
+marking it Done can require a photo receipt (the finished filter, the
+cleaned intake) that the owner sees beside the done-stamp in the same panel.
+Owner assigns and drops; assignee or owner completes; proof is enforced
+server-side (admin_complete_task rejects a proof-required task without a
+photo). Because delegation only works when "done" is observable: Paul needs
+to see that Jake did it, when, and to what standard, without standing next
+to him. Paul, 2026-06-12.
+
+`stop_closes_the_loop` (Clean: clients):
+When a client taps the portal stop sign, three things happen in one
+transaction: every future appointment is cancelled including pencilled
+(tentative) ones, a Plan-stopped alert cards the owner's Today feed
+naming the client and the count of cancelled visits, and the client gets
+the promised cancellation notice by email for their next upcoming
+appointment. Reminders are the only opt-out-able messages; account
+notices (confirmations, cancellations) always send. Because the stop sign
+brags that stopping is two taps with no phone call, and a stop nobody
+notices is how a client quietly disappears and a route day silently gains
+a hole; the easy exit must still inform the house. Paul, 2026-06-12.
+
 `riker_parses_on_the_record` (Clean: engineering):
 Every Riker parse is logged (riker_log: utterance, client, full plan), so a
 "Riker would not cooperate" report is diagnosed from the actual parses, not

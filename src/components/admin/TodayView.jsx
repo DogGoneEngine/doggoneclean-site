@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, uploadTaskProof, signedPhotoUrl } from './supabase.js';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
@@ -170,6 +170,8 @@ export default function TodayView({ onOpenClient }) {
           the same agent on one screen read as clutter. The client sheet
           keeps its fixed-client Riker box. */}
 
+      <TasksPanel />
+
       {error && <div className="ad-error">{error}</div>}
 
       {loading ? (
@@ -184,6 +186,147 @@ export default function TodayView({ onOpenClient }) {
         </div>
       )}
     </>
+  );
+}
+
+// Tasks (tasks_with_receipts). Paul assigns ("clean the intake filter"), the
+// assignee's Today shows it, Done can demand a photo receipt, and Paul sees
+// status and receipt in this same panel. Owner assigns and drops; assignee
+// or owner completes. Hidden entirely when there is nothing to show and no
+// one to assign (a solo owner with zero tasks sees no clutter).
+function TasksPanel() {
+  const [tasks, setTasks] = useState([]);
+  const [me, setMe] = useState(null);
+  const [team, setTeam] = useState([]);
+  const [title, setTitle] = useState('');
+  const [assignee, setAssignee] = useState('');
+  const [needsProof, setNeedsProof] = useState(true);
+  const [adding, setAdding] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+
+  const load = useCallback(async () => {
+    try { setTasks(await listTasks() || []); } catch { /* panel stays quiet */ }
+  }, []);
+  useEffect(() => {
+    load();
+    adminSelf().then((a) => {
+      setMe(a);
+      if (a?.role === 'owner') listTeam().then((t) => setTeam(t || [])).catch(() => {});
+    }).catch(() => {});
+  }, [load]);
+
+  const isOwner = me?.role === 'owner';
+  const open = tasks.filter((t) => t.status === 'open');
+  const recentDone = tasks.filter((t) => t.status === 'done').slice(0, 5);
+  if (!isOwner && tasks.length === 0) return null;
+
+  async function create() {
+    if (!title.trim() || !assignee) return;
+    setBusy(true); setErr(null);
+    try {
+      await addTask(title.trim(), assignee, null, needsProof);
+      setTitle(''); setAdding(false); load();
+    } catch (e) { setErr(e.message || 'add_failed'); }
+    finally { setBusy(false); }
+  }
+
+  async function markDone(t, file) {
+    setBusy(true); setErr(null);
+    try {
+      let proofPath = null;
+      if (file) proofPath = await uploadTaskProof(t.id, file);
+      await completeTask(t.id, proofPath);
+      load();
+    } catch (e) {
+      setErr(e.message === 'proof_required' ? 'This one needs a photo receipt: snap the finished work, then tap Done with photo.' : (e.message || 'done_failed'));
+    } finally { setBusy(false); }
+  }
+
+  async function viewReceipt(path) {
+    try { const u = await signedPhotoUrl(path); window.open(u, '_blank', 'noopener'); }
+    catch { setErr('could not open the receipt'); }
+  }
+
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Tasks</div>
+        {isOwner && !adding && (
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(true)}>Assign a task</button>
+        )}
+      </div>
+
+      {isOwner && adding && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '8px 0' }}>
+          <input className="pt-input" type="text" value={title} autoFocus placeholder="What needs doing? (e.g. clean the dryer intake filter)"
+            onChange={(e) => setTitle(e.target.value)}
+            style={{ width: '100%', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box' }} />
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
+            <select value={assignee} onChange={(e) => setAssignee(e.target.value)}
+              style={{ fontSize: 13, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }}>
+              <option value="">Who does it?</option>
+              {team.map((t) => <option key={t.id} value={t.id}>{t.first_name}{t.last_name ? ` ${t.last_name}` : ''}</option>)}
+            </select>
+            <label style={{ display: 'flex', gap: 6, alignItems: 'center', cursor: 'pointer' }}>
+              <input type="checkbox" checked={needsProof} onChange={(e) => setNeedsProof(e.target.checked)} />
+              ask for a photo receipt
+            </label>
+            <button className="ad-btn ad-btn--sm" disabled={busy || !title.trim() || !assignee} onClick={create}>
+              {busy ? '…' : 'Assign'}
+            </button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => setAdding(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {err && <div className="ad-error" style={{ fontSize: 12, marginTop: 6 }}>{err}</div>}
+
+      {open.length === 0 && recentDone.length === 0 ? (
+        <div style={{ fontSize: 13, opacity: 0.6, marginTop: 6 }}>Nothing assigned right now.</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+          {open.map((t) => (
+            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 180, fontSize: 14 }}>
+                {t.title}
+                <span style={{ display: 'block', fontSize: 12, opacity: 0.6 }}>
+                  {t.mine ? 'yours' : t.assignee}{t.needs_proof ? ' · photo receipt asked' : ''}
+                </span>
+              </div>
+              {(t.mine || isOwner) && (t.needs_proof ? (
+                <label className="ad-btn ad-btn--sm" style={{ cursor: 'pointer' }}>
+                  {busy ? '…' : 'Done with photo'}
+                  <input type="file" accept="image/*" capture="environment" disabled={busy} style={{ display: 'none' }}
+                    onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) markDone(t, f); }} />
+                </label>
+              ) : (
+                <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => markDone(t, null)}>Done</button>
+              ))}
+              {isOwner && (
+                <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy}
+                  onClick={async () => { try { await dropTask(t.id); load(); } catch (e) { setErr(e.message); } }}>
+                  Drop
+                </button>
+              )}
+            </div>
+          ))}
+          {recentDone.map((t) => (
+            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', opacity: 0.7, fontSize: 13 }}>
+              <div style={{ flex: 1, minWidth: 180 }}>
+                <span style={{ textDecoration: 'line-through' }}>{t.title}</span>
+                <span style={{ display: 'block', fontSize: 12, opacity: 0.7 }}>
+                  done by {t.assignee}{t.done_at ? ` · ${new Date(t.done_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}
+                </span>
+              </div>
+              {t.proof_photo_path && (
+                <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => viewReceipt(t.proof_photo_path)}>Receipt</button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -206,7 +349,7 @@ function hhmmToISO(hhmm) {
   return d.toISOString();
 }
 
-const CLOCKS = [['inbound', 'Left'], ['arrived', 'Arrived'], ['departed', 'Done']];
+const CLOCKS = [['inbound', 'Inbound'], ['arrived', 'Arrived'], ['departed', 'Departed']];
 
 // One stop, one card (Paul 2026-06-10: the old dense row mixed the open-the-
 // record tap with a strip of small buttons and everything fat-fingered).
@@ -222,6 +365,7 @@ function StopCard({ appt, onOpenClient }) {
   });
   const [busyCell, setBusyCell] = useState(null);
   const [busyStep, setBusyStep] = useState(false);
+  const [undoAsk, setUndoAsk] = useState(false);
   const [err, setErr] = useState(false);
   const [shareState, setShareState] = useState(null); // null | 'shared' | 'copied'
   const [showTimes, setShowTimes] = useState(false);
@@ -299,6 +443,28 @@ function StopCard({ appt, onOpenClient }) {
       } else if (status === 'returning') {
         await set('departed', new Date().toISOString());
       }
+    } catch { setErr(true); }
+    finally { setBusyStep(false); }
+  }
+
+  // Undo (tracker_undo_is_deliberate): one step back for a fast-fingered tap.
+  // Deliberately quiet (small text link) and deliberately two-stage (tap, then
+  // confirm with the step named), so the undo itself cannot be fat-fingered.
+  const lastStep = (times.departed || status === 'completed') ? 'All done'
+    : status === 'returning' ? 'Bringing them back'
+    : (status === 'on_site' || status === 'in_service') ? "I'm here"
+    : status === 'on_the_way' ? 'On my way'
+    : null;
+  async function undo() {
+    setBusyStep(true); setErr(false);
+    try {
+      const res = await trackerUndo(appt.id);
+      if (res && res.undone) {
+        setStatus(res.status);
+        setTimes({ inbound: res.inbound_at || null, arrived: res.arrived_at || null, departed: res.departed_at || null });
+        if (res.status === 'on_the_way') startLocationShare(appt.id); else stopLocationShare();
+      }
+      setUndoAsk(false);
     } catch { setErr(true); }
     finally { setBusyStep(false); }
   }
@@ -391,14 +557,37 @@ function StopCard({ appt, onOpenClient }) {
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowTimes((v) => !v)}
-          style={{ alignSelf: 'flex-start', background: 'transparent', border: 0, padding: 0,
-            fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', textDecoration: 'underline', cursor: 'pointer' }}
-        >
-          {showTimes ? 'hide times' : 'fix times'}
-        </button>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => setShowTimes((v) => !v)}
+            style={{ background: 'transparent', border: 0, padding: 0,
+              fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', textDecoration: 'underline', cursor: 'pointer' }}
+          >
+            {showTimes ? 'hide times' : 'fix times'}
+          </button>
+          {lastStep && !undoAsk && (
+            <button
+              type="button"
+              onClick={() => setUndoAsk(true)}
+              style={{ background: 'transparent', border: 0, padding: 0,
+                fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', opacity: 0.7, textDecoration: 'underline', cursor: 'pointer' }}
+            >
+              undo step
+            </button>
+          )}
+          {lastStep && undoAsk && (
+            <span style={{ fontSize: 12, display: 'inline-flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
+              <span>Roll back "{lastStep}"?</span>
+              <button type="button" className="ad-btn ad-btn--sm" disabled={busyStep} onClick={undo}>
+                {busyStep ? '…' : 'Yes, roll it back'}
+              </button>
+              <button type="button" className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busyStep} onClick={() => setUndoAsk(false)}>
+                Keep it
+              </button>
+            </span>
+          )}
+        </div>
         {showTimes && (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
             {CLOCKS.map(([field, label]) => (

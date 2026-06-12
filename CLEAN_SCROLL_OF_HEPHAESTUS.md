@@ -3229,3 +3229,33 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   18MB of 500, storage 39MB of 1000, Anthropic $0.13 this month) and says "dashboard only"
   where it cannot; the Operations infra panel renders the whole inventory. When a plan
   changes, the row changes; no limit is discovered by hitting it.
+
+### Batch sixteen: undo for fast fingers, tasks with receipts, the stop closes the loop (Jun 12; migration 0167)
+
+- **Tracker undo** (`tracker_undo_is_deliberate`): one quiet "undo step" link on the stop
+  card, two-stage on purpose (tap, then confirm with the step named), backed by
+  admin_tracker_undo which reverts the appointment status AND clears the matching clock so
+  the big button, the client's tracker, and the times agree. GPS broadcast restarts or
+  stops to match the reverted stage.
+- **Clock names corrected** on the stop card per Paul: Inbound / Arrived / Departed
+  (previously Left / Arrived / Done).
+- **Tasks with receipts** (`tasks_with_receipts`): owner assigns from the Tasks panel on
+  Today, the assignee's Today shows it, Done can demand a photo receipt enforced
+  server-side, and the owner sees done-stamp plus receipt in the same panel. First use:
+  filter-cleaning for Jake.
+- **Jake's Ray Russell capture verified from the riker_log, not memory**: the parse
+  matched, the visit row carries the $85 cash and Bailey's vibe 5 with all three tracker
+  stamps, and the one-visit-per-day merge worked. Nothing went into the void; what Paul
+  saw was the by-design pin behavior (today's visit sits in the pinned top panel, not in
+  history). On his instruction the pin rule changed: a visit unpins the moment Departed is
+  stamped (admin_get_client now returns departed_at), so a wrapped stop reads in history
+  where it belongs.
+- **The portal stop sign closes the loop** (`stop_closes_the_loop`): a stop now also
+  cancels pencilled (tentative) future appointments (they previously survived), cards
+  Today with a Plan-stopped retention alert naming the client, and sends the promised
+  cancellation email for the next upcoming appointment. Confirmed in the audit: reminders
+  are the only opt-out-able messages; account notices always send by email, so no new
+  preference checkbox is needed.
+- **Field test owed**: the undo path, the task photo-receipt path, and the stop briefing
+  were applied and build clean but have not been exercised end to end on a phone; Paul or
+  Jake tapping through a real stop is the verification that counts.
