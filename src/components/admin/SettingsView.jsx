@@ -6,7 +6,7 @@
 // secrets, never in the page.
 
 import { useCallback, useEffect, useState } from 'react';
-import { systemStatus } from './supabase.js';
+import { systemStatus, addInboxPhoto, listInbox } from './supabase.js';
 
 // Friendly labels for the known secrets (names only are ever read, never values).
 const SECRET_LABELS = {
@@ -37,6 +37,7 @@ export default function SettingsView() {
 
   return (
     <>
+      <PhotoInbox />
       <h1>Settings</h1>
       <p className="ad-sub">The system at a glance: what is connected, who is watching, and who holds the keys.</p>
 
@@ -103,3 +104,50 @@ export default function SettingsView() {
   );
 }
 function Cap({ children }) { return <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>{children}</div>; }
+
+
+// The photo inbox (photo_inbox_for_claude): drop a photo here with a note
+// about what you want done with it (a profile shot, site imagery, anything),
+// and Claude picks it up from the bucket next session. Ends the
+// how-do-I-get-you-this-file friction.
+function PhotoInbox() {
+  const [items, setItems] = useState([]);
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const load = useCallback(() => { listInbox().then(setItems).catch(() => {}); }, []);
+  useEffect(() => { load(); }, [load]);
+
+  async function pick(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setBusy(true); setErr(null);
+    try { await addInboxPhoto(file, note.trim() || null); setNote(''); load(); }
+    catch (x) { setErr(x.message || 'upload_failed'); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Photos for Claude</div>
+      <div style={{ fontSize: 13, opacity: 0.7, marginBottom: 8 }}>
+        Drop a photo and say what you want done with it. Claude reads this inbox and handles it (site imagery, profile shots, whatever).
+      </div>
+      <input className="pt-input" type="text" value={note} placeholder="What is this and what should happen with it?"
+        onChange={(e) => setNote(e.target.value)}
+        style={{ width: '100%', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', marginBottom: 8 }} />
+      <label className="ad-btn ad-btn--sm" style={{ cursor: 'pointer' }}>
+        {busy ? 'Uploading…' : 'Pick a photo'}
+        <input type="file" accept="image/*" onChange={pick} disabled={busy} style={{ display: 'none' }} />
+      </label>
+      {err && <div className="ad-error" style={{ fontSize: 12, marginTop: 6 }}>{err}</div>}
+      {items.length > 0 && (
+        <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
+          {items.slice(0, 5).map((i) => (
+            <div key={i.id}>{new Date(i.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {i.note || i.storage_path.split('/').pop()} · {i.status}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

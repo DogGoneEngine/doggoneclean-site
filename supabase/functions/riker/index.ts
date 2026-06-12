@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
       "The vibe score is 1 to 5: 1 unsafe/aggression, 2 poor, 3 average, 4 cooperative, 5 a joy. Map words like 'a five', 'great', 'terror', 'bit me' sensibly; only set a score Paul actually gave.",
       "service_type is one of full_groom, bath, nails or null. payment_method is one of square_in_person, stripe_card, cash, wallet or null (map 'card'->square_in_person unless he says Stripe; 'venmo'/'apple pay'/'google pay'->wallet). amount_cents is dollars times 100.",
       "A standing instruction, access/gate change, or anything about how to do the work next time goes in client_note (household-level) or dog_notes (about one dog). Behavior or condition seen this visit goes in visit.visit_notes.",
+      "A fact about WHO IS AT THE HOUSE (a spouse's or partner's name, a caregiver, who answers the door) goes in onsite_update as one short clause, e.g. 'Husband Alan.'; it appends to the who's-on-site field. Never bury a household person in client_note.",
       "A contact-sheet FACT (phone number, email, address) goes in client_update, never a note: {phone: '+1' then ten digits, email, address}. If Paul says a client moved away, paused, or should not be chased, client_update carries status 'moved_away' (or 'inactive') and suppress_winback true, plus a client_note restating what he said.",
       "If Paul CORRECTS an existing visit record (wrong service, wrong amount, 'that should have been nails'), use visit_update with the date of that visit from recent_visits: {date: 'YYYY-MM-DD', service_type, amount_cents, actual_minutes, visit_notes}. Do NOT create a new visit for a correction.",
       "A PRICE CHANGE or breed correction on an existing dog goes in dog_update with the dog's id (or dog_name) and price_cents/breed. A price change is NEVER a note. '$50 each' means every regular dog gets its own dog_update entry.",
@@ -83,7 +84,7 @@ Deno.serve(async (req) => {
       "If Paul shares a general lesson, technique, or business insight not tied to one client's records, put it in wisdom as a self-contained sentence (it lands in the knowledge base). A client-specific fact is a note, not wisdom.",
       "If he gave a score, money, minutes, or what was done, include a visit object; otherwise visit is null.",
       "Write a short plain summary of exactly what will be recorded, so Paul can confirm in one tap. No corporate jargon. No em dashes.",
-      'Respond as ONE JSON object, output only the JSON: {"matched": boolean, "client_id": string|null, "client_name": string|null, "candidates": [{"id":string,"name":string}], "summary": string, "visit": null | {"visited_at": string|null, "service_type": string|null, "work_done": string|null, "visit_notes": string|null, "actual_minutes": number|null, "amount_cents": number|null, "payment_method": string|null, "dog_scores": [{"dog_id": string|null, "dog_name": string, "score": number}]}, "client_note": string|null, "dog_notes": [{"dog_id": string, "dog_name": string, "text": string}], "dog_add": [{"name": string, "breed": string|null, "price_cents": number|null, "notes": string|null}], "dog_update": [{"dog_id": string|null, "dog_name": string, "price_cents": number|null, "breed": string|null}], "dog_status": [{"dog_id": string, "dog_name": string, "status": "regular"|"occasional"|"moved"|"former"|"deceased", "note": string|null}], "notify_person": null | {"id": string|null, "name": string, "phone": string|null, "email": string|null, "relationship": string|null, "mode": "in_addition"|"instead", "until": string|null}, "client_update": null | {"phone": string|null, "email": string|null, "address": string|null, "status": string|null, "suppress_winback": boolean|null}, "visit_update": null | {"date": string, "service_type": string|null, "amount_cents": number|null, "actual_minutes": number|null, "visit_notes": string|null}, "reminder": null | {"body": string, "due": string}, "wisdom": string|null}',
+      'Respond as ONE JSON object, output only the JSON: {"matched": boolean, "client_id": string|null, "client_name": string|null, "candidates": [{"id":string,"name":string}], "summary": string, "visit": null | {"visited_at": string|null, "service_type": string|null, "work_done": string|null, "visit_notes": string|null, "actual_minutes": number|null, "amount_cents": number|null, "payment_method": string|null, "dog_scores": [{"dog_id": string|null, "dog_name": string, "score": number}]}, "client_note": string|null, "dog_notes": [{"dog_id": string, "dog_name": string, "text": string}], "dog_add": [{"name": string, "breed": string|null, "price_cents": number|null, "notes": string|null}], "dog_update": [{"dog_id": string|null, "dog_name": string, "price_cents": number|null, "breed": string|null}], "dog_status": [{"dog_id": string, "dog_name": string, "status": "regular"|"occasional"|"moved"|"former"|"deceased", "note": string|null}], "notify_person": null | {"id": string|null, "name": string, "phone": string|null, "email": string|null, "relationship": string|null, "mode": "in_addition"|"instead", "until": string|null}, "client_update": null | {"phone": string|null, "email": string|null, "address": string|null, "status": string|null, "suppress_winback": boolean|null}, "onsite_update": string|null, "visit_update": null | {"date": string, "service_type": string|null, "amount_cents": number|null, "actual_minutes": number|null, "visit_notes": string|null}, "reminder": null | {"body": string, "due": string}, "wisdom": string|null}',
     ].join(" ");
 
     const userMsg = "Context:\n" + JSON.stringify(ctx) + "\n\nPaul said:\n" + String(utterance).trim();
@@ -116,6 +117,17 @@ Deno.serve(async (req) => {
       plan.matched = true;
       if (ctx?.client?.name) plan.client_name = ctx.client.name;
     }
+
+    // Every parse on the record (riker_log), so a "Riker would not
+    // cooperate" report is diagnosable from data instead of memory.
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/riker_log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: SERVICE_ROLE, Authorization: `Bearer ${SERVICE_ROLE}`, Prefer: "return=minimal" },
+        body: JSON.stringify({ utterance: String(utterance).trim(), client_id: client_id ?? null, plan }),
+      });
+    } catch (_) { /* logging never blocks the parse */ }
+
     return json({ ok: true, plan });
   } catch (e) {
     return json({ ok: false, error: String(e) }, 500);

@@ -5,7 +5,7 @@
 // more, grind less). It scales to a team roster when he hires.
 
 import { useCallback, useEffect, useState } from 'react';
-import { hrSummary, listAgents, listTeam, adminAgentCosts } from './supabase.js';
+import { hrSummary, listAgents, listTeam, adminAgentCosts, setAdminPhoto, setAdminBio, signedPhotoUrl } from './supabase.js';
 
 function money(c) { return c == null ? '$0' : '$' + Math.round(c / 100).toLocaleString('en-US'); }
 function usd(n) { return '$' + Number(n || 0).toFixed(2); }
@@ -52,10 +52,7 @@ export default function HRView() {
           <div className="ad-panel" style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>The team</div>
             {(team.length ? team : [{ id: 'paul', first_name: 'Paul', title: 'Owner and Hurricane Bath Operator', signed_in: true }]).map((m) => (
-              <div key={m.id} style={{ marginTop: 6, fontSize: 15 }}>
-                <strong>{m.first_name}{m.last_name ? ` ${m.last_name}` : ''}</strong>{' '}
-                <span style={{ opacity: 0.6 }}>· {m.title}{m.signed_in ? '' : ' · has not signed in yet'}</span>
-              </div>
+              <TeamMember key={m.id} m={m} onChanged={load} />
             ))}
           </div>
 
@@ -135,6 +132,74 @@ function Stat({ label, value, sub, big }) {
       <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>{label}</div>
       <div style={{ fontSize: big ? 30 : 22, fontWeight: 700, marginTop: 4 }}>{value}</div>
       {sub && <div style={{ fontSize: 12, marginTop: 2, opacity: 0.65 }}>{sub}</div>}
+    </div>
+  );
+}
+
+
+// One human on the roster, with the profile photo and bio the tracker shows
+// to clients (admins.photo_path / bio). Upload a face, edit the words, done;
+// the tracker follows with zero code changes.
+function TeamMember({ m, onChanged }) {
+  const [thumb, setThumb] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [editingBio, setEditingBio] = useState(false);
+  const [bio, setBio] = useState(m.bio || '');
+  const [err, setErr] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    if (m.photo_path) signedPhotoUrl(m.photo_path).then((u) => { if (alive) setThumb(u); }).catch(() => {});
+    return () => { alive = false; };
+  }, [m.photo_path]);
+
+  async function pick(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setBusy(true); setErr(null);
+    try { await setAdminPhoto(m.id, file); onChanged(); }
+    catch (x) { setErr(x.message || 'upload_failed'); }
+    finally { setBusy(false); }
+  }
+  async function saveBio() {
+    setBusy(true); setErr(null);
+    try { await setAdminBio(m.id, bio); setEditingBio(false); onChanged(); }
+    catch (x) { setErr(x.message || 'save_failed'); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 10 }}>
+      <label style={{ cursor: 'pointer', flexShrink: 0 }} title="Set profile photo (shows on the tracker)">
+        {thumb
+          ? <img src={thumb} alt={m.first_name} style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--ad-primary, #2563d8)' }} />
+          : <span style={{ width: 48, height: 48, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ad-surface-container, #eef)', fontSize: 18, fontWeight: 700 }}>{(m.first_name || '?')[0]}</span>}
+        <input type="file" accept="image/*" onChange={pick} disabled={busy} style={{ display: 'none' }} />
+      </label>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 15 }}>
+          <strong>{m.first_name}{m.last_name ? ` ${m.last_name}` : ''}</strong>{' '}
+          <span style={{ opacity: 0.6 }}>· {m.title}{m.signed_in ? '' : ' · has not signed in yet'}</span>
+        </div>
+        {editingBio ? (
+          <div style={{ marginTop: 4 }}>
+            <textarea rows={2} value={bio} onChange={(e) => setBio(e.target.value)}
+              style={{ width: '100%', fontSize: 13, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+            <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+              <button className="ad-btn ad-btn--sm" onClick={saveBio} disabled={busy}>Save</button>
+              <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => { setEditingBio(false); setBio(m.bio || ''); }}>Cancel</button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ fontSize: 12, opacity: 0.7, marginTop: 2 }}>
+            {m.bio || 'No bio yet.'}{' '}
+            <button type="button" onClick={() => setEditingBio(true)}
+              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', textDecoration: 'underline', cursor: 'pointer' }}>edit</button>
+          </div>
+        )}
+        {!m.photo_path && m.role !== 'viewer' && <div style={{ fontSize: 11, opacity: 0.5, marginTop: 2 }}>Tap the circle to add the profile photo the tracker shows.</div>}
+        {err && <div className="ad-error" style={{ fontSize: 12 }}>{err}</div>}
+      </div>
     </div>
   );
 }

@@ -459,6 +459,35 @@ export async function setAppointmentOperator(appointmentId, adminId) {
   return rpc('admin_set_appointment_operator', { p_appointment: appointmentId, p_admin: adminId });
 }
 
+// Operator profile photos and bios (admins.photo_path / bio): uploaded from
+// HR, served to the tracker so the face and words match who is rolling up.
+export async function setAdminPhoto(adminId, file) {
+  const f = await compressForUpload(file);
+  const ext = (f.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `operators/${adminId}/profile-${Date.now()}.${ext}`;
+  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, f, { contentType: f.type || 'image/jpeg', upsert: false });
+  if (error) throw new Error(error.message);
+  await rpc('admin_set_admin_photo', { p_admin: adminId, p_path: path });
+  return path;
+}
+export async function setAdminBio(adminId, bio) {
+  return rpc('admin_set_admin_bio', { p_admin: adminId, p_bio: bio });
+}
+
+// The photo inbox: a drop spot for files Paul hands to Claude (site imagery,
+// profile shots). Claude reads them from the bucket by path.
+export async function addInboxPhoto(file, note) {
+  const f = await compressForUpload(file);
+  const ext = (f.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `inbox/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, f, { contentType: f.type || 'image/jpeg', upsert: false });
+  if (error) throw new Error(error.message);
+  return rpc('admin_add_inbox', { p_path: path, p_note: note || null });
+}
+export async function listInbox() {
+  return rpc('admin_list_inbox');
+}
+
 // Live infrastructure usage (database, storage) against plan limits. The
 // daily infra watcher cards Today at 70% of a limit; this is the live view.
 export async function adminInfraStatus() {

@@ -37,7 +37,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
              who is coming to their driveway. Today that is Paul, the sole
              operator; when routes get operators this reads from the route. -->
         <div class="trk-who">
-          <img src="/photos/paul-specialist.jpg" width="56" height="56" alt="Your Hurricane Bath Operator with a client's dog in the trailer" />
+          <img id="trk-who-img" src="/photos/paul-specialist.jpg" width="56" height="56" alt="Your Hurricane Bath Operator with a client's dog in the trailer" />
           <div>
             <strong id="trk-who-name">Paul Nickerson</strong>
             <p id="trk-who-role">Owner and Hurricane Bath Operator. The one rolling up to your driveway.</p>
@@ -270,7 +270,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     opacity: 0.36;
   }
   .trk-steps li.is-done { opacity: 0.72; }
-  .trk-steps li.is-active { opacity: 1; }
+  /* The current step is the headline of the page's bottom half: scaled up,
+     pilled, and glowing, so a glance finds it (Paul, 2026-06-12). */
+  .trk-steps li.is-active {
+    opacity: 1;
+    transform: scale(1.05);
+    transform-origin: left center;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.10), rgba(34, 211, 238, 0.07));
+    border: 1px solid rgba(37, 99, 235, 0.28);
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin: 2px 0;
+    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.12);
+  }
+  .trk-steps li.is-active strong { font-size: 1.16em; }
+  .trk-steps li.is-active p { color: var(--ink); }
   .trk-paw {
     flex-shrink: 0;
     width: 26px;
@@ -682,9 +696,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const meetName = document.getElementById('trk-meet-name');
     if (op.name && whoName) whoName.textContent = op.name;
     if (op.name && meetName) meetName.textContent = op.name;
-    if (op.title && op.title.indexOf('Owner') < 0) {
-      const whoRole = document.getElementById('trk-who-role');
-      if (whoRole) whoRole.textContent = op.title + '. The one rolling up to your driveway.';
+    const whoRole = document.getElementById('trk-who-role');
+    if (whoRole && op.bio) whoRole.textContent = op.bio;
+    else if (whoRole && op.title && op.title.indexOf('Owner') < 0) {
+      whoRole.textContent = op.title + '. The one rolling up to your driveway.';
     }
   }
   const PHOTO_LABELS: Record<string, string> = { before: 'Before', after: 'After', with_dog: `With ${OPERATOR_FIRST}`, extra: 'Extra' };
@@ -776,6 +791,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       const data = await r.json();
       // Returning clients see Paul with THEIR dog on the who's-coming card,
       // from their own shared visit history; new clients keep the cover.
+      // The header face follows the assigned operator's profile photo.
+      const opPhoto = data && data.operator_photo;
+      if (opPhoto) {
+        const whoImg = document.getElementById('trk-who-img') as HTMLImageElement | null;
+        if (whoImg && whoImg.src !== opPhoto) whoImg.src = opPhoto;
+      }
       const who = data && data.who_is_coming;
       if (who && who.url) {
         const meetImg = document.getElementById('trk-meet-img') as HTMLImageElement | null;

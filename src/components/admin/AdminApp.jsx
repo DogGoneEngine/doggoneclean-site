@@ -26,11 +26,14 @@ import CalendarView from './CalendarView.jsx';
 import HRView from './HRView.jsx';
 import GeographyView from './GeographyView.jsx';
 import QuickCapture from './QuickCapture.jsx';
+import FamilyView from './FamilyView.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
 // until the department is built; it is the to-do list in plain sight.
 const SECTIONS = [
+  { key: 'family',    label: 'Family',         ready: true,
+    what: 'The stakeholder window: how the business is doing, where Paul is today, and the dogs. Signal, not noise.' },
   { key: 'today',     label: 'Today',          ready: true,
     what: 'The crystal ball. Today’s route and next stop, money in motion, and the briefing feed from your AI department heads.' },
   { key: 'calendar',  label: 'Calendar',       ready: true,
@@ -72,6 +75,9 @@ const READY = SECTIONS.filter((s) => s.ready).map((s) => s.key);
 // admin_today_appointments strip contact and money for the operator role),
 // so this list is navigation, not the security boundary.
 const OPERATOR_FLOORS = ['today', 'calendar', 'clients'];
+// The viewer role (Kristin): a stakeholder, not day-to-day. One floor, all
+// signal: family_window_into_the_business.
+const VIEWER_FLOORS = ['family'];
 
 export default function AdminApp() {
   const [session, setSession] = useState(null);
@@ -161,8 +167,16 @@ export default function AdminApp() {
   }
 
   const isOperator = me.role === 'operator';
-  const visibleSections = isOperator ? SECTIONS.filter((s) => OPERATOR_FLOORS.includes(s.key)) : SECTIONS;
-  const effectiveSection = isOperator && !OPERATOR_FLOORS.includes(section) ? 'today' : section;
+  const isViewer = me.role === 'viewer';
+  const floors = isViewer ? VIEWER_FLOORS : isOperator ? OPERATOR_FLOORS : null;
+  // Owners skip the Family floor in their own nav (it is for stakeholders);
+  // it stays reachable by role, not by menu clutter.
+  const visibleSections = floors
+    ? SECTIONS.filter((s) => floors.includes(s.key))
+    : SECTIONS.filter((s) => s.key !== 'family');
+  const effectiveSection = floors && !floors.includes(section)
+    ? floors[0]
+    : (!floors && section === 'family' ? 'today' : section);
   const active = SECTIONS.find((s) => s.key === effectiveSection);
   const activeLabel = active?.label || 'Orbit';
 
@@ -230,6 +244,7 @@ export default function AdminApp() {
       </aside>
 
       <main className="ad-main">
+        {effectiveSection === 'family' && <FamilyView />}
         {effectiveSection === 'today' && <TodayView onOpenClient={openClient} />}
         {effectiveSection === 'clients' && <ClientsView focus={clientFocus} />}
         {effectiveSection === 'schedule' && <ScheduleView />}

@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
 
   const { data: appt } = await sb
     .from('bath_appointments')
-    .select('id, scheduled_end, subscriber_id')
+    .select('id, scheduled_end, subscriber_id, operator_admin_id')
     .eq('tracker_token', token)
     .maybeSingle();
   if (!appt) return json({ photos: [] });
@@ -57,6 +57,25 @@ Deno.serve(async (req) => {
   // link goes quiet; the photos live on in the client's portal.
   if (appt.scheduled_end && Date.now() > new Date(appt.scheduled_end).getTime() + 7 * 86400_000) {
     return json({ photos: [] });
+  }
+
+  // The operator's own profile photo (admins.photo_path, set from HR), so
+  // the header face matches the human actually rolling up. Owner is the
+  // default when no operator is assigned.
+  let operatorPhoto: string | null = null;
+  {
+    const { data: op } = await sb
+      .from('admins')
+      .select('photo_path, role, id')
+      .or(appt.operator_admin_id ? `id.eq.${appt.operator_admin_id}` : 'role.eq.owner')
+      .limit(1)
+      .maybeSingle();
+    if (op?.photo_path) {
+      const { data: signed } = await sb.storage
+        .from('visit-photos')
+        .createSignedUrl(op.photo_path, SIGNED_URL_SECONDS);
+      operatorPhoto = signed?.signedUrl ?? null;
+    }
   }
 
   // Who's coming: the most recent shared Paul-with-their-dog photo across
@@ -92,7 +111,7 @@ Deno.serve(async (req) => {
     .select('id')
     .eq('appointment_id', appt.id);
   const visitIds = (visits ?? []).map((v) => v.id);
-  if (visitIds.length === 0) return json({ photos: [], who_is_coming: who });
+  if (visitIds.length === 0) return json({ photos: [], who_is_coming: who, operator_photo: operatorPhoto });
 
   const { data: photos } = await sb
     .from('visit_photos')
@@ -100,7 +119,7 @@ Deno.serve(async (req) => {
     .in('visit_id', visitIds)
     .eq('client_visible', true)
     .order('created_at', { ascending: true });
-  if (!photos || photos.length === 0) return json({ photos: [], who_is_coming: who });
+  if (!photos || photos.length === 0) return json({ photos: [], who_is_coming: who, operator_photo: operatorPhoto });
 
   const out: { id: string; kind: string; url: string; dog_name: string | null }[] = [];
   for (const p of photos) {
@@ -111,5 +130,5 @@ Deno.serve(async (req) => {
       out.push({ id: p.id, kind: p.kind, url: signed.signedUrl, dog_name: (p as any).dogs?.name ?? null });
     }
   }
-  return json({ photos: out, who_is_coming: who });
+  return json({ photos: out, who_is_coming: who, operator_photo: operatorPhoto });
 });

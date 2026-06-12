@@ -25,6 +25,7 @@ export function describeApplied(res) {
   if (n(res.dogs_added) > 0) bits.push(`${n(res.dogs_added)} dog card${n(res.dogs_added) === 1 ? '' : 's'} created`);
   if (n(res.dogs_updated) > 0) bits.push(`${n(res.dogs_updated)} dog card${n(res.dogs_updated) === 1 ? '' : 's'} changed`);
   if (res.client_updated) bits.push('contact sheet facts updated');
+  if (res.onsite_appended) bits.push("added to who's on site");
   if (res.client_note_appended) bits.push('household note added');
   if (n(res.dog_notes_appended) > 0) bits.push(`${n(res.dog_notes_appended)} dog note${n(res.dog_notes_appended) === 1 ? '' : 's'} added`);
   if (n(res.dog_status_changes) > 0) bits.push('dog roster updated');
@@ -173,6 +174,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                     {plan.visit_update.actual_minutes ? ` minutes to ${plan.visit_update.actual_minutes}` : ''}
                   </li>
                 )}
+                {plan.onsite_update && <li>Who's on site: {plan.onsite_update}</li>}
                 {plan.client_note && <li>Add to the contact sheet: {plan.client_note}</li>}
                 {(plan.dog_notes || []).map((d, i) => (
                   <li key={i}>Note on {d.dog_name || 'dog'}: {d.text}</li>
@@ -230,6 +232,7 @@ export function RikerManual() {
         <li><strong>Vibe scores:</strong> per dog, 1 to 5, only when you actually give one.</li>
         <li><strong>New dogs:</strong> "Add Maverick, French Bulldog, 75 dollars, and Sammy, mini Aussie, 105." Real dog cards with breed and price.</li>
         <li><strong>Price and breed changes:</strong> "Change the price to 50 dollars each." Lands on the dog cards, not as a note.</li>
+        <li><strong>Household people:</strong> "Alan is Becky's husband." Lands in the Who's-on-site field on the sheet.</li>
         <li><strong>Contact facts:</strong> "Her phone number is 352-875-4172" or a new email or address. Lands in the contact fields, not as a note.</li>
         <li><strong>Corrections:</strong> "That last visit should have been nails, not a full groom." Fixes the existing visit record instead of creating a new one.</li>
         <li><strong>Moved away or paused:</strong> "She moved away, may or may not be back, no need to chase her." Marks the client moved away and turns off win-back outreach.</li>

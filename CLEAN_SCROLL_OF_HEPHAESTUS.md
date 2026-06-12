@@ -3134,3 +3134,28 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **Concurrency posture stated**: simultaneous Paul+Jake editing is safe by construction
   (row-level RPCs, one-visit-per-day merge discipline, photo rows append to the same visit,
   score upserts); the GPS broadcast was the one true conflict and is now operator-gated.
+
+### Batch twelve: the tracker's current step shines, identities travel, the family window opens (Jun 12; migration 0162)
+
+- **Tracker current step amplified**: the active step now scales up into a glowing gradient
+  pill with bigger type, unmistakable at a glance; done and future steps stay quiet.
+- **Riker, diagnosed and instrumented**: the Becky's-husband miss had no durable home (who's-
+  on-site facts were not a Riker power) and no record to diagnose from. Now: onsite_update
+  power (household people land in Who's-on-site, with prompt guidance and review/ack lines),
+  and riker_log records EVERY parse (utterance + full plan) so the next "it would not
+  cooperate" is a query, not a guess (riker v7).
+- **Operator identity end to end** (`operator_identity_on_the_tracker`): admins.photo_path +
+  bio, HR upload (tap the circle) + bio editing, tracker-photos signs the operator's photo,
+  the page swaps name, bio, and header face per assigned operator. Jake's Nails bio ("the
+  kind of young man people are happy to see doing honest work") adapted and set.
+- **Photos for Claude** (`photo_inbox_for_claude`): a drop spot on Settings: photo + note ->
+  private bucket + site_inbox row; Claude reads the inbox each session. First intended use:
+  Jake's profile photo (which HR can now also take directly).
+- **The Family window** (`family_window_into_the_business`): Kristin's own Orbit login (role
+  viewer, kwallace9791@gmail.com) onto one signal-only floor: the value gauge with its two
+  levers, last-30-days money and visits, earned per hour, and where Paul is right now in
+  plain words ("in the bath", "coming back to the door"). Asks nothing, tells the truth.
+- **Same-address client turnover** examined on request: no conflicts by construction. The
+  address is descriptive text plus per-client coordinates; nothing is keyed on it. Identity
+  matching uses phone and email (the new resident's own), the old client archives after a
+  year of inactivity, and two client records sharing one address is a fully supported state.

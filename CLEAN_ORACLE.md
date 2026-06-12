@@ -1892,6 +1892,38 @@ sell, but a business valuable enough that someone would want to buy it is the
 truest single gauge that everything is going well, and it keeps
 clean_stays_saleable honest.
 
+`family_window_into_the_business` (Clean: operations):
+Kristin has her own Orbit login (role 'viewer') that opens onto ONE floor, the
+Family window: what the business is worth and its two health levers, the last
+30 days of money and visits, the earned-per-hour rate, and where Paul is right
+now with each stop's plain-words status. No cards to act on, no settings,
+nothing that needs tending; signal only. The viewer role sees no other floors.
+Because Kristin is very much a stakeholder in something that is becoming a big
+part of their lives without being in the day-to-day, and the page that earns a
+voluntary glance over coffee is the one that asks nothing and tells the truth.
+Paul, 2026-06-12.
+
+`operator_identity_on_the_tracker` (Clean: operations):
+Each operator's profile photo and bio live on their admins row (photo_path,
+bio), set from the HR floor, and the tracker serves whichever operator is
+assigned to the appointment: name, title, bio line, header photo, all of it.
+Because the who's-coming block is a trust feature, and Jake's first solo visit
+showed Paul's face over Jake's name; a new operator's identity must reach
+clients with zero code changes.
+
+`photo_inbox_for_claude` (Clean: process):
+Orbit's Settings floor carries a "Photos for Claude" drop spot: pick a photo,
+say what should happen with it, and it lands in the private bucket with a
+note (site_inbox). Claude reads the inbox each session and acts on it. Because
+getting a file from Paul's phone to Claude was a standing friction point, and
+the operations app is already the one place both of them live.
+
+`riker_parses_on_the_record` (Clean: engineering):
+Every Riker parse is logged (riker_log: utterance, client, full plan), so a
+"Riker would not cooperate" report is diagnosed from the actual parses, not
+from memory. Because the Becky's-husband failure could only be guessed at
+after the fact; the next miss will be a query.
+
 `reminders_one_gateway` (Clean: operations):
 A time-based commitment ("contact her in 2 weeks", "follow up after the
 holidays") goes in through Riker like everything else and lands in `reminders`
