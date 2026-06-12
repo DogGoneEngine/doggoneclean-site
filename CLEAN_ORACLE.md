@@ -1912,14 +1912,18 @@ showed Paul's face over Jake's name; a new operator's identity must reach
 clients with zero code changes.
 
 `photo_inbox_for_claude` (Clean: process):
-Orbit's Settings floor carries a "Photos and videos for Claude" drop spot:
-pick a photo or video, say what should happen with it, and it lands in the
-private bucket with a note (site_inbox). The note on every item stays editable
-after upload, and a media file with no note is held, never guessed at. Claude
-reads the inbox each session and acts on it. Because getting a file from
-Paul's phone to Claude was a standing friction point, and the first real use
-proved a note typed after the file pick was silently lost; a description that
-goes into the void teaches Paul to stop writing descriptions.
+Orbit carries a Library floor, the asset library: every photo and video Paul
+hands the business lands in the private bucket with a row in site_inbox,
+carrying an editable note and a status (new, shelf, used, dropped). A great
+shot goes on the shelf even with no use for it yet. A media file with no note
+is held, never guessed at. Claude reads the library each session, acts on the
+notes, and updates statuses. Files over the storage plan's 50MB cap go to
+Google Drive instead, where Claude reads them with the Drive tools. Because
+getting a file from Paul's phone to Claude was a standing friction point,
+good photos were getting lost in the Google Photos stream with nowhere to
+put them, and the first real use proved a note typed after the file pick was
+silently lost; a description that goes into the void teaches Paul to stop
+writing descriptions.
 
 `schedule_adherence_is_a_main_metric` (Clean: operations):
 Schedule adherence, the gap in minutes between an appointment's planned start
@@ -1927,12 +1931,28 @@ and the actual arrival the tracker stamps, is tracked as a first-class metric
 alongside cycle time: signed delta per stop (late positive), on-time rates,
 and drift across the stops of a day, derived live from bath_appointments
 .scheduled_start and visits.arrived_at by admin_schedule_adherence and shown
-on the Reports floor. Historical ground truth comes from the Time is Money
-sheet matched against the calendar (legacy/data/adherence_history.json).
+on the Reports floor. Historical ground truth (1,158 stops, 2023 to 2026,
+median 78 minutes behind) lives in schedule_adherence_history, seeded from
+legacy/data/adherence_history.json (the Time is Money sheet matched against
+the calendar), and the RPC returns it as a separate baseline block beside
+the live series: the history is the benchmark to beat, never blended with
+the tracker-era numbers, because the two come from different instruments.
 Because Paul plans the day on the calendar and reality keeps diverging from
 the plan, and a divergence you do not measure quietly becomes the schedule:
 honest scheduled times, realistic day plans, and client trust all hang on
 knowing this number. Paul, 2026-06-12.
+
+`living_prospectus` (Clean: finance):
+Orbit carries a Prospectus floor: the standing pitch to a buyer who does not
+exist yet, written as if Dog Gone Clean were for sale today. Every claim
+carries a receipt and every number is computed live from the operating
+tables by admin_prospectus on each load; nothing is typed in by hand and
+nothing is invented. Because Paul wants to see, always current and always
+true, why someone would want to buy this business: it keeps the
+clean_stays_saleable guardrail visible instead of theoretical, and a pitch
+that only reads stronger when the business actually gets stronger is a
+compass, while a stale or padded one is a lie waiting to be discovered.
+Paul, 2026-06-12.
 
 `riker_parses_on_the_record` (Clean: engineering):
 Every Riker parse is logged (riker_log: utterance, client, full plan), so a

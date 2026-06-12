@@ -27,6 +27,8 @@ import HRView from './HRView.jsx';
 import GeographyView from './GeographyView.jsx';
 import QuickCapture from './QuickCapture.jsx';
 import FamilyView from './FamilyView.jsx';
+import LibraryView from './LibraryView.jsx';
+import ProspectusView from './ProspectusView.jsx';
 import './admin.css';
 
 // The department taxonomy. `what` is the one-line definition shown in the shell
@@ -60,8 +62,12 @@ const SECTIONS = [
     what: 'Suppliers, reorder points, and the running-low tracker for shampoo, water, and parts.' },
   { key: 'knowledge', label: 'Knowledge base', ready: true,
     what: 'The wisdom inbox: reasons captured by the speed dial or by replying to an agent, on their way into the Oracle or a client record.' },
+  { key: 'library',   label: 'Library',        ready: true,
+    what: 'The asset library: every photo and video you hand the business, with notes, even before it has a use. Claude reads it each session.' },
   { key: 'reports',   label: 'Reports',        ready: true,
     what: 'Cross-department rollups: the weekly business review, the revenue-per-hour trend, and the briefing archive.' },
+  { key: 'prospectus', label: 'Prospectus',    ready: true,
+    what: 'The standing pitch to a buyer who does not exist yet, computed live from the operating data, every claim with a receipt.' },
   { key: 'audit',     label: 'Audit log',      ready: true,
     what: 'Every owner action and every AI recommendation, append-only.' },
   { key: 'settings',  label: 'Settings',       ready: true,
@@ -261,6 +267,8 @@ export default function AdminApp() {
         {effectiveSection === 'calendar' && <CalendarView />}
         {effectiveSection === 'hr' && <HRView />}
         {effectiveSection === 'geography' && <GeographyView />}
+        {effectiveSection === 'library' && <LibraryView />}
+        {effectiveSection === 'prospectus' && <ProspectusView />}
         {!READY.includes(effectiveSection) && <RoadmapPanel section={active} />}
       </main>
 

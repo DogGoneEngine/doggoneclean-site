@@ -95,11 +95,23 @@ function AdherencePanel({ adh }) {
   const fmtDelta = (m) => (m === null || m === undefined) ? '?' : (m > 0 ? `${m} min behind` : m < 0 ? `${-m} min ahead` : 'on the dot');
   const fmtClock = (ts) => { try { return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ts; } };
   const recent = adh.recent || [];
+  const base = adh.baseline;
+  // The history is the benchmark to beat, never blended with the live series:
+  // sheet-and-calendar provenance vs tracker stamps are different instruments.
+  const baseline = base ? (
+    <div style={{ fontSize: 12, marginTop: 10, paddingTop: 8, borderTop: '1px solid var(--ad-outline, #e3e2de)', opacity: 0.75 }}>
+      The record to beat ({base.first_day?.slice(0, 4)} to {base.last_day?.slice(0, 4)}, {base.n?.toLocaleString('en-US')} stops from the Time is Money sheet vs the calendar): median {base.median_delta_min} min behind, {base.on_time_15_pct}% within 15 min.
+      {(base.by_year || []).length > 1 && (
+        <span> By year: {(base.by_year || []).map((y) => `${y.year}: ${y.median_delta_min}`).join(' · ')} (median min behind).</span>
+      )}
+    </div>
+  ) : null;
   if (!adh.n) {
     return (
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <Cap>On schedule · last {adh.days} days</Cap>
         <div style={{ opacity: 0.6, marginTop: 8 }}>No tracked visits with a scheduled time yet. This fills in on its own as the tracker runs.</div>
+        {baseline}
       </div>
     );
   }
@@ -134,6 +146,7 @@ function AdherencePanel({ adh }) {
           ))}
         </div>
       )}
+      {baseline}
     </div>
   );
 }

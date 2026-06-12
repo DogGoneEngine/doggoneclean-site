@@ -493,6 +493,16 @@ export async function listInbox() {
 export async function updateInboxNote(id, note) {
   return rpc('admin_update_inbox_note', { p_id: id, p_note: note || null });
 }
+// Library statuses: new (just arrived), shelf (kept, no use yet), used, dropped.
+export async function setInboxStatus(id, status) {
+  return rpc('admin_set_inbox_status', { p_id: id, p_status: status });
+}
+
+// The living prospectus (living_prospectus): every number computed from the
+// operating tables on each call, so the pitch can never go stale.
+export async function prospectus() {
+  return rpc('admin_prospectus');
+}
 
 // Live infrastructure usage (database, storage) against plan limits. The
 // daily infra watcher cards Today at 70% of a limit; this is the live view.

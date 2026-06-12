@@ -3180,3 +3180,31 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   179 minutes behind plan, every one late, confirming Paul's sense that reality was not
   matching the calendar. Historical baseline from the Time is Money sheet matched against
   the calendar is being built into legacy/data/adherence_history.json by a research agent.
+
+### Batch fourteen: the Library opens, history meets the live gauge, and the Prospectus floor (Jun 12; migration 0165)
+
+- **The asset library** (Library floor): Paul asked for the Squarespace-style home for every
+  good photo and video, even with no use yet, instead of losing them in the Google Photos
+  stream. site_inbox grew a 'shelf' status and admin_set_inbox_status; LibraryView shows
+  signed previews (images and videos), editable notes, and shelf/drop controls; the media
+  inbox moved off Settings onto its own floor. The 50MB free-plan upload cap is guarded in
+  the UI with a plain-words pointer to the Drive fallback. Paul's "failed to fetch" video
+  upload was exactly that cap (or a mid-transfer drop): nothing landed, nothing was lost.
+- **The historical baseline went into the database**: 1,158 matched Time-is-Money stops
+  (2023 to 2026) now live in schedule_adherence_history (seed regenerable via
+  scripts/gen_adherence_seed.py), and admin_schedule_adherence returns a baseline block
+  beside the live series. Reports shows "the record to beat": median 78 min behind, 7%
+  within 15, with the by-year medians (62 / 76 / 90 / 78). Decision (Paul asked, answer
+  recorded): history and live stay two separate series, never blended, because they come
+  from different instruments and the whole point is watching the new operation beat the
+  old record. The headline finding stands: the day STARTS about 71 min late at stop 1 and
+  only adds 15 to 20 more by stop 4; Paul also left after the scheduled start on 88.8% of
+  appointments, so the launch, not the stop lengths, is the lever.
+- **The living Prospectus** (`living_prospectus`): an Orbit floor pitching the business to
+  a buyer who does not exist yet, every number computed live by admin_prospectus (value
+  range, TTM revenue, recurring share, median visit, tenure, the software-and-agents
+  machine) and every claim showing its receipt. Owner-only by role today.
+- **Filed without building**: marketing vs social media is one Growth hat, not two
+  departments (social is a channel); the department taxonomy is a visualization skin over
+  processes and agents and is expected to evolve as Paul gets used to the framework, not a
+  hierarchy to preserve.
