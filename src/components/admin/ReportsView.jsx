@@ -4,7 +4,7 @@
 // the full archive of every briefing your department heads have written.
 
 import { useCallback, useEffect, useState } from 'react';
-import { reportsSummary, listBriefings } from './supabase.js';
+import { reportsSummary, listBriefings, scheduleAdherence } from './supabase.js';
 
 function money(cents) {
   if (cents === null || cents === undefined) return '$0';
@@ -20,11 +20,13 @@ export default function ReportsView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [adh, setAdh] = useState(null);
+
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const [s, b] = await Promise.all([reportsSummary(), listBriefings()]);
-      setSum(s); setBriefs(b);
+      const [s, b, a] = await Promise.all([reportsSummary(), listBriefings(), scheduleAdherence(90)]);
+      setSum(s); setBriefs(b); setAdh(a);
     } catch (e) { setError(e.message || 'load_failed'); }
     finally { setLoading(false); }
   }, []);
@@ -48,6 +50,8 @@ export default function ReportsView() {
         <Stat label="This month" value={money(sum.this_month_cents)} sub={`${monthDelta >= 0 ? '+' : ''}${money(monthDelta)} vs last month`} tone={monthDelta >= 0 ? 'good' : 'bad'} />
         <Stat label="Next 7 days" value={String(sum.upcoming_7d)} sub={`${sum.active_subscriptions} active plans`} />
       </div>
+
+      {adh && <AdherencePanel adh={adh} />}
 
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <Cap>Department heads</Cap>
@@ -80,6 +84,57 @@ export default function ReportsView() {
         )}
       </div>
     </>
+  );
+}
+
+// Schedule adherence: plan vs reality, tracked like cycle time
+// (schedule_adherence_is_a_main_metric). delta_min is signed, late positive.
+// The drift row shows how lateness accumulates stop by stop across a day,
+// which is the failure mode that actually costs evenings.
+function AdherencePanel({ adh }) {
+  const fmtDelta = (m) => (m === null || m === undefined) ? '?' : (m > 0 ? `${m} min behind` : m < 0 ? `${-m} min ahead` : 'on the dot');
+  const fmtClock = (ts) => { try { return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ts; } };
+  const recent = adh.recent || [];
+  if (!adh.n) {
+    return (
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <Cap>On schedule · last {adh.days} days</Cap>
+        <div style={{ opacity: 0.6, marginTop: 8 }}>No tracked visits with a scheduled time yet. This fills in on its own as the tracker runs.</div>
+      </div>
+    );
+  }
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16 }}>
+      <Cap>On schedule · last {adh.days} days · {adh.n} tracked stops</Cap>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginTop: 10, marginBottom: 12 }}>
+        <Stat label="Typical arrival" value={fmtDelta(adh.median_delta_min)} sub={`average ${fmtDelta(adh.mean_delta_min)}`}
+          tone={adh.median_delta_min <= 15 ? 'good' : 'bad'} />
+        <Stat label="Within 15 min" value={`${adh.on_time_15_pct ?? 0}%`} sub={`${adh.on_time_5_pct ?? 0}% within 5 min`}
+          tone={(adh.on_time_15_pct ?? 0) >= 80 ? 'good' : 'bad'} />
+        <Stat label="Over 30 min behind" value={`${adh.late_30_pct ?? 0}%`} sub={`worst tenth: ${fmtDelta(adh.p90_delta_min)}`}
+          tone={(adh.late_30_pct ?? 0) <= 10 ? 'good' : 'bad'} />
+      </div>
+      {(adh.drift_by_stop || []).length > 1 && (
+        <div style={{ fontSize: 12, marginBottom: 10 }}>
+          <span style={{ opacity: 0.6 }}>Drift across the day: </span>
+          {(adh.drift_by_stop || []).map((d, i) => (
+            <span key={d.stop} className="ad-mono">{i > 0 ? ' · ' : ''}stop {d.stop}: {fmtDelta(d.mean_delta_min)}</span>
+          ))}
+        </div>
+      )}
+      {recent.length > 0 && (
+        <div style={{ fontSize: 12 }}>
+          {recent.slice(0, 8).map((r, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '2px 0', flexWrap: 'wrap' }}>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fmtDate(r.day)} · {r.client || 'client'}</span>
+              <span className="ad-mono" style={{ color: r.delta_min > 30 ? 'var(--ad-bad, #dc2626)' : r.delta_min > 15 ? 'var(--ad-text-dim, #565b6c)' : 'var(--ad-good, #1f8a4b)' }}>
+                {fmtClock(r.scheduled_start)} plan, {fmtClock(r.arrived_at)} actual, {fmtDelta(r.delta_min)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

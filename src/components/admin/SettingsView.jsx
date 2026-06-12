@@ -6,7 +6,7 @@
 // secrets, never in the page.
 
 import { useCallback, useEffect, useState } from 'react';
-import { systemStatus, addInboxPhoto, listInbox } from './supabase.js';
+import { systemStatus, addInboxPhoto, listInbox, updateInboxNote } from './supabase.js';
 
 // Friendly labels for the known secrets (names only are ever read, never values).
 const SECRET_LABELS = {
@@ -106,15 +106,20 @@ export default function SettingsView() {
 function Cap({ children }) { return <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>{children}</div>; }
 
 
-// The photo inbox (photo_inbox_for_claude): drop a photo here with a note
-// about what you want done with it (a profile shot, site imagery, anything),
-// and Claude picks it up from the bucket next session. Ends the
-// how-do-I-get-you-this-file friction.
+// The media inbox (photo_inbox_for_claude): drop a photo or video here with
+// a note about what you want done with it (a profile shot, site imagery,
+// anything), and Claude picks it up from the bucket next session. Ends the
+// how-do-I-get-you-this-file friction. The note on every item stays
+// editable after upload, because a description typed after picking the file
+// used to be silently lost (the upload fired on pick with whatever note
+// existed at that instant). Notes never go into the void now.
 function PhotoInbox() {
   const [items, setItems] = useState([]);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
+  const [editId, setEditId] = useState(null);
+  const [editText, setEditText] = useState('');
   const load = useCallback(() => { listInbox().then(setItems).catch(() => {}); }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -127,24 +132,50 @@ function PhotoInbox() {
     finally { setBusy(false); }
   }
 
+  async function saveNote(id) {
+    try { await updateInboxNote(id, editText.trim() || null); setEditId(null); setEditText(''); load(); }
+    catch (x) { setErr(x.message || 'note_save_failed'); }
+  }
+
   return (
     <div className="ad-panel" style={{ marginBottom: 16 }}>
-      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Photos for Claude</div>
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Photos and videos for Claude</div>
       <div style={{ fontSize: 13, opacity: 0.7, marginBottom: 8 }}>
-        Drop a photo and say what you want done with it. Claude reads this inbox and handles it (site imagery, profile shots, whatever).
+        Drop a photo or video and say what you want done with it. Claude reads this inbox each session and handles it (site imagery, profile shots, whatever). Type the note first or add it to the item afterward; either way it sticks.
       </div>
       <input className="pt-input" type="text" value={note} placeholder="What is this and what should happen with it?"
         onChange={(e) => setNote(e.target.value)}
         style={{ width: '100%', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', marginBottom: 8 }} />
       <label className="ad-btn ad-btn--sm" style={{ cursor: 'pointer' }}>
-        {busy ? 'Uploading…' : 'Pick a photo'}
-        <input type="file" accept="image/*" onChange={pick} disabled={busy} style={{ display: 'none' }} />
+        {busy ? 'Uploading…' : 'Pick a photo or video'}
+        <input type="file" accept="image/*,video/*" onChange={pick} disabled={busy} style={{ display: 'none' }} />
       </label>
       {err && <div className="ad-error" style={{ fontSize: 12, marginTop: 6 }}>{err}</div>}
       {items.length > 0 && (
-        <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
-          {items.slice(0, 5).map((i) => (
-            <div key={i.id}>{new Date(i.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {i.note || i.storage_path.split('/').pop()} · {i.status}</div>
+        <div style={{ marginTop: 10, fontSize: 12, opacity: 0.85 }}>
+          {items.slice(0, 8).map((i) => (
+            <div key={i.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '3px 0' }}>
+              <span style={{ opacity: 0.6, whiteSpace: 'nowrap' }}>{new Date(i.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+              {editId === i.id ? (
+                <>
+                  <input className="pt-input" type="text" value={editText} autoFocus
+                    onChange={(e) => setEditText(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveNote(i.id); if (e.key === 'Escape') setEditId(null); }}
+                    style={{ flex: 1, fontSize: 12, padding: '4px 8px', borderRadius: 6, border: '1px solid var(--ad-outline, #d8d8de)' }} />
+                  <button className="ad-btn ad-btn--sm" onClick={() => saveNote(i.id)}>Save</button>
+                </>
+              ) : (
+                <>
+                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: i.note ? 1 : 0.5 }}>
+                    {i.note || i.storage_path.split('/').pop()}
+                  </span>
+                  <span style={{ opacity: 0.55 }}>{i.status}</span>
+                  <button className="ad-btn ad-btn--sm" onClick={() => { setEditId(i.id); setEditText(i.note || ''); }}>
+                    {i.note ? 'Edit note' : 'Add note'}
+                  </button>
+                </>
+              )}
+            </div>
           ))}
         </div>
       )}

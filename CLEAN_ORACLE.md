@@ -1912,11 +1912,27 @@ showed Paul's face over Jake's name; a new operator's identity must reach
 clients with zero code changes.
 
 `photo_inbox_for_claude` (Clean: process):
-Orbit's Settings floor carries a "Photos for Claude" drop spot: pick a photo,
-say what should happen with it, and it lands in the private bucket with a
-note (site_inbox). Claude reads the inbox each session and acts on it. Because
-getting a file from Paul's phone to Claude was a standing friction point, and
-the operations app is already the one place both of them live.
+Orbit's Settings floor carries a "Photos and videos for Claude" drop spot:
+pick a photo or video, say what should happen with it, and it lands in the
+private bucket with a note (site_inbox). The note on every item stays editable
+after upload, and a media file with no note is held, never guessed at. Claude
+reads the inbox each session and acts on it. Because getting a file from
+Paul's phone to Claude was a standing friction point, and the first real use
+proved a note typed after the file pick was silently lost; a description that
+goes into the void teaches Paul to stop writing descriptions.
+
+`schedule_adherence_is_a_main_metric` (Clean: operations):
+Schedule adherence, the gap in minutes between an appointment's planned start
+and the actual arrival the tracker stamps, is tracked as a first-class metric
+alongside cycle time: signed delta per stop (late positive), on-time rates,
+and drift across the stops of a day, derived live from bath_appointments
+.scheduled_start and visits.arrived_at by admin_schedule_adherence and shown
+on the Reports floor. Historical ground truth comes from the Time is Money
+sheet matched against the calendar (legacy/data/adherence_history.json).
+Because Paul plans the day on the calendar and reality keeps diverging from
+the plan, and a divergence you do not measure quietly becomes the schedule:
+honest scheduled times, realistic day plans, and client trust all hang on
+knowing this number. Paul, 2026-06-12.
 
 `riker_parses_on_the_record` (Clean: engineering):
 Every Riker parse is logged (riker_log: utterance, client, full plan), so a

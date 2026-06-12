@@ -3159,3 +3159,24 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   address is descriptive text plus per-client coordinates; nothing is keyed on it. Identity
   matching uses phone and email (the new resident's own), the old client archives after a
   year of inactivity, and two client records sharing one address is a fully supported state.
+
+### Batch thirteen: the inbox keeps its word, the front page loses the sweat, adherence becomes a metric (Jun 12; migrations 0163-0164)
+
+- **The inbox's first real use found its flaw**: Paul's two photos arrived but both notes
+  were null. The upload fires the instant a file is picked, with whatever note text exists
+  at that moment; a description typed after pick went into the void. Fixed twice over:
+  every listed item's note is now editable after the fact (admin_update_inbox_note, 0163),
+  and the panel accepts videos too (the bucket never restricted mime types; only the file
+  picker's accept filter did). Oracle rule updated.
+- **Front page gallery photo 3 swapped** on Paul's instruction: the hot-and-sweaty shot with
+  the panting Bernese is out, the bright white German Shepherd selfie from the inbox is in
+  (resized to the gallery's 900x675, alt text updated, inbox item marked used). The second
+  inbox photo (Jake doing nail care on a German Shepherd) is annotated and held for Paul's
+  call on where it goes.
+- **Schedule adherence is now a main metric** (`schedule_adherence_is_a_main_metric`,
+  0164): the signed gap between scheduled_start and tracker-stamped arrival, with on-time
+  rates, p90, and drift by stop order, computed live by admin_schedule_adherence and shown
+  as the "On schedule" panel on Reports. The first eight tracked stops (Jun 9-11) ran 37 to
+  179 minutes behind plan, every one late, confirming Paul's sense that reality was not
+  matching the calendar. Historical baseline from the Time is Money sheet matched against
+  the calendar is being built into legacy/data/adherence_history.json by a research agent.

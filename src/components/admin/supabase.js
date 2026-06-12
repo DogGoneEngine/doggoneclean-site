@@ -474,18 +474,24 @@ export async function setAdminBio(adminId, bio) {
   return rpc('admin_set_admin_bio', { p_admin: adminId, p_bio: bio });
 }
 
-// The photo inbox: a drop spot for files Paul hands to Claude (site imagery,
-// profile shots). Claude reads them from the bucket by path.
+// The media inbox: a drop spot for files Paul hands to Claude (site imagery,
+// profile shots, videos). Claude reads them from the bucket by path. Videos
+// pass through compressForUpload untouched; only images get recompressed.
 export async function addInboxPhoto(file, note) {
   const f = await compressForUpload(file);
   const ext = (f.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
   const path = `inbox/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
-  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, f, { contentType: f.type || 'image/jpeg', upsert: false });
+  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, f, { contentType: f.type || 'application/octet-stream', upsert: false });
   if (error) throw new Error(error.message);
   return rpc('admin_add_inbox', { p_path: path, p_note: note || null });
 }
 export async function listInbox() {
   return rpc('admin_list_inbox');
+}
+// A note can be attached or corrected after the upload. Notes typed after
+// picking the file used to vanish; now every listed item's note is editable.
+export async function updateInboxNote(id, note) {
+  return rpc('admin_update_inbox_note', { p_id: id, p_note: note || null });
 }
 
 // Live infrastructure usage (database, storage) against plan limits. The
@@ -588,6 +594,13 @@ export async function financeSummary(windowDays = 90) {
 
 export async function reportsSummary() {
   return rpc('admin_reports_summary');
+}
+
+// Schedule adherence (schedule_adherence_is_a_main_metric): the gap between
+// the planned start (bath_appointments.scheduled_start) and reality
+// (visits.arrived_at, stamped by the tracker). Signed minutes, late positive.
+export async function scheduleAdherence(days = 90) {
+  return rpc('admin_schedule_adherence', { p_days: days });
 }
 
 // Recurring costs (subscriptions / tech-stack burn) --------------------------
