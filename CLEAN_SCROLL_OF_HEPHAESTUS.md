@@ -3430,3 +3430,7 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   RPC. Not built yet (no one to grant to); parked in CLEAN_PARKING_LOT.md with the note to also
   fold within-floor/tab visibility into the Access map when that machinery lands, so the map stays
   honest. The Access page is the one home for access: shows the map now, grants later.
+
+- **Tracker calls "Extra" photos "Moments"** (Paul, 2026-06-13): the operator-side "Extra" button
+  is unchanged; only the public /track label for kind=extra now reads "Moments". "Moments" is a
+  common generic word (no trademark concern for a photo-strip label).

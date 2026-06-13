@@ -749,7 +749,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       whoRole.textContent = op.title + '. The one rolling up to your driveway.';
     }
   }
-  const PHOTO_LABELS: Record<string, string> = { before: 'Before', after: 'After', with_dog: `With ${OPERATOR_FIRST}`, extra: 'Extra' };
+  // The operator still calls these "Extra"; the client-facing tracker calls them "Moments".
+  const PHOTO_LABELS: Record<string, string> = { before: 'Before', after: 'After', with_dog: `With ${OPERATOR_FIRST}`, extra: 'Moments' };
   function photoLabel(p: { kind: string; dog_name?: string | null }) {
     if (p.kind === 'with_dog') return p.dog_name ? `${OPERATOR_FIRST} and ${p.dog_name}` : `With ${OPERATOR_FIRST}`;
     const base = PHOTO_LABELS[p.kind] || 'Photo';
