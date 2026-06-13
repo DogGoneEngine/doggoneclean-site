@@ -2120,6 +2120,20 @@ behavior), and the value is surfacing it to the right person without playing vet
 the framing is fixed so it cannot drift into advice. Photo now; field video
 parked. Paul, 2026-06-13.
 
+`exceptions_zone` (Clean: operations):
+A client served outside the marketed service areas by Paul's own call (close to
+home, family, a one-off) is tagged with the single routing zone "Exceptions", not
+given a new service city. Their real town stays in the address; the zone only says
+"off-area, my call, not a market". Because adding outlying towns (Brunswick,
+Dunnellon, Anthony, Williston) as cities would tell the world we serve them and
+clutter the booking funnel, the pricing grid, and the markets; the funnel gates
+new strangers by city and perimeter, but an existing exception client needs no
+market, only a tidy label, and pricing for them is per-client. Members as of
+2026-06-13: Alyson Rahn (Brunswick), Brooksley Sheehe (Anthony), Greta Custer
+(Dunnellon), Tonya Hunt (Williston). Maria Arvanitis is recorded as Ocala-SE and
+is unresolved (Paul recalls Summerfield; the address reads Ocala 34480). Paul,
+2026-06-13.
+
 `stop_closes_the_loop` (Clean: clients):
 When a client taps the portal stop sign, three things happen in one
 transaction: every future appointment is cancelled including pencilled
