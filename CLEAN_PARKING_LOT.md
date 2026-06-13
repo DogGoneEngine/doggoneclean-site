@@ -172,6 +172,18 @@ Gates: Twilio (the sends), Stripe (online tips).
    (that route was blocked by a deploy-approval gate; moving the signal into the DB function
    routed around it). Original idea below.
 
+   **Two-tier hard ban (comms block), Twilio-gated.** Paul's idea 2026-06-13: split the hard ban
+   into two levels. Level 1 is today's hard ban (removed from every working list, never solicited,
+   record kept, reversible). Level 2 is for an obnoxious person: completely block communication.
+   Parked, not built, because it has no teeth yet: messaging is outbound-only today and there is no
+   inbound channel, so there is nothing for level 1 to "still allow" or level 2 to "block." The
+   distinction only becomes real when Twilio lands and a banned number can text the business line,
+   at which point level 2 means block-this-number on the inbound side. Build it with the Twilio
+   slice, not before (a level whose only home is card copy fails the redesign-survival gate). When
+   built: add a third `nofly_level` value (e.g. 'banned_blocked') or a separate `comms_blocked`
+   flag, and have the inbound SMS handler drop messages from a blocked number. Until then the card
+   copy was corrected to claim only what is enforced (removed + not solicited, no inbound claim).
+
    Make the tracker
    personal proof that the client was heard. When a client asks for something special at the door
    ("clip the ears a little shorter"), Paul captures it on the stop, and it shows on that visit's

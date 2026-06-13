@@ -1277,8 +1277,8 @@ function ClientStatusControl({ client, onChanged }) {
               {' '}They keep their record and their place in the book, and if they book or show up you still take care of them. What stops is every nudge from your side: no win-back when they go quiet, no outreach, no marketing. The relationship just goes cold on its own, with no confrontation. Use it for someone you would rather not keep but do not need to refuse outright.
             </div>
             <div>
-              <strong style={{ color: 'var(--ad-bad, #dc2626)' }}>Hard ban: they leave every working list and no message ever reaches them again.</strong>
-              {' '}They drop off your routes, rosters, win-back, and all outreach, so they never surface in your day again, and the door is shut on contact in both directions. Their record is not deleted: the name, the history, and your private reason are kept on purpose, so the ban sticks and the same person cannot quietly come back as a new client. It is fully reversible right here if you change your mind. Use it for a true no-fly: someone you will not serve again.
+              <strong style={{ color: 'var(--ad-bad, #dc2626)' }}>Hard ban: they leave every working list, so they never surface in your day and nothing goes out to them again.</strong>
+              {' '}They drop off your routes, rosters, win-back, and all outreach. Because they are off every list, no appointment gets booked and no message ever gets sent from your side. Their record is not deleted: the name, the history, and your private reason are kept on purpose, so the ban sticks and the same person cannot quietly come back as a new client. It is fully reversible right here if you change your mind. Use it for a true no-fly: someone you will not serve again.
             </div>
           </div>
           <textarea className="ad-textarea" rows={2} placeholder="reason (kept private)" value={reason} onChange={(e) => setReason(e.target.value)} style={{ width: '100%' }} />
