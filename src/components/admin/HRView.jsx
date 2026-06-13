@@ -4,7 +4,7 @@
 // Paul is working, from real visit hours, held against the prime directive (earn
 // more, grind less). It scales to a team roster when he hires.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { hrSummary, listAgents, listTeam, adminAgentCosts, setAdminPhoto, setAdminPhotoFromPath, setAdminBio, signedPhotoUrl, profilePhotoChoices } from './supabase.js';
 import HelpToggle from './Help.jsx';
 
@@ -152,11 +152,14 @@ function TeamMember({ m, onChanged }) {
   const [editingBio, setEditingBio] = useState(false);
   const [bio, setBio] = useState(m.bio || '');
   const [err, setErr] = useState(null);
-  // Library picker: choose an existing shared photo as the profile face,
-  // instead of only a fresh phone upload. libItems null = not loaded yet.
+  // Tapping the circle opens a small chooser (phone upload vs the Library)
+  // rather than jumping straight to the phone picker, so the Library is
+  // discoverable at the tap. libItems null = not loaded yet.
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [libOpen, setLibOpen] = useState(false);
   const [libItems, setLibItems] = useState(null);
   const [libUrls, setLibUrls] = useState({});
+  const fileRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
@@ -173,6 +176,7 @@ function TeamMember({ m, onChanged }) {
     finally { setBusy(false); }
   }
   async function openLibrary() {
+    setPickerOpen(false);
     setLibOpen(true);
     if (libItems) return;
     setErr(null);
@@ -200,12 +204,28 @@ function TeamMember({ m, onChanged }) {
 
   return (
     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 10 }}>
-      <label style={{ cursor: 'pointer', flexShrink: 0 }} title="Set profile photo (shows on the tracker)">
-        {thumb
-          ? <img src={thumb} alt={m.first_name} style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--ad-primary, #2563d8)' }} />
-          : <span style={{ width: 48, height: 48, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ad-surface-container, #eef)', fontSize: 18, fontWeight: 700 }}>{(m.first_name || '?')[0]}</span>}
-        <input type="file" accept="image/*" onChange={pick} disabled={busy} style={{ display: 'none' }} />
-      </label>
+      <div style={{ flexShrink: 0, position: 'relative' }}>
+        <button type="button" onClick={() => setPickerOpen((o) => !o)} disabled={busy}
+          aria-label="Set profile photo" title="Set the profile photo clients see on the tracker"
+          style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', borderRadius: '50%' }}>
+          {thumb
+            ? <img src={thumb} alt={m.first_name} style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--ad-primary, #2563d8)', display: 'block' }} />
+            : <span style={{ width: 48, height: 48, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ad-surface-container, #eef)', fontSize: 18, fontWeight: 700 }}>{(m.first_name || '?')[0]}</span>}
+        </button>
+        <input ref={fileRef} type="file" accept="image/*" onChange={(e) => { setPickerOpen(false); pick(e); }} disabled={busy} style={{ display: 'none' }} />
+        {pickerOpen && (
+          <div style={{ position: 'absolute', top: 54, left: 0, zIndex: 30, background: '#fff', border: '1px solid var(--ad-outline, #d8d8de)', borderRadius: 10, boxShadow: 'var(--ad-elev-1, 0 6px 20px rgba(0,0,0,0.12))', padding: 6, width: 190 }}>
+            <button type="button" onClick={() => { setPickerOpen(false); fileRef.current && fileRef.current.click(); }}
+              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 10px', border: 0, background: 'transparent', borderRadius: 7, fontSize: 13, cursor: 'pointer' }}>
+              Upload from your phone
+            </button>
+            <button type="button" onClick={openLibrary}
+              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 10px', border: 0, background: 'transparent', borderRadius: 7, fontSize: 13, cursor: 'pointer' }}>
+              Choose from the Library
+            </button>
+          </div>
+        )}
+      </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 15 }}>
           <strong>{m.first_name}{m.last_name ? ` ${m.last_name}` : ''}</strong>{' '}
@@ -228,14 +248,8 @@ function TeamMember({ m, onChanged }) {
           </div>
         )}
         {m.role !== 'viewer' && (
-          <div style={{ fontSize: 11, marginTop: 4 }}>
-            {!m.photo_path && <span style={{ opacity: 0.5 }}>Tap the circle to upload from your phone, or </span>}
-            {m.photo_path && <span style={{ opacity: 0.5 }}>Tap the circle to upload a new photo, or </span>}
-            <button type="button" onClick={() => (libOpen ? setLibOpen(false) : openLibrary())} disabled={busy}
-              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 11, color: 'var(--ad-primary, #2563d8)', textDecoration: 'underline', cursor: 'pointer' }}>
-              {libOpen ? 'close the Library' : 'choose from the Library'}
-            </button>
-            <span style={{ opacity: 0.5 }}>. This is the face clients see on the tracker.</span>
+          <div style={{ fontSize: 11, opacity: 0.5, marginTop: 4 }}>
+            Tap the circle to set the profile photo clients see on the tracker: upload from your phone, or choose one from the Library.
           </div>
         )}
         {libOpen && (
