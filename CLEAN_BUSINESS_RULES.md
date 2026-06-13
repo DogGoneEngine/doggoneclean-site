@@ -71,6 +71,7 @@ even DGN has many rules sitting in only one or two layers.
 | hurricane_bath_operator_title | Copy | Oracle; client-facing copy uses "Hurricane Bath Operator" (tracker, city page, trust lines); **`check.py`** asserts the title on `track.astro` + `the-villages.astro` | per-operator copy when the team grows |
 | who_is_coming_is_pilot | Tracker | Oracle; `tracker_status` returns the pilot-in-command operator (name + bio); `track.astro` portrait uses `operator_photo`, never a scraped recent photo | per-operator profile photos set via HR |
 | photo_attributed_to_logged_in_admin | Operator | Oracle; `visit_photos.taken_by_admin_id` stamped by `admin_add_visit_photo` from `auth.uid()`; `tracker-photos` edge fn returns each photo's `by`; `track.astro` labels by photographer | edge fn deploy carries the per-photo `by` to the live tracker |
+| context_gap_nudge | Moat | Oracle; `_client_context_gaps` RPC + `context_gaps` on `admin_today_appointments`; `TodayView` stop nudge, tap opens the contact sheet; self-clears live | the standing four-signal Moat agent (parked) |
 | specialist_assigned_per_route | Scheduling | Oracle | `routes.operator_id`; booking step 1 polygon-check response includes `route_operator` (name + photo URL); portal "your specialist" section reads the same join |
 | cancellation_24h | Money | Oracle | booking engine; site copy |
 | favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |

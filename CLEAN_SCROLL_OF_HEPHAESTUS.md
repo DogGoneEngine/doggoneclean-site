@@ -3558,3 +3558,19 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   photo_path at the chosen shot (same bucket, no copy). Sourced from shared photos, not just the
   Team gallery, because the Team gallery is empty today while there are dozens of client-shared
   shots; only already-shared photos are offered so a private photo never becomes the public face.
+  Picker UX then upgraded (PR #37): tapping the circle opens a phone/Library chooser instead of
+  jumping straight to the phone picker, because the inline text link was too easy to miss.
+
+- **Moat agent v1: just-in-time context-gap nudge (Jun 13)**: Paul asked whether an agent should
+  own "digging the moat deeper." Today the moat is only a decision lens Claude applies in-thread;
+  the department agents (cfo/coo/hr/growth/compliance, migration 0042, Riker-orchestrated) own no
+  moat mandate. Reframed: capturing Paul's 20 years of head-knowledge into records is the moat AND
+  "runs without Paul" AND sellability at once. Smallest real version, scoped with Paul: a
+  just-in-time nudge on the Today stop (not a 5th briefing agent). Migration 0180:
+  `_client_context_gaps(client_id)` returns the missing moat fields (experiential: how to handle
+  the dog, gate/entry notes; basics: dog breed, visit rhythm), and `admin_today_appointments`
+  carries `context_gaps` per stop; `TodayView` shows a tappable nudge that opens the contact sheet
+  and self-clears as fields fill. Verified live: varied per-client gaps (some fully covered).
+  Oracle `context_gap_nudge`. Paul's scope answers: pops up before a visit; experiential plus
+  basics; highest-frequency clients surface most because he sees them most. The standing
+  four-signal Moat agent stays parked in CLEAN_PARKING_LOT.md as v2.
