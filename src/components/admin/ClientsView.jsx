@@ -640,12 +640,13 @@ function StatusBadge({ level, reason }) {
   );
 }
 
-// A Google Maps link, preferring the plus code (reliable when the street address
-// routes to the wrong place), then the address, then lat/lng.
+// A Google Maps link. Exact coordinates first (the most reliable pin, and the
+// only thing that survives a plus code stored without its town or a placeholder
+// "PlusCode <town>" street address), then the plus code, then the address.
 function mapsUrl(c) {
-  const q = (c.location_plus || '').trim()
-    || [c.location_address, c.location_zip].filter(Boolean).join(' ').trim()
-    || (c.geo_lat != null && c.geo_lng != null ? `${c.geo_lat},${c.geo_lng}` : '');
+  const q = (c.geo_lat != null && c.geo_lng != null ? `${c.geo_lat},${c.geo_lng}` : '')
+    || (c.location_plus || '').trim()
+    || [c.location_address, c.location_zip].filter(Boolean).join(' ').trim();
   return q ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}` : null;
 }
 
@@ -660,7 +661,9 @@ function LocationField({ client }) {
         {url
           ? <a href={url} target="_blank" rel="noreferrer" style={{ color: 'var(--ad-primary, #2563d8)' }}>{text || 'Open in Maps'} ↗</a>
           : text}
-        {client.location_plus ? <span style={{ opacity: 0.5, fontSize: 12 }}> · maps uses plus code</span> : null}
+        {client.geo_lat != null && client.geo_lng != null
+          ? <span style={{ opacity: 0.5, fontSize: 12 }}> · maps uses exact coordinates</span>
+          : client.location_plus ? <span style={{ opacity: 0.5, fontSize: 12 }}> · maps uses plus code</span> : null}
       </dd>
     </>
   );
