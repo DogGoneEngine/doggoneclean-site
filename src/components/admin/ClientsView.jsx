@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
+import HelpToggle from './Help.jsx';
 
 const easternDay = (ts) => new Date(ts).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 import VisitPhotos from './VisitPhotos.jsx';
@@ -214,8 +215,16 @@ function ClientSheet({ clientId, onChanged }) {
       <RikerCapture clientId={clientId} clientName={c.name} onApplied={() => { load(); onChanged?.(); }} />
 
       {/* Semi-permanent header */}
-      <div className="ad-panel">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
+      <div className="ad-panel" style={{ position: 'relative' }}>
+        <HelpToggle corner items={[
+          ['Tap any field', 'Most details (access notes, gate codes, who is home, your private thoughts) edit right here: tap the value, type, it saves.'],
+          ['Add alternate address', 'Records a second place you sometimes groom this client, clickable to Maps.'],
+          ['Status / No-fly', 'Flags a client (watch, or do-not-book) so the booking funnel and the rest of the app know.'],
+          ['On each dog', 'Set breed, price, notes, and birthday. The price is what the visit charges.'],
+          ['Log a visit', 'Adds a visit to the history below, with what you did, time, and what was collected.'],
+          ['Photos', 'Each visit photo can go to the client, the Team gallery, the website, or be flagged. Their own help sits by the photos.'],
+        ]} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, paddingRight: 24 }}>
           <h2 style={{ margin: 0 }}>{c.name}{c.aka ? <span className="ad-mono" style={{ marginLeft: 8, opacity: 0.6, fontSize: 14 }}>{c.aka}</span> : null}</h2>
           <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{c.roster_group} · {c.status}</span>
         </div>

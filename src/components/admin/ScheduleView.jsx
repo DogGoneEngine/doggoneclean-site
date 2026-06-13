@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { listSchedule, setWindow, deleteWindow, addException, deleteException } from './supabase.js';
+import HelpToggle from './Help.jsx';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -51,7 +52,13 @@ function CitySchedule({ city, onChanged }) {
       <h2 style={{ marginBottom: 4 }}>{city.name}</h2>
       <p className="ad-sub" style={{ marginTop: 0 }}>{city.timezone}</p>
 
-      <div className="ad-panel" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div className="ad-panel" style={{ display: 'flex', flexDirection: 'column', gap: 6, position: 'relative' }}>
+        <HelpToggle corner items={[
+          ['Add hours', 'Opens that weekday for work. The booking funnel will offer slots inside the time window you set.'],
+          ['on', 'Uncheck to switch a window off without deleting it. The day goes Off if no window is on.'],
+          ['Save', 'Locks in the start and end time for that day.'],
+          ['Remove', 'Deletes that time window.'],
+        ]} />
         {DAYS.map((dayName, dow) => (
           <WeekdayRow
             key={dow}
@@ -151,8 +158,13 @@ function Exceptions({ cityId, exceptions, onChanged }) {
   }
 
   return (
-    <div className="ad-panel" style={{ marginTop: 12 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="ad-panel" style={{ marginTop: 12, position: 'relative' }}>
+      <HelpToggle corner items={[
+        ['Add', 'Overrides a single date: close a day you normally work, or open a one-off day you normally do not.'],
+        ['closed', 'Checked means that date is closed. Unchecked lets you set special open hours just for that date.'],
+        ['Remove', 'Deletes the exception; that date goes back to your normal weekly hours.'],
+      ]} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24 }}>
         <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Exceptions (close a day or open a one-off)</div>
         {!open && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(true)}>+ Add</button>}
       </div>
