@@ -20,19 +20,25 @@ import {
 const STATUS_LABEL = { new: 'New', shelf: 'On the shelf', used: 'Used', dropped: 'Dropped' };
 const GRID = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 };
 
-// Sign preview URLs for a list of items that each carry a `path`.
+// Sign preview URLs for a list of items that each carry a `path`. The effect
+// keys on the set of ids (a stable string), NOT the array reference, because
+// callers pass a freshly built array (items || []) every render; depending on
+// the reference would re-run the effect and setState every render, an infinite
+// loop that crashes the island.
 function useSignedUrls(items) {
   const [urls, setUrls] = useState({});
+  const list = items || [];
+  const key = list.map((i) => i.id).join(',');
   useEffect(() => {
     let alive = true;
     (async () => {
-      const entries = await Promise.all((items || []).map(async (i) => {
+      const entries = await Promise.all(list.map(async (i) => {
         try { return [i.id, await signedPhotoUrl(i.path)]; } catch { return [i.id, null]; }
       }));
       if (alive) setUrls(Object.fromEntries(entries));
     })();
     return () => { alive = false; };
-  }, [items]);
+  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
   return urls;
 }
 
@@ -47,6 +53,17 @@ export default function LibraryView() {
   const [me, setMe] = useState(null);
   useEffect(() => { adminSelf().then(setMe).catch(() => {}); }, []);
   const isOwner = me?.role === 'owner';
+
+  // Wait for the role before rendering tabs, so a non-default tab never flashes
+  // for the owner on the first paint.
+  if (!me) {
+    return (
+      <>
+        <h1>Library</h1>
+        <p className="ad-sub">Loading…</p>
+      </>
+    );
+  }
 
   // The crew gets the Team gallery only; Assets (the owner's upload shelf) and
   // Website (the approval queue) are owner-only, enforced in the RPCs too.
