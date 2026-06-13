@@ -177,9 +177,9 @@ function AssetsShelf() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, fontSize: 12, opacity: 0.7 }}>
           <span>Each item shows its status. Not sure about the buttons?</span>
           <HelpToggle items={[
-            ['Shelf', 'Keep it for later. It stays in the library, marked "on the shelf".'],
-            ['Drop', 'Remove it from the library (marked dropped). It stops showing here.'],
-            ['Tap the note', 'Tap the text under any item to add or change its note.'],
+            ['Shelf', 'You keep it. It stays in your library for later.'],
+            ['Drop', 'You are done with it. It leaves the library.'],
+            ['Tap the note', 'Tap the text under any item to add or change what it says.'],
           ]} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
@@ -291,9 +291,9 @@ function WebsiteReview() {
     <>
       <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
         <HelpToggle corner items={[
-          ['Approve', 'Publishes the photo to the public website gallery. Owner only.'],
-          ['Reject', 'Removes the suggestion. It does not go on the website.'],
-          ['Pull from website', 'On a live photo below, takes it back off the public gallery.'],
+          ['Approve', 'This dog goes live on your public website for everyone to see.'],
+          ['Reject', 'It never reaches the website and leaves this list.'],
+          ['Pull from website', 'On a live photo below: it comes off the public website right away.'],
         ]} />
         <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8, paddingRight: 24 }}>
           Waiting for your approval ({queued.length})

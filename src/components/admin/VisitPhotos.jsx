@@ -143,11 +143,11 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, fontSize: 11, opacity: 0.7 }}>
           <span>Where each photo goes</span>
           <HelpToggle items={[
-            ['Client', 'The client sees it in their portal and on the tracker.'],
-            ['Team', 'Keeps it in the internal Team gallery (your crew, not the client).'],
-            ['Web', 'Suggests it for the public website. Only the owner approves it live.'],
-            ['Answer', 'Marks it as the proof of a special request; shows beside that request on the tracker.'],
-            ['Flag', 'Worth a look sends it to the client as a heads-up; For the owner sends it to the owner privately.'],
+            ['Client', 'The client sees this photo in their portal and on the tracker.'],
+            ['Team', 'Only your crew sees it, in the private gallery. The client never does.'],
+            ['Web', 'Suggests it for your public website. Nothing happens until the owner says yes.'],
+            ['Answer', 'The client sees this as the proof of what they asked for, beside their request.'],
+            ['Flag', 'Worth a look: the client gets a heads-up to see something. For the owner: only the boss sees it.'],
           ]} />
         </div>
       )}

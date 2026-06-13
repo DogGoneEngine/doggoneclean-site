@@ -231,9 +231,9 @@ function FromTheField() {
   return (
     <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
       <HelpToggle corner items={[
-        ['From the field', 'Photos a teammate flagged privately for you on a visit, each with a note about what they noticed.'],
-        ['Got it', 'Clears a flag once you have seen it. It moves out of the way; nothing is deleted.'],
-        ['The photo', 'Tap it to open the full image.'],
+        ['What this is', 'Things a teammate spotted on a visit and wanted you, privately, to see. The client never sees these.'],
+        ['Got it', 'You have seen it. It moves out of the way. Nothing is deleted.'],
+        ['The photo', 'Tap it to open the full picture.'],
       ]} />
       <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8, paddingRight: 24 }}>From the field</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -332,12 +332,12 @@ function TasksPanel() {
   return (
     <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
       <HelpToggle corner items={[
-        ['Assign a task', 'Owner only. Give a job to a teammate; you can ask for a photo receipt when it is done.'],
-        ['Done / Done with photo', 'Mark a task finished. If a photo receipt was asked, snap the finished work to complete it.'],
-        ['Save hours', 'On an equipment-hours task, type the panel reading and save; the number lands and the source card closes.'],
-        ['Drop', 'Owner only. Remove an open task that no longer needs doing.'],
-        ['Clear / Clear finished', 'Owner only. Sweep a finished task (or all of them) off the board; kept in the record, just hidden here.'],
-        ['Receipt', 'Open the photo a teammate left as proof of finished work.'],
+        ['Assign a task', 'The job lands on a teammate\'s day, not just yours. You can require a photo when they finish.'],
+        ['Done', 'The job is finished and drops to the bottom. If a photo was required, you add it here to close it.'],
+        ['Save hours', 'On an hours task: type the panel reading. The equipment\'s hours update and this closes.'],
+        ['Drop', 'The job disappears. For something nobody needs to do after all.'],
+        ['Clear / Clear finished', 'Finished jobs leave the board so it stays clean. Nothing is deleted, just tidied away.'],
+        ['Receipt', 'Opens the photo a teammate left as proof the job got done.'],
       ]} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, paddingRight: 24 }}>
         <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Tasks</div>
@@ -890,13 +890,13 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
   return (
     <div className="ad-panel" style={{ borderLeft: `4px solid ${sev.color}`, position: 'relative' }}>
       <HelpToggle corner items={[
-        ['Reply box', 'Type a note to the agent. It rides along with whichever answer you pick, or use Just leave a note to record it and keep the card open.'],
-        ['Handle it', 'You are taking care of it. Clears the card.'],
-        ['Hand off', 'Give it to a teammate as a task; the card comes back resolved when they finish.'],
-        ['Leave it alone', 'It is on purpose. The agent stops flagging this for good.'],
-        ['Dismiss', 'Clear it for now; the agent may raise it again if it still matters.'],
-        ['Save hours', 'On an Update-hours card, type the panel reading and save; it records the hours and clears the card.'],
-        ['Undo', 'After you answer, the card shows an Undo for a moment so a wrong tap is reversible.'],
+        ['Handle it', 'The card goes away. Use it when you already took care of this yourself.'],
+        ['Hand off', 'It leaves your list and becomes a teammate\'s job. It comes back only once they finish it.'],
+        ['Leave it alone', 'The card goes away and you never hear about this one again. For things that are fine on purpose.'],
+        ['Dismiss', 'The card goes away for now, but it can come back later if it still matters. Use it for "not now".'],
+        ['Save hours', 'On an hours card: type the number off the panel and the card goes away, hours updated.'],
+        ['Reply box', 'Whatever you type here gets sent to the agent along with your answer. Just leave a note keeps the card.'],
+        ['Undo', 'Tapped the wrong one? An Undo shows for a moment and puts the card right back.'],
       ]} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
         <strong style={{ fontSize: 16, paddingRight: 24 }}>{b.title}</strong>

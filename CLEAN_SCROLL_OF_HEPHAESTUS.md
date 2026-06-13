@@ -3476,3 +3476,10 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Website review; grids of identical tiles (photo chips, Library items) keep one legend at the
   top instead of an "i" per tile. Reason it mattered: the old inline "i" sat right next to the
   buttons and was 50/50 to mis-tap.
+
+- **Info text rewritten outcome-first** (`help_on_demand`, Paul 2026-06-13): Paul invoked the
+  outcomes rule on the help itself. Every info card now leads with the result you get in plain
+  words ("the card goes away and you never hear about this one again") instead of the mechanism,
+  and confusable pairs are written so the difference is unmistakable (Leave it alone = gone for
+  good; Dismiss = gone for now, can return). Applied across the briefing cards, Tasks, From-the-
+  field, Library (Assets + Website), and the photo chips. Rule updated to require outcome-first help.
