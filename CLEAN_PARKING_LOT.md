@@ -203,16 +203,15 @@ Gates: Twilio (the sends), Stripe (online tips).
    (that route was blocked by a deploy-approval gate; moving the signal into the DB function
    routed around it). Original idea below.
 
-   **Edge-deploy cleanup: tracker-photos photographer `by`.** 2026-06-13: the tracker-photos edge
-   function was updated in the repo to return each photo's photographer first name (`by`), but
-   edge deploys are gated in the web session, so the live path carries it through tracker_status
-   instead (migration 0178, `photo_credits` map keyed by photo id, same routing trick as
-   answer_photo_ids). The page prefers photo_credits, then the edge `by`, then the named operator,
-   so it is correct today. CLEANUP when edge deploys are ungated: deploy tracker-photos (the repo
-   file is ready, verify_jwt stays off) and then optionally drop photo_credits from tracker_status,
-   since the two sources always agree. Low priority, purely a redundancy trim, not a correctness
-   fix. Also: set Paul's profile photo in Orbit HR (Jake already has one) so his who's-coming
-   portrait is a real photo instead of the static cover fallback.
+   **Optional trim: redundant photo_credits map.** UPDATE 2026-06-13: tracker-photos is now
+   DEPLOYED (v7) and returns each photo's photographer `by` directly. The `photo_credits` map in
+   tracker_status (migration 0178, the DB workaround added while edge deploys were stuck) is now
+   redundant: the page prefers it and the edge `by` always agrees, so it is harmless. Optional
+   low-priority trim: drop photo_credits from tracker_status someday. Not a correctness fix; leave
+   it until something else touches tracker_status. (History: while edge deploys were stuck in one
+   session, the signal rode tracker_status via the same routing trick as answer_photo_ids; a fresh
+   session deployed the function cleanly.) Separately: set Paul's profile photo in Orbit HR (Jake
+   already has one) so his who's-coming portrait is a real photo instead of the static cover.
 
    **Two-tier hard ban (comms block), Twilio-gated.** Paul's idea 2026-06-13: split the hard ban
    into two levels. Level 1 is today's hard ban (removed from every working list, never solicited,
