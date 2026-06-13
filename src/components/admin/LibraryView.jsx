@@ -48,31 +48,36 @@ export default function LibraryView() {
   useEffect(() => { adminSelf().then(setMe).catch(() => {}); }, []);
   const isOwner = me?.role === 'owner';
 
-  const tabs = [
-    ['assets', 'Assets'],
-    ['team', 'Team gallery'],
-    ...(isOwner ? [['website', 'Website']] : []),
-  ];
+  // The crew gets the Team gallery only; Assets (the owner's upload shelf) and
+  // Website (the approval queue) are owner-only, enforced in the RPCs too.
+  const tabs = isOwner
+    ? [['assets', 'Assets'], ['team', 'Team gallery'], ['website', 'Website']]
+    : [['team', 'Team gallery']];
+  const activeTab = tabs.some(([k]) => k === tab) ? tab : 'team';
 
   return (
     <>
       <h1>Library</h1>
       <p className="ad-sub">
-        Photos and videos with a life beyond their visit. Assets is the upload shelf; the Team gallery is the crew's internal keep; Website is the public gallery you approve.
+        {isOwner
+          ? "Photos and videos with a life beyond their visit. Assets is your upload shelf; the Team gallery is the crew's internal keep; Website is the public gallery you approve."
+          : "The crew's gallery: great shots from the road, kept so they aren't lost."}
       </p>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        {tabs.map(([key, label]) => (
-          <button key={key} onClick={() => setTab(key)}
-            className={'ad-btn ad-btn--sm ' + (tab === key ? '' : 'ad-btn--ghost')}>
-            {label}
-          </button>
-        ))}
-      </div>
+      {tabs.length > 1 && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+          {tabs.map(([key, label]) => (
+            <button key={key} onClick={() => setTab(key)}
+              className={'ad-btn ad-btn--sm ' + (activeTab === key ? '' : 'ad-btn--ghost')}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {tab === 'assets' && <AssetsShelf />}
-      {tab === 'team' && <TeamGallery />}
-      {tab === 'website' && isOwner && <WebsiteReview />}
+      {activeTab === 'assets' && isOwner && <AssetsShelf />}
+      {activeTab === 'team' && <TeamGallery />}
+      {activeTab === 'website' && isOwner && <WebsiteReview />}
     </>
   );
 }

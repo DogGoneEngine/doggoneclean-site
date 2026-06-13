@@ -2057,6 +2057,32 @@ mistake with real blast radius; everything else is a one-tap undo. No content ru
 yet: the owner is the final judge of what is safe to publish (no license plates,
 faces, house numbers). Paul, 2026-06-13.
 
+`library_tabs_by_role` (Clean: engineering):
+The Library has three shelves and they are not all for everyone. The Team gallery
+opens to the whole crew (employees and stakeholders); Assets (the owner's upload
+and curation shelf) and the Website approval queue are owner-only. A non-owner
+opening the Library sees only the Team tab. This is a real boundary, not a hidden
+tab: the Assets (site_inbox) RPCs and the website approve and review RPCs require
+the owner role server-side, so a teammate on the Library floor cannot read Assets
+or publish by calling an RPC directly. Because a teammate's default should be the
+least that does the job, the fun internal wall, not the owner's working shelves or
+the public-publishing controls; more is granted when there is a reason, never on
+by default. Paul, 2026-06-13.
+
+`access_grants_live_on_the_access_page` (Clean: engineering):
+Permissions are role-based by default and stay that way until a real person needs
+an exception. When that day comes (a future employee who should see the website
+queue, say), the grant is NOT hard-coded: it becomes a per-person capability that
+defaults off, is toggled on the Access page (the same emperor-only page that
+already shows who-can-see-what), stored on that admin's record, and enforced
+server-side in the RPC's role-or-capability check. Until there is such a person,
+no grant machinery is built. The Access page is therefore the single home for
+access: it shows the map today and becomes the place to grant from once grants
+exist. Because a permissions console with nobody to permission is speculative
+complexity, but scattering future grants through the code instead of one visible
+page is how access quietly drifts; name the home now, build the machinery when a
+real grant arrives. Paul asked where this belongs, 2026-06-13.
+
 `stop_closes_the_loop` (Clean: clients):
 When a client taps the portal stop sign, three things happen in one
 transaction: every future appointment is cancelled including pencilled

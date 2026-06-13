@@ -3413,3 +3413,20 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   URLs to the page. Unpublish clears the URL; FIFO roll-off drops it from the feed. Verified the
   anon feed returns a live photo and reverted. A real public bucket (permanent URLs, hard-delete
   on unpublish) is the parked upgrade if the yearly expiry ever bites.
+
+### Batch twenty-five: Library access tightened by role; where grants belong (Jun 13; migration 0175)
+
+- **Library tabs by role** (`library_tabs_by_role`): the Team gallery now opens to the crew
+  (operators and stakeholders get the Library floor, Team tab only), while Assets (the owner's
+  upload shelf) and the Website approval queue stay owner-only. Ground-truth correction: before
+  this, the Library floor was owner-only in the nav, so no employee could see ANY of it; Paul's
+  "library visible to the team" was the intent, not the state. Made it a real boundary, not a
+  hidden tab: migration 0175 tightens the four site_inbox (Assets) RPCs to owner-only (website
+  approve/review were already owner-only). Verified Jake (operator) gets "owner only" on
+  admin_list_inbox but the Team gallery returns fine.
+- **Where permissions belong** (`access_grants_live_on_the_access_page`, answering Paul's
+  question): role-based by default; when a real person needs an exception, it becomes a per-admin
+  capability that defaults off, is toggled on the Access page, and is enforced server-side in the
+  RPC. Not built yet (no one to grant to); parked in CLEAN_PARKING_LOT.md with the note to also
+  fold within-floor/tab visibility into the Access map when that machinery lands, so the map stays
+  honest. The Access page is the one home for access: shows the map now, grants later.
