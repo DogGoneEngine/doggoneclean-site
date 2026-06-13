@@ -81,9 +81,12 @@ const READY = SECTIONS.filter((s) => s.ready).map((s) => s.key);
 // admin_today_appointments strip contact and money for the operator role),
 // so this list is navigation, not the security boundary.
 const OPERATOR_FLOORS = ['today', 'calendar', 'clients'];
-// The viewer role (Kristin): a stakeholder, not day-to-day. One floor, all
-// signal: family_window_into_the_business.
-const VIEWER_FLOORS = ['family'];
+// The viewer role (Kristin): a stakeholder, not day-to-day. The Family window
+// (family_window_into_the_business) plus the Prospectus, so a stakeholder sees
+// both how the business is doing day to day and what it is worth. The
+// admin_prospectus RPC gates on _is_admin(), which an active viewer passes, so
+// surfacing it here is navigation, not a new grant.
+const VIEWER_FLOORS = ['family', 'prospectus'];
 
 export default function AdminApp() {
   const [session, setSession] = useState(null);
