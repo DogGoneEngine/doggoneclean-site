@@ -2084,16 +2084,20 @@ page is how access quietly drifts; name the home now, build the machinery when a
 real grant arrives. Paul asked where this belongs, 2026-06-13.
 
 `help_on_demand` (Clean: engineering):
-Buttons stay terse, and any control whose meaning is not obvious carries a small
-"i" info button beside it (the HelpToggle component) that, on tap, reveals a short
-legend of what each nearby control does and hides again on a second tap. The daily
-user never reads it; it is there for the control someone has not used yet, has
-forgotten, or a new teammate is learning. Tap-based so it works on a phone, never
-a hover-only title. Because a terse button is fast for the expert and opaque for
-everyone else, and the business has to run without Paul: a new hire should be able
-to learn a screen by tapping, not by asking. Roll it out wherever a button's job
-is not self-evident. First home: the Library status buttons (Shelf, Drop). Paul,
-2026-06-13.
+Buttons stay terse, and every card that has action buttons carries a small "i"
+pinned to its TOP-RIGHT corner: the same place on every card, deliberately clear
+of the action buttons (which cluster along the bottom and body) so it cannot be
+fat-fingered. Top-right, not bottom-right, exactly because the action buttons live
+bottom and body. Tapping it gives a thorough rundown of every action on that card
+and hides again on a second tap; the daily user never reads it, it is there for
+the control someone has not used yet, has forgotten, or a new teammate is
+learning. Tap-based so it works on a phone, never a hover-only title. A grid of
+identical tiles (photo thumbnails, library items) is the one exception: it gets a
+single legend at the top of the grid instead of an "i" on every tile. Built as one
+reusable component (HelpToggle, corner mode). Because a terse button is fast for
+the expert and opaque for everyone else, the business has to run without Paul, and
+an info button jammed next to the real buttons is a fat-finger waiting to happen:
+one consistent, safe, thorough help spot per card. Paul, 2026-06-13.
 
 `look_at_this_flags` (Clean: clients):
 An operator can flag a single visit photo plus a short note to one of two

@@ -3466,3 +3466,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   control (VisitPhotos), the Today briefing-card answers, and the From-the-field panel all carry
   the tappable "i" legend now, alongside the Library Shelf/Drop from the prior batch.
 - Built carefully after the Library crash: no inline-array hook deps in the new components.
+
+- **Info button became a placement standard** (`help_on_demand` updated, Paul 2026-06-13): the
+  "i" now pins to the TOP-RIGHT corner of a card (HelpToggle corner mode), the same spot every
+  time, deliberately clear of the action buttons (which cluster bottom/body) so it cannot be
+  fat-fingered. Paul's original instinct was bottom-right; recommended top-right instead because
+  that is where the real buttons are. Tapping gives a thorough rundown of every action on the
+  card. Applied to the Today briefing cards, Tasks panel, From-the-field panel, and Library
+  Website review; grids of identical tiles (photo chips, Library items) keep one legend at the
+  top instead of an "i" per tile. Reason it mattered: the old inline "i" sat right next to the
+  buttons and was 50/50 to mis-tap.

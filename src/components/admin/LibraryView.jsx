@@ -289,8 +289,13 @@ function WebsiteReview() {
 
   return (
     <>
-      <div className="ad-panel" style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>
+      <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
+        <HelpToggle corner items={[
+          ['Approve', 'Publishes the photo to the public website gallery. Owner only.'],
+          ['Reject', 'Removes the suggestion. It does not go on the website.'],
+          ['Pull from website', 'On a live photo below, takes it back off the public gallery.'],
+        ]} />
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8, paddingRight: 24 }}>
           Waiting for your approval ({queued.length})
         </div>
         {queued.length === 0 ? (
