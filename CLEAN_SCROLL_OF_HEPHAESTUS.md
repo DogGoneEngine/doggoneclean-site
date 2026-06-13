@@ -3530,3 +3530,22 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   side, record kept and reversible). Paul's two-tier-hard-ban idea (level 1 still lets them message
   you, level 2 fully blocks comms) parked in CLEAN_PARKING_LOT.md against the Twilio milestone,
   because it has no teeth until an inbound channel exists to block.
+
+- **Tracker who's-coming card + per-photo attribution (Jun 13)**: on a real training run Jake shot
+  the after photo of Barbara Lape's dog Manning while Paul was operator on record; the tracker's
+  "who's coming" card grabbed that newest with-dog photo and showed Jake's face under Paul's name.
+  Root cause (verified in code): the card name was hardcoded "Paul Nickerson", and the big portrait
+  was the most-recent shared with_dog photo with no record of who is in it. Two new Oracle rules:
+  `who_is_coming_is_pilot` (the card shows the pilot in command, named, with that operator's own
+  profile photo, never a scraped photo) and `photo_attributed_to_logged_in_admin` (each photo
+  records who took it and the tracker labels it by that photographer). Migration 0177 added
+  `visit_photos.taken_by_admin_id` (stamped by `admin_add_visit_photo` from auth.uid(), backfilled
+  to operator-on-record for history), and `tracker_status` now returns the pilot-in-command
+  operator object (name + bio) so the name follows the assignment. Applied to dgc-prod via
+  execute_sql (apply_migration was gated this session). track.astro: the portrait uses
+  `operator_photo` for both the header and the big card, and photo labels use each photo's `by`
+  (falls back to the named operator). The per-photo `by` needs the `tracker-photos` edge function,
+  whose deploy is gated this session, so the label degrades to the pilot's name until that one
+  deploy lands; the headline wrong-face fix is live without it. Decisions from Paul: who's-coming =
+  fixed profile portrait of the pilot in command; build multi-operator now to the extent that
+  photos attribute to the logged-in photographer, not the pilot.
