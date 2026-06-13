@@ -97,6 +97,11 @@ visible. RECOMMENDATION when built: start with ONE or two signals (proprietary-c
 highest-leverage and the data is already there), not all four, per Elon's algorithm (smallest real
 version first). Build only after Paul greenlights scope; do not ship a platitude generator.
 
+STATUS 2026-06-13: v1 SHIPPED as the just-in-time context-gap nudge on the Today stop (Oracle
+`context_gap_nudge`, migration 0180), NOT as a roster agent. Paul's call: leave it as the nudge
+and field-test it before adding any standing `moat` agent to the agents table. So the standing
+four-signal version below stays parked until the nudge proves what is worth escalating to a card.
+
 ## Voice-capture agent ("Riker"): BUILT v1 2026-06-09 (riker_capture_agent)
 
 Shipped: one-tap confirm, on Today (say the name) and the client sheet (client fixed). Writes a visit
