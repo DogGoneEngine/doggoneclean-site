@@ -2091,7 +2091,11 @@ fat-fingered. Top-right, not bottom-right, exactly because the action buttons li
 bottom and body. Tapping it gives a thorough rundown of every action on that card
 and hides again on a second tap; the daily user never reads it, it is there for
 the control someone has not used yet, has forgotten, or a new teammate is
-learning. Tap-based so it works on a phone, never a hover-only title. A grid of
+learning. The help text is OUTCOME-first and unmistakable (apply the outcomes
+rule to help itself): each line leads with the result you get in plain words
+("the card goes away and you never hear about this one again"), not the mechanism
+("marks it resolved"), and confusable pairs are written so the difference is
+obvious (Leave it alone = gone for good; Dismiss = gone for now, can return). Tap-based so it works on a phone, never a hover-only title. A grid of
 identical tiles (photo thumbnails, library items) is the one exception: it gets a
 single legend at the top of the grid instead of an "i" on every tile. Built as one
 reusable component (HelpToggle, corner mode). Because a terse button is fast for
