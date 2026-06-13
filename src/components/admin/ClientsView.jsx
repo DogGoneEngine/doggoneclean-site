@@ -1041,9 +1041,27 @@ function DogStatusChip({ status }) {
   );
 }
 
+// Age from a birth_date (date-only string), matching the portal's format: under
+// a year reads in months, otherwise years, with a ~ when the date is estimated.
+function ageFromBirthDate(dateStr, approximate) {
+  if (!dateStr) return '';
+  const b = new Date(dateStr + 'T12:00:00');
+  if (Number.isNaN(b.getTime())) return '';
+  const now = new Date();
+  let years = now.getFullYear() - b.getFullYear();
+  const m = now.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) years--;
+  if (years < 1) {
+    const months = Math.max(0, years * 12 + m);
+    return `${approximate ? '~' : ''}${months} mo`;
+  }
+  return `${approximate ? '~' : ''}${years} yr`;
+}
+
 function DogCard({ dog, onChanged }) {
   const isPast = ['former', 'deceased', 'moved'].includes(dog.roster_status);
-  const meta = [dog.breed, dog.price_cents != null ? money(dog.price_cents) : null].filter(Boolean).join(' · ');
+  const age = dog.roster_status === 'deceased' ? '' : ageFromBirthDate(dog.birth_date, dog.dob_approximate);
+  const meta = [dog.breed, age, dog.price_cents != null ? money(dog.price_cents) : null].filter(Boolean).join(' · ');
   return (
     <div className={`ad-dogcard${isPast ? ' ad-dogcard--past' : ''}`}>
       <div className="ad-dogcard__head">
