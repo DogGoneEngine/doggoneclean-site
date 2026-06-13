@@ -86,6 +86,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class="trk-collages" id="trk-collages" hidden></div>
           <div class="trk-photos__grid" id="trk-photos-grid"></div>
         </div>
+
+        <!-- What to expect: discreet, never hidden, so a recipient knows the
+             link is not forever. It retires a week after the visit (the
+             tracker_status 7-day window), and their photos and history live
+             on in the portal. -->
+        <p class="trk-avail">This live tracker stays up through your visit and for about a week after. Your photos and visit history live on in your portal.</p>
       </div>
 
       <div class="trk-card trk-card--missing" id="trk-missing" hidden>
@@ -352,6 +358,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: var(--text-sm);
   }
   .trk-card--missing { text-align: center; color: var(--soft); }
+
+  /* What to expect: present on every live tracker, but quiet. A hairline
+     divider sets it apart without competing with the status steps. */
+  .trk-avail {
+    margin: var(--space-lg) 0 0;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--line);
+    color: var(--soft);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    text-align: center;
+  }
 
   .trk-request {
     margin: var(--space-lg) auto 0;
