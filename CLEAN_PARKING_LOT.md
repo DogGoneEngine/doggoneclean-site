@@ -944,3 +944,22 @@ Do NOT build the machinery before there is a real person to grant to. The Access
 for both seeing and granting. Note for whoever builds it: also fold tab-level / within-floor
 visibility (like "operator sees only the Team tab of the Library") into the Access map so the map
 stays honest about finer-grained access, not just whole floors.
+
+## Special-request cleanup: tidy vs verbatim (parked 2026-06-13, blocked on edge deploy)
+
+The special-request box on the Today stop card (the "you asked for" line on the tracker) should
+let Paul dictate a stream-of-consciousness ramble and have it read intelligently on the client
+tracker. Design agreed with Paul:
+- A toggle on the box: "Their words" (verbatim, shown in quotes on the tracker, untouched) vs
+  "Tidy it up" (default, rough/dictated notes rewritten into one clean, warm, client-facing
+  line that adds nothing not said).
+- Dictation needs nothing special: the phone keyboard mic types into the field already.
+- GUARD (non-negotiable, client-facing): the tidied text shows back to Paul to approve or tweak
+  before it goes live, so the AI can never put words in a client's mouth. Dictate -> Tidy ->
+  approve -> live.
+Blocker: the AI tidy must run server-side (an edge function calling Claude, like Riker / the
+department-head agents; the key cannot be in the browser), and edge-function deploys are gated
+in the remote tool flow (same wall as the tracker-photos redeploy). Build the capture + the
+toggle + the approve step anytime; wire the AI tidy when an edge function can deploy (Paul can
+deploy it from the Supabase dashboard, or extend the existing riker function). Until then Paul
+types the request carefully himself; "Their words" works with no AI.
