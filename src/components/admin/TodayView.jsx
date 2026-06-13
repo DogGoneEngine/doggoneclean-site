@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, uploadTaskProof, signedPhotoUrl } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, uploadTaskProof, signedPhotoUrl } from './supabase.js';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
@@ -79,6 +79,18 @@ export default function TodayView({ onOpenClient }) {
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [me, setMe] = useState(null);
+  const [team, setTeam] = useState([]);
+
+  // Who is looking, and who they can hand a card to. Only the owner delegates
+  // and only the owner needs the team list.
+  useEffect(() => {
+    adminSelf().then((a) => {
+      setMe(a);
+      if (a?.role === 'owner') listTeam().then((t) => setTeam(t || [])).catch(() => {});
+    }).catch(() => {});
+  }, []);
+  const isOwner = me?.role === 'owner';
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -182,7 +194,7 @@ export default function TodayView({ onOpenClient }) {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {briefings.map((b) => <BriefingCard key={b.id} b={b} onChanged={load} onError={setError} />)}
+          {briefings.map((b) => <BriefingCard key={b.id} b={b} team={team} isOwner={isOwner} onChanged={load} onError={setError} />)}
         </div>
       )}
     </>
@@ -231,16 +243,30 @@ function TasksPanel() {
     finally { setBusy(false); }
   }
 
-  async function markDone(t, file) {
+  async function markDone(t, file, actionValue = null) {
     setBusy(true); setErr(null);
     try {
       let proofPath = null;
       if (file) proofPath = await uploadTaskProof(t.id, file);
-      await completeTask(t.id, proofPath);
+      await completeTask(t.id, proofPath, actionValue);
       load();
     } catch (e) {
-      setErr(e.message === 'proof_required' ? 'This one needs a photo receipt: snap the finished work, then tap Done with photo.' : (e.message || 'done_failed'));
+      const msg = e.message === 'proof_required'
+        ? 'This one needs a photo receipt: snap the finished work, then tap Done with photo.'
+        : e.message === 'hours_required'
+          ? 'Enter the hours reading first, then save.'
+          : (e.message || 'done_failed');
+      setErr(msg);
     } finally { setBusy(false); }
+  }
+
+  async function clearOne(t) {
+    setErr(null);
+    try { await clearTask(t.id); load(); } catch (e) { setErr(e.message || 'clear_failed'); }
+  }
+  async function clearAllDone() {
+    setErr(null);
+    try { await clearDoneTasks(); load(); } catch (e) { setErr(e.message || 'clear_failed'); }
   }
 
   async function viewReceipt(path) {
@@ -287,30 +313,15 @@ function TasksPanel() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
           {open.map((t) => (
-            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <div style={{ flex: 1, minWidth: 180, fontSize: 14 }}>
-                {t.title}
-                <span style={{ display: 'block', fontSize: 12, opacity: 0.6 }}>
-                  {t.mine ? 'yours' : t.assignee}{t.needs_proof ? ' · photo receipt asked' : ''}
-                </span>
-              </div>
-              {(t.mine || isOwner) && (t.needs_proof ? (
-                <label className="ad-btn ad-btn--sm" style={{ cursor: 'pointer' }}>
-                  {busy ? '…' : 'Done with photo'}
-                  <input type="file" accept="image/*" capture="environment" disabled={busy} style={{ display: 'none' }}
-                    onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) markDone(t, f); }} />
-                </label>
-              ) : (
-                <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => markDone(t, null)}>Done</button>
-              ))}
-              {isOwner && (
-                <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy}
-                  onClick={async () => { try { await dropTask(t.id); load(); } catch (e) { setErr(e.message); } }}>
-                  Drop
-                </button>
-              )}
-            </div>
+            <OpenTaskRow key={t.id} t={t} isOwner={isOwner} busy={busy}
+              onDone={markDone}
+              onDrop={async (task) => { try { await dropTask(task.id); load(); } catch (e) { setErr(e.message); } }} />
           ))}
+          {recentDone.length > 0 && isOwner && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={clearAllDone}>Clear finished</button>
+            </div>
+          )}
           {recentDone.map((t) => (
             <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', opacity: 0.7, fontSize: 13 }}>
               <div style={{ flex: 1, minWidth: 180 }}>
@@ -322,9 +333,61 @@ function TasksPanel() {
               {t.proof_photo_path && (
                 <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => viewReceipt(t.proof_photo_path)}>Receipt</button>
               )}
+              {isOwner && (
+                <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => clearOne(t)}>Clear</button>
+              )}
             </div>
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+// One open task row. A plain task gets Done (or Done-with-photo when a receipt
+// was asked). A task that carries an equipment_hours action gets a number box so
+// the assignee enters the reading from their own task (the only way an operator
+// writes hours), which lands the value and closes the source card. Overdue and
+// from-a-card are surfaced so a delegated card cannot quietly rot.
+function OpenTaskRow({ t, isOwner, busy, onDone, onDrop }) {
+  const [hours, setHours] = useState('');
+  const isHours = t.action && t.action.type === 'equipment_hours';
+  const canDo = t.mine || isOwner;
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+      borderLeft: t.overdue ? '3px solid var(--ad-warn, #b9770a)' : '3px solid transparent',
+      paddingLeft: 8,
+    }}>
+      <div style={{ flex: 1, minWidth: 180, fontSize: 14 }}>
+        {t.title}
+        <span style={{ display: 'block', fontSize: 12, opacity: 0.6 }}>
+          {t.overdue && <strong style={{ color: 'var(--ad-warn, #b9770a)' }}>Overdue · </strong>}
+          {t.mine ? 'yours' : `waiting on ${t.assignee}`}
+          {t.from_card ? ' · from a card' : ''}
+          {t.needs_proof ? ' · photo receipt asked' : ''}
+        </span>
+      </div>
+      {canDo && isHours ? (
+        <>
+          <input type="number" inputMode="decimal" min="0" value={hours} disabled={busy}
+            onChange={(e) => setHours(e.target.value)} placeholder="Panel hours"
+            style={{ width: 110, fontSize: 13, padding: '6px 9px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
+          <button className="ad-btn ad-btn--sm" disabled={busy || !hours.trim()} onClick={() => onDone(t, null, hours.trim())}>
+            {busy ? '…' : 'Save hours'}
+          </button>
+        </>
+      ) : canDo && (t.needs_proof ? (
+        <label className="ad-btn ad-btn--sm" style={{ cursor: 'pointer' }}>
+          {busy ? '…' : 'Done with photo'}
+          <input type="file" accept="image/*" capture="environment" disabled={busy} style={{ display: 'none' }}
+            onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) onDone(t, f); }} />
+        </label>
+      ) : (
+        <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => onDone(t, null)}>Done</button>
+      ))}
+      {isOwner && (
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => onDrop(t)}>Drop</button>
       )}
     </div>
   );
@@ -667,12 +730,14 @@ function TimeCell({ label, value, busy, onStampNow, onSet, onClear }) {
   );
 }
 
-function BriefingCard({ b, onChanged, onError }) {
+function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
   const sev = SEV[b.severity] || SEV.info;
   const ev = b.evidence || {};
   const notes = b.notes || [];
   const [reply, setReply] = useState('');
   const [busy, setBusy] = useState(false);
+  const [delegating, setDelegating] = useState(false);
+  const [delegateTo, setDelegateTo] = useState('');
 
   // An hours-ask card carries its own number box. A free-text reply is just a
   // recorded note (the 641-hours-into-the-void lesson, 2026-06-09): the data
@@ -688,6 +753,11 @@ function BriefingCard({ b, onChanged, onError }) {
   const doReply = () => reply.trim() && run(() => replyBriefing(b.id, reply.trim()));
   const doIntentional = () => run(() => resolveBriefing(b.id, 'intentional', reply.trim() || null));
   const doDismiss = () => run(() => resolveBriefing(b.id, 'dismissed', reply.trim() || null));
+  // Hand the card to whoever works for Clean as a task. It leaves the feed and
+  // resolves itself when they finish it; an hours-ask card carries its hours
+  // entry along so the assignee fills it from their own task.
+  const doDelegate = () => delegateTo && run(async () => { await delegateBriefing(b.id, delegateTo); });
+  const canDelegate = isOwner && team.length > 0;
   const doSaveHours = () => {
     const n = Number(hoursVal);
     if (!hoursVal.trim() || Number.isNaN(n) || n < 0) { onError('Enter the hours as a number.'); return; }
@@ -757,10 +827,25 @@ function BriefingCard({ b, onChanged, onError }) {
       <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
         <button className="ad-btn ad-btn--sm" onClick={doReply} disabled={busy || !reply.trim()}>Reply</button>
         {b.recommended_action && <button className="ad-btn ad-btn--sm" onClick={() => run(() => setBriefingStatus(b.id, 'approved'))} disabled={busy}>Approve</button>}
+        {canDelegate && !delegating && (
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setDelegating(true)} disabled={busy}>Hand to…</button>
+        )}
         <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doIntentional} disabled={busy} title="This is on purpose; stop flagging it">This is intentional</button>
         <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doDismiss} disabled={busy}>Dismiss</button>
         {b.status === 'new' && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => run(() => setBriefingStatus(b.id, 'read'))} disabled={busy}>Mark read</button>}
       </div>
+      {canDelegate && delegating && (
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
+          <select value={delegateTo} onChange={(e) => setDelegateTo(e.target.value)}
+            style={{ fontSize: 13, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }}>
+            <option value="">Hand it to…</option>
+            {team.map((m) => <option key={m.id} value={m.id}>{m.first_name}{m.last_name ? ` ${m.last_name}` : ''}</option>)}
+          </select>
+          <button className="ad-btn ad-btn--sm" disabled={busy || !delegateTo} onClick={doDelegate}>{busy ? '…' : 'Hand off'}</button>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => { setDelegating(false); setDelegateTo(''); }}>Cancel</button>
+          <span style={{ fontSize: 11, opacity: 0.55 }}>Becomes their task; this card resolves when they finish it.</span>
+        </div>
+      )}
     </div>
   );
 }

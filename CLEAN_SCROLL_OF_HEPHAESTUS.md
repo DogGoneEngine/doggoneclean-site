@@ -3272,3 +3272,29 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   what it is worth. No new grant was needed: admin_prospectus already gates on
   `_is_admin()`, which an active viewer passes, so this was a navigation change, not a
   security change.
+
+### Batch eighteen: delegation closes the loop (Jun 13; migration 0168)
+
+- **Delegate an agent card to anyone who works for Clean** (`delegation_closes_the_loop`):
+  the owner taps "Hand to" on any briefing card on Today, picks a worker, and the card
+  becomes that person's task. The card flips to a new `delegated` status and leaves the
+  active feed but stays visible as an in-flight task in the panel; completing the task
+  resolves the source card with a "Done by <name>" note. Built so a handoff can never be
+  a new void: an in-flight task stays visible, stamps a receipt when done, flags overdue
+  and resurfaces if open past three days, and the watcher agent re-raises the underlying
+  condition on its own (the hours scan dedupes only on status new/read, so a delegated
+  card no longer suppresses a fresh one). Verified end to end against dgc-prod by
+  impersonating Paul then Jake through the real RPCs: card delegated, hours written
+  (641 -> test value), card resolved, both notes posted; test rows cleaned up after.
+- **Carry the action**: a delegated "Update hours" card carries the equipment, so the
+  assignee enters the panel reading from their own task (OpenTaskRow hours box). The
+  number lands and the card closes. An operator writes equipment hours ONLY through a
+  task handed to them: direct admin_set_equipment_hours_by_name was tightened to
+  owner-only (Paul's explicit scoping decision). The 641-into-the-void rule holds with
+  one person removed.
+- **The broom**: the owner clears finished tasks off the board (Clear on a done task, or
+  Clear finished for all), status -> `cleared` not deleted so the audit trail survives.
+- **Schema**: tasks gained `briefing_id`, `action` jsonb, and a `cleared` status;
+  briefings gained a `delegated` status. admin_list_tasks now returns `from_card`,
+  `action`, and an `overdue` flag. Advisors clean: the new functions match the existing
+  security-definer-gated pattern, none introduced a mutable search_path.

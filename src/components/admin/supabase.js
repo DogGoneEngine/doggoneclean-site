@@ -518,11 +518,23 @@ export async function listTasks() {
 export async function addTask(title, assigneeId, details = null, needsProof = false) {
   return rpc('admin_add_task', { p_title: title, p_assignee: assigneeId, p_details: details, p_needs_proof: needsProof });
 }
-export async function completeTask(id, proofPath = null) {
-  return rpc('admin_complete_task', { p_id: id, p_proof_path: proofPath });
+export async function completeTask(id, proofPath = null, actionValue = null) {
+  return rpc('admin_complete_task', { p_id: id, p_proof_path: proofPath, p_action_value: actionValue });
 }
 export async function dropTask(id) {
   return rpc('admin_drop_task', { p_id: id });
+}
+// Owner sweeps finished work off the board (one task, or every done task).
+export async function clearTask(id) {
+  return rpc('admin_clear_task', { p_id: id });
+}
+export async function clearDoneTasks() {
+  return rpc('admin_clear_done_tasks');
+}
+// Hand an agent card to a worker as a task (owner only). The task links back to
+// the card; the card leaves the active feed and resolves when the task is done.
+export async function delegateBriefing(briefingId, assigneeId, needsProof = false) {
+  return rpc('admin_delegate_briefing', { p_briefing_id: briefingId, p_assignee: assigneeId, p_needs_proof: needsProof });
 }
 export async function uploadTaskProof(taskId, file) {
   const f = await compressForUpload(file);
