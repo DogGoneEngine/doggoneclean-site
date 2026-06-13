@@ -569,6 +569,12 @@ export async function resolveBriefing(id, disposition, note = null) {
   return rpc('admin_resolve_briefing', { p_briefing_id: id, p_disposition: disposition, p_note: note });
 }
 
+// Undo a card answer: reopen the briefing to 'read', clear its disposition, and
+// drop the task if it was handed off (only while that task is still open).
+export async function reopenBriefing(id) {
+  return rpc('admin_reopen_briefing', { p_id: id });
+}
+
 // Wisdom / knowledge capture --------------------------------------------------
 
 export async function captureWisdom(body, clientId = null) {

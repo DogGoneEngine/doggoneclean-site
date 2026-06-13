@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, uploadTaskProof, signedPhotoUrl } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, uploadTaskProof, signedPhotoUrl } from './supabase.js';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
@@ -738,6 +738,10 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
   const [busy, setBusy] = useState(false);
   const [delegating, setDelegating] = useState(false);
   const [delegateTo, setDelegateTo] = useState('');
+  // After an answer the card collapses to a one-line outcome that stays put with
+  // an Undo, instead of vanishing, so a fat-fingered tap is always reversible
+  // until the next refresh (cards_resolve_or_stay).
+  const [outcome, setOutcome] = useState(null);
 
   // An hours-ask card carries its own number box. A free-text reply is just a
   // recorded note (the 641-hours-into-the-void lesson, 2026-06-09): the data
@@ -745,27 +749,57 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
   const hoursAsk = /^Update hours: (.+)$/.exec(b.title || '');
   const [hoursVal, setHoursVal] = useState('');
 
-  async function run(fn) {
+  // act runs an answer. When it resolves the card it sets a local outcome stub
+  // (the card stays, showing Undo) instead of reloading the feed; a plain note
+  // keeps the card open and just refreshes the thread.
+  async function act(fn, outcomeLabel, undoable) {
     setBusy(true);
-    try { await fn(); onChanged(); }
-    catch (e) { onError(e.message || 'action_failed'); setBusy(false); }
+    try {
+      await fn();
+      if (outcomeLabel) setOutcome({ label: outcomeLabel, undoable: !!undoable });
+      else onChanged();
+    } catch (e) { onError(e.message || 'action_failed'); }
+    finally { setBusy(false); }
   }
-  const doReply = () => reply.trim() && run(() => replyBriefing(b.id, reply.trim()));
-  const doIntentional = () => run(() => resolveBriefing(b.id, 'intentional', reply.trim() || null));
-  const doDismiss = () => run(() => resolveBriefing(b.id, 'dismissed', reply.trim() || null));
+
+  const teamName = (id) => { const m = team.find((x) => x.id === id); return m ? `${m.first_name}${m.last_name ? ` ${m.last_name}` : ''}` : 'a teammate'; };
+  const doHandle = () => act(() => resolveBriefing(b.id, 'done', reply.trim() || null), 'Handled', true);
+  const doLeaveAlone = () => act(() => resolveBriefing(b.id, 'intentional', reply.trim() || null), 'Left alone, the agent will stop flagging it', true);
+  const doDismiss = () => act(() => resolveBriefing(b.id, 'dismissed', reply.trim() || null), 'Dismissed', true);
+  const doNote = () => reply.trim() && act(async () => { await replyBriefing(b.id, reply.trim()); setReply(''); }, null, false);
   // Hand the card to whoever works for Clean as a task. It leaves the feed and
   // resolves itself when they finish it; an hours-ask card carries its hours
   // entry along so the assignee fills it from their own task.
-  const doDelegate = () => delegateTo && run(async () => { await delegateBriefing(b.id, delegateTo); });
+  const doDelegate = () => delegateTo && act(() => delegateBriefing(b.id, delegateTo), `Handed to ${teamName(delegateTo)}`, true);
   const canDelegate = isOwner && team.length > 0;
   const doSaveHours = () => {
     const n = Number(hoursVal);
     if (!hoursVal.trim() || Number.isNaN(n) || n < 0) { onError('Enter the hours as a number.'); return; }
-    run(async () => {
+    act(async () => {
       await setEquipmentHoursByName(hoursAsk[1], n);
       await setBriefingStatus(b.id, 'resolved');
-    });
+    }, 'Hours saved', false);
   };
+  async function doUndo() {
+    setBusy(true);
+    try { await reopenBriefing(b.id); setOutcome(null); onChanged(); }
+    catch (e) { onError(e.message === 'already_done' ? 'Too late to undo: the task was already finished.' : (e.message || 'undo_failed')); }
+    finally { setBusy(false); }
+  }
+
+  if (outcome) {
+    return (
+      <div className="ad-panel" style={{ borderLeft: `4px solid ${sev.color}`, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <span style={{ flex: 1, minWidth: 180, fontSize: 14 }}>
+          <span style={{ color: 'var(--ad-good, #1f8a4b)', fontWeight: 700 }}>Done · </span>
+          <span style={{ opacity: 0.8 }}>{b.title}</span>
+          <span style={{ display: 'block', fontSize: 12, opacity: 0.6 }}>{outcome.label}</span>
+        </span>
+        {outcome.undoable && <button className="ad-btn ad-btn--sm" disabled={busy} onClick={doUndo}>{busy ? '…' : 'Undo'}</button>}
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={onChanged}>Hide</button>
+      </div>
+    );
+  }
 
   return (
     <div className="ad-panel" style={{ borderLeft: `4px solid ${sev.color}` }}>
@@ -817,22 +851,25 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
         </div>
       )}
 
-      {/* reply box */}
+      {/* An optional note rides along with whichever answer you pick. It is not
+          an answer by itself: a note alone keeps the card open on purpose. */}
       <textarea
         value={reply} onChange={(e) => setReply(e.target.value)} disabled={busy}
-        placeholder="Tell the agent what's up (e.g. she's on a fixed income, leave her price alone)…"
+        placeholder="Optional: tell the agent why (rides along with your answer, e.g. she's on a fixed income)"
         rows={2}
         style={{ width: '100%', marginTop: 8, fontSize: 13, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }}
       />
+      {/* The four answers. Every one clears the card; nothing else does. */}
       <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-        <button className="ad-btn ad-btn--sm" onClick={doReply} disabled={busy || !reply.trim()}>Reply</button>
-        {b.recommended_action && <button className="ad-btn ad-btn--sm" onClick={() => run(() => setBriefingStatus(b.id, 'approved'))} disabled={busy}>Approve</button>}
+        {!hoursAsk && <button className="ad-btn ad-btn--sm" onClick={doHandle} disabled={busy} title="I am taking care of this">Handle it</button>}
         {canDelegate && !delegating && (
-          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setDelegating(true)} disabled={busy}>Hand to…</button>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setDelegating(true)} disabled={busy} title="Give it to someone as a task">Hand off</button>
         )}
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doIntentional} disabled={busy} title="This is on purpose; stop flagging it">This is intentional</button>
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doDismiss} disabled={busy}>Dismiss</button>
-        {b.status === 'new' && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => run(() => setBriefingStatus(b.id, 'read'))} disabled={busy}>Mark read</button>}
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doLeaveAlone} disabled={busy} title="On purpose; stop flagging it for good">Leave it alone</button>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doDismiss} disabled={busy} title="Clear it; the agent can raise it again if it still matters">Dismiss</button>
+        {reply.trim() && (
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doNote} disabled={busy} title="Record a note and keep the card open">Just leave a note</button>
+        )}
       </div>
       {canDelegate && delegating && (
         <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
