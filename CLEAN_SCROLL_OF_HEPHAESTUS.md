@@ -3574,3 +3574,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Oracle `context_gap_nudge`. Paul's scope answers: pops up before a visit; experiential plus
   basics; highest-frequency clients surface most because he sees them most. The standing
   four-signal Moat agent stays parked in CLEAN_PARKING_LOT.md as v2.
+
+- **Partial-dog booking priced wrong (Jun 13)**: Paul booked Tonya Hunt for just Koa; the Today
+  stop showed $450 (all four dogs) instead of $100. Cause: `admin_book_appointment` set dog_count
+  from the picked dogs but priced amount_cents off the subscription base (whole book). Fix
+  (migration 0181): price the sum of the selected dogs' `price_cents`, base only when no dogs are
+  named. Oracle `price_by_dogs_going`. Corrected the live appointment to $100. Applied via
+  execute_sql.
+
+- **Open-times slot label flagged (Jun 13, diagnosed, not yet fixed)**: Paul noted every slot in a
+  day shows the same "X min before/after <neighbor>" regardless of slot time. Ground truth: that
+  number is the geographic DRIVE time between the two client homes (suggest-drive edge function,
+  Distance Matrix), which is correctly constant per neighbor; the wording is the problem because
+  it reads like a schedule gap. What actually varies and matters for routing is the idle/slack a
+  slot creates. Fix lives in the gated suggest-drive edge function; brought to Paul to choose the
+  label (honest "X min drive from <neighbor>" vs showing the varying slack) before changing it.

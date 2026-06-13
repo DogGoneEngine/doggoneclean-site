@@ -74,6 +74,7 @@ even DGN has many rules sitting in only one or two layers.
 | context_gap_nudge | Moat | Oracle; `_client_context_gaps` RPC + `context_gaps` on `admin_today_appointments`; `TodayView` stop nudge, tap opens the contact sheet; self-clears live | the standing four-signal Moat agent (parked) |
 | specialist_assigned_per_route | Scheduling | Oracle | `routes.operator_id`; booking step 1 polygon-check response includes `route_operator` (name + photo URL); portal "your specialist" section reads the same join |
 | cancellation_24h | Money | Oracle | booking engine; site copy |
+| price_by_dogs_going | Money | Oracle; `admin_book_appointment` sums selected dogs' `price_cents`, base only when none named | booking panel dog picker |
 | favor_high_hourly_work | Money | Oracle; convention | `business_rules` row |
 | accepted_payment_methods | Money | Oracle; convention | site copy; lint pattern |
 | house_shampoo | Service | Oracle; hurricane-bath page "The shampoo" section (house shampoo hyped unnamed + bring-your-own at no extra charge); brand private in the Field Manual | non-guarantee wording in intake/terms |

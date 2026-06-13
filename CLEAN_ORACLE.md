@@ -972,6 +972,16 @@ money creates refund liability that erodes trust, and post-collecting after a
 no-show kills the route's working-capital model; the 24-hour mark is the
 operator's commitment point and matches it with the client's.
 
+`price_by_dogs_going` (money):
+An appointment booked for a specific subset of a client's dogs is priced as the sum of those
+dogs' per-dog price (`public.dogs.price_cents`), not the client's whole-book base. In
+`admin_book_appointment`, when dogs are named (`p_dog_ids`) the amount is the sum of those dogs'
+prices; only when no dogs are named does it fall back to the subscription base (the all-dogs
+price). Because Paul books partial visits all the time (one of several dogs that day), and the
+charge has to follow who is actually serviced. The bug that set this rule (2026-06-13): Tonya
+Hunt booked for Koa alone showed $450 (all four dogs) on the Today stop instead of $100, because
+the booking set dog_count from the picked dogs but priced off the subscription base.
+
 `card_expiry_60_30_7` (money):
 The portal surfaces card-expiry banners at 60, 30, and 7 days before the card
 on file expires, escalating in tone (informational, urgent, blocking-soon).
