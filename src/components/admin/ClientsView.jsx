@@ -1041,21 +1041,23 @@ function DogStatusChip({ status }) {
   );
 }
 
-// Age from a birth_date (date-only string), matching the portal's format: under
-// a year reads in months, otherwise years, with a ~ when the date is estimated.
+// Age from a birth_date (date-only string): years and months, e.g. "7 yr 9 mo"
+// (just months under a year, just years on an exact birthday), with a ~ when the
+// date is estimated.
 function ageFromBirthDate(dateStr, approximate) {
   if (!dateStr) return '';
   const b = new Date(dateStr + 'T12:00:00');
   if (Number.isNaN(b.getTime())) return '';
   const now = new Date();
   let years = now.getFullYear() - b.getFullYear();
-  const m = now.getMonth() - b.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) years--;
-  if (years < 1) {
-    const months = Math.max(0, years * 12 + m);
-    return `${approximate ? '~' : ''}${months} mo`;
-  }
-  return `${approximate ? '~' : ''}${years} yr`;
+  let months = now.getMonth() - b.getMonth();
+  if (now.getDate() < b.getDate()) months--;
+  if (months < 0) { years--; months += 12; }
+  if (years < 0) return '';
+  const tilde = approximate ? '~' : '';
+  if (years < 1) return `${tilde}${months} mo`;
+  if (months === 0) return `${tilde}${years} yr`;
+  return `${tilde}${years} yr ${months} mo`;
 }
 
 function DogCard({ dog, onChanged }) {
