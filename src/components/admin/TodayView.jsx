@@ -761,6 +761,28 @@ function StopCard({ appt, onOpenClient }) {
             ))}
           </div>
         )}
+
+        {/* Moat nudge: while you are at this client, capture the knowledge only
+            you have. Computed live from the record, so it clears itself once the
+            field is filled. Tap opens the contact sheet to fill it. */}
+        {clickable && (appt.context_gaps || []).length > 0 && (
+          <button
+            type="button"
+            onClick={() => onOpenClient?.(appt.client_id)}
+            style={{
+              textAlign: 'left', cursor: 'pointer', width: '100%',
+              border: '1px solid var(--ad-outline, #d8d8de)', borderRadius: 10,
+              background: 'var(--ad-primary-container, #e8eefc)', color: 'var(--ad-text, #1b1b1f)',
+              padding: '8px 10px',
+            }}
+            title="Open the contact sheet to fill this in"
+          >
+            <strong style={{ display: 'block', fontSize: 12.5 }}>While you are here, capture what only you know</strong>
+            <span style={{ display: 'block', fontSize: 12, opacity: 0.8, marginTop: 1, lineHeight: 1.45 }}>
+              Still missing for {appt.client || 'this client'}: {appt.context_gaps.join(', ')}. Tap to add it.
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1499,6 +1499,22 @@ and <dog>" no matter who runs the appointment (Paul, 2026-06-13). The portrait n
 command (`who_is_coming_is_pilot`); the individual photos name their real photographer; the two
 are deliberately different people-facts and must not be collapsed.
 
+`context_gap_nudge` (moat):
+The day Paul is scheduled to see a client, the Today stop surfaces the moat-knowledge that
+client's record is still missing, one tap to open the contact sheet and fill it. It self-clears:
+the gaps are computed live from the record (`_client_context_gaps`), so the moment a field is
+filled the nudge is gone, with no state to manage. v1 flags experiential knowledge (how to handle
+the dog: no standing_instructions or notes on any active dog; gate or entry notes: no
+access_notes/access) and the basics (dog breed; visit rhythm: no cadence_days). It appears on the
+stop where Paul already works, so the prompt lands at the one moment he can actually capture the
+answer. Because Paul's 20 years of per-client knowledge lives in his head, and moving it into the
+records is at once the deepest moat a competitor or an AI cannot prompt past (`dig_the_moat`), the
+thing that lets the business run without Paul, and what a buyer would need (`clean_stays_saleable`);
+all three prime-directive tests point at the same task. This is the just-in-time v1 of the broader
+Moat agent (parked: the standing, four-signal version). Scope set with Paul 2026-06-13: pops up
+before a visit, experiential plus basics, highest-frequency clients surface most because he sees
+them most.
+
 `no_dgn_import` (copy):
 Never import DGN's nail vocabulary or bans into Clean. Because the two businesses describe
 themselves in opposite terms and merged vocabulary mis-describes the work.
