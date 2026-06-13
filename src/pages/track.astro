@@ -765,8 +765,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
   // The operator still calls these "Extra"; the client-facing tracker calls them "Moments".
   const PHOTO_LABELS: Record<string, string> = { before: 'Before', after: 'After', with_dog: `With ${OPERATOR_FIRST}`, extra: 'Moments' };
-  function photoLabel(p: { kind: string; dog_name?: string | null }) {
-    if (p.kind === 'with_dog') return p.dog_name ? `${OPERATOR_FIRST} and ${p.dog_name}` : `With ${OPERATOR_FIRST}`;
+  function photoLabel(p: { kind: string; dog_name?: string | null; by?: string | null }) {
+    // Each photo names whoever actually took it (the logged-in person), not the
+    // pilot in command. Jake's shot reads "Jake", Paul's reads "Paul". Falls
+    // back to the named operator when the photographer is not recorded.
+    const by = p.by || OPERATOR_FIRST;
+    if (p.kind === 'with_dog') return p.dog_name ? `${by} and ${p.dog_name}` : `With ${by}`;
     const base = PHOTO_LABELS[p.kind] || 'Photo';
     return p.dog_name ? `${base}, ${p.dog_name}` : base;
   }
@@ -925,20 +929,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       });
       if (!r.ok) return;
       const data = await r.json();
-      // Returning clients see Paul with THEIR dog on the who's-coming card,
-      // from their own shared visit history; new clients keep the cover.
-      // The header face follows the assigned operator's profile photo.
+      // Who's coming is the pilot in command: both the header face and the big
+      // portrait use that one operator's own profile photo, so the face always
+      // matches the name. No scraped recent visit photo (it could be anyone who
+      // worked the visit, e.g. a trainee), which is what put the wrong face on
+      // the card before.
       const opPhoto = data && data.operator_photo;
       if (opPhoto) {
         const whoImg = document.getElementById('trk-who-img') as HTMLImageElement | null;
         if (whoImg && whoImg.src !== opPhoto) whoImg.src = opPhoto;
-      }
-      const who = data && data.who_is_coming;
-      if (who && who.url) {
         const meetImg = document.getElementById('trk-meet-img') as HTMLImageElement | null;
-        if (meetImg && meetImg.src !== who.url) {
-          meetImg.src = who.url;
-          meetImg.alt = who.dog_name ? `Paul with ${who.dog_name}` : 'Paul with your dog';
+        if (meetImg && meetImg.src !== opPhoto) {
+          meetImg.src = opPhoto;
+          meetImg.alt = OPERATOR_FIRST + ', your Hurricane Bath operator';
         }
       }
       const photos = (data && data.photos) || [];

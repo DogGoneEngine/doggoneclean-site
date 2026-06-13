@@ -1477,6 +1477,28 @@ what makes the service different; Paul chose it on sound ("Owner and Hurricane B
 sounds better"). Pairs with `specialist_named_not_promised`: the title scales to every future
 hire without re-writing the promise.
 
+`who_is_coming_is_pilot` (tracker):
+The Dog Gone Tracker's "who's coming to your door" card shows the pilot in command of the
+appointment (the operator on record): that one person, named, with their own profile photo
+(admins.photo_path), and the name follows the assigned operator instead of a hardcoded string.
+The portrait is NEVER a scraped most-recent visit photo. Because the card makes exactly one
+promise (this specific person is rolling up to your driveway), and a face that does not match
+the name breaks it. The bug this rule closes: on a training visit Jake shot the after photo of
+Manning while Paul was the operator on record, the old card grabbed that newest with-dog photo,
+and a client saw Jake's face under Paul's name (Paul, 2026-06-13). Pairs with
+`specialist_named_not_promised` (who is coming, named and shown) and
+`photo_attributed_to_logged_in_admin` (who took each photo).
+
+`photo_attributed_to_logged_in_admin` (operator):
+Every visit photo records who took it: visit_photos.taken_by_admin_id is stamped by
+admin_add_visit_photo from the logged-in admin (auth.uid()), not the pilot in command. The
+client tracker labels each shot by that photographer ("Jake and Manning"), falling back to the
+named operator only when the photographer is unrecorded. Because on a shared training visit Paul
+and Jake both log photos under their own logins, and a shot Jake took of a dog is honestly "Jake
+and <dog>" no matter who runs the appointment (Paul, 2026-06-13). The portrait names the pilot in
+command (`who_is_coming_is_pilot`); the individual photos name their real photographer; the two
+are deliberately different people-facts and must not be collapsed.
+
 `no_dgn_import` (copy):
 Never import DGN's nail vocabulary or bans into Clean. Because the two businesses describe
 themselves in opposite terms and merged vocabulary mis-describes the work.
