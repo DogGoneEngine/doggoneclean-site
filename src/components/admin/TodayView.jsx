@@ -335,8 +335,9 @@ function TasksPanel() {
         ['Assign a task', 'The job lands on a teammate\'s day, not just yours. You can require a photo when they finish.'],
         ['Done', 'The job is finished and drops to the bottom. If a photo was required, you add it here to close it.'],
         ['Save hours', 'On an hours task: type the panel reading. The equipment\'s hours update and this closes.'],
-        ['Drop', 'The job disappears. For something nobody needs to do after all.'],
-        ['Clear / Clear finished', 'Finished jobs leave the board so it stays clean. Nothing is deleted, just tidied away.'],
+        ['Drop', 'Cancels a job that was never done, when it turns out nobody needs to do it. It disappears.'],
+        ['Clear', 'On a finished job: tucks that one off the board. The work already happened; this just tidies the list.'],
+        ['Clear finished', 'Tucks every finished job off the board at once. One tap to tidy up. Nothing is deleted.'],
         ['Receipt', 'Opens the photo a teammate left as proof the job got done.'],
       ]} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, paddingRight: 24 }}>
