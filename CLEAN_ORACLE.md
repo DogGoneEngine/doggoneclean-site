@@ -2083,6 +2083,18 @@ complexity, but scattering future grants through the code instead of one visible
 page is how access quietly drifts; name the home now, build the machinery when a
 real grant arrives. Paul asked where this belongs, 2026-06-13.
 
+`help_on_demand` (Clean: engineering):
+Buttons stay terse, and any control whose meaning is not obvious carries a small
+"i" info button beside it (the HelpToggle component) that, on tap, reveals a short
+legend of what each nearby control does and hides again on a second tap. The daily
+user never reads it; it is there for the control someone has not used yet, has
+forgotten, or a new teammate is learning. Tap-based so it works on a phone, never
+a hover-only title. Because a terse button is fast for the expert and opaque for
+everyone else, and the business has to run without Paul: a new hire should be able
+to learn a screen by tapping, not by asking. Roll it out wherever a button's job
+is not self-evident. First home: the Library status buttons (Shelf, Drop). Paul,
+2026-06-13.
+
 `stop_closes_the_loop` (Clean: clients):
 When a client taps the portal stop sign, three things happen in one
 transaction: every future appointment is cancelled including pencilled

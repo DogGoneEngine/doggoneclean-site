@@ -3443,3 +3443,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   keys its effect on a stable id-string (not the array reference), and LibraryView waits for the
   role before rendering any tab. Lesson: never depend on an inline-built array/object in a hook
   dependency list.
+
+- **Info button pattern** (`help_on_demand`, Paul 2026-06-13): buttons stay terse but anything
+  non-obvious now carries a small tappable "i" (HelpToggle, Help.jsx) that reveals a short legend
+  and hides on a second tap. For the thing you haven't used, forgot, or a new hire is learning;
+  tap-based so it works on a phone. First home: the Library Shelf/Drop buttons. Rolls out to the
+  Today card answers and the photo chips next, then the rest of Orbit incrementally.
