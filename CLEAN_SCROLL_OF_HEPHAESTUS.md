@@ -3321,3 +3321,24 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   elderly fixed-income client, leave-alone; her reason note was already on the card), and
   reopened the fat-fingered "Clean/inspect air filter: Bathing generator" card so it is back
   on the feed and the maintenance agent stops suppressing it.
+
+### Batch twenty: the access map, read from the truth (Jun 13; migration 0170)
+
+- **One emperor-only Access page** (`access_map_reads_the_truth`): shows, per role (Emperor /
+  Employee / Stakeholder, Paul's words for owner / operator / viewer), exactly what that person
+  sees: their menu and what is hidden inside the floors they can open, plus a Preview-as that
+  walks their menu live. Built so it cannot drift. The menu half is generated from `roles.js`,
+  a new single source of truth for SECTIONS + the floor lists that AdminApp's live nav and the
+  Access page both read (no second list to keep in sync). The masking half is read live by
+  admin_access_probe (migration 0170, owner-only), which calls the real masking RPCs once as
+  the owner and once as a representative of each other role and reports the fields that
+  disappear, field names only, never client data. So the page shows what the server actually
+  strips, not a hand-written note; unknown stripped fields still show by raw name so nothing
+  hides. No security code was rewritten to make it accurate.
+- **Verified live against dgc-prod**: the probe, run as Paul, returns operator hides phone,
+  email, private notes, and thoughts on the client, plus amount-collected, tips, payment
+  method, and appointment prices on visits and stops; viewer hides nothing extra (and has
+  neither floor on its menu). That is exactly the masking the functions enforce.
+- **The answer to Paul's "how do I keep track of who sees what"**: a living map that reads the
+  rules, not a doc that drifts. Preview-as currently shows the menu (data masking is listed on
+  the page, not rendered as that role); a true data-level preview is parked.
