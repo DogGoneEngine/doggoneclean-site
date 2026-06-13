@@ -167,9 +167,10 @@ Gates: Twilio (the sends), Stripe (online tips).
 7. ~~**Personalized tracker: the heard-and-delivered loop.**~~ BUILT 2026-06-13 (migration 0171,
    `tracker_heard_and_delivered`): per-visit special_request captured on the Today stop card shows
    on /track as "You asked for ...", reads delivered when the visit wraps, and a photo tagged
-   Answer (VisitPhotos) shows beside it as proof. One step still pending: redeploy the
-   tracker-photos edge function so it returns answers_request (the spotlight); until then the
-   answer photos still appear in the visit gallery. Original idea below.
+   Answer (VisitPhotos) shows beside it as proof. Fully live: the answer-photo spotlight reads
+   answer_photo_ids from tracker_status (migration 0172), so it needs no edge-function redeploy
+   (that route was blocked by a deploy-approval gate; moving the signal into the DB function
+   routed around it). Original idea below.
 
    Make the tracker
    personal proof that the client was heard. When a client asks for something special at the door
