@@ -16,6 +16,7 @@ import {
   addInboxPhoto, listInbox, updateInboxNote, setInboxStatus, signedPhotoUrl, adminSelf,
   teamGallery, websiteReview, approvePhotoWebsite, unpublishPhotoWebsite, withdrawPhotoWebsite,
 } from './supabase.js';
+import HelpToggle from './Help.jsx';
 
 const STATUS_LABEL = { new: 'New', shelf: 'On the shelf', used: 'Used', dropped: 'Dropped' };
 const GRID = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 };
@@ -172,6 +173,15 @@ function AssetsShelf() {
       {items.length === 0 ? (
         <div className="ad-panel" style={{ opacity: 0.6 }}>Nothing in the library yet.</div>
       ) : (
+        <>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, fontSize: 12, opacity: 0.7 }}>
+          <span>Each item shows its status. Not sure about the buttons?</span>
+          <HelpToggle items={[
+            ['Shelf', 'Keep it for later. It stays in the library, marked "on the shelf".'],
+            ['Drop', 'Remove it from the library (marked dropped). It stops showing here.'],
+            ['Tap the note', 'Tap the text under any item to add or change its note.'],
+          ]} />
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
           {items.map((i) => (
             <div key={i.id} className="ad-panel" style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -208,6 +218,7 @@ function AssetsShelf() {
             </div>
           ))}
         </div>
+        </>
       )}
     </>
   );
