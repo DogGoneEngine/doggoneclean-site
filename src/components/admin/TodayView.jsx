@@ -229,11 +229,13 @@ function FromTheField() {
   }
   if (!items || items.length === 0) return null;
   return (
-    <div className="ad-panel" style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>From the field</span>
-        <HelpToggle items={[['From the field', 'Photos a teammate flagged for you on a visit, with a private note. Tap Got it to clear one.']]} />
-      </div>
+    <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
+      <HelpToggle corner items={[
+        ['From the field', 'Photos a teammate flagged privately for you on a visit, each with a note about what they noticed.'],
+        ['Got it', 'Clears a flag once you have seen it. It moves out of the way; nothing is deleted.'],
+        ['The photo', 'Tap it to open the full image.'],
+      ]} />
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8, paddingRight: 24 }}>From the field</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {items.map((i) => (
           <div key={i.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', opacity: i.seen ? 0.55 : 1 }}>
@@ -328,8 +330,16 @@ function TasksPanel() {
   }
 
   return (
-    <div className="ad-panel" style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+    <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
+      <HelpToggle corner items={[
+        ['Assign a task', 'Owner only. Give a job to a teammate; you can ask for a photo receipt when it is done.'],
+        ['Done / Done with photo', 'Mark a task finished. If a photo receipt was asked, snap the finished work to complete it.'],
+        ['Save hours', 'On an equipment-hours task, type the panel reading and save; the number lands and the source card closes.'],
+        ['Drop', 'Owner only. Remove an open task that no longer needs doing.'],
+        ['Clear / Clear finished', 'Owner only. Sweep a finished task (or all of them) off the board; kept in the record, just hidden here.'],
+        ['Receipt', 'Open the photo a teammate left as proof of finished work.'],
+      ]} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, paddingRight: 24 }}>
         <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Tasks</div>
         {isOwner && !adding && (
           <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setAdding(true)}>Assign a task</button>
@@ -878,9 +888,18 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
   }
 
   return (
-    <div className="ad-panel" style={{ borderLeft: `4px solid ${sev.color}` }}>
+    <div className="ad-panel" style={{ borderLeft: `4px solid ${sev.color}`, position: 'relative' }}>
+      <HelpToggle corner items={[
+        ['Reply box', 'Type a note to the agent. It rides along with whichever answer you pick, or use Just leave a note to record it and keep the card open.'],
+        ['Handle it', 'You are taking care of it. Clears the card.'],
+        ['Hand off', 'Give it to a teammate as a task; the card comes back resolved when they finish.'],
+        ['Leave it alone', 'It is on purpose. The agent stops flagging this for good.'],
+        ['Dismiss', 'Clear it for now; the agent may raise it again if it still matters.'],
+        ['Save hours', 'On an Update-hours card, type the panel reading and save; it records the hours and clears the card.'],
+        ['Undo', 'After you answer, the card shows an Undo for a moment so a wrong tap is reversible.'],
+      ]} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-        <strong style={{ fontSize: 16 }}>{b.title}</strong>
+        <strong style={{ fontSize: 16, paddingRight: 24 }}>{b.title}</strong>
         <span className="ad-mono" style={{ fontSize: 11, color: sev.color }}>{sev.label} · {b.agent_key.toUpperCase()}</span>
       </div>
       {b.body && <p style={{ margin: '8px 0', fontSize: 14, lineHeight: 1.5 }}>{b.body}</p>}
@@ -946,13 +965,6 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
         {reply.trim() && (
           <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doNote} disabled={busy} title="Record a note and keep the card open">Just leave a note</button>
         )}
-        <HelpToggle items={[
-          ['Handle it', 'You are taking care of it. Clears the card.'],
-          ['Hand off', 'Give it to someone as a task; it comes back done.'],
-          ['Leave it alone', 'On purpose. The agent stops flagging it for good.'],
-          ['Dismiss', 'Clear it for now; the agent may raise it again if it still matters.'],
-          ['Note', 'Type in the box, then any answer carries your note. Just leave a note keeps the card open.'],
-        ]} />
       </div>
       {canDelegate && delegating && (
         <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
