@@ -891,12 +891,12 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
   return (
     <div className="ad-panel" style={{ borderLeft: `4px solid ${sev.color}`, position: 'relative' }}>
       <HelpToggle corner items={[
-        ['Handle it', 'The card goes away. Use it when you already took care of this yourself.'],
+        ['Handled it', 'The card goes away. For when you already took care of this yourself.'],
         ['Hand off', 'It leaves your list and becomes a teammate\'s job. It comes back only once they finish it.'],
         ['Leave it alone', 'The card goes away and you never hear about this one again. For things that are fine on purpose.'],
         ['Dismiss', 'The card goes away for now, but it can come back later if it still matters. Use it for "not now".'],
         ['Save hours', 'On an hours card: type the number off the panel and the card goes away, hours updated.'],
-        ['Reply box', 'Whatever you type here gets sent to the agent along with your answer. Just leave a note keeps the card.'],
+        ['Reply box', 'Your reason sticks to the card for good and the agent writes back, so the why behind a decision is never lost. It rides along with whatever answer you tap; Just leave a note keeps the card open.'],
         ['Undo', 'Tapped the wrong one? An Undo shows for a moment and puts the card right back.'],
       ]} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
@@ -957,7 +957,7 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
       />
       {/* The four answers. Every one clears the card; nothing else does. */}
       <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-        {!hoursAsk && <button className="ad-btn ad-btn--sm" onClick={doHandle} disabled={busy} title="I am taking care of this">Handle it</button>}
+        {!hoursAsk && <button className="ad-btn ad-btn--sm" onClick={doHandle} disabled={busy} title="I already took care of this">Handled it</button>}
         {canDelegate && !delegating && (
           <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setDelegating(true)} disabled={busy} title="Give it to someone as a task">Hand off</button>
         )}
