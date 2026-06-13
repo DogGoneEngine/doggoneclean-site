@@ -3548,4 +3548,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   whose deploy is gated this session, so the label degrades to the pilot's name until that one
   deploy lands; the headline wrong-face fix is live without it. Decisions from Paul: who's-coming =
   fixed profile portrait of the pilot in command; build multi-operator now to the extent that
-  photos attribute to the logged-in photographer, not the pilot.
+  photos attribute to the logged-in photographer, not the pilot. Follow-ups same day: the
+  photographer name was routed through tracker_status as a `photo_credits` map (migration 0178) so
+  it works without the gated tracker-photos edge deploy (verified: a Jake-shot token returns
+  {id:"Jake"}); the edge function update stays in the repo for later, cleanup parked. And the HR
+  profile-photo picker gained a "choose from the Library" source beside the phone upload: a new
+  `admin_profile_photo_choices` RPC (migration 0179) lists the operator's shared photos
+  (client- or team-visible with_dog/after/extra, 33 available), and `setAdminPhotoFromPath` points
+  photo_path at the chosen shot (same bucket, no copy). Sourced from shared photos, not just the
+  Team gallery, because the Team gallery is empty today while there are dozens of client-shared
+  shots; only already-shared photos are offered so a private photo never becomes the public face.
