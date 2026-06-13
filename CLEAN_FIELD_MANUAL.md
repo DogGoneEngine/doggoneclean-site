@@ -187,7 +187,11 @@ main vacuum, clippers, and lights; the Bathing generator runs the high-velocity 
 pumps, and dehumidifier. Each is tracked by engine hours read off the panel, not calendar dates,
 with hours-based service from the Predator 5000 manual: oil change at the first 30 hours then
 every 100 (10W-30), clean the air filter around every 50, inspect the spark plug around 300
-(gap 0.028 to 0.031 in). The maintenance watcher reminds Paul to enter the hours when they go
+(gap 0.028 to 0.031 in). The spark plug is an NGK BPR6ES (13/16 in / 21 mm socket); confirm it
+against the plug actually in the unit before buying, because Harbor Freight has dual-sourced the
+5000 from more than one factory. Acceptable equivalents are any projected-tip resistor plug of
+the same heat range: Champion RN9YC, Denso W20EPR-U, Bosch WR6DC, or Autolite 3923. The
+maintenance watcher reminds Paul to enter the hours when they go
 stale and flags a service when the hours cross an interval. Each unit puts out 3900W continuous;
 every appliance records its watt draw so Orbit shows the live load against capacity and the
 headroom before anything new is plugged in (pairs with "run with headroom"). Because hours, not
