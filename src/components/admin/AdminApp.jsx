@@ -209,7 +209,7 @@ export default function AdminApp() {
 
       <aside className={'ad-side ' + (drawerOpen ? 'ad-side--open' : '')}>
         <div className="ad-side__brand">
-          Dog Gone Clean<br />
+          <img className="ad-side__logo" src="/logo.png?v=2" alt="Dog Gone Clean" />
           <small>Orbit</small>
           <button
             type="button"

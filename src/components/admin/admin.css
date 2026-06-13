@@ -330,6 +330,12 @@ html, body {
   color: var(--ad-text);
   -webkit-text-fill-color: transparent;
 }
+.ad-side__logo {
+  display: block;
+  width: 100%;
+  max-width: 168px;
+  height: auto;
+}
 .ad-side__brand small {
   display: block;
   color: var(--ad-text-faint);
