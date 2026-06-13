@@ -3259,3 +3259,16 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **Field test owed**: the undo path, the task photo-receipt path, and the stop briefing
   were applied and build clean but have not been exercised end to end on a phone; Paul or
   Jake tapping through a real stop is the verification that counts.
+
+### Batch seventeen: Orbit drawer brand + Kristin sees the Prospectus (Jun 13)
+
+- **Orbit drawer brand**: the hamburger menu header now shows the Dog Gone Clean logo
+  instead of the "Dog Gone Clean" wordmark text, the decorative spinning blue brand ring
+  above it is removed (the real logo is the focal point now), and the "Orbit" sublabel is
+  a small brand-blue pill badge instead of floating gray micro-text. Neural Expressive
+  hallmarks (rounded pill, focal blue) keep it native.
+- **Kristin sees the Prospectus**: the viewer role's floor list gained `prospectus`
+  alongside `family`, so the stakeholder login shows both how the business is doing and
+  what it is worth. No new grant was needed: admin_prospectus already gates on
+  `_is_admin()`, which an active viewer passes, so this was a navigation change, not a
+  security change.
