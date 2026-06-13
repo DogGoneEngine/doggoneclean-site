@@ -3607,3 +3607,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   mid-session, just start a new session rather than routing around it. The `photo_credits` map in
   tracker_status (the DB workaround) is now redundant with the deployed `by`; harmless (the page
   prefers it and the two agree), optional to trim later.
+
+- **Calendar mirror: the sync now runs both directions (Jun 13)**: the "Dog Gone Clean" Google
+  calendar Paul made for parallel cutover was empty because the sync only ran inward (Google
+  Calendar -> app via `calendar-ingest`); nothing ever wrote to the calendar. Added the outbound
+  half: new `calendar-export` edge function (dgc-prod v1, secret-gated, verified live returning 221
+  events) serves `bath_appointments`, and `apps-script-calendar.gs` now reconciles them into the Dog
+  Gone Clean calendar on its existing 15-minute trigger (create/update/delete only its own tagged
+  events; hand-added events untouched, so the parallel-booking input path survives). The loop is
+  broken by skipping any inbound event carrying the `dgc_appt_id` tag or the `[dgc-mirror]` marker.
+  So the Dog Gone Clean calendar is now an app mirror Paul watches next to his old system, which is
+  what he expected all along (the as-built design had it as an input-only calendar). Paul's one
+  action: paste the updated Apps Script into his Apps Script project; the trigger already runs
+  `syncCalendar()`, so the calendar fills within 15 minutes of the paste. No service-account key
+  (Google blocks them on new projects, which is why the dead `calendar-sync` function stays inert).
