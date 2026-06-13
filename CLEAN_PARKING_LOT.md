@@ -213,6 +213,20 @@ Gates: Twilio (the sends), Stripe (online tips).
    session deployed the function cleanly.) Separately: set Paul's profile photo in Orbit HR (Jake
    already has one) so his who's-coming portrait is a real photo instead of the static cover.
 
+   **Cleanup: register migrations 0177-0181 in the migration history.** 2026-06-13: these five
+   migrations were APPLIED to dgc-prod via `execute_sql` (because `apply_migration` hit the stuck
+   approval gate that session), so the schema is correct and verified, but
+   `supabase_migrations.schema_migrations` has no rows for them (newest registered entry is
+   `task_delegation_and_clear`). The drift: the migration FILES exist in `supabase/migrations/`
+   (0177 photo_taken_by_and_tracker_operator, 0178 tracker_photo_credits, 0179
+   profile_photo_choices, 0180 context_gap_nudge, 0181 book_price_by_selected_dogs) but the
+   history table does not list them, which could confuse later migration tooling. FIX (do in a
+   fresh session where apply_migration is not gated): re-apply each of the five via
+   `mcp__supabase__apply_migration` (using the file contents). All five are written idempotently
+   (CREATE OR REPLACE, ADD COLUMN IF NOT EXISTS, the 0181 UPDATE just re-sets the same value), so
+   re-applying is safe and only adds the missing history rows. Low risk, do it to keep the file
+   set and the history in sync.
+
    **Two-tier hard ban (comms block), Twilio-gated.** Paul's idea 2026-06-13: split the hard ban
    into two levels. Level 1 is today's hard ban (removed from every working list, never solicited,
    record kept, reversible). Level 2 is for an obnoxious person: completely block communication.
