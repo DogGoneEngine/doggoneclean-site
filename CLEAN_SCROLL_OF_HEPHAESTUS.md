@@ -3506,3 +3506,10 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Sheehe (Anthony), Greta Custer (Dunnellon), Tonya Hunt (Williston, a scan find). Chester Weber
   ("near-base") is Ocala, not tagged. Unresolved: Maria Arvanitis (Paul recalls Summerfield, but
   her record reads Ocala 34480 / Ocala-SE), flagged for Paul rather than guessed.
+
+- **Today stop-card buttons leaned into Neural Expressive (Jun 13)**: the appointment cards'
+  controls looked flat/old next to the rest. The big step button now uses the polished .ad-btn
+  (brand gradient, glow, hover lift) instead of a flat inline gradient; the time-stamp chips
+  became rounded pills (the stamped time is a brand-gradient pill with the brand glow, the empty
+  "tap" is a soft primary-container pill), and clear/edit are clean round icon buttons. Also fixed
+  Maria Arvanitis's address to 15320 SE 36th Ave, Summerfield, FL 34491 (zone Exceptions).
