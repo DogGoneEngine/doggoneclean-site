@@ -1633,10 +1633,20 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
                   const start = typeof s === 'string' ? s : s.start;
                   const drive = [];
                   if (typeof s === 'object' && s.prev_stop) {
-                    drive.push(`${s.prev_stop.drive_minutes != null ? s.prev_stop.drive_minutes + ' min' : 'drive'} after ${(s.prev_stop.client || 'the stop before').split(' ')[0]}`);
+                    const who = (s.prev_stop.client || 'the stop before').split(' ')[0];
+                    const d = s.prev_stop.drive_minutes != null ? `${s.prev_stop.drive_minutes} min drive from ${who}` : `drive from ${who}`;
+                    const w = s.prev_stop.wait_minutes != null
+                      ? (s.prev_stop.wait_minutes <= 0 ? ', back to back' : `, then ${s.prev_stop.wait_minutes} min wait`)
+                      : '';
+                    drive.push(d + w);
                   }
                   if (typeof s === 'object' && s.next_stop) {
-                    drive.push(`${s.next_stop.drive_minutes != null ? s.next_stop.drive_minutes + ' min' : 'drive'} before ${(s.next_stop.client || 'the next stop').split(' ')[0]}`);
+                    const who = (s.next_stop.client || 'the next stop').split(' ')[0];
+                    const d = s.next_stop.drive_minutes != null ? `${s.next_stop.drive_minutes} min drive to ${who}` : `drive to ${who}`;
+                    const w = s.next_stop.wait_minutes != null
+                      ? (s.next_stop.wait_minutes <= 0 ? ', tight' : `, ${s.next_stop.wait_minutes} min to spare`)
+                      : '';
+                    drive.push(d + w);
                   }
                   const tight = typeof s === 'object' && s.tightest;
                   return (

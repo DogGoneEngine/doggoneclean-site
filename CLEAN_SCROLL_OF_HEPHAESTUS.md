@@ -3589,3 +3589,10 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   it reads like a schedule gap. What actually varies and matters for routing is the idle/slack a
   slot creates. Fix lives in the gated suggest-drive edge function; brought to Paul to choose the
   label (honest "X min drive from <neighbor>" vs showing the varying slack) before changing it.
+  Paul chose BOTH (drive + wait). Implemented: suggest-drive now computes wait_minutes per
+  neighbor (idle after the previous stop's drive; slack before the next stop), and ClientsView
+  renders "18 min drive from Donna, then 12 min wait" / "12 min drive to Michelle, 30 min to
+  spare" (back to back / tight when zero). Oracle `slot_shows_drive_and_wait`. The frontend
+  wording fix ships on push; the wait numbers light up once the gated suggest-drive edge function
+  is deployed (repo file ready, verify_jwt unchanged). Until then slots show the corrected drive
+  wording without the wait.

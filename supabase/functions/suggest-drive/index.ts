@@ -204,18 +204,28 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 7. Re-emit each day with annotated slots, tightest fit first.
+    // 7. Re-emit each day with annotated slots, tightest fit first. Each
+    // neighbor carries both the drive between homes (constant) and the wait the
+    // slot creates (varies by slot time): idle after arriving from the previous
+    // stop, and slack before you would have to leave for the next one.
     const outDays = days.map((day) => {
       const annotated = (day.slots ?? []).map((s: any) => {
         const start = typeof s === "string" ? s : s.start;
+        const t = Date.parse(start);
         const n = slotNeeds.get(`${start}`);
         const prevSec = n?.prev ? seconds.get(`${n.prev.client_id}|${client_id}`) : undefined;
         const nextSec = n?.next ? seconds.get(`${client_id}|${n.next.client_id}`) : undefined;
         const fit = (prevSec != null ? prevSec : 0) + (nextSec != null ? nextSec : 0);
+        // Wait after the previous stop: slot start minus (their end + the drive).
+        const prevWait = (n?.prev && prevSec != null)
+          ? Math.max(0, Math.round((t - (n.prev.end + prevSec * 1000)) / 60000)) : null;
+        // Slack before the next stop: their start minus (this slot's end + the drive).
+        const nextWait = (n?.next && nextSec != null)
+          ? Math.max(0, Math.round((n.next.start - (t + durMs + nextSec * 1000)) / 60000)) : null;
         return {
           start,
-          prev_stop: n?.prev ? { client: n.prev.name, drive_minutes: prevSec != null ? Math.round(prevSec / 60) : null } : null,
-          next_stop: n?.next ? { client: n.next.name, drive_minutes: nextSec != null ? Math.round(nextSec / 60) : null } : null,
+          prev_stop: n?.prev ? { client: n.prev.name, drive_minutes: prevSec != null ? Math.round(prevSec / 60) : null, wait_minutes: prevWait } : null,
+          next_stop: n?.next ? { client: n.next.name, drive_minutes: nextSec != null ? Math.round(nextSec / 60) : null, wait_minutes: nextWait } : null,
           _fit: (prevSec != null || nextSec != null) ? fit : Infinity,
         };
       });

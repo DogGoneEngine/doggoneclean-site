@@ -1525,6 +1525,18 @@ Moat agent (parked: the standing, four-signal version). Scope set with Paul 2026
 before a visit, experiential plus basics, highest-frequency clients surface most because he sees
 them most.
 
+`slot_shows_drive_and_wait` (scheduling):
+Each open-time slot in the booking panel shows two things about each adjacent neighbor: the drive
+between the two homes (constant, a property of the locations) and the wait the slot creates
+(varies by slot time): idle after arriving from the previous stop, slack before leaving for the
+next. "18 min drive from Donna, then 12 min wait" / "12 min drive to Michelle, 30 min to spare"
+(back to back / tight when zero). Computed in the suggest-drive edge function (drive from
+drive_cache + Distance Matrix; wait from the neighbors' appointment times). Because the drive
+alone is identical for every slot in a day, which made the slots look interchangeable; the wait
+is what actually differs and tells Paul which slot keeps the route lean (Paul, 2026-06-13, after
+seeing every slot read the same "18 min after Donna"). Pairs with the tightest-fit flag (least
+added drive).
+
 `no_dgn_import` (copy):
 Never import DGN's nail vocabulary or bans into Clean. Because the two businesses describe
 themselves in opposite terms and merged vocabulary mis-describes the work.

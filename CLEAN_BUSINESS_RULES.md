@@ -72,6 +72,7 @@ even DGN has many rules sitting in only one or two layers.
 | who_is_coming_is_pilot | Tracker | Oracle; `tracker_status` returns the pilot-in-command operator (name + bio); `track.astro` portrait uses `operator_photo`, never a scraped recent photo | per-operator profile photos set via HR |
 | photo_attributed_to_logged_in_admin | Operator | Oracle; `visit_photos.taken_by_admin_id` stamped by `admin_add_visit_photo` from `auth.uid()`; `tracker-photos` edge fn returns each photo's `by`; `track.astro` labels by photographer | edge fn deploy carries the per-photo `by` to the live tracker |
 | context_gap_nudge | Moat | Oracle; `_client_context_gaps` RPC + `context_gaps` on `admin_today_appointments`; `TodayView` stop nudge, tap opens the contact sheet; self-clears live | the standing four-signal Moat agent (parked) |
+| slot_shows_drive_and_wait | Scheduling | Oracle; `suggest-drive` edge fn returns `drive_minutes` + `wait_minutes` per neighbor; `ClientsView` renders both | wait numbers go live on the gated suggest-drive deploy |
 | specialist_assigned_per_route | Scheduling | Oracle | `routes.operator_id`; booking step 1 polygon-check response includes `route_operator` (name + photo URL); portal "your specialist" section reads the same join |
 | cancellation_24h | Money | Oracle | booking engine; site copy |
 | price_by_dogs_going | Money | Oracle; `admin_book_appointment` sums selected dogs' `price_cents`, base only when none named | booking panel dog picker |
