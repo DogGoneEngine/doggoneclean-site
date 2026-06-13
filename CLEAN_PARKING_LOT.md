@@ -71,6 +71,32 @@ changes Paul's calendar or his Acuity workflow.
 **Do NOT start any step until Paul says go.** Until then the default calendar stays the working
 truth and the admin view stays a test mirror.
 
+## Moat agent (proposed): a standing owner of "dig the moat deeper"
+
+Paul's thought 2026-06-13: success is all about digging moats; is there / should there be an agent
+in charge of digging the moat deeper? Status today: the moat (`dig_the_moat`) is a DECISION LENS
+applied by Claude at build/scope time and baked into CLAUDE.md + the Oracle, but it has no
+autonomous owner. The existing agents are department heads that emit briefing cards (migration
+0042: cfo / coo / hr / growth / compliance, orchestrated by Riker); none owns the moat as a
+standing mandate. So the moat only gets dug when Claude is in a thread, not continuously.
+
+Proposal: add a `moat` agent to the agents table (a "Chief Moat Officer" / "Moat" head) that emits
+briefings like the others, scoped TIGHTLY to concrete, data-grounded signals so it produces actions
+not platitudes (the real failure mode of a moat-agent is a vibes-bot saying "deepen relationships!").
+The four moat sources from `dig_the_moat`, each tied to a real query we already have data for:
+  1. Proprietary context: clients with thin records / data_gaps (no behavior notes, no handling
+     quirks, no dog specs). Card: "enrich X's record, depth of per-client context is the moat."
+  2. Grateful clients / relationships: heard-and-delivered moments delivered, worth-a-look shares,
+     special requests honored. Card: surface a client primed for a personal touch.
+  3. Reputation: reviews earned vs asked, referrals made. Card: ungathered goodwill to ask for.
+  4. Lean commodity layer: flag effort sunk into undifferentiated work an AI could replicate, to
+     keep it lean (the inverse signal: stop over-investing here).
+Because the moat is the whole game in the AI era (`dig_the_moat` serves the prime directive), and a
+lens with no owner is only applied when someone remembers to; an agent makes it continuous and
+visible. RECOMMENDATION when built: start with ONE or two signals (proprietary-context gaps is the
+highest-leverage and the data is already there), not all four, per Elon's algorithm (smallest real
+version first). Build only after Paul greenlights scope; do not ship a platitude generator.
+
 ## Voice-capture agent ("Riker"): BUILT v1 2026-06-09 (riker_capture_agent)
 
 Shipped: one-tap confirm, on Today (say the name) and the client sheet (client fixed). Writes a visit
