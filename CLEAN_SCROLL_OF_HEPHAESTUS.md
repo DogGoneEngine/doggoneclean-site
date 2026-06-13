@@ -3513,3 +3513,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   became rounded pills (the stamped time is a brand-gradient pill with the brand glow, the empty
   "tap" is a soft primary-container pill), and clear/edit are clean round icon buttons. Also fixed
   Maria Arvanitis's address to 15320 SE 36th Ave, Summerfield, FL 34491 (zone Exceptions).
+
+- **Wordmark in the Orbit top bar (Jun 13)**: cropped just the "dog gone clean" wordmark out of
+  logo.png (dropping the dog graphic and its water droplets) to public/wordmark.png, and placed
+  it small and subtle (height 15, 0.8 opacity, pushed right) on the right side of the Orbit
+  mobile top bar, so the app reads as branded even with the drawer closed. The full logo still
+  heads the drawer. Also parked the special-request tidy/verbatim cleanup (PR #29).

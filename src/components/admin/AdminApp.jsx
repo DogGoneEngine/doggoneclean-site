@@ -168,6 +168,7 @@ export default function AdminApp() {
           <span /><span /><span />
         </button>
         <span className="ad-mobilebar__title">{activeLabel}</span>
+        <img src="/wordmark.png?v=1" alt="Dog Gone Clean" style={{ marginLeft: 'auto', height: 15, width: 'auto', opacity: 0.8, flexShrink: 0 }} />
       </div>
 
       <div
