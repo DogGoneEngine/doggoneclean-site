@@ -652,14 +652,13 @@ function StopCard({ appt, onOpenClient }) {
         ) : (
           <button
             type="button"
+            className="ad-btn ad-btn--full"
             onClick={step}
             disabled={busyStep}
-            style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: 0, cursor: 'pointer',
-              background: 'linear-gradient(135deg, var(--ad-primary,#2563d8), #4f46e5)',
-              color: '#fff', fontSize: 15, fontWeight: 800, letterSpacing: 0.2 }}
+            style={{ minHeight: 48, fontSize: 15 }}
             title={stepHint || ''}
           >
-            {busyStep ? '...' : stepLabel}
+            {busyStep ? '…' : stepLabel}
           </button>
         )}
         {!wrapped && stepHint && (
@@ -789,28 +788,29 @@ function TimeCell({ label, value, busy, onStampNow, onSet, onClear }) {
     <span style={{ display: 'inline-flex', flexDirection: 'column', gap: 2, minWidth: 64 }}>
       <span style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>{label}</span>
       {shown ? (
-        <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+        <span style={{ display: 'inline-flex', gap: 5, alignItems: 'center' }}>
           <button onClick={() => setEditing(true)} disabled={busy} title="tap to adjust"
             className="ad-mono"
-            style={{ fontSize: 13, fontWeight: 700, padding: '3px 8px', borderRadius: 8, cursor: 'pointer',
-              color: 'var(--ad-on-primary,#fff)', background: 'var(--ad-primary,#2563d8)', border: 0 }}>
+            style={{ fontSize: 13, fontWeight: 700, padding: '5px 14px', borderRadius: 999, cursor: 'pointer',
+              color: '#fff', border: 0, backgroundImage: 'var(--ad-ne-gradient)',
+              boxShadow: 'var(--ad-brand-glow, 0 6px 18px rgba(37,99,216,0.28))' }}>
             {shown}
           </button>
-          <button onClick={onClear} disabled={busy} title="clear"
-            style={{ fontSize: 12, lineHeight: 1, padding: '2px 5px', borderRadius: 6, cursor: 'pointer',
-              color: 'var(--ad-text-dim,#565b6c)', background: 'transparent', border: '1px solid var(--ad-outline,#e0e0e6)' }}>×</button>
+          <button onClick={onClear} disabled={busy} title="clear" aria-label="clear time"
+            style={{ width: 28, height: 28, lineHeight: 1, borderRadius: '50%', cursor: 'pointer', fontSize: 14,
+              color: 'var(--ad-text-dim,#565b6c)', background: 'var(--ad-surface-container-low,#fff)', border: '1px solid var(--ad-line,#e6e3dc)' }}>×</button>
         </span>
       ) : (
-        <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+        <span style={{ display: 'inline-flex', gap: 5, alignItems: 'center' }}>
           <button onClick={onStampNow} disabled={busy} title="tap to stamp the current time"
-            style={{ fontSize: 13, padding: '3px 12px', borderRadius: 8, cursor: 'pointer',
-              color: 'var(--ad-primary,#2563d8)', background: 'var(--ad-primary-container,#e6edfc)',
-              border: '1px dashed rgba(37,99,216,0.4)' }}>
+            style={{ fontSize: 13, fontWeight: 600, padding: '5px 18px', borderRadius: 999, cursor: 'pointer',
+              color: 'var(--ad-primary-strong, #1d50b8)', background: 'var(--ad-primary-container,#e6edfc)',
+              border: '1px solid rgba(37,99,216,0.18)', boxShadow: 'var(--ad-elev-1, 0 1px 2px rgba(0,0,0,0.06))' }}>
             {busy ? '…' : 'tap'}
           </button>
-          <button onClick={() => setEditing(true)} disabled={busy} title="forgot to tap? enter the time you actually left/arrived/finished"
-            style={{ fontSize: 12, lineHeight: 1, padding: '3px 6px', borderRadius: 6, cursor: 'pointer',
-              color: 'var(--ad-text-dim,#565b6c)', background: 'transparent', border: '1px solid var(--ad-outline,#e0e0e6)' }}>✎</button>
+          <button onClick={() => setEditing(true)} disabled={busy} title="forgot to tap? enter the time you actually left, arrived, or finished" aria-label="enter time"
+            style={{ width: 28, height: 28, lineHeight: 1, borderRadius: '50%', cursor: 'pointer', fontSize: 12,
+              color: 'var(--ad-text-dim,#565b6c)', background: 'var(--ad-surface-container-low,#fff)', border: '1px solid var(--ad-line,#e6e3dc)' }}>✎</button>
         </span>
       )}
     </span>
