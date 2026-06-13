@@ -3519,3 +3519,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   it small and subtle (height 15, 0.8 opacity, pushed right) on the right side of the Orbit
   mobile top bar, so the app reads as branded even with the drawer closed. The full logo still
   heads the drawer. Also parked the special-request tidy/verbatim cleanup (PR #29).
+
+- **Shadow/hard ban explained outcome-first, plus copy honesty correction (Jun 13)**: the client
+  status card's one cramped line became a thorough outcome-first explanation of both tiers in the
+  info-card voice. Then Paul challenged the "no message ever reaches them / both directions" claim;
+  ground-truth check confirmed he was right: win-back/outreach suppression IS enforced
+  (`_winback_due_view` drops `exclude_from_everything` and the shadow tier), but there is no
+  inbound channel, so the "contact shuts in both directions" line overclaimed. Corrected the card
+  to state only what is enforced (removed from every list, never solicited, nothing sent from our
+  side, record kept and reversible). Paul's two-tier-hard-ban idea (level 1 still lets them message
+  you, level 2 fully blocks comms) parked in CLEAN_PARKING_LOT.md against the Twilio milestone,
+  because it has no teeth until an inbound channel exists to block.
