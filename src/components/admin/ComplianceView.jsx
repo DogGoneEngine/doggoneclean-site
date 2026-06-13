@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { listCompliance, upsertComplianceItem, deleteComplianceItem, runComplianceCheck } from './supabase.js';
+import HelpToggle from './Help.jsx';
 
 const CATS = ['insurance', 'license', 'registration', 'tax', 'a2p', 'processor_verification', 'permit', 'other'];
 const STATUSES = ['active', 'pending', 'expired', 'na'];
@@ -57,7 +58,11 @@ export default function ComplianceView() {
       {loading || !data ? (
         <div className="ad-panel">Loading…</div>
       ) : (
-        <div className="ad-panel" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className="ad-panel" style={{ display: 'flex', flexDirection: 'column', gap: 6, position: 'relative' }}>
+          <HelpToggle corner items={[
+            ['Add item / Edit', 'Track an insurance, license, registration, or tax item. Set its renewal date and the watchdog flags it before it lapses.'],
+            ['Run check now', 'Looks at every date right now and drops anything due or overdue onto Today.'],
+          ]} />
           {data.items.map((it) => <Row key={it.id} item={it} onChanged={load} />)}
           {adding
             ? <Row item={null} onChanged={() => { setAdding(false); load(); }} onCancel={() => setAdding(false)} />

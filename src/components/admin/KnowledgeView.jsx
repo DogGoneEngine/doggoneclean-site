@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { listWisdom, setWisdomStatus, captureWisdom, triggerArchivist } from './supabase.js';
+import HelpToggle from './Help.jsx';
 
 function fmt(ts) { try { return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch { return ts; } }
 
@@ -51,7 +52,12 @@ export default function KnowledgeView() {
       <h1>Knowledge base</h1>
       <p className="ad-sub">The business's memory. Reasons you capture here, by the speed dial or by replying to an agent, get absorbed into the Oracle or a client's record.</p>
 
-      <div className="ad-panel" style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+      <div className="ad-panel" style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'flex-start', position: 'relative' }}>
+        <HelpToggle corner items={[
+          ['Capture', 'Saves a reason or rule into the inbox so the why is never lost.'],
+          ['Sort now', 'The Archivist reads the inbox and proposes where each note belongs (an Oracle rule, a client note, the parking lot).'],
+          ['File', 'Marks a note handled once it is absorbed. It moves to Filed.'],
+        ]} />
         <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} placeholder="Capture a reason or rule (lead with the because)…"
           style={{ flex: 1, fontSize: 14, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
         <button className="ad-btn ad-btn--sm" onClick={add} disabled={busy || !text.trim()}>Capture</button>

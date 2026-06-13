@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { hrSummary, listAgents, listTeam, adminAgentCosts, setAdminPhoto, setAdminBio, signedPhotoUrl } from './supabase.js';
+import HelpToggle from './Help.jsx';
 
 function money(c) { return c == null ? '$0' : '$' + Math.round(c / 100).toLocaleString('en-US'); }
 function usd(n) { return '$' + Number(n || 0).toFixed(2); }
@@ -49,7 +50,12 @@ export default function HRView() {
         <div className="ad-panel">Adding up the hours…</div>
       ) : (
         <>
-          <div className="ad-panel" style={{ marginBottom: 16 }}>
+          <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
+            <HelpToggle corner items={[
+              ['Tap the circle', "Sets a teammate's profile photo, the face clients see on the tracker."],
+              ['edit (bio)', 'Changes the short bio shown next to that person on the client tracker.'],
+              ['30 / 90 / 1 year', 'Changes how far back the workload numbers below reach.'],
+            ]} />
             <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>The team</div>
             {(team.length ? team : [{ id: 'paul', first_name: 'Paul', title: 'Owner and Hurricane Bath Operator', signed_in: true }]).map((m) => (
               <TeamMember key={m.id} m={m} onChanged={load} />
