@@ -143,8 +143,10 @@ shorthand). The full spec is the Oracle rule. Status:
    no-longer-scheduled states.
 3. ~~**Orbit "On my way" button.**~~ DONE 2026-06-10: on each Today stop, one tap flips status to
    on_the_way (`admin_on_my_way`, never downgrades), stamps the Left clock if empty, and opens
-   the share sheet (or copies) the heads-up message: "Dog Gone Clean is rolling your way. Follow
-   along: <link>". Until Twilio, Paul pastes it into Google Voice; with Twilio the same tap sends.
+   the share sheet (or copies) the heads-up message. Copy hyped up 2026-06-13 to lead with the
+   tracker's value and name what it does: "Dog Gone Clean is rolling your way! Track our progress
+   to your driveway, watch the live ETA and map, and follow every step through to all done:
+   <link>". Until Twilio, Paul pastes it into Google Voice; with Twilio the same tap sends.
 4. **Photo sharing, portal half: DONE 2026-06-10 (migration 0137).** Per-photo Share toggle on
    each Orbit visit photo (admin_set_photo_visibility); the client portal's Visits tab gains a
    "Photos from your visits" section (bath_my_visit_photos + a storage policy that lets the
@@ -161,6 +163,30 @@ shorthand). The full spec is the Oracle rule. Status:
    capture is Stripe-gated, so this lands with the Stripe slice.
 
 Gates: Twilio (the sends), Stripe (online tips).
+
+7. **Personalized tracker: the heard-and-delivered loop (Paul, 2026-06-13).** Make the tracker
+   personal proof that the client was heard. When a client asks for something special at the door
+   ("clip the ears a little shorter"), Paul captures it on the stop, and it shows on that visit's
+   tracker as a "you asked for" line, so a client following along sees their request landed. Then
+   a matching "and here it is" state when it is done, ideally with the existing client-visible
+   photos attached right next to the request (the short ears, proof not just a checkmark). The
+   per-visit shared-photo plumbing already exists (item 4, migration 0137); the new pieces are a
+   place to capture the request (recommend a per-visit special-request field, entered from the
+   Today stop card / contact sheet), surfacing it on /track, and letting a shared photo be tagged
+   to a request so it renders beside it. Because the moat is grateful clients and proprietary
+   per-client context: "they heard me and showed me" is the un-promptable thing a competitor
+   cannot copy (`dig_the_moat`). Spec to be shaped with Paul before build; recommendation drafted
+   in the 2026-06-13 thread.
+
+## Access map: data-level Preview as (parked 2026-06-13)
+
+The Access page's "Preview as" shows another role's MENU live, and lists what is masked inside on
+the page. A true data-level preview (render Jake's actual screens with his masking applied, as if
+signed in as him) is deferred: doing it safely means running the app as that user or faithfully
+re-deriving every masking rule client-side, which is heavy and easy to get subtly wrong. Paul's
+call (2026-06-13): wait for a future, more capable model that can handle it cleanly rather than
+build a fragile version now. The menu preview plus the live masking list cover the day-to-day need
+(`access_map_reads_the_truth`). Bring back when the model lift makes it cheap and safe.
 
 ## Cutover follow-ons - legacy fold (2026-06-07)
 

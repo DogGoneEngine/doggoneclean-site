@@ -449,7 +449,7 @@ function StopCard({ appt, onOpenClient }) {
     const m = meta || await loadMeta();
     if (!m || !m.tracker_token) { setErr(true); return; }
     const url = `https://hurricanebath.com/track?t=${m.tracker_token}`;
-    const text = `Dog Gone Clean is rolling your way. Follow along: ${url}`;
+    const text = `Dog Gone Clean is rolling your way! Track our progress to your driveway, watch the live ETA and map, and follow every step through to all done: ${url}`;
     if (navigator.share) {
       try { await navigator.share({ text }); setShareState('shared'); return; }
       catch { /* sheet closed; fall through to copy */ }
@@ -487,7 +487,7 @@ function StopCard({ appt, onOpenClient }) {
         setStatus('on_the_way');
         startLocationShare(appt.id);
         const url = `https://hurricanebath.com/track?t=${res.tracker_token}`;
-        const text = `Dog Gone Clean is rolling your way. Follow along: ${url}`;
+        const text = `Dog Gone Clean is rolling your way! Track our progress to your driveway, watch the live ETA and map, and follow every step through to all done: ${url}`;
         if (navigator.share) {
           try { await navigator.share({ text }); setShareState('shared'); }
           catch { setShareState(null); } // user closed the sheet; no-op

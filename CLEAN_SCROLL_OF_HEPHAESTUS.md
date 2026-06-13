@@ -3342,3 +3342,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **The answer to Paul's "how do I keep track of who sees what"**: a living map that reads the
   rules, not a doc that drifts. Preview-as currently shows the menu (data masking is listed on
   the page, not rendered as that role); a true data-level preview is parked.
+
+### Batch twenty-one: tracker heads-up copy hyped; two items parked (Jun 13)
+
+- **Tracker share message hyped up** (Paul, 2026-06-13): the "On my way" heads-up text changed
+  from "Dog Gone Clean is rolling your way. Follow along: <link>" to lead with the tracker's
+  value and name what it does: "Dog Gone Clean is rolling your way! Track our progress to your
+  driveway, watch the live ETA and map, and follow every step through to all done: <link>".
+  Both send paths in the Today stop card updated; still SMS-length.
+- **Parked: data-level Preview as** for the Access page, on Paul's call to wait for a more capable
+  model rather than build a fragile version now.
+- **Parked: personalized tracker (heard-and-delivered loop)** (Paul, 2026-06-13): capture a
+  client's at-the-door special request, show it on their tracker as "you asked for," then an "and
+  here it is" state with the existing client-visible photos tagged beside the request as proof.
+  Recommendation drafted; spec to be shaped with Paul before build. Both parks filed in
+  CLEAN_PARKING_LOT.md.
