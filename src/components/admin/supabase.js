@@ -191,8 +191,8 @@ export async function suggestPhotoWebsite(id) {
 export async function withdrawPhotoWebsite(id) {
   return rpc('admin_withdraw_photo_website', { p_id: id });
 }
-export async function approvePhotoWebsite(id) {
-  return rpc('admin_approve_photo_website', { p_id: id });
+export async function approvePhotoWebsite(id, publicUrl = null) {
+  return rpc('admin_approve_photo_website', { p_id: id, p_public_url: publicUrl });
 }
 export async function unpublishPhotoWebsite(id) {
   return rpc('admin_unpublish_photo_website', { p_id: id });
