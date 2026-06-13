@@ -5,7 +5,7 @@
 // more, grind less). It scales to a team roster when he hires.
 
 import { useCallback, useEffect, useState } from 'react';
-import { hrSummary, listAgents, listTeam, adminAgentCosts, setAdminPhoto, setAdminBio, signedPhotoUrl } from './supabase.js';
+import { hrSummary, listAgents, listTeam, adminAgentCosts, setAdminPhoto, setAdminPhotoFromPath, setAdminBio, signedPhotoUrl, profilePhotoChoices } from './supabase.js';
 import HelpToggle from './Help.jsx';
 
 function money(c) { return c == null ? '$0' : '$' + Math.round(c / 100).toLocaleString('en-US'); }
@@ -52,7 +52,7 @@ export default function HRView() {
         <>
           <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
             <HelpToggle corner items={[
-              ['Tap the circle', "Sets a teammate's profile photo, the face clients see on the tracker."],
+              ['Tap the circle', "Sets a teammate's profile photo, the face clients see on the tracker. Upload from your phone, or pick one from the Library."],
               ['edit (bio)', 'Changes the short bio shown next to that person on the client tracker.'],
               ['30 / 90 / 1 year', 'Changes how far back the workload numbers below reach.'],
             ]} />
@@ -152,6 +152,11 @@ function TeamMember({ m, onChanged }) {
   const [editingBio, setEditingBio] = useState(false);
   const [bio, setBio] = useState(m.bio || '');
   const [err, setErr] = useState(null);
+  // Library picker: choose an existing shared photo as the profile face,
+  // instead of only a fresh phone upload. libItems null = not loaded yet.
+  const [libOpen, setLibOpen] = useState(false);
+  const [libItems, setLibItems] = useState(null);
+  const [libUrls, setLibUrls] = useState({});
 
   useEffect(() => {
     let alive = true;
@@ -165,6 +170,25 @@ function TeamMember({ m, onChanged }) {
     setBusy(true); setErr(null);
     try { await setAdminPhoto(m.id, file); onChanged(); }
     catch (x) { setErr(x.message || 'upload_failed'); }
+    finally { setBusy(false); }
+  }
+  async function openLibrary() {
+    setLibOpen(true);
+    if (libItems) return;
+    setErr(null);
+    try {
+      const items = await profilePhotoChoices();
+      setLibItems(items);
+      // Sign every thumbnail once, up front, so there is no per-render signing
+      // loop (the exact pattern that crashed the Library tab once).
+      const entries = await Promise.all(items.map(async (it) => [it.id, await signedPhotoUrl(it.path).catch(() => null)]));
+      setLibUrls(Object.fromEntries(entries));
+    } catch (x) { setErr(x.message || 'load_failed'); setLibItems([]); }
+  }
+  async function chooseFromLibrary(path) {
+    setBusy(true); setErr(null);
+    try { await setAdminPhotoFromPath(m.id, path); setLibOpen(false); onChanged(); }
+    catch (x) { setErr(x.message || 'save_failed'); }
     finally { setBusy(false); }
   }
   async function saveBio() {
@@ -203,7 +227,38 @@ function TeamMember({ m, onChanged }) {
               style={{ background: 'transparent', border: 0, padding: 0, fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', textDecoration: 'underline', cursor: 'pointer' }}>edit</button>
           </div>
         )}
-        {!m.photo_path && m.role !== 'viewer' && <div style={{ fontSize: 11, opacity: 0.5, marginTop: 2 }}>Tap the circle to add the profile photo the tracker shows.</div>}
+        {m.role !== 'viewer' && (
+          <div style={{ fontSize: 11, marginTop: 4 }}>
+            {!m.photo_path && <span style={{ opacity: 0.5 }}>Tap the circle to upload from your phone, or </span>}
+            {m.photo_path && <span style={{ opacity: 0.5 }}>Tap the circle to upload a new photo, or </span>}
+            <button type="button" onClick={() => (libOpen ? setLibOpen(false) : openLibrary())} disabled={busy}
+              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 11, color: 'var(--ad-primary, #2563d8)', textDecoration: 'underline', cursor: 'pointer' }}>
+              {libOpen ? 'close the Library' : 'choose from the Library'}
+            </button>
+            <span style={{ opacity: 0.5 }}>. This is the face clients see on the tracker.</span>
+          </div>
+        )}
+        {libOpen && (
+          <div style={{ marginTop: 8 }}>
+            {libItems === null ? (
+              <div style={{ fontSize: 12, opacity: 0.6 }}>Loading the Library…</div>
+            ) : libItems.length === 0 ? (
+              <div style={{ fontSize: 12, opacity: 0.6 }}>No shared photos yet. Photos shared to a client or the team show up here to pick from.</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))', gap: 6, maxHeight: 240, overflowY: 'auto', padding: 2 }}>
+                {libItems.map((it) => (
+                  <button key={it.id} type="button" onClick={() => chooseFromLibrary(it.path)} disabled={busy}
+                    title={[it.dog_name, it.client].filter(Boolean).join(' · ') || 'Library photo'}
+                    style={{ padding: 0, border: '1px solid var(--ad-outline, #d8d8de)', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', background: 'var(--ad-surface-container, #eef)', aspectRatio: '1' }}>
+                    {libUrls[it.id]
+                      ? <img src={libUrls[it.id]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      : <span style={{ display: 'block', width: '100%', height: '100%' }} />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         {err && <div className="ad-error" style={{ fontSize: 12 }}>{err}</div>}
       </div>
     </div>

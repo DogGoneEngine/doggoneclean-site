@@ -525,6 +525,17 @@ export async function setAdminPhoto(adminId, file) {
   await rpc('admin_set_admin_photo', { p_admin: adminId, p_path: path });
   return path;
 }
+// Point a profile photo at an existing Library photo instead of a fresh upload.
+// The shared photos live in the same bucket, so the storage path is usable as
+// photo_path directly (the tracker signs it the same way). No copy needed.
+export async function setAdminPhotoFromPath(adminId, path) {
+  return rpc('admin_set_admin_photo', { p_admin: adminId, p_path: path });
+}
+// The shared photos an operator can pick as a profile face (client- or
+// team-visible with_dog / after / extra shots), newest first.
+export async function profilePhotoChoices() {
+  return rpc('admin_profile_photo_choices');
+}
 export async function setAdminBio(adminId, bio) {
   return rpc('admin_set_admin_bio', { p_admin: adminId, p_bio: bio });
 }
