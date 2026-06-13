@@ -3298,3 +3298,26 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   briefings gained a `delegated` status. admin_list_tasks now returns `from_card`,
   `action`, and an `overdue` flag. Advisors clean: the new functions match the existing
   security-definer-gated pattern, none introduced a mutable search_path.
+
+### Batch nineteen: the card lifecycle simplified, with undo (Jun 13; migration 0169)
+
+- **Four answers, every one clears the card** (`cards_resolve_or_stay`): the briefing card
+  buttons collapsed from six (Reply, Approve, This-is-intentional, Dismiss, Mark-read, Hand-to)
+  to four answers, each of which resolves the card: Handle it, Hand off, Leave it alone,
+  Dismiss. A note to the agent is now an optional ride-along on whichever answer is chosen
+  (Reply and Mark-read are gone); a note alone keeps the card open on purpose. The problem
+  this fixes: buttons that looked like answers but left the card sitting there, and two
+  (intentional vs dismiss) that cleared it but looked identical, so Paul could not tell what
+  a button would do. Paul is trying the model before a final call.
+- **Undo for a fat-fingered tap** (migration 0169, admin_reopen_briefing): after any answer
+  the card collapses to a one-line outcome with an Undo instead of vanishing. Undo reopens it
+  (back to read, disposition cleared) and drops the handed-off task if there was one; it
+  refuses once that task is finished (already_done), because the work happened. Verified end
+  to end against dgc-prod: delegate -> undo (card read, task dropped), leave-alone -> undo
+  (card read, disposition null), and the already-finished guard all behaved; test rows cleaned
+  up. This came from Paul fat-fingering "This is intentional" on a maintenance card he meant
+  to hand to Jake.
+- **Two live corrections**: flipped Jeanne Leuenberger's below-rate card to intentional (the
+  elderly fixed-income client, leave-alone; her reason note was already on the card), and
+  reopened the fat-fingered "Clean/inspect air filter: Bathing generator" card so it is back
+  on the feed and the maintenance agent stops suppressing it.

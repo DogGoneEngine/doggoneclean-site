@@ -2007,6 +2007,24 @@ or clear all), cleared not deleted so the audit trail survives. Because Paul
 wants to route work instead of doing all of it, and a handoff that disappears is
 worse than no handoff: it has to come back if it is not done. Paul, 2026-06-13.
 
+`cards_resolve_or_stay` (Clean: operations):
+Every agent card on Today is a question, and every way to answer it makes the
+card go away; nothing else does. The answers are four: Handle it (I am taking
+care of it), Hand off (it becomes someone's task and resolves when they finish),
+Leave it alone (on purpose, the agent stops flagging it for good), and Dismiss
+(clear it, the agent may raise it again if it still matters). A note to the agent
+is optional and rides along with whichever answer is chosen; a note alone never
+resolves a card, so the only reason a card still sits there is that it has not
+been answered yet. Every answer is reversible: the card collapses to a one-line
+outcome with an Undo that reopens it (back to read, disposition cleared, the
+handed-off task dropped) until the next refresh, except a hand-off whose task is
+already finished, because then the work happened and there is nothing to take
+back. Because the old card had buttons that looked like answers but left the card
+sitting there (Reply, Mark read) and two that cleared it but looked identical
+(intentional vs dismiss), so Paul could not tell what any button would do, and a
+card you cannot confidently clear is a card that piles up. Being tried before a
+final call (Paul, 2026-06-13).
+
 `stop_closes_the_loop` (Clean: clients):
 When a client taps the portal stop sign, three things happen in one
 transaction: every future appointment is cancelled including pencilled
