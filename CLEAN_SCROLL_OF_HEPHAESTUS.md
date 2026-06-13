@@ -3434,3 +3434,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - **Tracker calls "Extra" photos "Moments"** (Paul, 2026-06-13): the operator-side "Extra" button
   is unchanged; only the public /track label for kind=extra now reads "Moments". "Moments" is a
   common generic word (no trademark concern for a photo-strip label).
+
+- **Crash fix (Library tab white-screened Orbit), Jun 13**: LibraryView's useSignedUrls hook took
+  a freshly built array (items || [], data?.queued || []) and depended on its reference in the
+  effect, so the effect re-ran and setState'd every render: an infinite loop ("Maximum update
+  depth exceeded") that crashed the whole admin island. Worse, on mount `me` is briefly null so
+  the owner's Library rendered the Team tab first and hit the loop instantly. Fixed: the hook now
+  keys its effect on a stable id-string (not the array reference), and LibraryView waits for the
+  role before rendering any tab. Lesson: never depend on an inline-built array/object in a hook
+  dependency list.
