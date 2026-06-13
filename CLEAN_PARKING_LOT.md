@@ -910,3 +910,21 @@ the n8n container. Data separation stays clean because the dashboard only READS 
 own Supabase project with its own keys; nothing merges. Until then the interim emperor view is
 Orbit's Finance floor (annual run rate stat shipped 2026-06-11). Decommissioning n8n (stop
 container, drop its Caddy block) is one droplet session, on Paul's go.
+
+## Public website gallery page (Phase 2 of photo_destinations, parked 2026-06-13)
+
+The photo-destinations pipeline is live (Client / Team / Website with an owner-approved
+queue, migration 0173). What is NOT built yet is the public marketing page that renders the
+approved ("live") photos to the world. The build:
+- A public storage bucket (e.g. `website-gallery`); the visit-photos bucket is private and
+  served via signed URLs, which are wrong for a cacheable, indexable public page.
+- On owner approval, copy the approved photo into the public bucket from the owner's browser
+  (download from private, upload to public). Edge-function deploys are gated in this remote
+  flow, so do the storage copy client-side rather than via a new edge function. On unpublish or
+  FIFO roll-off, delete the public copy.
+- An anon `website_gallery()` RPC returning the live photos' public paths, newest first, capped
+  at `_website_gallery_cap()` (24).
+- A `/gallery` Astro page (or a homepage section) that fetches and renders them; lead with the
+  before/after collages the tracker already builds.
+Until this ships, "live" photos are approved and tracked but have no public surface. The owner
+review tab and the whole approval boundary work now.

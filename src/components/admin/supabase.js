@@ -180,6 +180,30 @@ export async function setPhotoAnswersRequest(id, val) {
   return rpc('admin_set_photo_answers_request', { p_id: id, p_val: val });
 }
 
+// Photo destinations (photo_destinations). Team is one-tap for any admin; the
+// website is suggest-only for everyone and owner-approved in the review surface.
+export async function setPhotoTeam(id, val) {
+  return rpc('admin_set_photo_team', { p_id: id, p_val: val });
+}
+export async function suggestPhotoWebsite(id) {
+  return rpc('admin_suggest_photo_website', { p_id: id });
+}
+export async function withdrawPhotoWebsite(id) {
+  return rpc('admin_withdraw_photo_website', { p_id: id });
+}
+export async function approvePhotoWebsite(id) {
+  return rpc('admin_approve_photo_website', { p_id: id });
+}
+export async function unpublishPhotoWebsite(id) {
+  return rpc('admin_unpublish_photo_website', { p_id: id });
+}
+export async function teamGallery() {
+  return rpc('admin_team_gallery');
+}
+export async function websiteReview() {
+  return rpc('admin_website_review');
+}
+
 export async function setClientNofly(clientId, banned, reason = null) {
   return rpc('admin_set_client_nofly', { p_client_id: clientId, p_banned: banned, p_reason: reason });
 }
