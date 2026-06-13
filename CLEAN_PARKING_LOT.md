@@ -931,3 +931,16 @@ Remaining nice-to-haves (parked, not blocking):
 - A pulled photo leaves the feed immediately but its saved direct link survives until expiry
   (not hard-deleted). Fine for curated dog photos.
 - Lead the wall with the before/after collages the tracker already builds.
+
+## Per-person access grants (parked 2026-06-13, build when first needed)
+
+Today access is purely role-based (owner / operator / viewer), defined in roles.js (menu + tabs)
+and RPC role checks (actions), and shown on the emperor-only Access page (read-only map). Paul
+asked where a future grant would live, e.g. letting one future employee see the Website queue
+without making everyone an owner. Decision (`access_grants_live_on_the_access_page`): when a real
+person needs an exception, add a per-admin capability (a flag on the admins record, default off),
+surface a toggle on the Access page, and have the relevant RPC accept role OR that capability.
+Do NOT build the machinery before there is a real person to grant to. The Access page is the home
+for both seeing and granting. Note for whoever builds it: also fold tab-level / within-floor
+visibility (like "operator sees only the Team tab of the Library") into the Access map so the map
+stays honest about finer-grained access, not just whole floors.

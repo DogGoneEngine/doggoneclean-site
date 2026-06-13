@@ -58,11 +58,15 @@ export const READY = SECTIONS.filter((s) => s.ready).map((s) => s.key);
 // the data inside them is masked server-side (admin_get_client and
 // admin_today_appointments strip contact and money for the operator role), so
 // this list is navigation, not the security boundary.
-export const OPERATOR_FLOORS = ['today', 'calendar', 'clients'];
+// Library is on both lists for the Team gallery only; LibraryView shows a
+// non-owner just that tab (Assets and Website stay owner-only, enforced in the
+// RPCs too). See library_tabs_by_role.
+export const OPERATOR_FLOORS = ['today', 'calendar', 'clients', 'library'];
 // The viewer role (Kristin): a stakeholder, not day-to-day. The Family window
-// (family_window_into_the_business) plus the Prospectus, so a stakeholder sees
-// both how the business is doing day to day and what it is worth.
-export const VIEWER_FLOORS = ['family', 'prospectus'];
+// (family_window_into_the_business), the Prospectus, and the Team gallery, so a
+// stakeholder sees how the business is doing, what it is worth, and the crew's
+// gallery of good shots.
+export const VIEWER_FLOORS = ['family', 'prospectus', 'library'];
 
 // Paul's words for each role, for the access map and the preview banner.
 export const ROLES = [
