@@ -238,6 +238,18 @@ function WebsiteReview() {
     catch (e) { setErr(e.message || 'action_failed'); }
     finally { setBusy(false); }
   }
+  // Approving signs a long-lived URL here in the browser (the owner can sign; a
+  // public visitor cannot) and stores it, so the public gallery can show it
+  // without an edge function. A year out; re-approve refreshes.
+  async function approve(i) {
+    setBusy(true); setErr(null);
+    try {
+      const url = await signedPhotoUrl(i.path, 31536000);
+      await approvePhotoWebsite(i.id, url);
+      await load();
+    } catch (e) { setErr(e.message || 'approve_failed'); }
+    finally { setBusy(false); }
+  }
 
   if (err) return <div className="ad-error">{err}</div>;
   if (!data) return <div className="ad-panel" style={{ opacity: 0.6 }}>Loading the queue…</div>;
@@ -263,7 +275,7 @@ function WebsiteReview() {
                   {caption(i)}{i.proposed_by ? ` · by ${i.proposed_by}` : ''}
                 </figcaption>
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => act(approvePhotoWebsite, i.id)}>Approve</button>
+                  <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => approve(i)}>Approve</button>
                   <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => act(withdrawPhotoWebsite, i.id)}>Reject</button>
                 </div>
               </figure>

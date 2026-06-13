@@ -911,20 +911,23 @@ own Supabase project with its own keys; nothing merges. Until then the interim e
 Orbit's Finance floor (annual run rate stat shipped 2026-06-11). Decommissioning n8n (stop
 container, drop its Caddy block) is one droplet session, on Paul's go.
 
-## Public website gallery page (Phase 2 of photo_destinations, parked 2026-06-13)
+## Public website gallery: BUILT 2026-06-13 (Phase 2 of photo_destinations, migration 0174)
 
-The photo-destinations pipeline is live (Client / Team / Website with an owner-approved
-queue, migration 0173). What is NOT built yet is the public marketing page that renders the
-approved ("live") photos to the world. The build:
-- A public storage bucket (e.g. `website-gallery`); the visit-photos bucket is private and
-  served via signed URLs, which are wrong for a cacheable, indexable public page.
-- On owner approval, copy the approved photo into the public bucket from the owner's browser
-  (download from private, upload to public). Edge-function deploys are gated in this remote
-  flow, so do the storage copy client-side rather than via a new edge function. On unpublish or
-  FIFO roll-off, delete the public copy.
-- An anon `website_gallery()` RPC returning the live photos' public paths, newest first, capped
-  at `_website_gallery_cap()` (24).
-- A `/gallery` Astro page (or a homepage section) that fetches and renders them; lead with the
-  before/after collages the tracker already builds.
-Until this ships, "live" photos are approved and tracked but have no public surface. The owner
-review tab and the whole approval boundary work now.
+The public homepage gallery is live. On the homepage's "Real dogs, real driveways" section a
+script calls the anon `website_gallery()` feed and, once there are at least 6 approved photos,
+replaces the three curated fallback shots with the live wall (responsive grid, dog-name
+captions, staggered fade-in, hover zoom). Below 6 it keeps the curated shots so the homepage
+never looks thin.
+
+How private photos reach a public page without an edge function (those deploys are gated): at
+approval the OWNER'S BROWSER mints a long-lived (1 year) signed URL and stores it on the row
+(`visit_photos.website_public_url`); `website_gallery()` hands those URLs to the homepage.
+Unpublish clears the URL; FIFO roll-off drops the photo from the feed.
+
+Remaining nice-to-haves (parked, not blocking):
+- Signed URLs expire after a year; re-approving refreshes. If it ever bites, upgrade to a real
+  public bucket (copy on approve from the owner's browser) for permanent, cacheable, indexable
+  URLs, which would also make unpublish a hard delete.
+- A pulled photo leaves the feed immediately but its saved direct link survives until expiry
+  (not hard-deleted). Fine for curated dog photos.
+- Lead the wall with the before/after collages the tracker already builds.

@@ -3399,3 +3399,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   copy the approved photo into a public bucket from the owner's browser (edge-function deploys are
   gated). Parked in CLEAN_PARKING_LOT.md. The whole approval pipeline is live and safe in the
   meantime; "live" photos just have no public page to show on yet.
+
+### Batch twenty-four: the public homepage gallery (Jun 13; migration 0174)
+
+- **Phase 2 of photo_destinations shipped**: the homepage "Real dogs, real driveways" section is
+  now a living wall. A script calls the anon `website_gallery()` feed and, once at least 6 photos
+  are approved, replaces the three curated fallback shots with the live, owner-approved dogs
+  (responsive grid, dog-name captions, staggered fade-in, hover zoom). Below 6 it keeps the
+  curated shots, so the most important page never looks thin (Paul's guidance question: homepage
+  section, with the self-hiding-when-thin guard as the answer to its only real downside).
+- **No edge function needed** (those deploys are gated): at approval the owner's browser mints a
+  1-year signed URL and stores it on `visit_photos.website_public_url`; the anon feed hands those
+  URLs to the page. Unpublish clears the URL; FIFO roll-off drops it from the feed. Verified the
+  anon feed returns a live photo and reverted. A real public bucket (permanent URLs, hard-delete
+  on unpublish) is the parked upgrade if the yearly expiry ever bites.

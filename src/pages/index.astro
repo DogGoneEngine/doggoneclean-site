@@ -182,13 +182,52 @@ const recurringSteps = [
           home. Calm dogs, clean dogs, no trip to a salon.
         </p>
       </div>
-      <div class="gallery">
+      <!-- Curated fallback shots. Once enough real dogs are approved to the
+           gallery, the script below replaces these with the live wall. -->
+      <div class="gallery" id="home-gallery-grid">
         <img src="/photos/gallery-1.jpg" loading="lazy" alt="Paul with a calm black Lab in the Hurricane Bath trailer" />
         <img src="/photos/gallery-2.jpg" loading="lazy" alt="Paul with a relaxed yellow Lab in the trailer" />
         <img src="/photos/gallery-3.jpg" loading="lazy" alt="Paul with a happy white German Shepherd in the bright trailer" />
       </div>
     </div>
   </section>
+
+  <script>
+    // The living wall of clean dogs: pull the owner-approved gallery photos and,
+    // only when there are enough to look full, replace the curated fallback with
+    // them. Below the floor the homepage keeps the three baseline shots, so it
+    // never looks thin (photo_destinations).
+    import { createClient } from '@supabase/supabase-js';
+    import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../components/portal/supabase.js';
+    const MIN_TO_SHOW = 6;
+    const grid = document.getElementById('home-gallery-grid');
+    if (grid) {
+      const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      });
+      client.rpc('website_gallery').then(({ data }) => {
+        const photos = Array.isArray(data) ? data : [];
+        if (photos.length < MIN_TO_SHOW) return;
+        grid.classList.add('gallery--live');
+        grid.replaceChildren(...photos.map((p, idx) => {
+          const fig = document.createElement('figure');
+          fig.className = 'gallery__item';
+          fig.style.animationDelay = (idx * 0.05) + 's';
+          const img = document.createElement('img');
+          img.src = p.url;
+          img.loading = 'lazy';
+          img.alt = p.dog_name ? `${p.dog_name}, freshly bathed by Dog Gone Clean` : 'A freshly bathed dog from Dog Gone Clean';
+          fig.append(img);
+          if (p.dog_name) {
+            const cap = document.createElement('figcaption');
+            cap.textContent = p.dog_name;
+            fig.append(cap);
+          }
+          return fig;
+        }));
+      }).catch(() => { /* the gallery is a bonus; the curated shots stand on their own */ });
+    }
+  </script>
 
   <!-- THE LOOP -->
   <section class="section loop-section">
@@ -772,5 +811,47 @@ const recurringSteps = [
   }
   @media (min-width: 760px) {
     .gallery { grid-template-columns: repeat(3, 1fr); }
+  }
+  /* The live wall of approved dogs: a tighter responsive grid with name
+     captions and a gentle staggered fade-in. */
+  .gallery--live {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+  @media (min-width: 760px) {
+    .gallery--live { grid-template-columns: repeat(3, 1fr); }
+  }
+  .gallery__item {
+    position: relative;
+    margin: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    animation: gallery-fade 0.6s ease both;
+  }
+  .gallery__item img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .gallery__item:hover img { transform: scale(1.04); }
+  .gallery__item figcaption {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 22px 12px 9px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  }
+  @keyframes gallery-fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gallery__item { animation: none; }
+    .gallery__item:hover img { transform: none; }
   }
 </style>
