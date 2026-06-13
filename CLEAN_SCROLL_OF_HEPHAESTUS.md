@@ -3491,3 +3491,10 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   (clearer, outcome-aligned; disposition stays 'dismissed' in the DB). Also captured Alyson Rahn:
   dog Charlie (Goldendoodle, normally $150 but always comped because family), office at Strategic
   Partners set as her alternate address with a note he is sometimes groomed there.
+
+- **Info buttons completed across the floors (Jun 13)**: added the corner "i" to the remaining
+  floors with action buttons: Vendors, Operations, Compliance, HR, Knowledge (Clients + Schedule
+  shipped just before). Read-only / single-action / stub floors (Pricing, Geography, Reports,
+  Settings, Audit, Family, Calendar, Finance, Growth, Prospectus) need none. The help_on_demand
+  standard is now applied everywhere a card has buttons. Also corrected Charlie's comped price
+  from $150 to $175 on Alyson Rahn's record.

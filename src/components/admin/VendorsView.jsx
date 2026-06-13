@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { listSupplies, upsertSupply, supplyAction, runReorderCheck } from './supabase.js';
+import HelpToggle from './Help.jsx';
 
 const CATS = ['shampoo', 'towels', 'blades', 'tools', 'cleaning', 'consumables', 'office', 'other'];
 
@@ -56,7 +57,13 @@ export default function VendorsView() {
       {loading || !data ? (
         <div className="ad-panel">Loading…</div>
       ) : (
-        <div className="ad-panel" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className="ad-panel" style={{ display: 'flex', flexDirection: 'column', gap: 6, position: 'relative' }}>
+          <HelpToggle corner items={[
+            ['Mark low', 'Flags the reorder on Today before you run out. Clear low once it is restocked.'],
+            ['Ordered', 'Resets the reorder clock the moment you reorder, so the next reminder is timed right.'],
+            ['Add supply / Edit', 'Add a supply or change its vendor, reorder link, and how often you reorder it.'],
+            ['Run check now', 'Looks at everything right now and drops anything due onto your Today feed.'],
+          ]} />
           {data.items.map((it) => <Row key={it.id} item={it} onChanged={load} />)}
           {adding
             ? <Row item={null} onChanged={() => { setAdding(false); load(); }} onCancel={() => setAdding(false)} />

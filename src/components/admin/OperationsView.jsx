@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { listEquipment, upsertEquipment, deleteEquipment, runMaintenanceCheck, adminInfraStatus } from './supabase.js';
 import GeneratorsPanel from './GeneratorsPanel.jsx';
 import MaintenancePanel from './MaintenancePanel.jsx';
+import HelpToggle from './Help.jsx';
 
 const CATS = ['trailer', 'tow_vehicle', 'generator', 'bath_system', 'dryer', 'clippers', 'rotary', 'water_system', 'other'];
 
@@ -69,7 +70,13 @@ export default function OperationsView() {
       {loading || !data ? (
         <div className="ad-panel">Loading…</div>
       ) : (
-        <div className="ad-panel" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className="ad-panel" style={{ display: 'flex', flexDirection: 'column', gap: 6, position: 'relative' }}>
+          <HelpToggle corner items={[
+            ['Add equipment / Edit', 'Track a piece of gear: set when it was last serviced and how often, and the watcher flags it before it is overdue.'],
+            ['Run check now', 'Looks at all gear right now and drops anything due for service onto Today.'],
+            ['Maintenance: Done', 'Up in the Maintenance schedule, Done marks a service complete and resets its cycle.'],
+            ['Generators: hours', "Up in Generators and power, enter engine hours and each appliance's watts to see free capacity."],
+          ]} />
           {data.items.map((it) => <Row key={it.id} item={it} onChanged={load} />)}
           {adding
             ? <Row item={null} onChanged={() => { setAdding(false); load(); }} onCancel={() => setAdding(false)} />
