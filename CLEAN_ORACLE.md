@@ -2025,6 +2025,21 @@ sitting there (Reply, Mark read) and two that cleared it but looked identical
 card you cannot confidently clear is a card that piles up. Being tried before a
 final call (Paul, 2026-06-13).
 
+`access_map_reads_the_truth` (Clean: engineering):
+Orbit has one emperor-only Access page that shows, per role (Emperor, Employee,
+Stakeholder), exactly what that person sees: their menu, and what is hidden
+inside the floors they can open, plus a Preview-as that walks their menu live. It
+is built so it can never drift from reality. The menu half is generated from the
+one role-to-floors definition the live nav also gates on (roles.js), so there are
+not two lists to keep in sync, only one. The masking half is read live by
+admin_access_probe, which calls the real masking RPCs once as the owner and once
+as a representative of each other role and reports the fields that disappear, so
+the page shows what the server actually strips, not a hand-written note that can
+go stale; an unknown stripped field still shows by its raw name so nothing can
+hide. Because access creep is silent: permissions get added one at a time and a
+year later no one can say who sees what, and a map you cannot trust is worse than
+no map. A description drifts; a generated map cannot. Paul, 2026-06-13.
+
 `stop_closes_the_loop` (Clean: clients):
 When a client taps the portal stop sign, three things happen in one
 transaction: every future appointment is cancelled including pencilled

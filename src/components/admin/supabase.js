@@ -575,6 +575,12 @@ export async function reopenBriefing(id) {
   return rpc('admin_reopen_briefing', { p_id: id });
 }
 
+// The masking half of the access map, read live from the real RPCs per role
+// (owner-only). Returns field names hidden for each role, never any client data.
+export async function accessProbe() {
+  return rpc('admin_access_probe');
+}
+
 // Wisdom / knowledge capture --------------------------------------------------
 
 export async function captureWisdom(body, clientId = null) {

@@ -29,64 +29,12 @@ import QuickCapture from './QuickCapture.jsx';
 import FamilyView from './FamilyView.jsx';
 import LibraryView from './LibraryView.jsx';
 import ProspectusView from './ProspectusView.jsx';
+import AccessView from './AccessView.jsx';
+import { SECTIONS, READY, floorsFor, ROLE_MODE } from './roles.js';
 import './admin.css';
 
-// The department taxonomy. `what` is the one-line definition shown in the shell
-// until the department is built; it is the to-do list in plain sight.
-const SECTIONS = [
-  { key: 'family',    label: 'Family',         ready: true,
-    what: 'The stakeholder window: how the business is doing, where Paul is today, and the dogs. Signal, not noise.' },
-  { key: 'today',     label: 'Today',          ready: true,
-    what: 'The crystal ball. Today’s route and next stop, money in motion, and the briefing feed from your AI department heads.' },
-  { key: 'calendar',  label: 'Calendar',       ready: true,
-    what: 'Every appointment across the bath book and the legacy book, month and week, with a Google Calendar import overlay.' },
-  { key: 'schedule',  label: 'Schedule',       ready: true,
-    what: 'Set your work days and work hours, block a date, open a Saturday. Your real availability per city.' },
-  { key: 'clients',   label: 'Clients',        ready: true,
-    what: 'The contact-sheet database. Each client’s semi-permanent header over a growing visit history.' },
-  { key: 'geography', label: 'Geography',      ready: true,
-    what: 'Service polygons, plus-code zones, and the drive-time perimeter that gates new signups.' },
-  { key: 'operations', label: 'Operations',    ready: true,
-    what: 'The trailer, wash system, generators, climate, and maintenance intervals. Pre-trip checklist and maintenance-due alerts.' },
-  { key: 'finance',   label: 'Finance',        ready: true,
-    what: 'Revenue per visit and per hour, who owes you, the Square and Stripe split, and the expense ledger. Home of the CFO.' },
-  { key: 'pricing',   label: 'Pricing',        ready: true,
-    what: 'The locked price grid per city and coat tier, and the founders-spot counter.' },
-  { key: 'hr',        label: 'HR',             ready: true,
-    what: 'You today, your specialists later. Roles, hours, pay, commission tiers, and onboarding.' },
-  { key: 'growth',    label: 'Growth',         ready: true,
-    what: 'The lead funnel, the waitlist, referrals, retention, and a churn watch.' },
-  { key: 'compliance', label: 'Compliance',    ready: true,
-    what: 'Insurance and license renewals, A2P registration, payment-processor verification, and tax dates.' },
-  { key: 'vendors',   label: 'Vendors',        ready: true,
-    what: 'Suppliers, reorder points, and the running-low tracker for shampoo, water, and parts.' },
-  { key: 'knowledge', label: 'Knowledge base', ready: true,
-    what: 'The wisdom inbox: reasons captured by the speed dial or by replying to an agent, on their way into the Oracle or a client record.' },
-  { key: 'library',   label: 'Library',        ready: true,
-    what: 'The asset library: every photo and video you hand the business, with notes, even before it has a use. Claude reads it each session.' },
-  { key: 'reports',   label: 'Reports',        ready: true,
-    what: 'Cross-department rollups: the weekly business review, the revenue-per-hour trend, and the briefing archive.' },
-  { key: 'prospectus', label: 'Prospectus',    ready: true,
-    what: 'The standing pitch to a buyer who does not exist yet, computed live from the operating data, every claim with a receipt.' },
-  { key: 'audit',     label: 'Audit log',      ready: true,
-    what: 'Every owner action and every AI recommendation, append-only.' },
-  { key: 'settings',  label: 'Settings',       ready: true,
-    what: 'Owner identity, the Google, Stripe, Square, and Claude integrations, and notification killswitches.' },
-];
-
-const READY = SECTIONS.filter((s) => s.ready).map((s) => s.key);
-
-// A Hurricane Bath Operator sees the floors the route needs and nothing
-// else; the data inside them is masked server-side (admin_get_client and
-// admin_today_appointments strip contact and money for the operator role),
-// so this list is navigation, not the security boundary.
-const OPERATOR_FLOORS = ['today', 'calendar', 'clients'];
-// The viewer role (Kristin): a stakeholder, not day-to-day. The Family window
-// (family_window_into_the_business) plus the Prospectus, so a stakeholder sees
-// both how the business is doing day to day and what it is worth. The
-// admin_prospectus RPC gates on _is_admin(), which an active viewer passes, so
-// surfacing it here is navigation, not a new grant.
-const VIEWER_FLOORS = ['family', 'prospectus'];
+// SECTIONS, the floor lists, and the role definitions live in roles.js so the
+// access map and this nav read one source of truth and cannot drift apart.
 
 export default function AdminApp() {
   const [session, setSession] = useState(null);
@@ -102,6 +50,8 @@ export default function AdminApp() {
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [clientFocus, setClientFocus] = useState({ id: null, n: 0 });
+  // Preview as: an owner can walk another role's menu. Owner-only, menu-only.
+  const [previewRole, setPreviewRole] = useState(null);
   const closeDrawer = () => setDrawerOpen(false);
   const pickSection = (key) => { setSection(key); setDrawerOpen(false); };
   // Open a client's contact sheet from anywhere (e.g. a Today stop): jump to the
@@ -175,9 +125,11 @@ export default function AdminApp() {
     );
   }
 
-  const isOperator = me.role === 'operator';
-  const isViewer = me.role === 'viewer';
-  const floors = isViewer ? VIEWER_FLOORS : isOperator ? OPERATOR_FLOORS : null;
+  const isOwner = me.role === 'owner';
+  // When the owner previews another role, only the menu changes; data stays the
+  // owner's. The banner says so, and the Access page lists what is masked inside.
+  const navRole = (isOwner && previewRole) ? previewRole : me.role;
+  const floors = floorsFor(navRole);
   // Owners skip the Family floor in their own nav (it is for stakeholders);
   // it stays reachable by role, not by menu clutter.
   const visibleSections = floors
@@ -191,6 +143,20 @@ export default function AdminApp() {
 
   return (
     <div className={'ad-app ' + (drawerOpen ? 'ad-app--drawer-open' : '')}>
+      {isOwner && previewRole && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60,
+          background: 'var(--ad-primary, #2563d8)', color: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+          padding: '8px 14px', fontSize: 13, flexWrap: 'wrap',
+        }}>
+          <span>Previewing the <strong>{ROLE_MODE[previewRole] || previewRole}</strong> menu. This is what they see; what is hidden inside is on the Access page.</span>
+          <button className="ad-btn ad-btn--sm" style={{ background: '#fff', color: 'var(--ad-primary,#2563d8)' }}
+            onClick={() => { setPreviewRole(null); setSection('access'); }}>
+            Exit preview
+          </button>
+        </div>
+      )}
       <div className="ad-mobilebar">
         <button
           type="button"
@@ -272,6 +238,7 @@ export default function AdminApp() {
         {effectiveSection === 'geography' && <GeographyView />}
         {effectiveSection === 'library' && <LibraryView />}
         {effectiveSection === 'prospectus' && <ProspectusView />}
+        {effectiveSection === 'access' && <AccessView onPreview={setPreviewRole} />}
         {!READY.includes(effectiveSection) && <RoadmapPanel section={active} />}
       </main>
 
