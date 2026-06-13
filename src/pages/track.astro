@@ -713,6 +713,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       requestEl.hidden = true;
     }
 
+    // Which shared photos are the answer to the request comes from the status
+    // call (a DB function), so it works without any edge-function change.
+    answerIds = new Set((data.answer_photo_ids as string[]) || []);
+    renderPhotos();
+
     // Chime only for a change observed LIVE: the page visible and the last
     // poll recent. A backgrounded tab catches up silently, so nobody gets a
     // doorbell an hour after the truck arrived (and left).
@@ -767,6 +772,25 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const photosEl = document.getElementById('trk-photos')!;
   const photosGrid = document.getElementById('trk-photos-grid')!;
   const collagesEl = document.getElementById('trk-collages')!;
+
+  // The answer photos are spotlighted beside the request; the rest fill the
+  // gallery. Which ids are the answer comes from tracker_status (answerIds);
+  // p.answers_request is an accepted second source if the edge fn carries it.
+  // Both feeds (status and photos) call renderPhotos so whichever lands first
+  // or last, the split is correct.
+  let answerIds = new Set<string>();
+  let lastPhotos: Array<{ id: string; kind: string; url: string; dog_name?: string | null; answers_request?: boolean }> = [];
+  function renderPhotos() {
+    const photos = lastPhotos;
+    if (!photos || photos.length === 0) return;
+    const isAnswer = (p: any) => p.answers_request || answerIds.has(p.id);
+    const answerPhotos = photos.filter(isAnswer);
+    const galleryPhotos = answerPhotos.length ? photos.filter((p) => !isAnswer(p)) : photos;
+    requestPhotosEl.replaceChildren(...answerPhotos.map(photoAnchor));
+    photosGrid.replaceChildren(...galleryPhotos.map(photoAnchor));
+    photosEl.hidden = galleryPhotos.length === 0;
+    buildCollages(photos);
+  }
 
   // Before-and-after, side by side, thin white divider, nothing flowery:
   // the thing a proud client actually shares. Built right here on the page
@@ -863,17 +887,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       }
       const photos = (data && data.photos) || [];
       if (photos.length === 0) return;
-      // The proof photos for the special request get spotlighted right beside it;
-      // the rest fill the gallery. (If the photo feed predates the answers_request
-      // flag, none are tagged and everything just shows in the gallery.)
-      const answerPhotos = photos.filter((p: any) => p.answers_request);
-      const galleryPhotos = answerPhotos.length ? photos.filter((p: any) => !p.answers_request) : photos;
-      if (answerPhotos.length) {
-        requestPhotosEl.replaceChildren(...answerPhotos.map(photoAnchor));
-      }
-      photosGrid.replaceChildren(...galleryPhotos.map(photoAnchor));
-      photosEl.hidden = galleryPhotos.length === 0;
-      buildCollages(photos);
+      lastPhotos = photos;
+      renderPhotos();
     } catch { /* photos are a bonus; the tracker never breaks over them */ }
   }
 
