@@ -3378,3 +3378,24 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   already gets from tracker-photos. DB functions deploy freely via SQL, so the whole feature is
   live with no edge change. Verified: tagging a photo Answer makes tracker_status list its id;
   untagged after. Lesson: when an edge deploy is gated, carry the signal in a SQL-deployable RPC.
+
+### Batch twenty-three: photo destinations + the owner-approved website queue (Jun 13; migration 0173)
+
+- **Three independent share destinations on a visit photo** (`photo_destinations`): Client (existing),
+  Team (internal Orbit gallery), Website (public marketing gallery). Per-photo chips in VisitPhotos
+  (Client / Team / Web / Answer), color-coded.
+- **The website is owner-approved** (`website_is_owner_approved`, folded into photo_destinations):
+  anyone can SUGGEST a photo (website_state -> queued); only the owner role APPROVES it live, from
+  the Library's new Website tab. Built as a role power so the privilege can be granted later. FIFO
+  cap of 24 (newest in, oldest rolls off). Verified the boundary on dgc-prod: Jake (operator) could
+  suggest (queued) but his approve raised "owner only"; Paul's approve set it live; cleaned up.
+  This was Paul's security concern: an employee must not be able to put anything on the public site.
+- **Library is now three tabs**: Assets (the original upload shelf), Team gallery (all roles), and
+  Website (owner-only review: a queue with Approve/Reject and a live list with Pull-from-website).
+- **Schema**: visit_photos gained team_visible, website_state, website_proposed_by/approved_by/live_at;
+  admin_get_client carries team_visible + website_state so the chips persist.
+- **Phase 2 pending**: the actual public /gallery marketing page that renders the live photos. It
+  needs a public storage bucket (the visit-photos bucket is private/signed-URL), so publishing will
+  copy the approved photo into a public bucket from the owner's browser (edge-function deploys are
+  gated). Parked in CLEAN_PARKING_LOT.md. The whole approval pipeline is live and safe in the
+  meantime; "live" photos just have no public page to show on yet.

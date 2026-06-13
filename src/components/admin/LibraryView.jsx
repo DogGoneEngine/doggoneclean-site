@@ -1,24 +1,84 @@
 // src/components/admin/LibraryView.jsx
 //
-// The Library: the asset library (photo_inbox_for_claude, grown up). Every
-// photo and video Paul hands the business lives here, like the old
-// Squarespace asset bucket: a great shot goes on the shelf even with no use
-// for it yet, instead of getting lost in the Google Photos stream. Each item
-// carries an editable note (what it is, what should happen with it) and a
-// status: new (just arrived, Claude triages it next session), shelf (kept
-// for later), used, dropped. Claude reads this floor's data from the bucket
-// by path each session.
+// The Library, now three shelves (photo_destinations):
+//  - Assets: the hand-uploaded asset bucket (photo_inbox_for_claude, grown up).
+//    Every photo/video Paul hands the business, with a note and a status.
+//  - Team gallery: visit photos toggled Team, kept for internal enjoyment, for
+//    everyone who logs in. Not customer-facing.
+//  - Website: owner-only. The approval queue for the public gallery plus what
+//    is live. Employees can suggest a photo; only the owner approves it live.
 //
-// Upload limit: the Supabase free plan caps a single file at 50MB. Phone
-// videos often exceed that; those go to Google Drive instead, where Claude
-// can read them with the Drive tools.
+// Upload limit on Assets: the Supabase free plan caps a single file at 50MB.
+// Phone videos often exceed that; those go to Google Drive instead.
 
 import { useCallback, useEffect, useState } from 'react';
-import { addInboxPhoto, listInbox, updateInboxNote, setInboxStatus, signedPhotoUrl } from './supabase.js';
+import {
+  addInboxPhoto, listInbox, updateInboxNote, setInboxStatus, signedPhotoUrl, adminSelf,
+  teamGallery, websiteReview, approvePhotoWebsite, unpublishPhotoWebsite, withdrawPhotoWebsite,
+} from './supabase.js';
 
 const STATUS_LABEL = { new: 'New', shelf: 'On the shelf', used: 'Used', dropped: 'Dropped' };
+const GRID = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 };
+
+// Sign preview URLs for a list of items that each carry a `path`.
+function useSignedUrls(items) {
+  const [urls, setUrls] = useState({});
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const entries = await Promise.all((items || []).map(async (i) => {
+        try { return [i.id, await signedPhotoUrl(i.path)]; } catch { return [i.id, null]; }
+      }));
+      if (alive) setUrls(Object.fromEntries(entries));
+    })();
+    return () => { alive = false; };
+  }, [items]);
+  return urls;
+}
+
+function caption(i) {
+  const who = i.dog_name || i.client || '';
+  const when = i.visited_at ? new Date(i.visited_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+  return [who, when].filter(Boolean).join(' · ');
+}
 
 export default function LibraryView() {
+  const [tab, setTab] = useState('assets');
+  const [me, setMe] = useState(null);
+  useEffect(() => { adminSelf().then(setMe).catch(() => {}); }, []);
+  const isOwner = me?.role === 'owner';
+
+  const tabs = [
+    ['assets', 'Assets'],
+    ['team', 'Team gallery'],
+    ...(isOwner ? [['website', 'Website']] : []),
+  ];
+
+  return (
+    <>
+      <h1>Library</h1>
+      <p className="ad-sub">
+        Photos and videos with a life beyond their visit. Assets is the upload shelf; the Team gallery is the crew's internal keep; Website is the public gallery you approve.
+      </p>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        {tabs.map(([key, label]) => (
+          <button key={key} onClick={() => setTab(key)}
+            className={'ad-btn ad-btn--sm ' + (tab === key ? '' : 'ad-btn--ghost')}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'assets' && <AssetsShelf />}
+      {tab === 'team' && <TeamGallery />}
+      {tab === 'website' && isOwner && <WebsiteReview />}
+    </>
+  );
+}
+
+// ---- Assets (the original library) ------------------------------------------
+function AssetsShelf() {
   const [items, setItems] = useState([]);
   const [urls, setUrls] = useState({});
   const [note, setNote] = useState('');
@@ -35,8 +95,6 @@ export default function LibraryView() {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  // Signed preview URLs, fetched lazily per item; videos get the same signed
-  // URL and render in a <video> tag.
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -69,21 +127,14 @@ export default function LibraryView() {
     try { await updateInboxNote(id, editText.trim() || null); setEditId(null); setEditText(''); load(); }
     catch (x) { setErr(x.message || 'note_save_failed'); }
   }
-
   async function setStatus(id, status) {
     try { await setInboxStatus(id, status); load(); }
     catch (x) { setErr(x.message || 'status_failed'); }
   }
-
   const isVideo = (path) => /\.(mp4|webm|mov|m4v|mkv)$/i.test(path);
 
   return (
     <>
-      <h1>Library</h1>
-      <p className="ad-sub">
-        Every photo and video you hand the business. Drop a great shot here even with no use for it yet; nothing gets lost in the photo stream. Claude reads this library each session and acts on the notes.
-      </p>
-
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <input className="pt-input" type="text" value={note} placeholder="What is this and what should happen with it? (You can also add the note after.)"
           onChange={(e) => setNote(e.target.value)}
@@ -136,6 +187,116 @@ export default function LibraryView() {
           ))}
         </div>
       )}
+    </>
+  );
+}
+
+// ---- Team gallery (internal, all roles) -------------------------------------
+function TeamGallery() {
+  const [items, setItems] = useState(null);
+  const [err, setErr] = useState(null);
+  useEffect(() => { teamGallery().then((d) => setItems(d || [])).catch((e) => setErr(e.message || 'load_failed')); }, []);
+  const urls = useSignedUrls(items || []);
+  if (err) return <div className="ad-error">{err}</div>;
+  if (!items) return <div className="ad-panel" style={{ opacity: 0.6 }}>Loading the gallery…</div>;
+  if (items.length === 0) return <div className="ad-panel" style={{ opacity: 0.6 }}>No team photos yet. Tap Team on any visit photo to keep it here.</div>;
+  return (
+    <div style={GRID}>
+      {items.map((i) => (
+        <figure key={i.id} className="ad-panel" style={{ padding: 8, margin: 0 }}>
+          <div style={{ aspectRatio: '1 / 1', borderRadius: 8, overflow: 'hidden', background: 'var(--ad-surface-container, #f5f4f1)' }}>
+            {urls[i.id]
+              ? <a href={urls[i.id]} target="_blank" rel="noreferrer"><img src={urls[i.id]} alt={caption(i)} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></a>
+              : <span style={{ fontSize: 11, opacity: 0.5 }}>…</span>}
+          </div>
+          <figcaption style={{ fontSize: 12, opacity: 0.7, marginTop: 6, display: 'flex', justifyContent: 'space-between', gap: 6 }}>
+            <span>{caption(i)}</span>
+            {i.website_state === 'live' && <span title="Live on the website" style={{ color: 'var(--ad-warn, #b9770a)' }}>web</span>}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
+
+// ---- Website review (owner only) --------------------------------------------
+function WebsiteReview() {
+  const [data, setData] = useState(null);
+  const [err, setErr] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(() => websiteReview().then(setData).catch((e) => setErr(e.message || 'load_failed')), []);
+  useEffect(() => { load(); }, [load]);
+  const queued = data?.queued || [];
+  const live = data?.live || [];
+  const cap = data?.cap || 24;
+  const qUrls = useSignedUrls(queued);
+  const lUrls = useSignedUrls(live);
+
+  async function act(fn, id) {
+    setBusy(true); setErr(null);
+    try { await fn(id); await load(); }
+    catch (e) { setErr(e.message || 'action_failed'); }
+    finally { setBusy(false); }
+  }
+
+  if (err) return <div className="ad-error">{err}</div>;
+  if (!data) return <div className="ad-panel" style={{ opacity: 0.6 }}>Loading the queue…</div>;
+
+  return (
+    <>
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>
+          Waiting for your approval ({queued.length})
+        </div>
+        {queued.length === 0 ? (
+          <div style={{ fontSize: 13, opacity: 0.6 }}>Nothing waiting. Anyone can suggest a photo from a visit; it lands here for you.</div>
+        ) : (
+          <div style={GRID}>
+            {queued.map((i) => (
+              <figure key={i.id} className="ad-panel" style={{ padding: 8, margin: 0 }}>
+                <div style={{ aspectRatio: '1 / 1', borderRadius: 8, overflow: 'hidden', background: 'var(--ad-surface-container, #f5f4f1)' }}>
+                  {qUrls[i.id]
+                    ? <a href={qUrls[i.id]} target="_blank" rel="noreferrer"><img src={qUrls[i.id]} alt={caption(i)} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></a>
+                    : <span style={{ fontSize: 11, opacity: 0.5 }}>…</span>}
+                </div>
+                <figcaption style={{ fontSize: 12, opacity: 0.7, margin: '6px 0' }}>
+                  {caption(i)}{i.proposed_by ? ` · by ${i.proposed_by}` : ''}
+                </figcaption>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => act(approvePhotoWebsite, i.id)}>Approve</button>
+                  <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => act(withdrawPhotoWebsite, i.id)}>Reject</button>
+                </div>
+              </figure>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="ad-panel">
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>
+          Live on the website ({live.length} of {cap})
+        </div>
+        {live.length === 0 ? (
+          <div style={{ fontSize: 13, opacity: 0.6 }}>Nothing live yet. Approve a photo above and it goes on the public gallery.</div>
+        ) : (
+          <div style={GRID}>
+            {live.map((i) => (
+              <figure key={i.id} className="ad-panel" style={{ padding: 8, margin: 0 }}>
+                <div style={{ aspectRatio: '1 / 1', borderRadius: 8, overflow: 'hidden', background: 'var(--ad-surface-container, #f5f4f1)' }}>
+                  {lUrls[i.id]
+                    ? <a href={lUrls[i.id]} target="_blank" rel="noreferrer"><img src={lUrls[i.id]} alt={caption(i)} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></a>
+                    : <span style={{ fontSize: 11, opacity: 0.5 }}>…</span>}
+                </div>
+                <figcaption style={{ fontSize: 12, opacity: 0.7, margin: '6px 0' }}>{caption(i)}</figcaption>
+                <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => act(unpublishPhotoWebsite, i.id)}>Pull from website</button>
+              </figure>
+            ))}
+          </div>
+        )}
+        <div style={{ fontSize: 11, opacity: 0.55, marginTop: 10 }}>
+          The public gallery shows the newest {cap}. Approving more rolls the oldest off on its own.
+        </div>
+      </div>
     </>
   );
 }

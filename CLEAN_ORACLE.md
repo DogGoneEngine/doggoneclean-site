@@ -2040,6 +2040,23 @@ hide. Because access creep is silent: permissions get added one at a time and a
 year later no one can say who sees what, and a map you cannot trust is worse than
 no map. A description drifts; a generated map cannot. Paul, 2026-06-13.
 
+`photo_destinations` (Clean: engineering):
+A visit photo has three independent share destinations, each its own chip on the
+photo: Client (their portal and tracker), Team (an internal Orbit gallery for the
+whole crew, in the Library), and Website (the public marketing gallery). The
+website is the only one an employee cannot reach alone: anyone may SUGGEST a photo
+for the website and it queues, but only the owner role APPROVES it live, from the
+Library's Website tab. Built as a role power, not a person, so the approver
+privilege can be granted to someone else later without a rewrite. The public
+gallery holds the newest cap (24); approving past the cap rolls the oldest off on
+its own. Tagging Team or suggesting Website is reversible and low-stakes;
+publishing to the public web is the guarded, owner-only, single-place action.
+Because the website is public and hard to take back, and an employee accidentally
+or unilaterally putting a photo on the company's public site is the one sharing
+mistake with real blast radius; everything else is a one-tap undo. No content rule
+yet: the owner is the final judge of what is safe to publish (no license plates,
+faces, house numbers). Paul, 2026-06-13.
+
 `stop_closes_the_loop` (Clean: clients):
 When a client taps the portal stop sign, three things happen in one
 transaction: every future appointment is cancelled including pencilled

@@ -6,7 +6,7 @@
 // no capture, so the gallery is offered, not just the camera. See visit_photos_capture.
 
 import { useState, useEffect, useCallback } from 'react';
-import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoAnswersRequest, setPhotoDog, adminSelf } from './supabase.js';
+import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoAnswersRequest, setPhotoTeam, suggestPhotoWebsite, withdrawPhotoWebsite, setPhotoDog, adminSelf } from './supabase.js';
 
 // "With dog" reads wrong; the photo is the dog WITH the person running the
 // appointment, so the label carries the operator's name (today: Paul; when
@@ -92,9 +92,13 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
   // client's portal (later the Dog Gone Tracker too). Optimistic toggle.
   const [shared, setShared] = useState({});
   const [answer, setAnswer] = useState({});
+  const [team, setTeam] = useState({});
+  const [web, setWeb] = useState({});
   useEffect(() => {
     setShared(Object.fromEntries(photos.map((p) => [p.id, !!p.client_visible])));
     setAnswer(Object.fromEntries(photos.map((p) => [p.id, !!p.answers_request])));
+    setTeam(Object.fromEntries(photos.map((p) => [p.id, !!p.team_visible])));
+    setWeb(Object.fromEntries(photos.map((p) => [p.id, p.website_state || 'none'])));
   }, [photos]);
   async function toggleShare(p) {
     const next = !shared[p.id];
@@ -102,6 +106,24 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
     setError(null);
     try { await setPhotoVisibility(p.id, next); }
     catch (e) { setShared((s) => ({ ...s, [p.id]: !next })); setError(e.message || 'share_failed'); }
+  }
+  async function toggleTeam(p) {
+    const next = !team[p.id];
+    setTeam((s) => ({ ...s, [p.id]: next }));
+    setError(null);
+    try { await setPhotoTeam(p.id, next); }
+    catch (e) { setTeam((s) => ({ ...s, [p.id]: !next })); setError(e.message || 'team_failed'); }
+  }
+  // Website from a photo is suggest-only for everyone; the owner approves a
+  // queued photo in the Library's Website tab. A fat finger can at worst queue.
+  async function webAction(p) {
+    const cur = web[p.id] || 'none';
+    if (cur === 'live') return; // pulling a live photo is owner-only, in review
+    const next = cur === 'queued' ? 'none' : 'queued';
+    setWeb((s) => ({ ...s, [p.id]: next }));
+    setError(null);
+    try { next === 'queued' ? await suggestPhotoWebsite(p.id) : await withdrawPhotoWebsite(p.id); }
+    catch (e) { setWeb((s) => ({ ...s, [p.id]: cur })); setError(e.message || 'website_failed'); }
   }
   // Tag a photo as the proof of what the client asked for. The server also
   // shares it (the client must see the proof on their tracker), so reflect that.
@@ -119,7 +141,7 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
       {photos.length > 0 && (
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
           {photos.map((p) => (
-            <div key={p.id} style={{ width: 64 }}>
+            <div key={p.id} style={{ width: 92 }}>
               <div style={{ position: 'relative' }}>
                 <a href={urls[p.id] || undefined} target="_blank" rel="noreferrer" title={KIND_LABEL[p.kind]}>
                   <div style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden', background: 'var(--ad-surface-container, #f1f1f4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -135,20 +157,26 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
                 >{photoLabel(p)}</span>
                 <button onClick={() => remove(p)} disabled={busy} title="remove" style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', border: 'none', background: '#dc2626', color: '#fff', fontSize: 11, cursor: 'pointer', lineHeight: 1 }}>×</button>
               </div>
-              <button
-                onClick={() => toggleShare(p)}
-                title={shared[p.id] ? 'Shared: the client sees this in their portal' : 'Not shared: only you see this'}
-                style={{ marginTop: 3, width: '100%', fontSize: 9, fontWeight: 700, padding: '2px 0', borderRadius: 6, cursor: 'pointer', border: '1px solid', borderColor: shared[p.id] ? 'var(--ad-accent, #2563d8)' : 'var(--ad-outline, #d5d5dd)', background: shared[p.id] ? 'var(--ad-accent, #2563d8)' : 'transparent', color: shared[p.id] ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}
-              >
-                {shared[p.id] ? 'Shared' : 'Share'}
-              </button>
-              <button
-                onClick={() => toggleAnswer(p)}
-                title={answer[p.id] ? 'This is the proof of what they asked for; it shows next to their request on the tracker' : 'Mark this as the answer to their special request (also shares it)'}
-                style={{ marginTop: 3, width: '100%', fontSize: 9, fontWeight: 700, padding: '2px 0', borderRadius: 6, cursor: 'pointer', border: '1px solid', borderColor: answer[p.id] ? 'var(--ad-good, #1f8a4b)' : 'var(--ad-outline, #d5d5dd)', background: answer[p.id] ? 'var(--ad-good, #1f8a4b)' : 'transparent', color: answer[p.id] ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}
-              >
-                {answer[p.id] ? 'Answer ✓' : 'Answer'}
-              </button>
+              {/* Destinations: where this photo is shared. Each is independent.
+                  Website is suggest-only here; the owner approves in Library. */}
+              <div style={{ marginTop: 3, display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                <Chip on={shared[p.id]} onColor="var(--ad-accent, #2563d8)" onClick={() => toggleShare(p)}
+                  title={shared[p.id] ? 'Client sees this in their portal and tracker' : 'Share to the client'}>
+                  {shared[p.id] ? 'Client ✓' : 'Client'}
+                </Chip>
+                <Chip on={team[p.id]} onColor="var(--ad-good, #1f8a4b)" onClick={() => toggleTeam(p)}
+                  title={team[p.id] ? 'In the internal Team gallery' : 'Add to the internal Team gallery'}>
+                  {team[p.id] ? 'Team ✓' : 'Team'}
+                </Chip>
+                <Chip on={web[p.id] && web[p.id] !== 'none'} onColor="var(--ad-warn, #b9770a)" onClick={() => webAction(p)}
+                  title={web[p.id] === 'live' ? 'Live on the website (pull it in Library)' : web[p.id] === 'queued' ? 'Suggested; waiting for the owner to approve. Tap to withdraw.' : 'Suggest for the public website (the owner approves)'}>
+                  {web[p.id] === 'live' ? 'Web ✓' : web[p.id] === 'queued' ? 'Queued' : 'Web'}
+                </Chip>
+                <Chip on={answer[p.id]} onColor="#7c3aed" onClick={() => toggleAnswer(p)}
+                  title={answer[p.id] ? 'Proof of what they asked for; shows beside their request on the tracker' : 'Mark as the answer to their special request (also shares to client)'}>
+                  {answer[p.id] ? 'Answer ✓' : 'Answer'}
+                </Chip>
+              </div>
             </div>
           ))}
         </div>
@@ -191,5 +219,17 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
       )}
       {error && <div className="ad-error" style={{ marginTop: 6 }}>{error}</div>}
     </div>
+  );
+}
+
+// A small destination chip: filled in its color when on, outline when off.
+function Chip({ on, onColor, onClick, title, children }) {
+  return (
+    <button onClick={onClick} title={title}
+      style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 6, cursor: 'pointer',
+        border: '1px solid', borderColor: on ? onColor : 'var(--ad-outline, #d5d5dd)',
+        background: on ? onColor : 'transparent', color: on ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}>
+      {children}
+    </button>
   );
 }
