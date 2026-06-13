@@ -170,6 +170,16 @@ export async function setPhotoVisibility(id, visible) {
   return rpc('admin_set_photo_visibility', { p_id: id, p_visible: visible });
 }
 
+// The heard-and-delivered loop (tracker_heard_and_delivered). Capture a per-visit
+// special request at the door (by appointment; finds-or-creates the visit), and
+// tag the photo that answers it (which also shares it so the client sees the proof).
+export async function setVisitRequest(appointmentId, text) {
+  return rpc('admin_set_visit_request', { p_appointment_id: appointmentId, p_text: text });
+}
+export async function setPhotoAnswersRequest(id, val) {
+  return rpc('admin_set_photo_answers_request', { p_id: id, p_val: val });
+}
+
 export async function setClientNofly(clientId, banned, reason = null) {
   return rpc('admin_set_client_nofly', { p_client_id: clientId, p_banned: banned, p_reason: reason });
 }

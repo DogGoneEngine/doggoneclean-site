@@ -6,7 +6,7 @@
 // no capture, so the gallery is offered, not just the camera. See visit_photos_capture.
 
 import { useState, useEffect, useCallback } from 'react';
-import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoDog, adminSelf } from './supabase.js';
+import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoAnswersRequest, setPhotoDog, adminSelf } from './supabase.js';
 
 // "With dog" reads wrong; the photo is the dog WITH the person running the
 // appointment, so the label carries the operator's name (today: Paul; when
@@ -91,8 +91,10 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
   // Sharing is per photo and deliberate: a shared photo shows in the
   // client's portal (later the Dog Gone Tracker too). Optimistic toggle.
   const [shared, setShared] = useState({});
+  const [answer, setAnswer] = useState({});
   useEffect(() => {
     setShared(Object.fromEntries(photos.map((p) => [p.id, !!p.client_visible])));
+    setAnswer(Object.fromEntries(photos.map((p) => [p.id, !!p.answers_request])));
   }, [photos]);
   async function toggleShare(p) {
     const next = !shared[p.id];
@@ -100,6 +102,16 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
     setError(null);
     try { await setPhotoVisibility(p.id, next); }
     catch (e) { setShared((s) => ({ ...s, [p.id]: !next })); setError(e.message || 'share_failed'); }
+  }
+  // Tag a photo as the proof of what the client asked for. The server also
+  // shares it (the client must see the proof on their tracker), so reflect that.
+  async function toggleAnswer(p) {
+    const next = !answer[p.id];
+    setAnswer((s) => ({ ...s, [p.id]: next }));
+    if (next) setShared((s) => ({ ...s, [p.id]: true }));
+    setError(null);
+    try { await setPhotoAnswersRequest(p.id, next); }
+    catch (e) { setAnswer((s) => ({ ...s, [p.id]: !next })); setError(e.message || 'tag_failed'); }
   }
 
   return (
@@ -129,6 +141,13 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
                 style={{ marginTop: 3, width: '100%', fontSize: 9, fontWeight: 700, padding: '2px 0', borderRadius: 6, cursor: 'pointer', border: '1px solid', borderColor: shared[p.id] ? 'var(--ad-accent, #2563d8)' : 'var(--ad-outline, #d5d5dd)', background: shared[p.id] ? 'var(--ad-accent, #2563d8)' : 'transparent', color: shared[p.id] ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}
               >
                 {shared[p.id] ? 'Shared' : 'Share'}
+              </button>
+              <button
+                onClick={() => toggleAnswer(p)}
+                title={answer[p.id] ? 'This is the proof of what they asked for; it shows next to their request on the tracker' : 'Mark this as the answer to their special request (also shares it)'}
+                style={{ marginTop: 3, width: '100%', fontSize: 9, fontWeight: 700, padding: '2px 0', borderRadius: 6, cursor: 'pointer', border: '1px solid', borderColor: answer[p.id] ? 'var(--ad-good, #1f8a4b)' : 'var(--ad-outline, #d5d5dd)', background: answer[p.id] ? 'var(--ad-good, #1f8a4b)' : 'transparent', color: answer[p.id] ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}
+              >
+                {answer[p.id] ? 'Answer ✓' : 'Answer'}
               </button>
             </div>
           ))}

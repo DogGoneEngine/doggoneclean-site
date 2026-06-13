@@ -65,6 +65,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </button>
 
         <p class="trk-block" id="trk-block"></p>
+
+        <!-- The heard-and-delivered loop: what the client asked for at the door,
+             shown back so they know they were heard, then the proof photos. -->
+        <div class="trk-request" id="trk-request" hidden>
+          <p class="trk-request__ask">You asked for <strong id="trk-request-text"></strong></p>
+          <p class="trk-request__status" id="trk-request-status"></p>
+          <div class="trk-request__photos" id="trk-request-photos"></div>
+        </div>
+
         <div class="trk-photos" id="trk-photos" hidden>
           <p class="trk-photos__label">Photos from this visit</p>
           <!-- The shareable moment: once a before and an after both exist,
@@ -340,6 +349,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
   .trk-card--missing { text-align: center; color: var(--soft); }
 
+  .trk-request {
+    margin: var(--space-lg) auto 0;
+    max-width: 30rem;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(34, 211, 238, 0.08));
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    text-align: left;
+  }
+  .trk-request__ask { font-size: 0.95rem; margin: 0; }
+  .trk-request__ask strong { color: #2563eb; }
+  .trk-request__status { font-size: 0.85rem; opacity: 0.7; margin: 4px 0 0; }
+  .trk-request__photos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .trk-request__photos:empty { margin-top: 0; }
+  .trk-request__photos a { position: relative; display: block; }
+  .trk-request__photos img { width: 88px; height: 88px; object-fit: cover; border-radius: 10px; display: block; }
+  .trk-request__photos span { position: absolute; bottom: 0; left: 0; right: 0; font-size: 9px; text-align: center; background: rgba(0, 0, 0, 0.55); color: #fff; border-radius: 0 0 10px 10px; }
+
   .trk-meet {
     margin-top: var(--space-xl);
     padding: 0;
@@ -439,6 +466,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const missingLinkEl = document.getElementById('trk-missing-link') as HTMLAnchorElement;
   const blockEl = document.getElementById('trk-block')!;
   const meetEl = document.getElementById('trk-meet')!;
+  const requestEl = document.getElementById('trk-request')!;
+  const requestTextEl = document.getElementById('trk-request-text')!;
+  const requestStatusEl = document.getElementById('trk-request-status')!;
+  const requestPhotosEl = document.getElementById('trk-request-photos')!;
 
   const dayFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'long', day: 'numeric' });
   const timeFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
@@ -671,6 +702,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       blockEl.textContent = '';
     }
 
+    // The heard-and-delivered loop: show what they asked for, and whether it is
+    // handled yet. The proof photos fill in from refreshPhotos.
+    const req = (data.special_request || '').trim();
+    if (req) {
+      requestEl.hidden = false;
+      requestTextEl.textContent = req;
+      requestStatusEl.textContent = data.request_delivered ? 'Done, just for you.' : 'We heard you. We will take care of it.';
+    } else {
+      requestEl.hidden = true;
+    }
+
     // Chime only for a change observed LIVE: the page visible and the last
     // poll recent. A backgrounded tab catches up silently, so nobody gets a
     // doorbell an hour after the truck arrived (and left).
@@ -707,6 +749,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     if (p.kind === 'with_dog') return p.dog_name ? `${OPERATOR_FIRST} and ${p.dog_name}` : `With ${OPERATOR_FIRST}`;
     const base = PHOTO_LABELS[p.kind] || 'Photo';
     return p.dog_name ? `${base}, ${p.dog_name}` : base;
+  }
+  function photoAnchor(p: { id: string; kind: string; url: string; dog_name?: string | null }) {
+    const a = document.createElement('a');
+    a.href = p.url;
+    a.target = '_blank';
+    a.rel = 'noreferrer';
+    const img = document.createElement('img');
+    img.src = p.url;
+    img.loading = 'lazy';
+    img.alt = photoLabel(p);
+    const label = document.createElement('span');
+    label.textContent = photoLabel(p);
+    a.append(img, label);
+    return a;
   }
   const photosEl = document.getElementById('trk-photos')!;
   const photosGrid = document.getElementById('trk-photos-grid')!;
@@ -807,21 +863,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       }
       const photos = (data && data.photos) || [];
       if (photos.length === 0) return;
-      photosGrid.replaceChildren(...photos.map((p: { id: string; kind: string; url: string; dog_name?: string }) => {
-        const a = document.createElement('a');
-        a.href = p.url;
-        a.target = '_blank';
-        a.rel = 'noreferrer';
-        const img = document.createElement('img');
-        img.src = p.url;
-        img.loading = 'lazy';
-        img.alt = photoLabel(p);
-        const label = document.createElement('span');
-        label.textContent = photoLabel(p);
-        a.append(img, label);
-        return a;
-      }));
-      photosEl.hidden = false;
+      // The proof photos for the special request get spotlighted right beside it;
+      // the rest fill the gallery. (If the photo feed predates the answers_request
+      // flag, none are tagged and everything just shows in the gallery.)
+      const answerPhotos = photos.filter((p: any) => p.answers_request);
+      const galleryPhotos = answerPhotos.length ? photos.filter((p: any) => !p.answers_request) : photos;
+      if (answerPhotos.length) {
+        requestPhotosEl.replaceChildren(...answerPhotos.map(photoAnchor));
+      }
+      photosGrid.replaceChildren(...galleryPhotos.map(photoAnchor));
+      photosEl.hidden = galleryPhotos.length === 0;
       buildCollages(photos);
     } catch { /* photos are a bonus; the tracker never breaks over them */ }
   }

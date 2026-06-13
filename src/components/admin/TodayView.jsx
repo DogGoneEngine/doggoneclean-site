@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, uploadTaskProof, signedPhotoUrl } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, uploadTaskProof, signedPhotoUrl } from './supabase.js';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
@@ -431,6 +431,9 @@ function StopCard({ appt, onOpenClient }) {
   const [undoAsk, setUndoAsk] = useState(false);
   const [err, setErr] = useState(false);
   const [shareState, setShareState] = useState(null); // null | 'shared' | 'copied'
+  const [request, setRequest] = useState(appt.special_request || '');
+  const [reqBusy, setReqBusy] = useState(false);
+  const [reqSaved, setReqSaved] = useState(false);
   const [showTimes, setShowTimes] = useState(false);
   const [meta, setMeta] = useState(null);   // { tracker_token, operator_admin_id, operator_name }
   const [team, setTeam] = useState(null);
@@ -449,7 +452,7 @@ function StopCard({ appt, onOpenClient }) {
     const m = meta || await loadMeta();
     if (!m || !m.tracker_token) { setErr(true); return; }
     const url = `https://hurricanebath.com/track?t=${m.tracker_token}`;
-    const text = `Dog Gone Clean is rolling your way! Track our progress to your driveway, watch the live ETA and map, and follow every step through to all done: ${url}`;
+    const text = `Dog Gone Clean is rolling your way! Track our drive to your door on the live map, then follow the whole visit, photos and all, right through to done: ${url}`;
     if (navigator.share) {
       try { await navigator.share({ text }); setShareState('shared'); return; }
       catch { /* sheet closed; fall through to copy */ }
@@ -487,7 +490,7 @@ function StopCard({ appt, onOpenClient }) {
         setStatus('on_the_way');
         startLocationShare(appt.id);
         const url = `https://hurricanebath.com/track?t=${res.tracker_token}`;
-        const text = `Dog Gone Clean is rolling your way! Track our progress to your driveway, watch the live ETA and map, and follow every step through to all done: ${url}`;
+        const text = `Dog Gone Clean is rolling your way! Track our drive to your door on the live map, then follow the whole visit, photos and all, right through to done: ${url}`;
         if (navigator.share) {
           try { await navigator.share({ text }); setShareState('shared'); }
           catch { setShareState(null); } // user closed the sheet; no-op
@@ -545,6 +548,13 @@ function StopCard({ appt, onOpenClient }) {
     : (status === 'on_site' || status === 'in_service') ? 'tells them to watch the door'
     : status === 'returning' ? 'stamps Done and closes the stop'
     : 'marks on the way and shares the tracker link';
+
+  async function saveRequest() {
+    setReqBusy(true);
+    try { await setVisitRequest(appt.id, request); setReqSaved(true); setTimeout(() => setReqSaved(false), 2000); }
+    catch { setErr(true); }
+    finally { setReqBusy(false); }
+  }
 
   return (
     <div style={{ border: '1px solid var(--ad-outline, #ececf1)', borderRadius: 12, overflow: 'hidden' }}>
@@ -618,6 +628,19 @@ function StopCard({ appt, onOpenClient }) {
               Operator: {meta.operator_name ? meta.operator_name.split(' ')[0] : 'Paul'}
             </button>
           ))}
+        </div>
+
+        {/* Special request the client made at the door. Shows on their tracker
+            as "you asked for", then proven with the photo tagged Answer. */}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+          <input
+            type="text" value={request} onChange={(e) => setRequest(e.target.value)}
+            placeholder="Special request (e.g. ears a little shorter)"
+            style={{ flex: 1, minWidth: 160, fontSize: 13, padding: '6px 9px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box' }}
+          />
+          <button type="button" className="ad-btn ad-btn--ghost ad-btn--sm" disabled={reqBusy || request === (appt.special_request || '')} onClick={saveRequest}>
+            {reqBusy ? '…' : reqSaved ? 'Saved' : 'Save'}
+          </button>
         </div>
 
         <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', flexWrap: 'wrap' }}>

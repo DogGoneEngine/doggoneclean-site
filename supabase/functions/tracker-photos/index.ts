@@ -115,19 +115,19 @@ Deno.serve(async (req) => {
 
   const { data: photos } = await sb
     .from('visit_photos')
-    .select('id, kind, storage_path, created_at, dog_id, dogs(name)')
+    .select('id, kind, storage_path, created_at, dog_id, answers_request, dogs(name)')
     .in('visit_id', visitIds)
     .eq('client_visible', true)
     .order('created_at', { ascending: true });
   if (!photos || photos.length === 0) return json({ photos: [], who_is_coming: who, operator_photo: operatorPhoto });
 
-  const out: { id: string; kind: string; url: string; dog_name: string | null }[] = [];
+  const out: { id: string; kind: string; url: string; dog_name: string | null; answers_request: boolean }[] = [];
   for (const p of photos) {
     const { data: signed } = await sb.storage
       .from('visit-photos')
       .createSignedUrl(p.storage_path, SIGNED_URL_SECONDS);
     if (signed?.signedUrl) {
-      out.push({ id: p.id, kind: p.kind, url: signed.signedUrl, dog_name: (p as any).dogs?.name ?? null });
+      out.push({ id: p.id, kind: p.kind, url: signed.signedUrl, dog_name: (p as any).dogs?.name ?? null, answers_request: !!(p as any).answers_request });
     }
   }
   return json({ photos: out, who_is_coming: who, operator_photo: operatorPhoto });

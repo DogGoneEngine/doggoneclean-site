@@ -2052,6 +2052,20 @@ brags that stopping is two taps with no phone call, and a stop nobody
 notices is how a client quietly disappears and a route day silently gains
 a hole; the easy exit must still inform the house. Paul, 2026-06-12.
 
+`tracker_heard_and_delivered` (Clean: clients):
+The Dog Gone Tracker proves the client was heard, not just served. A special
+request the client makes at the door ("clip the ears a little shorter") is
+captured per visit on the Today stop card, and the moment it is saved the
+client's tracker shows "You asked for ..." so anyone following along sees their
+ask landed. When the visit wraps (returning or done) that line reads as delivered,
+and any photo Paul tags as the Answer shows right beside the request as the proof,
+not just a checkmark. Per visit on purpose: a standing preference would be noise;
+the ask belongs to this visit and ties to this visit's proof photos. Tagging a
+photo Answer also shares it, because the whole point is the client sees it.
+Because the un-promptable moat is grateful clients and proprietary per-client
+care: "they heard me and showed me" is something no competitor can copy and no AI
+can prompt its way into (`dig_the_moat`). Paul, 2026-06-13.
+
 `riker_parses_on_the_record` (Clean: engineering):
 Every Riker parse is logged (riker_log: utterance, client, full plan), so a
 "Riker would not cooperate" report is diagnosed from the actual parses, not
