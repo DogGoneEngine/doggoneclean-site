@@ -158,7 +158,13 @@ function AssetsShelf() {
 
   return (
     <>
-      <div className="ad-panel" style={{ marginBottom: 16 }}>
+      <div className="ad-panel" style={{ marginBottom: 16, position: 'relative' }}>
+        <HelpToggle corner items={[
+          ['Add a photo or video', 'Drops a file into your library shelf to keep, even before it has a use.'],
+          ['Shelf', 'You keep it. It stays in your library for later.'],
+          ['Drop', 'You are done with it. It leaves the library.'],
+          ['Tap the note', 'Tap the text under any item to add or change what it says.'],
+        ]} />
         <input className="pt-input" type="text" value={note} placeholder="What is this and what should happen with it? (You can also add the note after.)"
           onChange={(e) => setNote(e.target.value)}
           style={{ width: '100%', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', marginBottom: 8 }} />
@@ -173,15 +179,6 @@ function AssetsShelf() {
       {items.length === 0 ? (
         <div className="ad-panel" style={{ opacity: 0.6 }}>Nothing in the library yet.</div>
       ) : (
-        <>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, fontSize: 12, opacity: 0.7 }}>
-          <span>Each item shows its status. Not sure about the buttons?</span>
-          <HelpToggle items={[
-            ['Shelf', 'You keep it. It stays in your library for later.'],
-            ['Drop', 'You are done with it. It leaves the library.'],
-            ['Tap the note', 'Tap the text under any item to add or change what it says.'],
-          ]} />
-        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
           {items.map((i) => (
             <div key={i.id} className="ad-panel" style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -218,7 +215,6 @@ function AssetsShelf() {
             </div>
           ))}
         </div>
-        </>
       )}
     </>
   );

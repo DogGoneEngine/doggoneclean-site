@@ -3483,3 +3483,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   and confusable pairs are written so the difference is unmistakable (Leave it alone = gone for
   good; Dismiss = gone for now, can return). Applied across the briefing cards, Tasks, From-the-
   field, Library (Assets + Website), and the photo chips. Rule updated to require outcome-first help.
+
+- **Info-button + briefing-card polish (Jun 13)**: (1) Library info button moved to the always-
+  present corner of the upload panel (it had only shown once the shelf had items, which read as
+  "the info buttons don't work"). (2) The four briefing answers are now equal weight, all ghost,
+  so none looks pre-tapped (Handled it had been filled blue). (3) Renamed Dismiss to "Not now"
+  (clearer, outcome-aligned; disposition stays 'dismissed' in the DB). Also captured Alyson Rahn:
+  dog Charlie (Goldendoodle, normally $150 but always comped because family), office at Strategic
+  Partners set as her alternate address with a note he is sometimes groomed there.
