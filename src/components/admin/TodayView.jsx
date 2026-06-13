@@ -852,7 +852,7 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
   const teamName = (id) => { const m = team.find((x) => x.id === id); return m ? `${m.first_name}${m.last_name ? ` ${m.last_name}` : ''}` : 'a teammate'; };
   const doHandle = () => act(() => resolveBriefing(b.id, 'done', reply.trim() || null), 'Handled', true);
   const doLeaveAlone = () => act(() => resolveBriefing(b.id, 'intentional', reply.trim() || null), 'Left alone, the agent will stop flagging it', true);
-  const doDismiss = () => act(() => resolveBriefing(b.id, 'dismissed', reply.trim() || null), 'Dismissed', true);
+  const doDismiss = () => act(() => resolveBriefing(b.id, 'dismissed', reply.trim() || null), 'Set aside for now', true);
   const doNote = () => reply.trim() && act(async () => { await replyBriefing(b.id, reply.trim()); setReply(''); }, null, false);
   // Hand the card to whoever works for Clean as a task. It leaves the feed and
   // resolves itself when they finish it; an hours-ask card carries its hours
@@ -894,7 +894,7 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
         ['Handled it', 'The card goes away. For when you already took care of this yourself.'],
         ['Hand off', 'It leaves your list and becomes a teammate\'s job. It comes back only once they finish it.'],
         ['Leave it alone', 'The card goes away and you never hear about this one again. For things that are fine on purpose.'],
-        ['Dismiss', 'The card goes away for now, but it can come back later if it still matters. Use it for "not now".'],
+        ['Not now', 'The card goes away for now, but it can come back later if it still matters.'],
         ['Save hours', 'On an hours card: type the number off the panel and the card goes away, hours updated.'],
         ['Reply box', 'Your reason sticks to the card for good and the agent writes back, so the why behind a decision is never lost. It rides along with whatever answer you tap; Just leave a note keeps the card open.'],
         ['Undo', 'Tapped the wrong one? An Undo shows for a moment and puts the card right back.'],
@@ -955,14 +955,14 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
         rows={2}
         style={{ width: '100%', marginTop: 8, fontSize: 13, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }}
       />
-      {/* The four answers. Every one clears the card; nothing else does. */}
+      {/* The four answers, all equal weight (none pre-filled, none looks tapped). */}
       <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-        {!hoursAsk && <button className="ad-btn ad-btn--sm" onClick={doHandle} disabled={busy} title="I already took care of this">Handled it</button>}
+        {!hoursAsk && <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doHandle} disabled={busy} title="I already took care of this">Handled it</button>}
         {canDelegate && !delegating && (
           <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setDelegating(true)} disabled={busy} title="Give it to someone as a task">Hand off</button>
         )}
         <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doLeaveAlone} disabled={busy} title="On purpose; stop flagging it for good">Leave it alone</button>
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doDismiss} disabled={busy} title="Clear it; the agent can raise it again if it still matters">Dismiss</button>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doDismiss} disabled={busy} title="Clear it for now; it can come back later">Not now</button>
         {reply.trim() && (
           <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doNote} disabled={busy} title="Record a note and keep the card open">Just leave a note</button>
         )}
