@@ -74,6 +74,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class="trk-request__photos" id="trk-request-photos"></div>
         </div>
 
+        <!-- Worth a look: the operator shows the client something they would not
+             normally see. Calm, never alarming, never advice. -->
+        <div class="trk-worth" id="trk-worth" hidden></div>
+
         <div class="trk-photos" id="trk-photos" hidden>
           <p class="trk-photos__label">Photos from this visit</p>
           <!-- The shareable moment: once a before and an after both exist,
@@ -367,6 +371,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .trk-request__photos img { width: 88px; height: 88px; object-fit: cover; border-radius: 10px; display: block; }
   .trk-request__photos span { position: absolute; bottom: 0; left: 0; right: 0; font-size: 9px; text-align: center; background: rgba(0, 0, 0, 0.55); color: #fff; border-radius: 0 0 10px 10px; }
 
+  .trk-worth { margin: var(--space-lg) auto 0; max-width: 30rem; display: flex; flex-direction: column; gap: 12px; }
+  .trk-worth__card { padding: 14px 16px; border-radius: 16px; text-align: left; background: var(--surface, #fff); border: 1px solid var(--line, #e6e3dc); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+  .trk-worth__by { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent, #2563eb); margin: 0 0 6px; }
+  .trk-worth__msg { font-size: 0.95rem; margin: 0 0 10px; }
+  .trk-worth__card a { display: block; }
+  .trk-worth__card img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 12px; display: block; }
+  .trk-worth__note { font-size: 0.9rem; opacity: 0.8; margin: 8px 0 0; }
+
   .trk-meet {
     margin-top: var(--space-xl);
     padding: 0;
@@ -470,6 +482,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const requestTextEl = document.getElementById('trk-request-text')!;
   const requestStatusEl = document.getElementById('trk-request-status')!;
   const requestPhotosEl = document.getElementById('trk-request-photos')!;
+  const worthEl = document.getElementById('trk-worth')!;
 
   const dayFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'long', day: 'numeric' });
   const timeFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
@@ -716,6 +729,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     // Which shared photos are the answer to the request comes from the status
     // call (a DB function), so it works without any edge-function change.
     answerIds = new Set((data.answer_photo_ids as string[]) || []);
+    worthItems = (data.worth_a_look as Array<{ id: string; note?: string; by?: string }>) || [];
     renderPhotos();
 
     // Chime only for a change observed LIVE: the page visible and the last
@@ -780,13 +794,54 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   // Both feeds (status and photos) call renderPhotos so whichever lands first
   // or last, the split is correct.
   let answerIds = new Set<string>();
+  let worthItems: Array<{ id: string; note?: string | null; by?: string | null }> = [];
   let lastPhotos: Array<{ id: string; kind: string; url: string; dog_name?: string | null; answers_request?: boolean }> = [];
+
+  // The fixed, locked framing for a worth-a-look. Never changes; the operator's
+  // note is their specific observation underneath it.
+  const WORTH_MSG = "Here's something I noticed up close, the kind of thing that's easy to miss in everyday life. Take a look, and take it from there.";
+
+  function renderWorth() {
+    if (!worthItems.length) { worthEl.hidden = true; return; }
+    const byId = new Map(lastPhotos.map((p) => [p.id, p]));
+    worthEl.replaceChildren(...worthItems.map((w) => {
+      const card = document.createElement('div');
+      card.className = 'trk-worth__card';
+      const by = document.createElement('p');
+      by.className = 'trk-worth__by';
+      by.textContent = 'From ' + (w.by || 'Dog Gone Clean');
+      const msg = document.createElement('p');
+      msg.className = 'trk-worth__msg';
+      msg.textContent = WORTH_MSG;
+      card.append(by, msg);
+      const p = byId.get(w.id);
+      if (p && p.url) {
+        const a = document.createElement('a');
+        a.href = p.url; a.target = '_blank'; a.rel = 'noreferrer';
+        const img = document.createElement('img');
+        img.src = p.url; img.loading = 'lazy'; img.alt = 'Something to look at from your visit';
+        a.append(img);
+        card.append(a);
+      }
+      if (w.note) {
+        const note = document.createElement('p');
+        note.className = 'trk-worth__note';
+        note.textContent = w.note;
+        card.append(note);
+      }
+      return card;
+    }));
+    worthEl.hidden = false;
+  }
+
   function renderPhotos() {
+    renderWorth();
     const photos = lastPhotos;
     if (!photos || photos.length === 0) return;
+    const hidden = new Set<string>([...answerIds, ...worthItems.map((w) => w.id)]);
     const isAnswer = (p: any) => p.answers_request || answerIds.has(p.id);
     const answerPhotos = photos.filter(isAnswer);
-    const galleryPhotos = answerPhotos.length ? photos.filter((p) => !isAnswer(p)) : photos;
+    const galleryPhotos = photos.filter((p) => !hidden.has(p.id) && !p.answers_request);
     requestPhotosEl.replaceChildren(...answerPhotos.map(photoAnchor));
     photosGrid.replaceChildren(...galleryPhotos.map(photoAnchor));
     photosEl.hidden = galleryPhotos.length === 0;

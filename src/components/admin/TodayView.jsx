@@ -7,7 +7,8 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, uploadTaskProof, signedPhotoUrl } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, fieldFlags, markFieldSeen, uploadTaskProof, signedPhotoUrl } from './supabase.js';
+import HelpToggle from './Help.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_TINT = { confirmed: '#1f8a4b', tentative: '#2563d8', requested: '#b9770a', on_the_way: '#2563d8', on_site: '#2563d8', returning: '#2563d8', in_service: '#2563d8', completed: '#565b6c' };
@@ -182,6 +183,8 @@ export default function TodayView({ onOpenClient }) {
           the same agent on one screen read as clutter. The client sheet
           keeps its fixed-client Riker box. */}
 
+      {isOwner && <FromTheField />}
+
       <TasksPanel />
 
       {error && <div className="ad-error">{error}</div>}
@@ -198,6 +201,56 @@ export default function TodayView({ onOpenClient }) {
         </div>
       )}
     </>
+  );
+}
+
+// From the field (field_flag): photos an operator flagged for the owner with a
+// private note. Owner-only; hidden when there is nothing flagged. Mark "Got it"
+// to clear it.
+function FromTheField() {
+  const [items, setItems] = useState(null);
+  const [urls, setUrls] = useState({});
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(() => { fieldFlags().then((d) => setItems(d || [])).catch(() => setItems([])); }, []);
+  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      for (const i of (items || [])) {
+        if (urls[i.id]) continue;
+        try { const u = await signedPhotoUrl(i.path); if (alive) setUrls((prev) => ({ ...prev, [i.id]: u })); } catch { /* skip preview */ }
+      }
+    })();
+    return () => { alive = false; };
+  }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
+  async function seen(id) {
+    setBusy(true);
+    try { await markFieldSeen(id); load(); } catch { /* leave it */ } finally { setBusy(false); }
+  }
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>From the field</span>
+        <HelpToggle items={[['From the field', 'Photos a teammate flagged for you on a visit, with a private note. Tap Got it to clear one.']]} />
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {items.map((i) => (
+          <div key={i.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', opacity: i.seen ? 0.55 : 1 }}>
+            {urls[i.id] && (
+              <a href={urls[i.id]} target="_blank" rel="noreferrer">
+                <img src={urls[i.id]} alt="" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }} />
+              </a>
+            )}
+            <div style={{ flex: 1, fontSize: 14 }}>
+              <strong>{i.by || 'A teammate'}</strong> flagged{i.dog_name ? ` ${i.dog_name}` : ''}{i.client ? ` (${i.client})` : ''}
+              {i.note && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 2 }}>{i.note}</div>}
+            </div>
+            {!i.seen && <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => seen(i.id)}>Got it</button>}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -893,6 +946,13 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
         {reply.trim() && (
           <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={doNote} disabled={busy} title="Record a note and keep the card open">Just leave a note</button>
         )}
+        <HelpToggle items={[
+          ['Handle it', 'You are taking care of it. Clears the card.'],
+          ['Hand off', 'Give it to someone as a task; it comes back done.'],
+          ['Leave it alone', 'On purpose. The agent stops flagging it for good.'],
+          ['Dismiss', 'Clear it for now; the agent may raise it again if it still matters.'],
+          ['Note', 'Type in the box, then any answer carries your note. Just leave a note keeps the card open.'],
+        ]} />
       </div>
       {canDelegate && delegating && (
         <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>

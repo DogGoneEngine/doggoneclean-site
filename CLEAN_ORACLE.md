@@ -2095,6 +2095,23 @@ to learn a screen by tapping, not by asking. Roll it out wherever a button's job
 is not self-evident. First home: the Library status buttons (Shelf, Drop). Paul,
 2026-06-13.
 
+`look_at_this_flags` (Clean: clients):
+An operator can flag a single visit photo plus a short note to one of two
+audiences. Worth a look goes to the CLIENT: it auto-shares and appears on their
+tracker as a calm "From <operator>" card with one fixed, locked, non-medical line
+("Here's something I noticed up close, the kind of thing that's easy to miss in
+everyday life. Take a look, and take it from there.") above the operator's
+specific observation and the photo. It is a heads-up to look, never a diagnosis,
+recommendation, or accusation; the locked wording carries that and the operator's
+note stays observational (what is seen, not what it is or what to do). From the
+field goes to the OWNER: it lands on the owner's Today as a private card with an
+owner-only note kept in a SEPARATE column (field_note) so it can never leak to the
+client, cleared with Got it. Because the operator sees things up close the client
+and owner never will (skin under the lifted coat, inside the ears, a lump, odd
+behavior), and the value is surfacing it to the right person without playing vet:
+the framing is fixed so it cannot drift into advice. Photo now; field video
+parked. Paul, 2026-06-13.
+
 `stop_closes_the_loop` (Clean: clients):
 When a client taps the portal stop sign, three things happen in one
 transaction: every future appointment is cancelled including pencilled

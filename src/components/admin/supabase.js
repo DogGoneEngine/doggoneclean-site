@@ -200,6 +200,21 @@ export async function unpublishPhotoWebsite(id) {
 export async function teamGallery() {
   return rpc('admin_team_gallery');
 }
+
+// "Look at this" photo flags. Worth a look shows the client (auto-shares);
+// flag-for-owner sends it to the owner's Today feed (owner-private note).
+export async function setWorthALook(id, on, note = null) {
+  return rpc('admin_set_worth_a_look', { p_id: id, p_on: on, p_note: note });
+}
+export async function flagForOwner(id, note = null) {
+  return rpc('admin_flag_for_owner', { p_id: id, p_note: note });
+}
+export async function fieldFlags() {
+  return rpc('admin_field_flags');
+}
+export async function markFieldSeen(id) {
+  return rpc('admin_mark_field_seen', { p_id: id });
+}
 export async function websiteReview() {
   return rpc('admin_website_review');
 }

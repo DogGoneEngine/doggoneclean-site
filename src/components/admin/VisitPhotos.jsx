@@ -6,7 +6,8 @@
 // no capture, so the gallery is offered, not just the camera. See visit_photos_capture.
 
 import { useState, useEffect, useCallback } from 'react';
-import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoAnswersRequest, setPhotoTeam, suggestPhotoWebsite, withdrawPhotoWebsite, setPhotoDog, adminSelf } from './supabase.js';
+import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoAnswersRequest, setPhotoTeam, suggestPhotoWebsite, withdrawPhotoWebsite, setWorthALook, flagForOwner, setPhotoDog, adminSelf } from './supabase.js';
+import HelpToggle from './Help.jsx';
 
 // "With dog" reads wrong; the photo is the dog WITH the person running the
 // appointment, so the label carries the operator's name (today: Paul; when
@@ -139,6 +140,18 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
   return (
     <div style={{ marginTop: 6 }}>
       {photos.length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, fontSize: 11, opacity: 0.7 }}>
+          <span>Where each photo goes</span>
+          <HelpToggle items={[
+            ['Client', 'The client sees it in their portal and on the tracker.'],
+            ['Team', 'Keeps it in the internal Team gallery (your crew, not the client).'],
+            ['Web', 'Suggests it for the public website. Only the owner approves it live.'],
+            ['Answer', 'Marks it as the proof of a special request; shows beside that request on the tracker.'],
+            ['Flag', 'Worth a look sends it to the client as a heads-up; For the owner sends it to the owner privately.'],
+          ]} />
+        </div>
+      )}
+      {photos.length > 0 && (
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
           {photos.map((p) => (
             <div key={p.id} style={{ width: 92 }}>
@@ -177,6 +190,7 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
                   {answer[p.id] ? 'Answer ✓' : 'Answer'}
                 </Chip>
               </div>
+              <PhotoFlag photo={p} onChanged={onChanged} />
             </div>
           ))}
         </div>
@@ -218,6 +232,51 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
         <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(true)}>+ Photos</button>
       )}
       {error && <div className="ad-error" style={{ marginTop: 6 }}>{error}</div>}
+    </div>
+  );
+}
+
+// Per-photo "look at this" flags: Worth a look (to the client) and For the owner
+// (private). Both carry a short note. Expandable so the chips stay uncluttered.
+function PhotoFlag({ photo, onChanged }) {
+  const [open, setOpen] = useState(false);
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const wal = !!photo.worth_a_look;
+  const fld = !!photo.field_flag;
+
+  async function run(fn) {
+    setBusy(true); setErr(null);
+    try { await fn(); setOpen(false); setNote(''); onChanged?.(); }
+    catch (e) { setErr(e.message || 'flag_failed'); setBusy(false); }
+  }
+
+  return (
+    <div style={{ marginTop: 4 }}>
+      {(wal || fld) && (
+        <div style={{ fontSize: 9, opacity: 0.75, marginBottom: 2 }}>
+          {wal && <span style={{ color: 'var(--ad-accent, #2563d8)' }}>Worth a look ✓ </span>}
+          {fld && <span style={{ color: 'var(--ad-warn, #b9770a)' }}>Sent to owner ✓</span>}
+        </div>
+      )}
+      {!open ? (
+        <button type="button" onClick={() => setOpen(true)}
+          style={{ width: '100%', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 6, cursor: 'pointer', border: '1px dashed var(--ad-outline, #d5d5dd)', background: 'transparent', color: 'var(--ad-text-dim, #565b6c)' }}>
+          Flag…
+        </button>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="What you noticed (optional)"
+            style={{ width: '100%', fontSize: 11, padding: '4px 6px', borderRadius: 6, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', resize: 'vertical' }} />
+          <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => run(() => setWorthALook(photo.id, true, note.trim() || null))}>Worth a look (client)</button>
+          <button className="ad-btn ad-btn--sm ad-btn--ghost" disabled={busy} onClick={() => run(() => flagForOwner(photo.id, note.trim() || null))}>For the owner</button>
+          {wal && <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => run(() => setWorthALook(photo.id, false))}>Remove worth-a-look</button>}
+          <button type="button" onClick={() => { setOpen(false); setErr(null); }}
+            style={{ fontSize: 10, background: 'transparent', border: 0, color: 'var(--ad-text-dim, #565b6c)', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>cancel</button>
+          {err && <div className="ad-error" style={{ fontSize: 10 }}>{err}</div>}
+        </div>
+      )}
     </div>
   );
 }
