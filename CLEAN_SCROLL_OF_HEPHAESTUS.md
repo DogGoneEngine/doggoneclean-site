@@ -3498,3 +3498,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   Settings, Audit, Family, Calendar, Finance, Growth, Prospectus) need none. The help_on_demand
   standard is now applied everywhere a card has buttons. Also corrected Charlie's comped price
   from $150 to $175 on Alyson Rahn's record.
+
+- **Exceptions zone for out-of-area clients** (`exceptions_zone`, Paul 2026-06-13): rather than
+  add outlying towns as service cities (which would clutter the markets and booking funnel),
+  out-of-area clients get the single routing zone "Exceptions"; their real town stays in the
+  address. Scanned the book for non-Ocala clients and tagged: Alyson Rahn (Brunswick), Brooksley
+  Sheehe (Anthony), Greta Custer (Dunnellon), Tonya Hunt (Williston, a scan find). Chester Weber
+  ("near-base") is Ocala, not tagged. Unresolved: Maria Arvanitis (Paul recalls Summerfield, but
+  her record reads Ocala 34480 / Ocala-SE), flagged for Paul rather than guessed.
