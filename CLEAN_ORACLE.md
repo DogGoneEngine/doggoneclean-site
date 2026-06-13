@@ -1988,6 +1988,25 @@ photo). Because delegation only works when "done" is observable: Paul needs
 to see that Jake did it, when, and to what standard, without standing next
 to him. Paul, 2026-06-12.
 
+`delegation_closes_the_loop` (Clean: operations):
+Handing work down can never become a new void. The owner can hand any agent
+card on Today to whoever works for Clean ("Hand to"): it becomes that person's
+task, the card flips to delegated and leaves the active feed but stays visible
+as an in-flight task in the panel, and it resolves itself with a done note the
+moment the assignee finishes. Four things keep a delegated card from rotting:
+it stays visible while out, it stamps a receipt when done (a photo, or for an
+hours-ask card the number itself), it flags overdue and resurfaces if it sits
+open past three days, and the watcher agent re-raises the underlying condition
+on its own once its dedupe window passes, so reality and not a reminder is the
+backstop. An action card carries its action: a delegated "Update hours" card
+lets the assignee enter the reading from their own task, which lands the number
+and closes the card; an operator writes equipment hours only through a task
+handed to them, never as a general power (direct admin_set_equipment_hours_by_name
+is owner-only). The owner also sweeps finished tasks off the board (clear one,
+or clear all), cleared not deleted so the audit trail survives. Because Paul
+wants to route work instead of doing all of it, and a handoff that disappears is
+worse than no handoff: it has to come back if it is not done. Paul, 2026-06-13.
+
 `stop_closes_the_loop` (Clean: clients):
 When a client taps the portal stop sign, three things happen in one
 transaction: every future appointment is cancelled including pencilled
