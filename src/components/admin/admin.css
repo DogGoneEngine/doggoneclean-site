@@ -1005,6 +1005,17 @@ a:hover { color: #0a4f63; }
   color: var(--ad-text-dim);
   font-weight: 600;
 }
+/* The price is the glance value on a stop: pushed to the right edge of the head
+   and sized up so it reads at arm's length without hunting through the meta. */
+.ad-dogcard__price {
+  margin-left: auto;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ad-primary);
+  white-space: nowrap;
+}
+.ad-dogcard--past .ad-dogcard__price { color: var(--ad-text-dim); }
 .ad-dogcard__body {
   padding: 10px 14px 12px 18px;
 }

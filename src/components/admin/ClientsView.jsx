@@ -1063,13 +1063,14 @@ function ageFromBirthDate(dateStr, approximate) {
 function DogCard({ dog, onChanged }) {
   const isPast = ['former', 'deceased', 'moved'].includes(dog.roster_status);
   const age = dog.roster_status === 'deceased' ? '' : ageFromBirthDate(dog.birth_date, dog.dob_approximate);
-  const meta = [dog.breed, age, dog.price_cents != null ? money(dog.price_cents) : null].filter(Boolean).join(' · ');
+  const meta = [dog.breed, age].filter(Boolean).join(' · ');
   return (
     <div className={`ad-dogcard${isPast ? ' ad-dogcard--past' : ''}`}>
       <div className="ad-dogcard__head">
         <span className="ad-dogcard__name">{dog.name}</span>
         {meta && <span className="ad-dogcard__meta">{meta}</span>}
         <DogStatusChip status={dog.roster_status} />
+        {dog.price_cents != null && <span className="ad-dogcard__price">{money(dog.price_cents)}</span>}
       </div>
       <div className="ad-dogcard__body">
       <DogField label="Standing instructions" variant="standing" value={dog.standing_instructions}
