@@ -730,6 +730,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     // call (a DB function), so it works without any edge-function change.
     answerIds = new Set((data.answer_photo_ids as string[]) || []);
     worthItems = (data.worth_a_look as Array<{ id: string; note?: string; by?: string }>) || [];
+    // Who took each shared photo, carried by the DB function so the label is
+    // right without a tracker-photos edge deploy (which is gated). Keyed by
+    // photo id; photoLabel prefers this over the edge function's own `by`.
+    photoCredits = new Map(Object.entries((data.photo_credits as Record<string, string>) || {}));
     renderPhotos();
 
     // Chime only for a change observed LIVE: the page visible and the last
@@ -765,11 +769,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
   // The operator still calls these "Extra"; the client-facing tracker calls them "Moments".
   const PHOTO_LABELS: Record<string, string> = { before: 'Before', after: 'After', with_dog: `With ${OPERATOR_FIRST}`, extra: 'Moments' };
-  function photoLabel(p: { kind: string; dog_name?: string | null; by?: string | null }) {
+  function photoLabel(p: { id?: string; kind: string; dog_name?: string | null; by?: string | null }) {
     // Each photo names whoever actually took it (the logged-in person), not the
-    // pilot in command. Jake's shot reads "Jake", Paul's reads "Paul". Falls
-    // back to the named operator when the photographer is not recorded.
-    const by = p.by || OPERATOR_FIRST;
+    // pilot in command. Jake's shot reads "Jake", Paul's reads "Paul". The
+    // photographer comes from the DB function's credits map (works without an
+    // edge deploy), then the edge function's own `by`, then the named operator.
+    const by = (p.id && photoCredits.get(p.id)) || p.by || OPERATOR_FIRST;
     if (p.kind === 'with_dog') return p.dog_name ? `${by} and ${p.dog_name}` : `With ${by}`;
     const base = PHOTO_LABELS[p.kind] || 'Photo';
     return p.dog_name ? `${base}, ${p.dog_name}` : base;
@@ -799,6 +804,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   // or last, the split is correct.
   let answerIds = new Set<string>();
   let worthItems: Array<{ id: string; note?: string | null; by?: string | null }> = [];
+  let photoCredits = new Map<string, string>();
   let lastPhotos: Array<{ id: string; kind: string; url: string; dog_name?: string | null; answers_request?: boolean }> = [];
 
   // The fixed, locked framing for a worth-a-look. Never changes; the operator's
