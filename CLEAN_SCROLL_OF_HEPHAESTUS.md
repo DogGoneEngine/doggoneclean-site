@@ -3357,3 +3357,20 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   here it is" state with the existing client-visible photos tagged beside the request as proof.
   Recommendation drafted; spec to be shaped with Paul before build. Both parks filed in
   CLEAN_PARKING_LOT.md.
+
+### Batch twenty-two: the heard-and-delivered tracker loop (Jun 13; migration 0171)
+
+- **Built same thread** (`tracker_heard_and_delivered`): Paul said yes, per visit. A per-visit
+  special request captured on the Today stop card (admin_set_visit_request, finds-or-creates the
+  visit by appointment) shows on /track as "You asked for ...", reads delivered when the visit
+  wraps (returning/done), and a photo Paul tags Answer in VisitPhotos shows right beside it as
+  proof. Tagging Answer also shares the photo (admin_set_photo_answers_request sets client_visible)
+  because the client must see it. Per visit, not a standing preference (Paul: a standing pref would
+  be noise). Schema: visits.special_request, visit_photos.answers_request; tracker_status returns
+  special_request + request_delivered; admin_today_appointments and admin_get_client carry both;
+  tracker-photos returns answers_request. Verified end to end against dgc-prod (set request ->
+  tracker_status shows it -> reverted). The tracker message was also hyped to mention photos.
+- **One step pending**: the tracker-photos edge function redeploy (to return answers_request for
+  the beside-the-request spotlight) needed an approval the MCP deploy did not get this session; the
+  code is committed. Until it redeploys, answer photos still show in the visit gallery, just not
+  spotlighted. Deploy from the Supabase dashboard or re-run the MCP deploy.

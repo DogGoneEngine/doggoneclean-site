@@ -164,7 +164,14 @@ shorthand). The full spec is the Oracle rule. Status:
 
 Gates: Twilio (the sends), Stripe (online tips).
 
-7. **Personalized tracker: the heard-and-delivered loop (Paul, 2026-06-13).** Make the tracker
+7. ~~**Personalized tracker: the heard-and-delivered loop.**~~ BUILT 2026-06-13 (migration 0171,
+   `tracker_heard_and_delivered`): per-visit special_request captured on the Today stop card shows
+   on /track as "You asked for ...", reads delivered when the visit wraps, and a photo tagged
+   Answer (VisitPhotos) shows beside it as proof. One step still pending: redeploy the
+   tracker-photos edge function so it returns answers_request (the spotlight); until then the
+   answer photos still appear in the visit gallery. Original idea below.
+
+   Make the tracker
    personal proof that the client was heard. When a client asks for something special at the door
    ("clip the ears a little shorter"), Paul captures it on the stop, and it shows on that visit's
    tracker as a "you asked for" line, so a client following along sees their request landed. Then
