@@ -3449,3 +3449,20 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   and hides on a second tap. For the thing you haven't used, forgot, or a new hire is learning;
   tap-based so it works on a phone. First home: the Library Shelf/Drop buttons. Rolls out to the
   Today card answers and the photo chips next, then the rest of Orbit incrementally.
+
+### Batch twenty-six: look-at-this photo flags (Jun 13; migration 0176)
+
+- **Worth a look (to the client)** and **From the field (to the owner)** (`look_at_this_flags`):
+  an operator flags a visit photo + a short note to one audience. Worth-a-look auto-shares and
+  renders on the tracker as a calm "From <operator>" card with the LOCKED line Paul approved
+  ("Here's something I noticed up close, the kind of thing that's easy to miss in everyday life.
+  Take a look, and take it from there.") + the operator's note + the photo. Never a diagnosis or
+  advice; the fixed wording carries that. From-the-field lands on the owner's Today as a private
+  card (Got it to clear). The two notes are SEPARATE columns (note vs field_note) after a test
+  caught the owner-private note overwriting and nearly leaking to the client. Verified the
+  boundary: operator can flag both ways but cannot read the owner field feed (owner only); the
+  worth-a-look surfaces on the anon tracker; reverted the test rows. Photo now; field video parked.
+- **Info buttons rolled further** (`help_on_demand`): the photo destination chips + the Flag
+  control (VisitPhotos), the Today briefing-card answers, and the From-the-field panel all carry
+  the tappable "i" legend now, alongside the Library Shelf/Drop from the prior batch.
+- Built carefully after the Library crash: no inline-array hook deps in the new components.
