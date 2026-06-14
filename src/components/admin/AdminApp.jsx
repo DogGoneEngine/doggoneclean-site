@@ -168,7 +168,10 @@ export default function AdminApp() {
           <span /><span /><span />
         </button>
         <span className="ad-mobilebar__title">{activeLabel}</span>
-        <span className="ad-laelaps ad-laelaps--bar" aria-label="Laelaps">Laelaps</span>
+        <span className="ad-laelaps ad-laelaps--bar" aria-label="Laelaps">
+          <span className="ad-laelaps__mark">Laelaps</span>
+          <span className="ad-laelaps__tag">The inescapable hound</span>
+        </span>
       </div>
 
       <div
@@ -180,7 +183,10 @@ export default function AdminApp() {
       <aside className={'ad-side ' + (drawerOpen ? 'ad-side--open' : '')}>
         <div className="ad-side__brand">
           <img className="ad-side__logo" src="/logo.png?v=2" alt="Dog Gone Clean" />
-          <span className="ad-laelaps ad-laelaps--side" aria-label="Laelaps">Laelaps</span>
+          <span className="ad-laelaps ad-laelaps--side" aria-label="Laelaps">
+            <span className="ad-laelaps__mark">Laelaps</span>
+            <span className="ad-laelaps__tag">The inescapable hound</span>
+          </span>
           <button
             type="button"
             className="ad-side__close"

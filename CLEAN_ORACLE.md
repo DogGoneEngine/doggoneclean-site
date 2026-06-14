@@ -884,8 +884,9 @@ The admin console is named Laelaps, served at /laelaps, with /orbit and /admin k
 aliases so old bookmarks never break. The Google sign-in redirect targets /laelaps, which must
 stay in the Supabase auth redirect allowlist. The Laelaps wordmark (a deep-navy-to-brand-blue
 ombre wash under a soft glow, a Neural Expressive treatment rather than a plain typeface) is the
-console's brand mark: it sits on the desktop rail under the Dog Gone Clean logo and on the mobile
-top bar, never buried in the drawer. Laelaps was the inescapable
+console's brand mark, set under a quiet uppercase eyebrow tagline, "The inescapable hound": it
+sits on the desktop rail under the Dog Gone Clean logo and on the mobile top bar, never buried in
+the drawer. Laelaps was the inescapable
 hound of Greek myth, the hunting dog fated to always catch what it chased, and its name carries
 the sense of a storm wind. Because the console is the one place that sees the whole business and
 never loses the thread, the inescapable-hound image fits it exactly, and the storm-wind meaning

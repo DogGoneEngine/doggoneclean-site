@@ -339,13 +339,19 @@ html, body {
 
 /* Laelaps wordmark. A Neural Expressive treatment, not a typeface choice: the
    word is filled with the deep-navy-to-brand-blue ombre wash and lifted on a
-   soft blue glow, set tight and heavy so it reads as a designed mark. One mark,
-   reused on the desktop rail and the mobile top bar. */
+   soft blue glow, set tight and heavy. Under it, a quiet uppercase eyebrow
+   tagline (solid, not gradient, so it stays crisp). One lockup, reused on the
+   desktop rail and the mobile top bar. */
 .ad-laelaps {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.ad-laelaps__mark {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
+  white-space: nowrap;
   background-image: var(--ad-laelaps-fill);
   background-clip: text;
   -webkit-background-clip: text;
@@ -355,17 +361,36 @@ html, body {
     drop-shadow(0 1px 0 rgba(255, 255, 255, 0.55))
     drop-shadow(0 6px 16px rgba(37, 99, 216, 0.30));
 }
+.ad-laelaps__tag {
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--ad-text-dim);
+  -webkit-text-fill-color: var(--ad-text-dim);
+}
 /* Desktop rail: the brand block's hero, under the Dog Gone Clean logo. */
 .ad-laelaps--side {
-  display: block;
+  display: flex;
   margin-top: 12px;
-  font-size: 31px;
 }
-/* Mobile top bar: sits on the right where the wordmark image used to. */
+.ad-laelaps--side .ad-laelaps__mark { font-size: 31px; }
+.ad-laelaps--side .ad-laelaps__tag {
+  margin-top: 8px;
+  font-size: 10.5px;
+  letter-spacing: 0.30em;
+}
+/* Mobile top bar: right-aligned, where the wordmark image used to sit. */
 .ad-laelaps--bar {
   margin-left: auto;
+  align-items: flex-end;
+  text-align: right;
   flex-shrink: 0;
-  font-size: 21px;
+}
+.ad-laelaps--bar .ad-laelaps__mark { font-size: 20px; }
+.ad-laelaps--bar .ad-laelaps__tag {
+  margin-top: 3px;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
 }
 
 
