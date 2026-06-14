@@ -963,20 +963,40 @@ optimizing a part that should not exist). Implementation rides the committed rol
 round: every completed visit updates clients.visit_minutes (and the groom/nails splits) from
 that window.
 
-## Mount Olympus dashboard at mountolympusops.com (parked 2026-06-11, pending Paul's go)
+## Mount Olympus dashboard at mountolympusops.com (v1 BUILT 2026-06-14; deploy is a droplet chore)
 
-Paul set up n8n during early stack planning, but every automation ended up as custom code:
-Supabase edge functions, pg_cron SQL agents, and the GitHub Actions deploy. Nothing calls the
-n8n container (`engine-n8n-1` on the droplet, bound to localhost:5678); for this project it is
-obsolete. The domain he attached to it, mountolympusops.com, is the natural home for the
-cross-business owner dashboard ("emperor mode"): one page with both businesses' run rate,
-today's stops, open cards, and agent costs. Setup when greenlit: build a small static dashboard
-(its own repo or a directory in one of these), serve it from the droplet by repointing the
-mountolympusops.com Caddy site block from the n8n proxy to the dashboard directory, and stop
-the n8n container. Data separation stays clean because the dashboard only READS each business's
-own Supabase project with its own keys; nothing merges. Until then the interim emperor view is
-Orbit's Finance floor (annual run rate stat shipped 2026-06-11). Decommissioning n8n (stop
-container, drop its Caddy block) is one droplet session, on Paul's go.
+Greenlit and built 2026-06-14. The cross-business owner dashboard ("emperor mode") is a plain
+static site (one HTML file, one stylesheet, one script, one config file `projects.js`); no build
+step, so it survives any redesign by being too simple to break. It lives in this repo for now at
+`mount-olympus/` on branch `claude/business-dashboard-entryway-6jpj9v`, kept self-contained so it
+lifts into its own repo verbatim. It is NOT merged into Clean's `main` (it is not Clean's
+product; merging it would pollute Clean's trunk and deploy nothing useful). Permanent home is a
+decision parked for Paul: its own `mount-olympus` repo (recommended, keeps Clean sellable and
+un-entangled) vs. staying a directory here.
+
+v1 contents: a "building" card per business (Dog Gone Clean, Dog Gone Nails) with doors into
+every surface (site, booking, portal, operator, Orbit) and a collapsible "engine room" (Supabase,
+GitHub, deploys); a `/`-key command palette that jumps to any door across all businesses;
+add-a-project in one `projects.js` edit; best-effort reachability dots; an Eastern-time clock; a
+localStorage scratchpad; and a web manifest + icons so it installs on the Pixel home screen.
+Distinct night-sky-and-gold identity so it reads as the layer above the businesses, not as either.
+
+Why n8n can go: every automation ended up as custom code (Supabase edge functions, pg_cron, the
+GitHub Actions deploy). Nothing calls the `engine-n8n-1` container (droplet, localhost:5678); it
+is obsolete for both businesses. The domain attached to it, mountolympusops.com, becomes the
+dashboard's home.
+
+Remaining (all droplet / decision, not code):
+- Decide permanent repo home; if its own repo, create it and move `mount-olympus/` over
+  (`deploy/deploy.yml.template` is ready to become its `.github/workflows/deploy.yml`).
+- Droplet session (one sitting): put the files in `/srv/mountolympus`, replace the
+  mountolympusops.com Caddy block (currently proxying n8n) with `mount-olympus/deploy/Caddyfile.snippet`,
+  set a basic-auth password, reload Caddy, then stop the n8n container.
+- Phase 2 live tiles (today's count, week count, run rate) per business: each reads its OWN
+  Supabase with its own keys so nothing merges; parked on one decision (which numbers, and
+  whether behind the page's basic auth or a per-business login) and on `dgn-prod` being paused
+  until Nails launches. Interim emperor view stays Orbit's Finance floor.
+- Data separation stays clean: the dashboard only READS each business's own project; never merges.
 
 ## Public website gallery: BUILT 2026-06-13 (Phase 2 of photo_destinations, migration 0174)
 

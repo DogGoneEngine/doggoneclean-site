@@ -1,0 +1,34 @@
+# Mount Olympus - Caddy site block for mountolympusops.com
+#
+# This REPLACES whatever currently proxies mountolympusops.com to n8n
+# (the old "reverse_proxy n8n:5678" block). Paste this into the droplet
+# Caddyfile (/etc/caddy/Caddyfile inside the engine-caddy-1 container's
+# mounted config), then reload Caddy.
+#
+# It serves the static dashboard from a directory and locks it behind HTTP
+# basic auth so only you can reach it. Generate the password hash with:
+#
+#     docker exec engine-caddy-1 caddy hash-password --plaintext 'YOUR_PASSWORD'
+#
+# then paste the hash where shown below.
+
+mountolympusops.com {
+	root * /srv/mountolympus
+	encode gzip zstd
+	file_server
+
+	basic_auth {
+		# user  <paste the hash from caddy hash-password here>
+		paul $2a$14$REPLACE_WITH_REAL_HASH
+	}
+
+	header {
+		# This is a private cockpit; keep it out of search and framing.
+		X-Robots-Tag "noindex, nofollow"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+	}
+}
+
+# Optional: retire the old vault subdomain at the same time.
+# vault.mountolympusops.com  -> remove its block entirely (no longer used).

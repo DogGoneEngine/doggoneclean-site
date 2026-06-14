@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mount Olympus</title>
+  <meta name="description" content="The one doorway into every business." />
+  <meta name="theme-color" content="#070b16" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="crown">
+      <h1 class="wordmark">Mount Olympus</h1>
+      <div class="greeting" id="greeting"></div>
+      <div class="clock" id="clock"></div>
+      <div class="motto" id="motto"></div>
+    </header>
+
+    <div class="command">
+      <span class="glyph">⌕</span>
+      <input id="cmd" type="text" placeholder="Jump to anything... (press /)" autocomplete="off" spellcheck="false" aria-label="Search all doors" />
+      <span class="hint">/ to search</span>
+    </div>
+    <div class="results" id="results"></div>
+
+    <main class="buildings" id="buildings"></main>
+
+    <h2 class="section-title">Shared tools</h2>
+    <div class="shelf" id="shelf"></div>
+
+    <h2 class="section-title">On my mind</h2>
+    <div class="scratch">
+      <textarea id="scratch" placeholder="Notes to yourself. Saved in this browser."></textarea>
+      <div class="row">
+        <span class="saved" id="scratch-saved">saved on this device</span>
+        <a class="door" id="install" href="#" style="display:none;">Install as app</a>
+      </div>
+    </div>
+
+    <footer>
+      Mount Olympus &middot; the layer above the businesses.<br />
+      Edit <strong>projects.js</strong> to add a building or change a door.
+    </footer>
+  </div>
+
+  <script src="projects.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
