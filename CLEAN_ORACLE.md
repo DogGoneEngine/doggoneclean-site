@@ -864,7 +864,7 @@ owner teaches the owner to route around it, which is worse, because the workarou
 record and the system stops reflecting reality (Paul, 2026-06-10).
 
 `orbit_roles_operator_masked` (Clean: engineering):
-Orbit has roles: 'owner' (Paul, everything) and 'operator' (a Hurricane Bath Operator running a
+Laelaps has roles: 'owner' (Paul, everything) and 'operator' (a Hurricane Bath Operator running a
 route). An operator signs in with their own Google account (onboarding: insert an `admins` row
 with their email and role; their first sign-in binds it via admin_self's adopt-by-email), sees
 only the floors the route needs (Today, Calendar, Clients), and the MASKING IS SERVER-SIDE
@@ -878,6 +878,17 @@ console is being built emperor-mode for Paul but the business is built to run wi
 every client's personal contact and the business's money numbers; masking in the RPC instead of
 the page means no future floor can accidentally leak what the role should not see. Paul,
 2026-06-10. Foundation shipped in migration 0150.
+
+`admin_console_named_laelaps` (Clean: brand):
+The admin console is named Laelaps, served at /laelaps, with /orbit and /admin kept as working
+aliases so old bookmarks and the Google sign-in redirect never break. Laelaps was the inescapable
+hound of Greek myth, the hunting dog fated to always catch what it chased, and its name carries
+the sense of a storm wind. Because the console is the one place that sees the whole business and
+never loses the thread, the inescapable-hound image fits it exactly, and the storm-wind meaning
+ties straight to the Hurricane Bath the new Dog Gone Clean is built on. The database role stays
+`admin`; only the product name is Laelaps, the same role-versus-name split as the operator app
+(role `operator`, product String of Pearls). Replaces the placeholder name Orbit. Paul,
+2026-06-14.
 
 `villages_only_in_copy` (Hurricane Bath: copy):
 (Name kept for continuity; the rule now means served-cities-only.) The Hurricane
@@ -1261,7 +1272,7 @@ the dogs are headed back and that is exactly when the client should watch the
 door); done. While rolling, the tracker shows a PROMINENT live drive ETA and
 the truck on a map (operator location from the Today sheet's geolocation
 watch, ETA via Google server-side, both token-scoped and broadcast only until
-arrival; honest limit: Chrome only delivers fixes while Orbit is on screen,
+arrival; honest limit: Chrome only delivers fixes while Laelaps is on screen,
 so the client sees the last fix with its age, never a guess, and the true
 background fix is a small Android companion app, parked); status changes can
 chime and vibrate, gentle and short (a doorbell for the driveway, a bright
@@ -1875,7 +1886,7 @@ exists to prevent.
 
 `calendar_sync_moves_orbit` (Clean: calendar):
 The Google Calendar sync is two-way in effect for every appointment it knows:
-moving an event in the calendar moves the appointment in Orbit (the sync
+moving an event in the calendar moves the appointment in Laelaps (the sync
 updates times by external_id), and an app-booked appointment that Paul added
 to the calendar gets ADOPTED on the next sync (the overlapping event stamps
 its external_id onto the existing row instead of inserting a duplicate), so
@@ -1953,7 +1964,7 @@ truest single gauge that everything is going well, and it keeps
 clean_stays_saleable honest.
 
 `family_window_into_the_business` (Clean: operations):
-Kristin has her own Orbit login (role 'viewer') that opens onto ONE floor, the
+Kristin has her own Laelaps login (role 'viewer') that opens onto ONE floor, the
 Family window: what the business is worth and its two health levers, the last
 30 days of money and visits, the earned-per-hour rate, and where Paul is right
 now with each stop's plain-words status. No cards to act on, no settings,
@@ -1972,7 +1983,7 @@ showed Paul's face over Jake's name; a new operator's identity must reach
 clients with zero code changes.
 
 `photo_inbox_for_claude` (Clean: process):
-Orbit carries a Library floor, the asset library: every photo and video Paul
+Laelaps carries a Library floor, the asset library: every photo and video Paul
 hands the business lands in the private bucket with a row in site_inbox,
 carrying an editable note and a status (new, shelf, used, dropped). A great
 shot goes on the shelf even with no use for it yet. A media file with no note
@@ -2003,7 +2014,7 @@ honest scheduled times, realistic day plans, and client trust all hang on
 knowing this number. Paul, 2026-06-12.
 
 `living_prospectus` (Clean: finance):
-Orbit carries a Prospectus floor: the standing pitch to a buyer who does not
+Laelaps carries a Prospectus floor: the standing pitch to a buyer who does not
 exist yet, written as if Dog Gone Clean were for sale today. Every claim
 carries a receipt and every number is computed live from the operating
 tables by admin_prospectus on each load; nothing is typed in by hand and
@@ -2086,7 +2097,7 @@ card you cannot confidently clear is a card that piles up. Being tried before a
 final call (Paul, 2026-06-13).
 
 `access_map_reads_the_truth` (Clean: engineering):
-Orbit has one emperor-only Access page that shows, per role (Emperor, Employee,
+Laelaps has one emperor-only Access page that shows, per role (Emperor, Employee,
 Stakeholder), exactly what that person sees: their menu, and what is hidden
 inside the floors they can open, plus a Preview-as that walks their menu live. It
 is built so it can never drift from reality. The menu half is generated from the
@@ -2102,7 +2113,7 @@ no map. A description drifts; a generated map cannot. Paul, 2026-06-13.
 
 `photo_destinations` (Clean: engineering):
 A visit photo has three independent share destinations, each its own chip on the
-photo: Client (their portal and tracker), Team (an internal Orbit gallery for the
+photo: Client (their portal and tracker), Team (an internal Laelaps gallery for the
 whole crew, in the Library), and Website (the public marketing gallery). The
 website is the only one an employee cannot reach alone: anyone may SUGGEST a photo
 for the website and it queues, but only the owner role APPROVES it live, from the
@@ -2277,7 +2288,7 @@ used to silence one alert. His talk-backs are wisdom about the business (why a
 client is priced the way she is, why a cadence is what it is), and the reason is
 the most valuable thing to keep. Replies and "this is intentional" resolutions
 land in the `wisdom` inbox, scoped to the client or the department, and a one-tap
-quick-capture (the speed dial, a floating button on every Orbit floor, text or
+quick-capture (the speed dial, a floating button on every Laelaps floor, text or
 voice) lets Paul drop any idea into the same inbox to be absorbed into the Oracle
 or a client record. These notes are internal only: `briefing_notes` and `wisdom`
 are RLS-locked admin surfaces, never shown to a client (so a blunt private note
@@ -2350,7 +2361,7 @@ himself and exposing it, or treating a pencilled slot as a firm commitment to th
 client, would both break trust; while still honoring it as planned time keeps the
 calendar and win-back honest. Decided 2026-06-09; banana color and the year-ahead
 penciling strategy folded in 2026-06-11 (Apps Script color flag + `_sync_appointments`
-tentative field, 0152; Orbit's booking panel labels a tentative next booking
+tentative field, 0152; Laelaps's booking panel labels a tentative next booking
 "penciled, not client-official").
 
 ---
@@ -2407,7 +2418,7 @@ auto-restoring the moment a client returns. Decided 2026-06-09.
 
 `calendar_flip_order` (Clean: calendar):
 Until a deliberate cutover, Paul's single Google calendar (his default calendar) stays the
-working source of truth he books and works out of; the Orbit admin Calendar floor is a
+working source of truth he books and works out of; the Laelaps admin Calendar floor is a
 read-only mirror he uses to test the sync against that calendar, never a replacement, and
 Acuity stays the system that actually sends client reminders until our own reminder send is
 built and verified. The cutover to a dedicated "Dog Gone Clean" calendar now runs as a
@@ -2494,7 +2505,7 @@ him" sets roster_status, reversible, never a delete; 0149), notify people ("text
 instead until July"; 0148), and a WISDOM FALLBACK (0150): anything that is not about one
 client's record (an idea, a rule, a decision) lands in the wisdom inbox for the Archivist, with
 no client required; every dog reference is validated to belong to the client. THE ONE GATEWAY
-(Paul, 2026-06-10): the floating + on every Orbit floor now sends everything through Riker,
+(Paul, 2026-06-10): the floating + on every Laelaps floor now sends everything through Riker,
 who routes it; there is no separate Oracle-capture or per-purpose entry point, because one
 habit (hit +, say it) beats remembering which button files what, and the wisdom fallback means
 nothing said can fall on the floor. The living user manual is the "What can I tell Riker?"
@@ -2523,7 +2534,7 @@ stay private and inside Clean's own project so the business stays sellable (`cle
 simplest intake that works on his Pixel (direct pick-and-upload) beats a Google Photos integration that
 would add a dependency to untangle at sale. Per-dog tagging shipped 2026-06-10 (Paul: the upload
 assumed a one-dog household): `visit_photos.dog_id`, an "Of:" dog chip at upload for multi-dog
-clients, tap-the-label retro-tagging, and the dog's name on the Orbit, portal, and tracker photo
+clients, tap-the-label retro-tagging, and the dog's name on the Laelaps, portal, and tracker photo
 labels; untagged stays legitimate (a whole-pack shot is real). Default visibility refined the
 same day (0149, the Michelle case): the standard kinds (before, after, with-operator) are SHARED
 the moment they upload, because appearing on the client's live tracker is the whole point of

@@ -1,0 +1,14 @@
+---
+// src/pages/laelaps.astro
+// Laelaps, the Dog Gone Clean admin console, at /laelaps (primary). Mounts
+// AdminApp as a React island under AdminLayout (no marketing chrome). /orbit
+// and /admin are working aliases for the same console, kept so old bookmarks
+// and the Google sign-in redirect never break.
+
+import AdminLayout from '../layouts/AdminLayout.astro';
+import AdminApp from '../components/admin/AdminApp.jsx';
+---
+
+<AdminLayout>
+  <AdminApp client:load />
+</AdminLayout>

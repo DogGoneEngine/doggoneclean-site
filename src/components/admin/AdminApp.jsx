@@ -1,10 +1,10 @@
 // src/components/admin/AdminApp.jsx
 //
-// Orbit: the Dog Gone Clean admin console shell. Google OAuth gate, a
+// Laelaps: the Dog Gone Clean admin console shell. Google OAuth gate, a
 // department rail, and section routing. Every department is navigable from day
 // one: the ones not yet built render a panel that states what lives there, so
 // the structure itself is the roadmap. Clients is live; the rest fill in over
-// the build sequence. Mirrors the Dog Gone Nails Orbit shell but talks only to
+// the build sequence. Mirrors the Dog Gone Nails admin shell but talks only to
 // Clean's own project (dgc-prod).
 
 import { useCallback, useEffect, useState } from 'react';
@@ -86,7 +86,7 @@ export default function AdminApp() {
     return (
       <div className="ad-center">
         <div className="ad-gate">
-          <h1>Orbit sign-in</h1>
+          <h1>Laelaps sign-in</h1>
           <p>Sign in with the Google account on file for your admin profile.</p>
           <button className="ad-btn ad-btn--full" onClick={signInWithGoogle}>
             Continue with Google
@@ -100,7 +100,7 @@ export default function AdminApp() {
     return (
       <div className="ad-center">
         <div className="ad-gate">
-          <h1>Could not load Orbit</h1>
+          <h1>Could not load Laelaps</h1>
           <p>{error}</p>
           <button className="ad-btn ad-btn--ghost ad-btn--full" onClick={() => signOut().then(loadMe)}>
             Sign out
@@ -139,7 +139,7 @@ export default function AdminApp() {
     ? floors[0]
     : (!floors && section === 'family' ? 'today' : section);
   const active = SECTIONS.find((s) => s.key === effectiveSection);
-  const activeLabel = active?.label || 'Orbit';
+  const activeLabel = active?.label || 'Laelaps';
 
   return (
     <div className={'ad-app ' + (drawerOpen ? 'ad-app--drawer-open' : '')}>
@@ -180,7 +180,11 @@ export default function AdminApp() {
       <aside className={'ad-side ' + (drawerOpen ? 'ad-side--open' : '')}>
         <div className="ad-side__brand">
           <img className="ad-side__logo" src="/logo.png?v=2" alt="Dog Gone Clean" />
-          <small>Orbit</small>
+          <span className="ad-laelaps">
+            <span className="ad-laelaps__glyph" aria-hidden="true" />
+            <span className="ad-laelaps__mark">Laelaps</span>
+          </span>
+          <span className="ad-laelaps__sub">The inescapable hound</span>
           <button
             type="button"
             className="ad-side__close"

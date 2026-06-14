@@ -1522,7 +1522,7 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
       action: 'TEMPLATE',
       text: clientName || 'Dog Gone Clean visit',
       dates: `${f(res.scheduled_start)}/${f(res.scheduled_end)}`,
-      details: 'Booked in Orbit (Dog Gone Clean).',
+      details: 'Booked in Laelaps (Dog Gone Clean).',
     });
     return `https://calendar.google.com/calendar/render?${params}`;
   }
