@@ -992,10 +992,17 @@ Remaining (all droplet / decision, not code):
 - Droplet session (one sitting): put the files in `/srv/mountolympus`, replace the
   mountolympusops.com Caddy block (currently proxying n8n) with `mount-olympus/deploy/Caddyfile.snippet`,
   set a basic-auth password, reload Caddy, then stop the n8n container.
-- Phase 2 live tiles (today's count, week count, run rate) per business: each reads its OWN
-  Supabase with its own keys so nothing merges; parked on one decision (which numbers, and
-  whether behind the page's basic auth or a per-business login) and on `dgn-prod` being paused
-  until Nails launches. Interim emperor view stays Orbit's Finance floor.
+- Phase 2 live tiles (today's count, week count, run rate) per business: VALIDATED 2026-06-14.
+  Unpaused dgn-prod and ran the pulse against real data; the core-three compute cleanly (Nails:
+  today 0, this week 1, next appt Sat Jul 11). Confirmed buildable NOW for both businesses (no
+  longer blocked by the DGN pause). Caveat: Nails is still pre-launch TEST data ($0 paid, 0
+  subscriptions, 16 clients / 19 appts), so its tiles read real-but-throwaway until launch;
+  Clean's tiles are real. Build path: a small Cloudflare Worker that holds each project's
+  read key server-side (keys never touch the browser) and returns the aggregates to the
+  Google-gated page. Each Worker call reads only its OWN project, so nothing merges. Decision on
+  exposure dissolves once the page is behind Cloudflare Access (Google, one email): all numbers
+  are private to Paul. Cost note: two active projects stays within Supabase Free; dgn-prod will
+  re-pause after about a week idle pre-launch (fine), and going always-on is the Pro trigger.
 - Data separation stays clean: the dashboard only READS each business's own project; never merges.
 
 ## Public website gallery: BUILT 2026-06-13 (Phase 2 of photo_destinations, migration 0174)
