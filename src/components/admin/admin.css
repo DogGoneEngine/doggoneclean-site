@@ -97,6 +97,9 @@
   /* Refined deep-ink display ombre. Sophisticated, high-contrast, no
      rainbow. Used for headings and the wordmark. */
   --ad-ne-ombre: linear-gradient(168deg, #161a27 0%, #303a51 58%, #45516c 100%);
+  /* Laelaps wordmark wash: a deep-navy-to-vibrant-blue ombre. Reads as a
+     designed mark, not flat type, and stays legible (no rainbow). */
+  --ad-laelaps-fill: linear-gradient(100deg, #11254b 0%, #1d50b8 38%, #2f74dc 64%, #5a93ea 100%);
   /* Page-level aura strength behind the warm base. */
   --ad-ne-aura: 0.05;
 
@@ -334,46 +337,35 @@ html, body {
   text-transform: uppercase;
 }
 
-/* Laelaps wordmark: the console's name, the inescapable hound of myth whose
-   name carries the sense of a storm wind. The mark rides the deep-ink display
-   ombre it inherits from .ad-side__brand; a small conic storm-ring glyph,
-   driven by the root --ad-ne-angle keyframe, spins like the weather the name
-   is built on and ties it to the Hurricane Bath. */
+/* Laelaps wordmark. A Neural Expressive treatment, not a typeface choice: the
+   word is filled with the deep-navy-to-brand-blue ombre wash and lifted on a
+   soft blue glow, set tight and heavy so it reads as a designed mark. One mark,
+   reused on the desktop rail and the mobile top bar. */
 .ad-laelaps {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-}
-.ad-laelaps__glyph {
-  width: 18px; height: 18px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--ad-ne-conic);
-  -webkit-mask: radial-gradient(closest-side, transparent 58%, #000 60%);
-          mask: radial-gradient(closest-side, transparent 58%, #000 60%);
-  box-shadow: 0 0 0 1px rgba(37, 99, 216, 0.10);
-}
-.ad-laelaps__mark {
-  font-size: 25px;
+  display: inline-block;
   font-weight: 800;
+  letter-spacing: -0.03em;
   line-height: 1;
-  letter-spacing: 0.004em;
-  /* text fill stays transparent (inherited from .ad-side__brand) so the
-     ombre shows through the glyphs. */
+  background-image: var(--ad-laelaps-fill);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.55))
+    drop-shadow(0 6px 16px rgba(37, 99, 216, 0.30));
 }
-.ad-laelaps__sub {
+/* Desktop rail: the brand block's hero, under the Dog Gone Clean logo. */
+.ad-laelaps--side {
   display: block;
-  margin-top: 8px;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ad-text-faint);
-  -webkit-text-fill-color: var(--ad-text-faint);
+  margin-top: 12px;
+  font-size: 31px;
 }
-@media (prefers-reduced-motion: reduce) {
-  .ad-laelaps__glyph { background: var(--ad-primary); }
+/* Mobile top bar: sits on the right where the wordmark image used to. */
+.ad-laelaps--bar {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 21px;
 }
 
 
@@ -974,6 +966,9 @@ a:hover { color: #0a4f63; }
 
   .ad-side__brand { padding-right: 44px; }
   .ad-side__close { display: block; }
+  /* The wordmark lives on the top bar at this width, so keep it out of the
+     drawer (no duplication). */
+  .ad-laelaps--side { display: none; }
 
   .ad-main { padding: 22px 18px 72px; }
   .ad-main h1 { font-size: 26px; }

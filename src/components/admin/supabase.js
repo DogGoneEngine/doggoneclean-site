@@ -62,7 +62,7 @@ export async function signInWithGoogle() {
   const { error } = await sb().auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/orbit`,
+      redirectTo: `${window.location.origin}/laelaps`,
       queryParams: { prompt: 'select_account' },
     },
   });
