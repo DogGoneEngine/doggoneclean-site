@@ -16,7 +16,7 @@ and one config file. No build step, no framework, nothing to break in a redesign
 | `app.js` | behavior: clock, command palette, health dots, scratchpad |
 | `projects.js` | **the only file you edit day to day** (businesses + tools) |
 | `manifest.webmanifest`, `icon-*.png`, `favicon.svg` | makes it installable on the Pixel home screen |
-| `deploy/Caddyfile.snippet` | the droplet web-server block (with basic auth) |
+| `deploy/Caddyfile.snippet` | the droplet web-server block (with the gate options) |
 | `deploy/deploy.yml.template` | a GitHub Actions deploy, for when this has its own repo |
 
 ## Add a project
@@ -43,11 +43,19 @@ parked because they need one decision (which numbers, and whether they sit behin
 the page's basic auth or behind a per-business login) and because `dgn-prod` is
 paused until Dog Gone Nails goes live. See the chore list in the build report.
 
+## Privacy
+
+The page is private and not crawlable: a `noindex` meta tag, an `X-Robots-Tag`
+header, a `robots.txt` disallow, and (the real protection) an auth gate in front
+so nothing renders to the public. Recommended gate is Google login via Cloudflare
+Access, restricted to one email. See `deploy/Caddyfile.snippet`.
+
 ## Deploy (summary)
 
 1. Put these files in `/srv/mountolympus` on the droplet.
 2. Replace the `mountolympusops.com` Caddy block (currently proxying n8n) with
-   `deploy/Caddyfile.snippet`, set a basic-auth password, reload Caddy.
+   `deploy/Caddyfile.snippet`, pick a gate (Google via Cloudflare Access, or a
+   password), reload Caddy.
 3. Stop the now-unused n8n container.
 
 Full steps live in the build report.
