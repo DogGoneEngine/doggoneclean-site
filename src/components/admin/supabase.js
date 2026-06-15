@@ -353,6 +353,7 @@ export async function completeAppointment(appointmentId, v = {}) {
     p_payment_method:        v.paymentMethod ?? null,
     p_condition_flags:       v.conditionFlags ?? null,
     p_dog_ids:               v.dogIds ?? null,
+    p_charged_cents:         v.chargedCents ?? null,
   });
 }
 

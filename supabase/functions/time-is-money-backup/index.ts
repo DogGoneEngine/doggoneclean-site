@@ -1,16 +1,15 @@
 // time-is-money-backup
-// Read/finish endpoint for the weekly Time is Money backup, called by the Google
-// Apps Script producer (the calendar-sync pattern). Custom auth via x-cfo-secret
-// (matches app_secrets.cfo_cron_secret); no JWT. Never write Drive here, that is the
-// Apps Script's job under Paul's Google identity (Google blocks service-account keys
-// on new projects). See time_is_money_weekly_backup in CLEAN_ORACLE.md.
+// Read/finish/load endpoint for the weekly Time is Money backup. Called by the Google
+// Apps Script producer (which reads the master sheet directly under Paul's identity).
+// Custom auth via x-cfo-secret (matches app_secrets.cfo_cron_secret); no JWT.
 //
-//   GET  -> text/csv of the ENTIRE visit history (the full ledger)
-//   POST {file_name,file_url,rows,folder_url} -> logs the run + files the Today card
+//   GET                          -> text/csv of the complete ledger (frozen history + live visits)
+//   POST {action:'load_history'} -> one-time seed of the frozen history table from the master
+//   POST {file_name,...}         -> logs the run + files the Today card
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const COLS = ["Date","Day","Client","Dogs","Service","Inbound","Arrival","Departure","Minutes","Charged","Paid","Tip","Method","Notes","Source"];
+const COLS = ["Date","Client","Inbound","Arrival","Departure","Charged","Paid","Method","Appointment Duration","Cycle Time","On Site Rate","Cycle Rate"];
 const cell = (v: unknown) => '"' + String(v ?? "").replace(/"/g, '""') + '"';
 
 Deno.serve(async (req: Request) => {
@@ -25,6 +24,13 @@ Deno.serve(async (req: Request) => {
 
   if (req.method === "POST") {
     const b = await req.json().catch(() => ({}));
+
+    if (b.action === "load_history") {
+      const { data, error } = await sb.rpc("_load_time_is_money_history", { p_rows: b.rows });
+      if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ loaded: data }), { headers: { "Content-Type": "application/json" } });
+    }
+
     const { data, error } = await sb.rpc("time_is_money_snapshot_finish", {
       p_file_name: b.file_name, p_file_url: b.file_url,
       p_rows: b.rows, p_folder_url: b.folder_url ?? null,

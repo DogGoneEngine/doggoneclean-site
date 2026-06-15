@@ -3731,3 +3731,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   no URL is hardcoded in the page. Button shows only once the URL is set; until then a hint says
   one-tap turns on after the script is published as a web app. Paul's human API step: Deploy ->
   New deployment -> Web app (execute as you, access only you), then give the URL to set the secret.
+
+- **Time is Money: Laelaps becomes the system of record** (Paul 2026-06-15): Paul is retiring the
+  manual master sheet. Copying the master was wrong (it would freeze the day he stops editing it),
+  so the weekly sheet now generates FROM Laelaps. Built: frozen history table
+  `time_is_money_history` (verbatim import of the master's 1,231 rows through 2026-06-13, loaded
+  once via `_load_time_is_money_history` which the Apps Script feeds by reading the master directly,
+  no human/model transcription), a rewritten `_time_is_money_ledger()` that unions that frozen past
+  with live Laelaps visits after the cutover in the master's exact 12-column format (computing
+  Duration/Cycle/On Site Rate/Cycle Rate for live rows via `_fmt_hms`), edge `time-is-money-backup`
+  v2 (GET = 12-col CSV, POST load_history), and the Apps Script rewritten with `seedHistoryFromMaster`
+  + a GET-based `fileTimeIsMoneyBackup`. Added a Charged field to the appointment-completion path
+  (migration 0195; the manual Log-a-visit form already had Charged + Paid). One date typo in the
+  master (`12:27/23` -> 12/27/2023, JoAnn Velas) corrected on import. Server path verified with a
+  2-row sample; full match verifies right after Paul runs `seedHistoryFromMaster`. Migrations
+  0193-0195.
