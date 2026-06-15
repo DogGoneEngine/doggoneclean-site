@@ -942,6 +942,12 @@ function BriefingCard({ b, team = [], isOwner = false, onChanged, onError }) {
       </div>
       {b.body && <p style={{ margin: '8px 0', fontSize: 14, lineHeight: 1.5 }}>{b.body}</p>}
 
+      {ev.file_url && (
+        <div style={{ margin: '8px 0' }}>
+          <a className="ad-btn ad-btn--sm" href={ev.file_url} target="_blank" rel="noreferrer">Open the document</a>
+        </div>
+      )}
+
       {hoursAsk && (
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', margin: '8px 0', flexWrap: 'wrap' }}>
           <input
