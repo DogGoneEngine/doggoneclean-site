@@ -1002,11 +1002,9 @@ source of truth is versioned in the mount-olympus repo at `deploy/olympus-status
 confirm of the rendered panel is Paul's, since only his Google login passes the gate.
 
 Still open:
-- CI deploy is BROKEN: `.github/workflows/deploy.yml` rsyncs to an `olympusdeploy@` droplet user
-  that does not exist, so the Action fails on every push. Deploys are MANUAL for now (rsync the
-  repo to `root@droplet:/srv/mountolympus`, excluding `status.json`, then chown to `cleandeploy`).
-  Fix = create the `olympusdeploy` user + deploy key + the `DROPLET_SSH_KEY` repo secret. The
-  workflow already excludes `status.json` so a deploy cannot wipe the cron output.
+- CI deploy now WORKS (fixed 2026-06-15): push to `main` auto-deploys via GitHub Actions as the
+  `olympusdeploy` droplet user. The workflow excludes `status.json` so a deploy never wipes the
+  cron output. When JS/CSS change, bump the `?v=` tag in index.html for Cloudflare/browser cache.
 - Phase 2 live BUSINESS tiles (today's count, week count, run rate per business) are still PARKED,
   and are separate from the server-health panel above. VALIDATED 2026-06-14: unpaused dgn-prod and
   ran the pulse against real data; the core-three compute cleanly (Nails: today 0, this week 1,
