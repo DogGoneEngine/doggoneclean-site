@@ -323,6 +323,16 @@ function TasksPanel() {
     setErr(null);
     try { await clearDoneTasks(); load(); } catch (e) { setErr(e.message || 'clear_failed'); }
   }
+  // Take a handed-off card back: drops the teammate's task and returns the card
+  // to your own feed (admin_reopen_briefing). Only possible while the task is
+  // still open; once they finish it, the work happened and there is nothing to
+  // take back.
+  async function takeBack(t) {
+    if (!t.briefing_id) return;
+    setErr(null);
+    try { await reopenBriefing(t.briefing_id); load(); }
+    catch (e) { setErr(e.message === 'already_done' ? 'Too late to take it back: it was already finished.' : (e.message || 'take_back_failed')); }
+  }
 
   async function viewReceipt(path) {
     try { const u = await signedPhotoUrl(path); window.open(u, '_blank', 'noopener'); }
@@ -335,6 +345,7 @@ function TasksPanel() {
         ['Assign a task', 'The job lands on a teammate\'s day, not just yours. You can require a photo when they finish.'],
         ['Done', 'The job is finished and drops to the bottom. If a photo was required, you add it here to close it.'],
         ['Save hours', 'On an hours task: type the panel reading. The equipment\'s hours update and this closes.'],
+        ['Take back', 'On a handed-off card: pulls it back onto your own list and cancels the teammate\'s task. Use it if you decide to handle it yourself. Only works until they finish it.'],
         ['Drop', 'Cancels a job that was never done, when it turns out nobody needs to do it. It disappears.'],
         ['Clear', 'On a finished job: tucks that one off the board. The work already happened; this just tidies the list.'],
         ['Clear finished', 'Tucks every finished job off the board at once. One tap to tidy up. Nothing is deleted.'],
@@ -379,6 +390,7 @@ function TasksPanel() {
           {open.map((t) => (
             <OpenTaskRow key={t.id} t={t} isOwner={isOwner} busy={busy}
               onDone={markDone}
+              onTakeBack={takeBack}
               onDrop={async (task) => { try { await dropTask(task.id); load(); } catch (e) { setErr(e.message); } }} />
           ))}
           {recentDone.length > 0 && isOwner && (
@@ -413,7 +425,7 @@ function TasksPanel() {
 // the assignee enters the reading from their own task (the only way an operator
 // writes hours), which lands the value and closes the source card. Overdue and
 // from-a-card are surfaced so a delegated card cannot quietly rot.
-function OpenTaskRow({ t, isOwner, busy, onDone, onDrop }) {
+function OpenTaskRow({ t, isOwner, busy, onDone, onDrop, onTakeBack }) {
   const [hours, setHours] = useState('');
   const isHours = t.action && t.action.type === 'equipment_hours';
   const canDo = t.mine || isOwner;
@@ -450,8 +462,11 @@ function OpenTaskRow({ t, isOwner, busy, onDone, onDrop }) {
       ) : (
         <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => onDone(t, null)}>Done</button>
       ))}
-      {isOwner && (
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => onDrop(t)}>Drop</button>
+      {isOwner && (t.from_card
+        ? <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy}
+            title="Pull this card back onto your own list and cancel the handoff"
+            onClick={() => onTakeBack(t)}>Take back</button>
+        : <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => onDrop(t)}>Drop</button>
       )}
     </div>
   );
