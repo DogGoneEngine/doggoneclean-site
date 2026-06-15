@@ -66,7 +66,7 @@ export default function QuickCapture() {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} title="Tell Riker (text or voice); he files it where it belongs"
+      <button onClick={() => setOpen(true)} title="Tell Clio (text or voice); she files it where it belongs"
         style={{
           position: 'fixed', right: 20, bottom: 20, zIndex: 50, width: 52, height: 52, borderRadius: '50%',
           border: 'none', cursor: 'pointer', fontSize: 22, color: '#fff',
@@ -80,14 +80,14 @@ export default function QuickCapture() {
         }}>
           <div onClick={(e) => e.stopPropagation()} className="ad-panel" style={{ width: '100%', maxWidth: 560, marginBottom: 60 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <strong style={{ fontSize: 15 }}>Tell Riker</strong>
+              <strong style={{ fontSize: 15 }}>Tell Clio</strong>
               <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)} disabled={phase === 'applying'}>Close</button>
             </div>
 
             {phase !== 'review' ? (
               <>
                 <p style={{ fontSize: 12, opacity: 0.65, margin: '0 0 8px' }}>
-                  Anything: a visit, a note, a roster change, who to text, or just an idea. Riker files it where it belongs. Say "because" so the reason rides along.
+                  Anything: a visit, a note, a roster change, who to text, or just an idea. Clio files it where it belongs. Say "because" so the reason rides along.
                 </p>
                 <textarea value={body} onChange={(e) => setBody(e.target.value)} disabled={phase === 'parsing'} rows={4} autoFocus
                   placeholder="e.g. Windsor moved away, archive him. Or: idea for the portal, because..."
@@ -100,7 +100,7 @@ export default function QuickCapture() {
                   )}
                   <div style={{ flex: 1 }} />
                   <button className="ad-btn ad-btn--sm" onClick={send} disabled={phase === 'parsing' || !body.trim()}>
-                    {phase === 'parsing' ? 'Riker is listening\u2026' : 'Send to Riker'}
+                    {phase === 'parsing' ? 'Clio is listening\u2026' : 'Send to Clio'}
                   </button>
                 </div>
                 {saved && (
@@ -118,7 +118,7 @@ export default function QuickCapture() {
             ) : (
               <div style={{ fontSize: 14, lineHeight: 1.5 }}>
                 <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>
-                  Riker will record
+                  Clio will record
                 </div>
                 {plan.matched === false && !plan.wisdom && !plan.reminder ? (
                   <div style={{ color: 'var(--ad-warn, #b9770a)' }}>

@@ -1,7 +1,8 @@
 // src/components/admin/RikerCapture.jsx
 //
-// Riker: say it, it gets entered. Paul dictates a short note (his phone's
-// voice-to-text fills the box) and Riker parses it into a plan of record updates.
+// Clio (the persona's display name; the plumbing key stays `riker`, the generic
+// role layer): say it, it gets entered. Paul dictates a short note (his phone's
+// voice-to-text fills the box) and Clio parses it into a plan of record updates.
 // Nothing is written until Paul taps Confirm (one-tap confirm). Used two ways: on
 // a client sheet (clientId fixed) and on Today (no client, Riker resolves the name
 // Paul says). The AI proposes; the tap writes. See riker_capture_agent.
@@ -69,7 +70,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
   return (
     <div className="ad-panel" style={{ marginBottom: 16, borderLeft: '4px solid var(--ad-primary, #2563d8)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-        <strong style={{ fontSize: 14 }}>Tell Riker</strong>
+        <strong style={{ fontSize: 14 }}>Tell Clio</strong>
         <span style={{ fontSize: 12, opacity: 0.6 }}>
           {clientName ? `about ${clientName}` : 'say the client, then what happened'}
         </span>
@@ -89,7 +90,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
           />
           <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
             <button className="ad-btn ad-btn--sm" onClick={send} disabled={phase === 'parsing' || !text.trim()}>
-              {phase === 'parsing' ? 'Riker is listening…' : 'Send to Riker'}
+              {phase === 'parsing' ? 'Clio is listening…' : 'Send to Clio'}
             </button>
           </div>
           {done && (
@@ -111,7 +112,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
       {phase === 'review' && plan && (
         <div style={{ marginTop: 4 }}>
           <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>
-            Riker will record
+            Clio will record
           </div>
           {plan.matched === false ? (
             <div>
@@ -120,7 +121,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
               </div>
               {(plan.candidates || []).length > 0 && (
                 <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>
-                  Did you mean: {plan.candidates.map((c) => c.name).join(', ')}? Open the sheet and tell Riker there, or say the full name.
+                  Did you mean: {plan.candidates.map((c) => c.name).join(', ')}? Open the sheet and tell Clio there, or say the full name.
                 </div>
               )}
             </div>
@@ -226,7 +227,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
 export function RikerManual() {
   return (
     <details style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>
-      <summary style={{ cursor: 'pointer' }}>What can I tell Riker?</summary>
+      <summary style={{ cursor: 'pointer' }}>What can I tell Clio?</summary>
       <ul style={{ margin: '6px 0 0', paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
         <li><strong>Log a visit:</strong> "Bella was a five today, full groom, 90 minutes, collected 120 cash." Service, minutes, money, payment method, what was done. Past visits work too: "at the previous appointment, Sammy was a four."</li>
         <li><strong>Vibe scores:</strong> per dog, 1 to 5, only when you actually give one.</li>
@@ -242,7 +243,7 @@ export function RikerManual() {
         <li><strong>Reminders:</strong> "If I have not booked her by then, contact Mary in 2 weeks." It surfaces on Today when it comes due.</li>
         <li><strong>Anything else:</strong> ideas, rules, decisions, business thoughts. If it is not about one client's record, it lands in the wisdom inbox and the Archivist files it. Say "because" so the reason rides along.</li>
       </ul>
-      <div style={{ marginTop: 4, opacity: 0.8 }}>Nothing is written until you tap Confirm. Riker cannot book or move appointments or change business rules; booking lives on the contact sheet, rules go through Claude.</div>
+      <div style={{ marginTop: 4, opacity: 0.8 }}>Nothing is written until you tap Confirm. Clio cannot book or move appointments or change business rules; booking lives on the contact sheet, rules go through Claude.</div>
     </details>
   );
 }

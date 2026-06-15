@@ -207,9 +207,11 @@ Demeter (provisions and supplies). No Olympian holds pure finance; the enterpris
 sits under Hermes (commerce) or Zeus's treasury, with Plutus as the realm steward.
 
 PER-REALM APPS AND TECHNIQUES (lesser; reused in every realm):
-Laelaps = the admin console (DB role: admin). Clio = the voice scribe that records each appointment
-(currently the `riker` edge function, RPCs admin_riker_context / admin_riker_apply, table riker_log;
-code rename pending). Calliope = the correspondent that drafts client messages (`message-draft`).
+Laelaps = the admin console (DB role: admin). Clio = the voice scribe that records each appointment;
+Clio is the user-facing name in the Laelaps UI (shipped 2026-06-15), and the plumbing keys stay
+generic by the role-stays-generic rule (the `riker` edge function, RPCs admin_riker_context /
+admin_riker_apply, table riker_log are unchanged, the un-branded role layer). Calliope = the
+correspondent that drafts client messages (`message-draft`).
 String of Pearls = the routing technique (Ariadne's thread parked as the Greek alternative).
 
 DOG GONE CLEAN REALM AGENTS (persona: hats = agent_key -> reports up to):
