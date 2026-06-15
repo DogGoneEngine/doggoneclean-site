@@ -3746,3 +3746,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   master (`12:27/23` -> 12/27/2023, JoAnn Velas) corrected on import. Server path verified with a
   2-row sample; full match verifies right after Paul runs `seedHistoryFromMaster`. Migrations
   0193-0195.
+
+- **Time is Money backup: complete, verified, shipped** (Paul 2026-06-15): the full thread landed.
+  Laelaps is the system of record; the weekly sheet generates from the ledger (frozen 1,231-row
+  history + live visits), not a copy of the master. Verified end to end against the master: exact
+  match, 1,231 rows, Paid $193,059 and Charged $163,301 to the dollar. The Reports "Back up now"
+  button is live (web-app /exec URL in app_secrets.time_is_money_webapp_url); manual pushes file
+  distinct date+time files, the weekly Sunday run keeps one clean dated file. Charged is captured
+  going forward. Master retired and preserved as a renamed "OG File" baseline. Oracle rule
+  time_is_money_weekly_backup corrected in place to this shipped reality.
