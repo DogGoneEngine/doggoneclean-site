@@ -1876,6 +1876,20 @@ charge cron, the calendar sync) cost effectively nothing and log nothing.
 Because Paul asked to see what his AI staff costs, and `agent_when_value_beats_cost`
 is only checkable when the cost side is a number on a screen instead of a guess.
 
+`receivables_are_completed_unpaid` (Clean: finance):
+Accounts receivable counts only money actually owed for work already done: an
+appointment that was completed (the visit happened), is priced (amount over
+zero), is still unpaid (payment pending), is in the past, and belongs to a real,
+non-test subscriber. Calendar-synced pressure-test rows, cancelled or no-show
+appointments, zero-dollar rows, and test subscribers are never receivables. Both
+the CFO brief (cfo_brief_data) and the Finance pane (admin_finance_summary) apply
+the same definition so the two never disagree. Because the first cut counted
+every past still-pending appointment as A/R, which on Clean meant sixteen
+gcal_sync calendar rows, one cancelled appointment, and several zero-dollar rows,
+about $275 of money nobody owed, shown to Paul as a real receivable that read as
+a hallucination. Pre-launch this is correctly zero; post-launch it flags a
+finished visit whose card-on-file did not charge. Paul, 2026-06-15.
+
 `infra_usage_watched` (Clean: operations):
 The infrastructure under the business is watched like everything else: a daily
 scan snapshots database and storage usage into `infra_metrics` and cards Today
@@ -2069,12 +2083,13 @@ Handing work down can never become a new void. The owner can hand any agent
 card on Today to whoever works for Clean ("Hand to"): it becomes that person's
 task, the card flips to delegated and leaves the active feed but stays visible
 as an in-flight task in the panel, and it resolves itself with a done note the
-moment the assignee finishes. Four things keep a delegated card from rotting:
+moment the assignee finishes. Three things keep a delegated card from rotting:
 it stays visible while out, it stamps a receipt when done (a photo, or for an
-hours-ask card the number itself), it flags overdue and resurfaces if it sits
-open past three days, and the watcher agent re-raises the underlying condition
-on its own once its dedupe window passes, so reality and not a reminder is the
-backstop. An action card carries its action: a delegated "Update hours" card
+hours-ask card the number itself), and it flags overdue and resurfaces if it
+sits open past three days, so the in-flight task itself is the backstop. While a
+card is out as an open task the watchers do not raise a duplicate of it
+(corrected 2026-06-15; see delegated_card_not_re_raised), so it shows once, as
+the task, and the owner can take it back at any time. An action card carries its action: a delegated "Update hours" card
 lets the assignee enter the reading from their own task, which lands the number
 and closes the card; an operator writes equipment hours only through a task
 handed to them, never as a general power (direct admin_set_equipment_hours_by_name
@@ -2100,6 +2115,48 @@ sitting there (Reply, Mark read) and two that cleared it but looked identical
 (intentional vs dismiss), so Paul could not tell what any button would do, and a
 card you cannot confidently clear is a card that piles up. Being tried before a
 final call (Paul, 2026-06-13).
+
+`reminders_surface_when_due` (Clean: operations):
+A reminder is a dated commitment, and it belongs on Today only when it is due,
+not the day it was written. The On-your-plate panel shows a reminder once its due
+date has arrived (due or overdue); a reminder set for a future date, commonly a
+Riker note tied to a client's next visit ("ask Lisa about Gypsy's foot at the
+next visit"), waits out of the way until that date and lands on the day it is
+useful. admin_list_reminders splits open reminders into a due-or-overdue set
+(what the panel shows) and an upcoming set (held), and the panel hides entirely
+when nothing is due. Because a note written at one visit for the next visit a
+month out is noise on every screen in between, and a commitment surfaced a month
+early teaches the eye to ignore the whole panel. Paul, 2026-06-15.
+
+`hours_update_clears_the_card` (Clean: operations):
+The standing "Update hours" card exists only to get a fresh engine-hours reading
+entered, so the instant the reading moves by any path the card has done its job
+and clears itself. A trigger on the equipment row resolves the open hours-reminder
+card for that unit whenever its current_hours or hours_updated_at changes, whether
+the number came from the card's own inline box, a task handed to an operator, or
+Riker logging a service by voice. Because the card was wired to clear only from
+its own Save button, so a reading entered through Riker left the card orphaned on
+Today even though the hours were already recorded; the clear has to follow the
+data, not one entry path. Generator hours live in equipment.current_hours, and
+the service intervals (oil, spark plug, air filter) are computed against that
+reading. Paul, 2026-06-15.
+
+`delegated_card_not_re_raised` (Clean: operations):
+A card handed off is not the owner's card anymore, so it shows exactly once, as
+the in-flight task, never also as a fresh card in the feed. While a briefing is
+an open handed-off task the watcher agents do not raise a duplicate of it: a
+guard on the briefings table skips raising any card whose title matches an open
+task that came from a card. Once that task is finished (the card resolves),
+dropped, or taken back, the watcher is free to raise the condition again. The
+owner can take a handed-off card back at any time from the Tasks panel; take-back
+cancels the assignee's task and returns the card to the owner's feed, and it is
+refused only once the task is already finished, because then the work happened and
+there is nothing to take back. This corrects the earlier backstop in
+delegation_closes_the_loop, under which a delegated card stopped suppressing the
+watcher and so got re-raised into the feed, duplicating every handoff Paul made
+to Jake. Because Paul's rule is that handing a task to anyone removes it from his
+cards and keeps it only in the handed-off list until it is done, with a way to
+pull it back if needed. Paul, 2026-06-15.
 
 `access_map_reads_the_truth` (Clean: engineering):
 Laelaps has one emperor-only Access page that shows, per role (Emperor, Employee,
