@@ -1004,6 +1004,16 @@ Remaining (all droplet / decision, not code):
   are private to Paul. Cost note: two active projects stays within Supabase Free; dgn-prod will
   re-pause after about a week idle pre-launch (fine), and going always-on is the Pro trigger.
 - Data separation stays clean: the dashboard only READS each business's own project; never merges.
+- Engine Room panel (DECIDED 2026-06-14, Paul's go): add a server health/status panel to Mount
+  Olympus. A cron script on the droplet writes /srv/mountolympus/status.json every ~5 min (CPU
+  load + cores, memory used/percent, disk used/percent, swap, uptime, pending apt/security update
+  count, running docker containers, TLS cert days-to-expiry for mountolympusops.com /
+  doggonenails.com / hurricanebath.com, generated-at timestamp); the dashboard fetches it and
+  renders glanceable tiles with an overall green/red dot, going red on disk >85%, memory >90%,
+  any cert <14 days, or stale data >15 min, plus reachability dots for the three sites. status.json
+  sits under the Access-gated domain so it stays private. Built by the terminal agent (it has both
+  droplet access and the mount-olympus repo). Money-job monitor (DGN auto-charge last run/result)
+  is a later add, not part of this server-vitals panel.
 
 ## Public website gallery: BUILT 2026-06-13 (Phase 2 of photo_destinations, migration 0174)
 
