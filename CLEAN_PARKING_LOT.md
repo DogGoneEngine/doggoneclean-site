@@ -990,16 +990,15 @@ one `projects.js` edit; best-effort reachability dots; an Eastern-time clock; a 
 scratchpad; and a web manifest + icons so it installs on the Pixel home screen. Distinct
 night-sky-and-gold identity so it reads as the layer above the businesses.
 
-Server-health panel ("Engine Room") is LIVE (added 2026-06-14). A droplet cron job
-(`/usr/local/bin/olympus-status.sh` via `/etc/cron.d/olympus-status`, every 5 minutes) writes
-`/srv/mountolympus/status.json` with CPU load and core count, memory, disk, swap, uptime, pending
-and security apt counts, running containers, and TLS days-to-expiry for the three domains, plus a
-timestamp. The dashboard's Engine Room section reads it and shows glanceable tiles with an overall
-green/red health dot (red on disk over 85 percent, memory over 90 percent, any cert under 14 days,
-or data over 15 minutes old), per-site reachability dots, and an "updated X ago" line.
-`status.json` is served only under the Access-gated domain, so it stays private. The collector's
-source of truth is versioned in the mount-olympus repo at `deploy/olympus-status.sh`. Visual
-confirm of the rendered panel is Paul's, since only his Google login passes the gate.
+Server-health panel ("Engine Room") is LIVE. A droplet cron job writes
+`/srv/mountolympus/status.json` every 5 minutes; the dashboard renders it as a single
+green/amber/red health beacon with a plain-English verdict, collapsed by default and expandable
+to grouped detail (server vitals, real HTTP-200 site checks, per-business Supabase liveness,
+security updates, containers, and a TLS cert only when under 14 days). It shows ONLY actionable
+things (Paul's rule), and `status.json` is served only under the Access-gated domain so it stays
+private. The page refreshes every 60 seconds; data is at most ~5 minutes old. Full detail, the
+collector, and the runbook are versioned in the mount-olympus repo (`SHARED_INFRASTRUCTURE.md`).
+Visual confirm of the rendered panel is Paul's, since only his Google login passes the gate.
 
 Still open:
 - CI deploy now WORKS (fixed 2026-06-15): push to `main` auto-deploys via GitHub Actions as the
