@@ -963,57 +963,64 @@ optimizing a part that should not exist). Implementation rides the committed rol
 round: every completed visit updates clients.visit_minutes (and the groom/nails splits) from
 that window.
 
-## Mount Olympus dashboard at mountolympusops.com (v1 BUILT 2026-06-14; deploy is a droplet chore)
+## Mount Olympus dashboard at mountolympusops.com (LIVE 2026-06-14; own repo; CI deploy broken; business tiles still parked)
 
-Greenlit and built 2026-06-14. The cross-business owner dashboard ("emperor mode") is a plain
-static site (one HTML file, one stylesheet, one script, one config file `projects.js`); no build
-step, so it survives any redesign by being too simple to break. It lives in this repo for now at
-`mount-olympus/` on branch `claude/business-dashboard-entryway-6jpj9v`, kept self-contained so it
-lifts into its own repo verbatim. It is NOT merged into Clean's `main` (it is not Clean's
-product; merging it would pollute Clean's trunk and deploy nothing useful). Permanent home is a
-decision parked for Paul: its own `mount-olympus` repo (recommended, keeps Clean sellable and
-un-entangled) vs. staying a directory here.
+LIVE at mountolympusops.com behind Cloudflare Access (Google sign-in, Paul's email only). The
+cross-business owner dashboard ("emperor mode") is a plain static site (one HTML file, one
+stylesheet, the app script, one config file `projects.js`); no build step, so it survives any
+redesign by being too simple to break.
 
-v1 contents: a "building" card per business (Dog Gone Clean, Dog Gone Nails) with doors into
-every surface (site, booking, portal, operator, Orbit) and a collapsible "engine room" (Supabase,
-GitHub, deploys); a `/`-key command palette that jumps to any door across all businesses;
-add-a-project in one `projects.js` edit; best-effort reachability dots; an Eastern-time clock; a
-localStorage scratchpad; and a web manifest + icons so it installs on the Pixel home screen.
-Distinct night-sky-and-gold identity so it reads as the layer above the businesses, not as either.
+Permanent repo home is DECIDED and DONE: it has its own repo, `DogGoneEngine/mount-olympus`
+(keeps Clean sellable and un-entangled). The copy still sitting at `mount-olympus/` in this Clean
+repo on branch `claude/business-dashboard-entryway-6jpj9v` is a leftover of where it was first
+built; it is NOT merged into Clean's `main` and should stay that way (it is not Clean's product).
 
-Why n8n can go: every automation ended up as custom code (Supabase edge functions, pg_cron, the
-GitHub Actions deploy). Nothing calls the `engine-n8n-1` container (droplet, localhost:5678); it
-is obsolete for both businesses. The domain attached to it, mountolympusops.com, becomes the
-dashboard's home.
+How it serves on the shared droplet: Caddy serves `/srv/mountolympus` for mountolympusops.com,
+with the site block locked to Cloudflare IPs only (the droplet answers nothing else, so the
+Google gate cannot be skipped by hitting the IP) over a Cloudflare origin cert. n8n is fully
+retired: the container was stopped and removed in a prior session, and on 2026-06-14 the leftovers
+were cleared too (the roughly 2 GB n8n image, the `engine_n8n_data` volume, `/root/.n8n`, three
+n8n SSH keys in root's `authorized_keys`, and the open UFW rule for port 5678). Every automation
+it once did is custom code now (Supabase edge functions, pg_cron, the GitHub Actions deploys).
 
-Remaining (all droplet / decision, not code):
-- Decide permanent repo home; if its own repo, create it and move `mount-olympus/` over
-  (`deploy/deploy.yml.template` is ready to become its `.github/workflows/deploy.yml`).
-- Droplet session (one sitting): put the files in `/srv/mountolympus`, replace the
-  mountolympusops.com Caddy block (currently proxying n8n) with `mount-olympus/deploy/Caddyfile.snippet`,
-  set a basic-auth password, reload Caddy, then stop the n8n container.
-- Phase 2 live tiles (today's count, week count, run rate) per business: VALIDATED 2026-06-14.
-  Unpaused dgn-prod and ran the pulse against real data; the core-three compute cleanly (Nails:
-  today 0, this week 1, next appt Sat Jul 11). Confirmed buildable NOW for both businesses (no
-  longer blocked by the DGN pause). Caveat: Nails is still pre-launch TEST data ($0 paid, 0
-  subscriptions, 16 clients / 19 appts), so its tiles read real-but-throwaway until launch;
-  Clean's tiles are real. Build path: a small Cloudflare Worker that holds each project's
-  read key server-side (keys never touch the browser) and returns the aggregates to the
-  Google-gated page. Each Worker call reads only its OWN project, so nothing merges. Decision on
-  exposure dissolves once the page is behind Cloudflare Access (Google, one email): all numbers
-  are private to Paul. Cost note: two active projects stays within Supabase Free; dgn-prod will
-  re-pause after about a week idle pre-launch (fine), and going always-on is the Pro trigger.
+Contents: a "building" card per business (Dog Gone Clean, Dog Gone Nails) with doors into every
+surface (site, booking, portal, operator, Laelaps/Orbit) and a collapsible "engine room"
+(Supabase, GitHub, deploys); a `/`-key command palette across all businesses; add-a-project in
+one `projects.js` edit; best-effort reachability dots; an Eastern-time clock; a localStorage
+scratchpad; and a web manifest + icons so it installs on the Pixel home screen. Distinct
+night-sky-and-gold identity so it reads as the layer above the businesses.
+
+Server-health panel ("Engine Room") is LIVE (added 2026-06-14). A droplet cron job
+(`/usr/local/bin/olympus-status.sh` via `/etc/cron.d/olympus-status`, every 5 minutes) writes
+`/srv/mountolympus/status.json` with CPU load and core count, memory, disk, swap, uptime, pending
+and security apt counts, running containers, and TLS days-to-expiry for the three domains, plus a
+timestamp. The dashboard's Engine Room section reads it and shows glanceable tiles with an overall
+green/red health dot (red on disk over 85 percent, memory over 90 percent, any cert under 14 days,
+or data over 15 minutes old), per-site reachability dots, and an "updated X ago" line.
+`status.json` is served only under the Access-gated domain, so it stays private. The collector's
+source of truth is versioned in the mount-olympus repo at `deploy/olympus-status.sh`. Visual
+confirm of the rendered panel is Paul's, since only his Google login passes the gate.
+
+Still open:
+- CI deploy is BROKEN: `.github/workflows/deploy.yml` rsyncs to an `olympusdeploy@` droplet user
+  that does not exist, so the Action fails on every push. Deploys are MANUAL for now (rsync the
+  repo to `root@droplet:/srv/mountolympus`, excluding `status.json`, then chown to `cleandeploy`).
+  Fix = create the `olympusdeploy` user + deploy key + the `DROPLET_SSH_KEY` repo secret. The
+  workflow already excludes `status.json` so a deploy cannot wipe the cron output.
+- Phase 2 live BUSINESS tiles (today's count, week count, run rate per business) are still PARKED,
+  and are separate from the server-health panel above. VALIDATED 2026-06-14: unpaused dgn-prod and
+  ran the pulse against real data; the core-three compute cleanly (Nails: today 0, this week 1,
+  next appt Sat Jul 11). Buildable now for both businesses. Caveat: Nails is still pre-launch TEST
+  data ($0 paid, 0 subscriptions, 16 clients / 19 appts), so its tiles read real-but-throwaway
+  until launch; Clean's are real. Build path: a small Cloudflare Worker that holds each project's
+  read key server-side (keys never touch the browser) and returns aggregates to the Google-gated
+  page; each call reads only its OWN project, so nothing merges. The exposure concern dissolves
+  behind Access. Cost note: two active projects stays within Supabase Free; dgn-prod re-pauses
+  after about a week idle pre-launch, and going always-on is the Pro trigger.
 - Data separation stays clean: the dashboard only READS each business's own project; never merges.
-- Engine Room panel (DECIDED 2026-06-14, Paul's go): add a server health/status panel to Mount
-  Olympus. A cron script on the droplet writes /srv/mountolympus/status.json every ~5 min (CPU
-  load + cores, memory used/percent, disk used/percent, swap, uptime, pending apt/security update
-  count, running docker containers, TLS cert days-to-expiry for mountolympusops.com /
-  doggonenails.com / hurricanebath.com, generated-at timestamp); the dashboard fetches it and
-  renders glanceable tiles with an overall green/red dot, going red on disk >85%, memory >90%,
-  any cert <14 days, or stale data >15 min, plus reachability dots for the three sites. status.json
-  sits under the Access-gated domain so it stays private. Built by the terminal agent (it has both
-  droplet access and the mount-olympus repo). Money-job monitor (DGN auto-charge last run/result)
-  is a later add, not part of this server-vitals panel.
+- Money-job monitor (DGN auto-charge last run/result) is a later add to Mount Olympus, separate
+  from the server-vitals Engine Room panel that is now live above (idea captured by the parallel
+  session 2026-06-14).
 
 ## Public website gallery: BUILT 2026-06-13 (Phase 2 of photo_destinations, migration 0174)
 
