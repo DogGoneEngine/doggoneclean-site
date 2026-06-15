@@ -68,7 +68,10 @@ function seedHistoryFromMaster() {
 }
 
 // STEP 3 / weekly / button: build the dated backup from the Laelaps ledger.
-function fileTimeIsMoneyBackup() {
+// stamped=false (weekly) -> one file per day, replacing the same day's file.
+// stamped=true (manual button / editor run) -> a distinct date+time file every push.
+function fileTimeIsMoneyBackup(stamped) {
+  const useStamp = stamped !== false;
   const res = UrlFetchApp.fetch(EDGE_URL, { method: 'get', headers: _headers_(), muteHttpExceptions: true });
   if (res.getResponseCode() !== 200) throw new Error('Ledger fetch failed: ' + res.getResponseCode() + ' ' + res.getContentText());
   const values = Utilities.parseCsv(res.getContentText());
@@ -76,10 +79,13 @@ function fileTimeIsMoneyBackup() {
   const rows = values.length, cols = values[0].length;
 
   const tz = 'America/New_York';
-  const name = 'Time is Money - full backup - ' + Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
+  const day = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
+  const name = 'Time is Money - full backup - ' + day + (useStamp ? ' ' + Utilities.formatDate(new Date(), tz, 'h:mm a') : '');
   const folder = DriveApp.getFolderById(FOLDER_ID);
-  const dups = folder.getFilesByName(name);
-  while (dups.hasNext()) dups.next().setTrashed(true);
+  if (!useStamp) {
+    const dups = folder.getFilesByName(name);
+    while (dups.hasNext()) dups.next().setTrashed(true);
+  }
 
   const backup = SpreadsheetApp.create(name, rows, cols);
   const sheet = backup.getSheets()[0];
@@ -106,14 +112,14 @@ function _postCard_(name, fileUrl, dataRows, folderUrl) {
 // you, access only you), then store the /exec URL in app_secrets.time_is_money_webapp_url.
 function doGet() {
   try {
-    const url = fileTimeIsMoneyBackup();
+    const url = fileTimeIsMoneyBackup(true);   // manual push: distinct time-stamped file
     return HtmlService.createHtmlOutput('<p>Backup filed. <a href="' + url + '" target="_blank">Open it</a>. You can close this tab.</p>');
   } catch (e) {
     return HtmlService.createHtmlOutput('<p>Backup failed: ' + e + '</p>');
   }
 }
 
-function weeklyTrigger() { fileTimeIsMoneyBackup(); }
+function weeklyTrigger() { fileTimeIsMoneyBackup(false); }   // weekly: one clean file per Sunday
 
 function installWeeklyTrigger() {
   ScriptApp.getProjectTriggers().forEach(function (t) {
