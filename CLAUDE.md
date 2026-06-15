@@ -298,15 +298,15 @@ for the legacy book.
 18 islands, Node 20, npm. Supabase backend. Deploy: push to main -> GitHub Actions builds
 Astro -> rsync `dist/` to the shared DigitalOcean droplet -> Caddy serves.
 
-**Deploy host (actual, verified 2026-05-25).** The shared droplet is `dog-gone-engine`
-(DigitalOcean, NYC1, Ubuntu 24.04, 2 GB / 50 GB, public IP 178.128.144.219). Web serving is
-Caddy running in Docker (container `engine-caddy-1`, image `caddy:latest`, holding host ports
-80/443, config `/etc/caddy/Caddyfile`), under a Docker Compose project named `engine`; an n8n
-container (`engine-n8n-1`, bound to localhost:5678) also runs there. This is the shared "Dog
-Gone Engine" host, acceptable to share per `own_infrastructure`. Clean deploys onto it by
-adding its OWN Caddy site block (hurricanebath.com for staging, doggoneclean.us at launch)
-and its own served directory, reusing the existing Dockerized Caddy rather than installing a
-second web server. The site is NOT Squarespace; do not assume so again.
+**Deploy host.** Clean deploys onto the shared "Dog Gone Engine" DigitalOcean droplet
+(acceptable to share per `own_infrastructure`) by adding its OWN Caddy site block
+(hurricanebath.com for staging, doggoneclean.us at launch) and its own served directory
+(`/srv/doggoneclean`), reusing the existing Dockerized Caddy rather than installing a second
+web server. The site is NOT Squarespace; do not assume so again. NEVER install nginx or any
+second web server on that droplet (a stray nginx grabbing port 80 took both sites down on
+2026-06-14). The full shared-droplet detail (host, IP, Caddy and Compose layout, every site's
+deploy, TLS, the status collector, security posture, and the recovery runbook) is the single
+source of truth in the `mount-olympus` repo's `SHARED_INFRASTRUCTURE.md`, not duplicated here.
 
 **Build gate (partial; structural lint live in CI, local build-chain not built yet).** The
 structural lint runs in three places off one script: `scripts/check.py` runs on every

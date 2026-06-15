@@ -971,9 +971,9 @@ stylesheet, the app script, one config file `projects.js`); no build step, so it
 redesign by being too simple to break.
 
 Permanent repo home is DECIDED and DONE: it has its own repo, `DogGoneEngine/mount-olympus`
-(keeps Clean sellable and un-entangled). The copy still sitting at `mount-olympus/` in this Clean
-repo on branch `claude/business-dashboard-entryway-6jpj9v` is a leftover of where it was first
-built; it is NOT merged into Clean's `main` and should stay that way (it is not Clean's product).
+(keeps Clean sellable and un-entangled), with its own doc set (README, LOG, and
+SHARED_INFRASTRUCTURE runbook). The original copy at `mount-olympus/` in this Clean repo was
+removed 2026-06-14; the dashboard lives only in its own repo now.
 
 How it serves on the shared droplet: Caddy serves `/srv/mountolympus` for mountolympusops.com,
 with the site block locked to Cloudflare IPs only (the droplet answers nothing else, so the
