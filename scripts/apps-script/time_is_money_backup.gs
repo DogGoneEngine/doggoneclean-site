@@ -112,6 +112,18 @@ function fixSaturday() {
   Logger.log(report.join('\n'));
 }
 
+// Web-app entry point for the Reports "Back up now" button. Deploy this script as a
+// web app (execute as you, access: only you) and store the /exec URL in app_secrets
+// (time_is_money_webapp_url). Opening the URL runs a backup and shows a confirmation.
+function doGet() {
+  try {
+    const url = fileTimeIsMoneyBackup();
+    return HtmlService.createHtmlOutput('<p>Backup filed. <a href="' + url + '" target="_blank">Open it</a>. You can close this tab.</p>');
+  } catch (e) {
+    return HtmlService.createHtmlOutput('<p>Backup failed: ' + e + '</p>');
+  }
+}
+
 function weeklyTrigger() { fileTimeIsMoneyBackup(); }
 
 function installWeeklyTrigger() {

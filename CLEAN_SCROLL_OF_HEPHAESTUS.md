@@ -3722,3 +3722,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   (frozen getDisplayValues, practice tab excluded by picking the largest sheet), so nothing can be
   dropped. The edge function is kept only to post the Today card. The incomplete DB import of the
   Time is Money history is a separate, still-open issue for any app feature that reads `public.visits`.
+
+- **Reports "Back up now" button (on-demand Time is Money backup)** (Paul 2026-06-15): added a
+  one-tap button to the Reports backup panel that triggers an instant full backup. Because only
+  Paul's Google identity can write his Drive, the button opens the producer script's web-app
+  doGet (added to time_is_money_backup.gs); the web-app /exec URL lives in app_secrets
+  (time_is_money_webapp_url), surfaced by admin_time_is_money_backup_status (migration 0192), so
+  no URL is hardcoded in the page. Button shows only once the URL is set; until then a hint says
+  one-tap turns on after the script is published as a web app. Paul's human API step: Deploy ->
+  New deployment -> Web app (execute as you, access only you), then give the URL to set the secret.

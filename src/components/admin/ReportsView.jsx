@@ -171,6 +171,9 @@ function TimeIsMoneyBackupPanel({ tim }) {
         The full visit history, every row on record, filed as a dated Google Sheet every Sunday and kept week by week. Your insurance copy of the book, in your own Drive.
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+        {tim.webapp_url && (
+          <button className="ad-btn ad-btn--sm" onClick={() => window.open(tim.webapp_url, '_blank', 'noopener')}>Back up now</button>
+        )}
         {tim.folder_url && (
           <a className="ad-btn ad-btn--sm" href={tim.folder_url} target="_blank" rel="noopener noreferrer">Open the backups folder</a>
         )}
@@ -178,6 +181,11 @@ function TimeIsMoneyBackupPanel({ tim }) {
           <a className="ad-btn ad-btn--ghost ad-btn--sm" href={last.url} target="_blank" rel="noopener noreferrer">Open the latest backup</a>
         )}
       </div>
+      {!tim.webapp_url && (
+        <div style={{ fontSize: 12, opacity: 0.6, marginTop: 8 }}>
+          One-tap backup turns on after the producer script is published once as a web app.
+        </div>
+      )}
       <div style={{ fontSize: 12, opacity: 0.65, marginTop: 10 }}>
         {last && last.finished_at
           ? `Last filed ${fmtWhen(last.finished_at)}${last.rows ? ` · ${Number(last.rows).toLocaleString('en-US')} rows` : ''}.`
