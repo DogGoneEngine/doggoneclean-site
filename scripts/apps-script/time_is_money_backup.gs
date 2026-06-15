@@ -76,6 +76,36 @@ function _postCard_(name, fileUrl, dataRows, folderUrl) {
   }
 }
 
+// One-time fix for Saturday 2026-06-13 from the times and amounts logged in Laelaps.
+// Corrects the three rows in place (matched by date + client), setting the time columns
+// as times and Charged/Paid as numbers so the formula columns recompute correctly.
+function fixSaturday() {
+  const DATE = '6/13/2026';
+  const fixes = [
+    { client: 'Lisa Prater',    inbound: '12:06:40 PM', arrival: '12:28:48 PM', departure: '12:46:05 PM', charged: 30,  paid: 35  },
+    { client: 'Nancy Franklin', inbound: '12:46:06 PM', arrival: '12:49:13 PM', departure: '12:58:59 PM', charged: 25,  paid: 25  },
+    { client: 'Tonya Hunt',     inbound: '1:43:02 PM',  arrival: '2:15:57 PM',  departure: '4:41:13 PM',  charged: 100, paid: 200 },
+  ];
+  const sh = _mainTab_(SpreadsheetApp.openById(MASTER_ID));
+  const data = sh.getDataRange().getDisplayValues();
+  const report = [];
+  fixes.forEach(function (fx) {
+    let r = -1;
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim() === DATE && String(data[i][1]).trim() === fx.client) { r = i + 1; break; }
+    }
+    if (r < 0) { report.push('NOT FOUND, skipped: ' + fx.client); return; }
+    sh.getRange(r, 3).setValue(fx.inbound);    // Inbound Time
+    sh.getRange(r, 4).setValue(fx.arrival);    // Arrival Time
+    sh.getRange(r, 5).setValue(fx.departure);  // Departure Time
+    sh.getRange(r, 6).setValue(fx.charged);    // Charged
+    sh.getRange(r, 7).setValue(fx.paid);       // Paid
+    sh.getRange(r, 8).setValue('Cash');        // Payment Method
+    report.push('fixed row ' + r + ': ' + fx.client);
+  });
+  Logger.log(report.join('\n'));
+}
+
 function weeklyTrigger() { fileTimeIsMoneyBackup(); }
 
 function installWeeklyTrigger() {
