@@ -3711,3 +3711,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   blocks supabase.co); the underlying `_time_is_money_ledger()` RPC is verified (1,440 rows), and Paul's
   one-time Run is the integration test, which also produces the first backup now. Paul's human API task:
   paste the .gs, set the `CFO_CRON_SECRET` script property, authorize, Run once, then installWeeklyTrigger.
+
+- **Time is Money backup corrected: copy the sheet, not the database** (Paul 2026-06-15): the
+  first cut backed up `public.visits` via the `_time_is_money_ledger()` RPC, but that DB copy was
+  incomplete: only 808 of the master sheet's 1,230 rows imported, and Charged, Inbound/Arrival/
+  Departure times, Appointment Duration, Cycle Time, On Site Rate, and Cycle Rate were all dropped
+  (NULL across every row). Reality check against the master "Time is Money!" sheet
+  (Drive id 1rxZ6WDOp2xJsb4dK4vBRFDqx2LQQiP3SAdjpwzdyDbU): main tab = 1,230 data rows, 7/28/2023 to
+  6/13/2026, 12 columns. Fix: the producer now snapshots the master sheet's MAIN tab directly
+  (frozen getDisplayValues, practice tab excluded by picking the largest sheet), so nothing can be
+  dropped. The edge function is kept only to post the Today card. The incomplete DB import of the
+  Time is Money history is a separate, still-open issue for any app feature that reads `public.visits`.

@@ -1,60 +1,79 @@
 /**
  * Dog Gone Clean - Time is Money weekly backup producer.
  *
- * Files the ENTIRE visit history as a dated Google Sheet into the backups folder, then
- * posts a Today card with a link. Runs under Paul's Google identity, mirroring the
- * calendar-sync script, because Google blocks service-account keys on new projects.
- * The teeth live in the database (see time_is_money_weekly_backup in CLEAN_ORACLE.md);
- * this script is just the deterministic producer, no LLM in the loop.
+ * Makes a complete, frozen weekly snapshot of Paul's source-of-truth spreadsheet
+ * "Time is Money!" (its MAIN tab, every row and column) into the backups folder,
+ * then posts a Today card with a link. Runs under Paul's Google identity, mirroring
+ * the calendar-sync script, because Google blocks service-account keys on new projects.
+ *
+ * This copies the master sheet DIRECTLY. It does not go through the app database,
+ * so nothing can be dropped: what is on your main tab is what lands in the backup.
+ * See time_is_money_weekly_backup in CLEAN_ORACLE.md.
  *
  * One-time setup:
  *   1. Project Settings -> Script Properties: add CFO_CRON_SECRET with the value of
  *      app_secrets.cfo_cron_secret from the dgc-prod Supabase project.
  *   2. Run fileTimeIsMoneyBackup once from the editor; authorize when Google prompts.
- *      Confirm the dated Sheet lands in the folder and a card shows on the Today screen.
+ *      Confirm the dated Sheet lands in the folder with all your rows and columns, and
+ *      a card shows on the Today screen.
  *   3. Run installWeeklyTrigger once to schedule it every Sunday morning.
  */
 
-const EDGE_URL = 'https://urebdrosrxejhubpbxsa.supabase.co/functions/v1/time-is-money-backup';
-// Publishable anon key (safe to embed): the Supabase functions gateway wants it present.
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZWJkcm9zcnhlamh1YnBieHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NTE5NDMsImV4cCI6MjA5NTIyNzk0M30.CoxYUJ3GLQbLKtcvHMovYoXb76XFx8CGrnP6Sg3q94c';
+// Paul's live source-of-truth spreadsheet "Time is Money!".
+const MASTER_ID = '1rxZ6WDOp2xJsb4dK4vBRFDqx2LQQiP3SAdjpwzdyDbU';
 const FOLDER_ID = '115Q5cKvgZ0ic5RhPelzUbVK_o5gMUsWZ';
+// The Today card is posted through the app; these reach the same edge endpoint.
+const EDGE_URL = 'https://urebdrosrxejhubpbxsa.supabase.co/functions/v1/time-is-money-backup';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZWJkcm9zcnhlamh1YnBieHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NTE5NDMsImV4cCI6MjA5NTIyNzk0M30.CoxYUJ3GLQbLKtcvHMovYoXb76XFx8CGrnP6Sg3q94c';
 
-function _headers_() {
-  const secret = PropertiesService.getScriptProperties().getProperty('CFO_CRON_SECRET');
-  if (!secret) throw new Error('Set the CFO_CRON_SECRET script property first.');
-  return { 'x-cfo-secret': secret, 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON };
+// The MAIN tab is the one with the real history. Pick the sheet with the most rows so
+// the small practice tab is never the one we back up (Paul: never the practice tab).
+function _mainTab_(ss) {
+  return ss.getSheets().reduce(function (a, b) {
+    return b.getLastRow() > a.getLastRow() ? b : a;
+  });
 }
 
 function fileTimeIsMoneyBackup() {
-  const headers = _headers_();
+  const master = SpreadsheetApp.openById(MASTER_ID);
+  const main = _mainTab_(master);
+  const rows = main.getLastRow();
+  const cols = main.getLastColumn();
+  if (rows < 2) throw new Error('Main tab looks empty (' + rows + ' rows).');
 
-  const res = UrlFetchApp.fetch(EDGE_URL, { method: 'get', headers: headers, muteHttpExceptions: true });
-  if (res.getResponseCode() !== 200) {
-    throw new Error('Ledger fetch failed: ' + res.getResponseCode() + ' ' + res.getContentText());
-  }
-  const rows = Utilities.parseCsv(res.getContentText());
-  if (!rows || rows.length < 2) throw new Error('Ledger came back empty.');
+  // Frozen snapshot: copy exactly what the sheet displays (values, not formulas), so a
+  // catastrophe backup can never recompute or break a cross-sheet reference.
+  const values = main.getRange(1, 1, rows, cols).getDisplayValues();
 
   const tz = 'America/New_York';
   const name = 'Time is Money - full backup - ' + Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
-  const ss = SpreadsheetApp.create(name, rows.length, rows[0].length);
-  const sheet = ss.getSheets()[0];
-  sheet.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+  const backup = SpreadsheetApp.create(name, rows, cols);
+  const sheet = backup.getSheets()[0];
+  sheet.getRange(1, 1, rows, cols).setValues(values);
   sheet.setFrozenRows(1);
+  DriveApp.getFileById(backup.getId()).moveTo(DriveApp.getFolderById(FOLDER_ID));
 
-  // Move the new Sheet out of My Drive root and into the backups folder.
-  DriveApp.getFileById(ss.getId()).moveTo(DriveApp.getFolderById(FOLDER_ID));
-
-  const fileUrl = ss.getUrl();
+  const fileUrl = backup.getUrl();
   const folderUrl = 'https://drive.google.com/drive/folders/' + FOLDER_ID;
-  UrlFetchApp.fetch(EDGE_URL, {
-    method: 'post', contentType: 'application/json', headers: headers,
-    payload: JSON.stringify({ file_name: name, file_url: fileUrl, rows: rows.length - 1, folder_url: folderUrl }),
-    muteHttpExceptions: true,
-  });
-  Logger.log('Filed ' + name + ' -> ' + fileUrl);
+  _postCard_(name, fileUrl, rows - 1, folderUrl);
+  Logger.log('Filed ' + name + ' (' + (rows - 1) + ' rows, ' + cols + ' cols) -> ' + fileUrl);
   return fileUrl;
+}
+
+// Post the Today card via the app. Best-effort: a failed card never loses the backup.
+function _postCard_(name, fileUrl, dataRows, folderUrl) {
+  const secret = PropertiesService.getScriptProperties().getProperty('CFO_CRON_SECRET');
+  if (!secret) { Logger.log('No CFO_CRON_SECRET set; skipped the Today card.'); return; }
+  try {
+    UrlFetchApp.fetch(EDGE_URL, {
+      method: 'post', contentType: 'application/json',
+      headers: { 'x-cfo-secret': secret, 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON },
+      payload: JSON.stringify({ file_name: name, file_url: fileUrl, rows: dataRows, folder_url: folderUrl }),
+      muteHttpExceptions: true,
+    });
+  } catch (e) {
+    Logger.log('Card post failed (backup still filed): ' + e);
+  }
 }
 
 function weeklyTrigger() { fileTimeIsMoneyBackup(); }
