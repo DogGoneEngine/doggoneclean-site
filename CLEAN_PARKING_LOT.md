@@ -271,7 +271,8 @@ survive a reset:
 - **Reminders + confirmations on Supabase.** Net-new and load-bearing: Acuity sends the legacy
   reminders today, so a Supabase scheduled edge function (pg_cron + SMS/email, mirroring DGN
   send-notification) must exist before Acuity is cancelled or clients no-show
-  (confirmations_and_reminders_via_supabase). n8n is deferred.
+  (confirmations_and_reminders_via_supabase). n8n is retired (container and droplet leftovers
+  removed 2026-06-14), not the reminder path.
 - **Legacy client login: done for who needs it; the rest are intentional.** Mechanism built +
   verified (`bath_claim_legacy_account`, migration 0024). Calendar backfill (2026-06-07) brought
   44 of 51 active clients to login-ready. The remaining no-contact clients are NOT a backfill TODO:

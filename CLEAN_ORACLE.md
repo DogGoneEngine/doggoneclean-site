@@ -1355,8 +1355,8 @@ block. Every existing legacy client is carried into the app; none are dropped in
 to card-on-file is a deferred, separate decision and is not part of this work. Acuity's
 reminders are load-bearing, so reminders must exist in the app before Acuity is cancelled or
 clients no-show; those reminders and confirmations are sent from Clean's own Supabase as a
-scheduled edge function (see `confirmations_and_reminders_via_supabase`), not n8n, which is
-reserved for later automation. Because killing Squarespace
+scheduled edge function (see `confirmations_and_reminders_via_supabase`), not n8n, which was
+retired and removed from the shared droplet 2026-06-14. Because killing Squarespace
 and Acuity removes legacy's only operational home, so legacy needs that home in the app now,
 not at a later rebuild; one app with one login preserves the client relationship and full
 history through the Ocala-to-Villages, grooming-to-bath migration that is the core business
@@ -1370,8 +1370,9 @@ into the app.
 Appointment confirmations and reminders are sent from Clean's own Supabase: a scheduled edge
 function on a pg_cron trigger calls the SMS and email providers, mirroring DGN's
 `send-notification` edge function but with Clean's own instances and keys (never shared, per
-`clean_stays_saleable`). n8n on the shared droplet is reserved for later, non-core automation
-and is not the confirmation or reminder path. Because Acuity's reminders are load-bearing and
+`clean_stays_saleable`). n8n was retired and removed from the shared droplet 2026-06-14 and is
+not the confirmation or reminder path; if non-core automation is ever wanted it would be a fresh
+edge-function/pg_cron build, not a revived n8n. Because Acuity's reminders are load-bearing and
 must be rebuilt before Acuity is cancelled (`legacy_folds_into_v2`); the notification path
 belongs in the same Supabase that owns the appointments, on the same scheduled-function
 pattern DGN already proved, rather than in a separate automation tool that would split the
