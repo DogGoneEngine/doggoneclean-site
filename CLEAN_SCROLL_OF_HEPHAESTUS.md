@@ -171,6 +171,63 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-15 (NAMING COSMOLOGY AND AGENT ROSTER locked; HR-floor titles named in migration 0191)
+
+Paul locked the naming system. The block below is the authoritative cross-business source.
+Its permanent home is the `mount-olympus` repo; it lives in both business scrolls (this one and
+the Nails scroll) temporarily so either can seed the Mount Olympus naming scroll. A future session
+with the `mount-olympus` repo connected should lift this block verbatim into a Mount Olympus naming
+doc and leave a one-line pointer here in its place.
+
+THREE TIERS.
+- COUNCIL: the twelve Olympians plus a few major gods. Mount-Olympus-only singletons that oversee
+  every business and never work inside one; they are the cross-business C-suite. A council name is
+  never given to a per-business app or agent.
+- REALM: each business (Dog Gone Clean, Dog Gone Nails) is a realm, staffed entirely by LESSER
+  figures (Muses, nymphs, minor gods, heroes, creatures). The same role reuses the same lesser name
+  in every realm (one product, one name).
+- ROLE: the generic DB layer (admin, operator, the agent_key). Never branded, so a buyer can rename
+  freely.
+RULES. A name dedicated TO a god (the Oracle rulebook, the Scroll of Hephaestus) is a per-business
+artifact and is allowed per realm; a god who IS a live agent is a council singleton. To name a
+realm agent, take the lesser figure attached to the Olympian who owns that portfolio (Peitho
+attends Aphrodite, Dike is Themis's daughter), so the reporting line is baked into the myth. Name
+PERSONAS, not functions: a persona wears every hat in its portfolio and the agent_key keeps each
+hat legible; consolidating names does not consolidate agents. A sale never forces a rename (role
+layer is generic); council names never ship inside a sold business. The cosmology governs internal
+apps, agents, and techniques, NOT customer brands (Dog Gone Clean, Dog Gone Nails, Hurricane Bath).
+OPEN: strict "everything Greek" vs loose (Greek council, each realm its own idiom). Leaning strict.
+
+MOUNT OLYMPUS COUNCIL (cross-business singletons):
+Zeus (orchestrator; Paul the emperor sits above him), Athena (operations and strategy), Hermes
+(commerce and the cross-business courier/router; reserved; also the old retired n8n router),
+Aphrodite (client experience and growth), Hestia (people), Themis (law and compliance), Hephaestus
+(build and engineering), Poseidon (infrastructure), Apollo (brand and voice), Artemis (monitoring),
+Demeter (provisions and supplies). No Olympian holds pure finance; the enterprise CFO portfolio
+sits under Hermes (commerce) or Zeus's treasury, with Plutus as the realm steward.
+
+PER-REALM APPS AND TECHNIQUES (lesser; reused in every realm):
+Laelaps = the admin console (DB role: admin). Clio = the voice scribe that records each appointment
+(currently the `riker` edge function, RPCs admin_riker_context / admin_riker_apply, table riker_log;
+code rename pending). Calliope = the correspondent that drafts client messages (`message-draft`).
+String of Pearls = the routing technique (Ariadne's thread parked as the Greek alternative).
+
+DOG GONE CLEAN REALM AGENTS (persona: hats = agent_key -> reports up to):
+Plutus (Finance): cfo, ledger_keeper, bookkeeper, pricing -> Hermes.
+Daedalus (Operations): coo, capacity, reorder -> Athena.
+Talos (Infrastructure): infra, maintenance -> Hephaestus.
+Harmonia (People): hr -> Hestia.
+Peitho (Growth): growth, retention, winback -> Aphrodite.
+Dike (Compliance): compliance -> Themis.
+Chiron (Valuation coach): value_coach -> Hermes (finance).
+Mnemosyne (Archivist): archivist -> Athena.
+Nestor (Weekly review): chief_of_staff -> the council.
+Eos (Day-before brief): tomorrow -> Daedalus.
+Personal staff (not department heads): Clio (the scribe, `riker`), Calliope (the correspondent,
+`message-draft`).
+Migration 0191 set the HR-floor titles in dgc-prod to "Persona, Role" for all 18 department-head
+agents.
+
 ### 2026-06-15 (naming cosmology landing: one product one name, Laelaps is the console everywhere, String of Pearls becomes the routing technique)
 
 A naming-architecture thread with Paul (no code). Reached a three-tier cosmology, to be formalized in the `mount-olympus` repo (which was not loaded this session, so only the Clean-relevant pieces were captured here, plus the Nails-forward pieces parked in DGN). The tiers: COUNCIL = the twelve Olympians, Mount-Olympus-only singletons that oversee every business and never ship inside a sold one (Hermes the cross-business courier, Zeus the owner seat, the methodology names); LESSER = gods, heroes, and creatures, used as per-business product/role/technique names and reused freely across businesses (one product, one name); ROLE = the generic DB layer (`admin`, `operator`), never branded, so a buyer can rename freely. A name dedicated TO a god (the Oracle rulebook, the Scroll of Hephaestus) is a per-business artifact and does not violate the council-singleton rule; a god who IS a live agent (a router named Hermes) is a singleton. Decisions Paul locked: (1) Laelaps is THE admin-console product name in every business, not Clean alone (extended `admin_console_named_laelaps`); for now, until reality forces a change. (2) The standalone field/operator app is obsolete; Laelaps is role-aware and shows a field operator only what is relevant to them (their Today appointments + handed-off tasks, a PII-scrubbed Clients page). The old String of Pearls operator app failed every Nails field test; Laelaps (proven on Clean with live appointments) replaces both it and Orbit when Nails work resumes. (3) "String of Pearls" the NAME is reassigned to the routing technique, reusable in any routing business; Ariadne's thread parked as the Greek alternative. Still open (deferred to the Mount Olympus pass): strict-vs-loose "everything Greek," and the formal cosmology doc. Captured: extended the Laelaps Oracle rule; the Nails-forward pieces parked in DGN's PARKING_LOT.md. Nothing in code changed; DGN's CLAUDE.md still describes the live String of Pearls / Orbit apps and is correct until the Nails rework actually happens.
