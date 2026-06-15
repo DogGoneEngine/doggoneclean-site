@@ -3699,3 +3699,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   and NOT a service-account edge function (Google blocks service-account keys on new projects); it should
   be a time-triggered Google Apps Script like the calendar sync, which is the remaining piece, gated on
   Paul pasting the script once. Audit green; shipped to main.
+
+- **Ledger Keeper producer shipped (edge function + Apps Script)** (Paul 2026-06-15): wired the
+  unattended weekly write. Edge function `time-is-money-backup` (deployed, verify_jwt off, custom
+  `x-cfo-secret` auth) returns the full ledger as CSV on GET and files the Today card on POST via
+  `time_is_money_snapshot_finish`. The deterministic producer is `scripts/apps-script/time_is_money_backup.gs`:
+  it fetches the CSV, writes a dated Google Sheet into the backups folder under Paul's Google identity,
+  moves it into the folder, and posts the card with the file link. Weekly Sunday ~7am Eastern trigger via
+  `installWeeklyTrigger`. No LLM in the loop, so the per-run model cost is $0; the recurring cost is just
+  Supabase + Google quota (free at this volume). Could not curl-test from the container (egress allowlist
+  blocks supabase.co); the underlying `_time_is_money_ledger()` RPC is verified (1,440 rows), and Paul's
+  one-time Run is the integration test, which also produces the first backup now. Paul's human API task:
+  paste the .gs, set the `CFO_CRON_SECRET` script property, authorize, Run once, then installWeeklyTrigger.
