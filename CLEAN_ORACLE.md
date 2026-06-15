@@ -904,8 +904,10 @@ reassigned to the routing technique itself, reusable in any business that routes
 is the parked Greek alternative if the technique is ever renamed). Because one proven console name
 reused across businesses is learned once and read instantly, the DB role stays generic
 (`admin`/`operator`) so a buyer of any single business can rename freely, and one role-aware console
-is less to build and maintain than two apps. This sits inside a three-tier naming cosmology still
-being settled, whose formal home is the `mount-olympus` repo: council (the twelve Olympians) are
+is less to build and maintain than two apps. This sits inside a three-tier naming cosmology whose
+full authoritative text (council / realm / role, the council roster, the per-realm apps, and the
+Dog Gone Clean agent personas) lives in `mount-olympus/NAMING_COSMOLOGY.md`; the strict-vs-loose
+question was resolved strict, everything Greek (Paul, 2026-06-15). In brief: council (the twelve Olympians) are
 Mount-Olympus-only singletons that oversee all businesses and never ship inside a sold one; lesser
 gods, heroes, and creatures are per-business product/role/technique names, reused freely across
 businesses (one product = one name); the DB role layer stays generic. Names dedicated to a god (the
