@@ -47,11 +47,17 @@ function fileTimeIsMoneyBackup() {
 
   const tz = 'America/New_York';
   const name = 'Time is Money - full backup - ' + Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
+  const folder = DriveApp.getFolderById(FOLDER_ID);
+  // Idempotent: trash any earlier file with this exact name (e.g. a bad earlier run
+  // the same day) so the folder never holds two same-named backups.
+  const dups = folder.getFilesByName(name);
+  while (dups.hasNext()) dups.next().setTrashed(true);
+
   const backup = SpreadsheetApp.create(name, rows, cols);
   const sheet = backup.getSheets()[0];
   sheet.getRange(1, 1, rows, cols).setValues(values);
   sheet.setFrozenRows(1);
-  DriveApp.getFileById(backup.getId()).moveTo(DriveApp.getFolderById(FOLDER_ID));
+  DriveApp.getFileById(backup.getId()).moveTo(folder);
 
   const fileUrl = backup.getUrl();
   const folderUrl = 'https://drive.google.com/drive/folders/' + FOLDER_ID;
