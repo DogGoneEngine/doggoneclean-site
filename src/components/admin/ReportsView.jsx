@@ -4,7 +4,7 @@
 // the full archive of every briefing your department heads have written.
 
 import { useCallback, useEffect, useState } from 'react';
-import { reportsSummary, listBriefings, scheduleAdherence } from './supabase.js';
+import { reportsSummary, listBriefings, scheduleAdherence, timeIsMoneyBackup } from './supabase.js';
 
 function money(cents) {
   if (cents === null || cents === undefined) return '$0';
@@ -21,12 +21,16 @@ export default function ReportsView() {
   const [error, setError] = useState(null);
 
   const [adh, setAdh] = useState(null);
+  const [tim, setTim] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const [s, b, a] = await Promise.all([reportsSummary(), listBriefings(), scheduleAdherence(90)]);
-      setSum(s); setBriefs(b); setAdh(a);
+      const [s, b, a, t] = await Promise.all([
+        reportsSummary(), listBriefings(), scheduleAdherence(90),
+        timeIsMoneyBackup().catch(() => null),
+      ]);
+      setSum(s); setBriefs(b); setAdh(a); setTim(t);
     } catch (e) { setError(e.message || 'load_failed'); }
     finally { setLoading(false); }
   }, []);
@@ -52,6 +56,8 @@ export default function ReportsView() {
       </div>
 
       {adh && <AdherencePanel adh={adh} />}
+
+      {tim && <TimeIsMoneyBackupPanel tim={tim} />}
 
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <Cap>Department heads</Cap>
@@ -147,6 +153,36 @@ function AdherencePanel({ adh }) {
         </div>
       )}
       {baseline}
+    </div>
+  );
+}
+
+// Time is Money backup: the insurance copy of the whole book. The Ledger Keeper files
+// the entire visit history as a dated Google Sheet into a Drive folder every Sunday,
+// and keeps each week's file (a trail, not a single overwritten copy). This panel is
+// the home for that, moved out of the Clients tab where the old append-helper lived.
+function TimeIsMoneyBackupPanel({ tim }) {
+  const last = tim.last_run;
+  const fmtWhen = (ts) => { try { return new Date(ts).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }); } catch { return ts; } };
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16 }}>
+      <Cap>Time is Money backup</Cap>
+      <div style={{ fontSize: 13, opacity: 0.8, marginTop: 8, lineHeight: 1.5 }}>
+        The full visit history, every row on record, filed as a dated Google Sheet every Sunday and kept week by week. Your insurance copy of the book, in your own Drive.
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+        {tim.folder_url && (
+          <a className="ad-btn ad-btn--sm" href={tim.folder_url} target="_blank" rel="noopener noreferrer">Open the backups folder</a>
+        )}
+        {last && last.url && (
+          <a className="ad-btn ad-btn--ghost ad-btn--sm" href={last.url} target="_blank" rel="noopener noreferrer">Open the latest backup</a>
+        )}
+      </div>
+      <div style={{ fontSize: 12, opacity: 0.65, marginTop: 10 }}>
+        {last && last.finished_at
+          ? `Last filed ${fmtWhen(last.finished_at)}${last.rows ? ` · ${Number(last.rows).toLocaleString('en-US')} rows` : ''}.`
+          : 'No backup filed yet. The first weekly copy lands once the Ledger Keeper is switched on.'}
+      </div>
     </div>
   );
 }

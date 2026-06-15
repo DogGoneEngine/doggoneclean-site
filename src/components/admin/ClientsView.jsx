@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, exportTimeIsMoney, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -93,7 +93,6 @@ export default function ClientsView({ focus = null }) {
       )}
       {!showDetailOnly && <NoFlyPanel onChanged={load} />}
       {!showDetailOnly && <ArchivedPanel onChanged={load} />}
-      {!showDetailOnly && <TimeIsMoneyExportPanel />}
 
       {showDetailOnly ? (
         <div>
@@ -951,76 +950,10 @@ function DogBirthday({ dog, onChanged }) {
   );
 }
 
-// Export new app-entered visits as tab-separated rows in the exact time_is_money
-// column order, ready to paste onto the end of the original sheet. Paul keeps the
-// original book in parallel until he trusts this; the app never writes to his sheet.
-// Where the time_is_money data lives: a tiny, out-of-the-way link (so the floor
-// stays clean) that opens the export. Missed-tap fixes happen per cell on the
-// Today sheet, not here, so this is export-only.
-function TimeIsMoneyExportPanel() {
-  const COLS = ['Date', 'Client', 'Inbound', 'Arrival', 'Departure', 'Charged', 'Paid', 'Method'];
-  const [open, setOpen] = useState(false);
-  const [since, setSince] = useState('');
-  const [rows, setRows] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState(null);
-  const [copied, setCopied] = useState(false);
-
-  async function build() {
-    setBusy(true); setErr(null); setCopied(false);
-    try { setRows(await exportTimeIsMoney(since || null)); }
-    catch (e) { setErr(e.message || 'export_failed'); }
-    finally { setBusy(false); }
-  }
-  const tsv = (rows || [])
-    .map((r) => [r.date, r.client, r.inbound, r.arrival, r.departure, r.charged, r.paid, r.method].join('\t'))
-    .join('\n');
-  async function copy() {
-    try { await navigator.clipboard.writeText(tsv); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* manual select */ }
-  }
-
-  if (!open) {
-    return (
-      <div style={{ textAlign: 'right', margin: '-2px 0 10px' }}>
-        <button onClick={() => setOpen(true)}
-          style={{ background: 'none', border: 0, cursor: 'pointer', fontSize: 11.5,
-            color: 'var(--ad-text-faint, #8b8f9e)', textDecoration: 'underline', textUnderlineOffset: 2, padding: 0 }}>
-          time is money
-        </button>
-      </div>
-    );
-  }
-  return (
-    <div className="ad-panel" style={{ marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Time is money</div>
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)}>close</button>
-      </div>
-      <div style={{ fontSize: 12, opacity: 0.7, lineHeight: 1.5 }}>
-        App-entered visits only, in your sheet's column order. Copy the block and paste it onto the end of the original sheet; the columns line up. Tune the date or time format with me if it does not match your sheet.
-      </div>
-      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-        <label style={{ fontSize: 13 }}>
-          Since (optional)<br />
-          <input className="ad-input" type="date" value={since} onChange={(e) => setSince(e.target.value)} />
-        </label>
-        <button type="button" className="ad-btn" onClick={build} disabled={busy}>{busy ? 'Building…' : 'Build export'}</button>
-        {rows && <span style={{ fontSize: 12, opacity: 0.7 }}>{rows.length} row{rows.length === 1 ? '' : 's'}</span>}
-      </div>
-      {err && <div className="ad-error">{err}</div>}
-      {rows && (
-        <>
-          <div className="ad-mono" style={{ fontSize: 11, opacity: 0.55 }}>{COLS.join('  ·  ')}</div>
-          <textarea className="ad-input ad-mono" readOnly value={tsv} rows={Math.min(12, Math.max(3, (rows.length || 1) + 1))}
-            style={{ width: '100%', fontSize: 12, whiteSpace: 'pre' }} onFocusCapture={(e) => e.target.select()} />
-          <div>
-            <button type="button" className="ad-btn ad-btn--sm" onClick={copy} disabled={!tsv}>{copied ? 'Copied' : 'Copy block'}</button>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
+// The old "time is money" append-helper export lived here as a tiny link. It is
+// retired (Paul, 2026-06-15): the parallel manual sheet is being retired, so there is
+// nothing to append rows onto. The full-history backup now lives in Reports as the
+// Ledger Keeper's weekly Google Sheet. See time_is_money_weekly_backup in the Oracle.
 
 // Small chip showing a dog's standing on the roster. 'regular' is the default and
 // shows nothing (no clutter); the rest get a quiet label so a name is never a mystery.

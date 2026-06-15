@@ -2632,6 +2632,28 @@ trusted over it. Because time_is_money is the system Paul actually ran the money
 it is the ledger of record; the sheets are his field notebook, trustworthy for observations, looser on
 exact dates and figures. Decided 2026-06-09.
 
+`time_is_money_weekly_backup` (Clean: records):
+Paul kept a manual Time is Money sheet for years as his source of truth and is now retiring the parallel
+doc to trust the app, but wants a full, portable snapshot of the ENTIRE visit history filed every Sunday
+as an insurance copy he controls, plus the ability to make one on demand. The teeth live in the database
+so they survive a redesign and stay sellable: `_time_is_money_ledger()` (service role) and
+`admin_export_time_is_money_full()` (admin) emit every visit on record, ordered by date, with a Source
+column so provenance stays honest (time_is_money is the ledger of record per
+`time_is_money_is_source_of_truth`; google_calendar and contact_sheet rows are real visits recovered from
+those books that the sheet never had). The producer is the `ledger_keeper` department head: it writes a
+dated Google Sheet into a dedicated Drive folder (folder id in `app_secrets`), KEEPS every week's file as
+a trail rather than overwriting one, and calls `time_is_money_snapshot_finish()` to log the run and post a
+Today card linking the file so the backup announces itself. Home is the Reports tab, not Clients; the old
+Clients-tab "append the new rows onto the end of the sheet" helper is retired because the parallel sheet
+is. This is portability and platform insurance (a copy in Paul's own hands, openable as a grid, that
+outlives the app/vendor), NOT an independent second witness; that trade is accepted now that the export
+was spot-checked accurate. The full ledger is too large to push through an LLM context every week, so the
+unattended weekly write belongs in a server-side producer, not a scheduled agent. The right mechanism is a
+time-triggered Google Apps Script (the same pattern the calendar sync already uses, because Google blocks
+service-account keys on new projects), reading the ledger through a secret-guarded endpoint and writing the
+dated Sheet into the folder via DriveApp/SpreadsheetApp, then calling `time_is_money_snapshot_finish()`.
+Paul's one action is pasting that script once, exactly as with calendar sync. Decided 2026-06-15.
+
 `visit_history_migration` (Clean: clients):
 The old contact-sheet visit history is MIGRATED into the new system, not abandoned. Paul's whole
 purpose in switching systems was to carry his data forward, and an earlier import had captured only the

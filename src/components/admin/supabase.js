@@ -335,8 +335,11 @@ export async function logVisit(v) {
   });
 }
 
-export async function exportTimeIsMoney(since = null) {
-  return rpc('admin_export_time_is_money', { p_since: since });
+// Time is Money backup: where the weekly full-history snapshots live and when the
+// last one was filed. The Ledger Keeper files a dated Google Sheet of the entire
+// visit history into the Drive folder every Sunday; this powers the Reports panel.
+export async function timeIsMoneyBackup() {
+  return rpc('admin_time_is_money_backup_status');
 }
 
 export async function completeAppointment(appointmentId, v = {}) {

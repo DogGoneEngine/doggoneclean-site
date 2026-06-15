@@ -3681,3 +3681,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   action: paste the updated Apps Script into his Apps Script project; the trigger already runs
   `syncCalendar()`, so the calendar fills within 15 minutes of the paste. No service-account key
   (Google blocks them on new projects, which is why the dead `calendar-sync` function stays inert).
+- **Time is Money becomes a weekly full-history backup, the Ledger Keeper** (`time_is_money_weekly_backup`,
+  Paul 2026-06-15): Paul is retiring the parallel manual Time is Money sheet (he spot-checked last week's
+  export as accurate and is ready to trust the app), but wants the ENTIRE visit history filed as a dated
+  Google Sheet into a dedicated Drive folder every Sunday, kept week by week, plus on demand, as an
+  insurance copy he controls. Built the durable teeth: `_time_is_money_ledger()` (service role) and
+  `admin_export_time_is_money_full()` (admin) emit every visit on record (1,440 rows today) ordered by
+  date with a Source column for honest provenance (0190); a `ledger_keeper` department head + agent row +
+  `time_is_money_snapshot_finish()` log the run and post a Today card; `admin_time_is_money_backup_status()`
+  + folder id in `app_secrets` power a new Reports panel (0191). Retired the old Clients-tab append-helper
+  (the "paste new rows onto the end of the sheet" link) and its `exportTimeIsMoney` wrapper, since the
+  parallel sheet is going away. Created the Drive folder "Dog Gone Clean - Time is Money backups"
+  (id 115Q5cKvgZ0ic5RhPelzUbVK_o5gMUsWZ) and delivered the first full backup CSV. Framed the trade for
+  Paul: this is portability/platform insurance (a grid-openable copy in his own hands that outlives the
+  app/vendor), not an independent second witness. The unattended weekly write is deliberately NOT a
+  scheduled LLM agent (the ledger is too big to push through context; it already blew the tool size cap)
+  and NOT a service-account edge function (Google blocks service-account keys on new projects); it should
+  be a time-triggered Google Apps Script like the calendar sync, which is the remaining piece, gated on
+  Paul pasting the script once. Audit green; shipped to main.
