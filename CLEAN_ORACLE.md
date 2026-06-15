@@ -894,6 +894,23 @@ ties straight to the Hurricane Bath the new Dog Gone Clean is built on. The data
 `admin`; only the product name is Laelaps, the same role-versus-name split as the operator app
 (role `operator`, product String of Pearls). Replaces the placeholder name Orbit. Paul,
 2026-06-14.
+One product, one name across businesses (Paul, 2026-06-15): Laelaps is THE admin-console product
+name in every business Mount Olympus oversees, not Clean alone. The separate field/operator app is
+folded into it: Laelaps is role-aware, so a field operator logs in and sees only what is relevant
+to them (their Today appointments and handed-off tasks, a Clients page scrubbed of phone numbers
+and other PII), which retires the standalone operator app (the old String of Pearls app, which was
+tested in Nails and never passed) rather than maintaining two apps. "String of Pearls" the NAME is
+reassigned to the routing technique itself, reusable in any business that routes (Ariadne's thread
+is the parked Greek alternative if the technique is ever renamed). Because one proven console name
+reused across businesses is learned once and read instantly, the DB role stays generic
+(`admin`/`operator`) so a buyer of any single business can rename freely, and one role-aware console
+is less to build and maintain than two apps. This sits inside a three-tier naming cosmology still
+being settled, whose formal home is the `mount-olympus` repo: council (the twelve Olympians) are
+Mount-Olympus-only singletons that oversee all businesses and never ship inside a sold one; lesser
+gods, heroes, and creatures are per-business product/role/technique names, reused freely across
+businesses (one product = one name); the DB role layer stays generic. Names dedicated to a god (the
+Oracle rulebook, the Scroll of Hephaestus) are per-business artifacts, distinct from a god who IS a
+live agent (a council singleton).
 
 `villages_only_in_copy` (Hurricane Bath: copy):
 (Name kept for continuity; the rule now means served-cities-only.) The Hurricane
