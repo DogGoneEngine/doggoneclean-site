@@ -57,6 +57,12 @@ const ogImageURL = new URL(ogImage, Astro.site);
       <slot />
     </main>
     <FloatBookButton />
+    
+    <!-- Paw prints just above footer -->
+    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: var(--space-xl); opacity: 0.6; font-size: 1.25rem;">
+      <span>🐾</span>
+    </div>
+
     <Footer />
   </body>
 </html>
