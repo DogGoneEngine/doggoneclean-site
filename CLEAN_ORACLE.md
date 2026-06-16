@@ -2809,3 +2809,47 @@ read-only badge when a status is set. Shadow is distinct from `suppress_winback`
 "self-manages their own cadence" flag, e.g. Mary Jane): both stop win-back, but shadow is a negative
 disposition and lands on the no-fly list, while suppress_winback is neutral and does not. Supersedes
 the single-tier framing in `no_fly_list`. Decided 2026-06-09.
+
+`operators_and_rigs` (Clean: operations):
+The work is run by OPERATORS on RIGS, and the system records both on every piece of work. An
+operator is a person on the team (the `admins` row and `role`: today Paul as owner and Jake as
+operator; "operator" is the working name until a better one is chosen). A rig is a vehicle (the
+`rigs` table: today one, Rig 1). An appointment carries its pilot-in-command operator
+(`bath_appointments.operator_admin_id`) and its rig (`rig_id`). A visit carries the pilot in
+command (`visits.operator_admin_id`), an optional helper (`visits.helper_admin_id`, the second
+person on a team day), and its rig (`visits.rig_id`). The client only ever chooses a person,
+never a rig. Because more than one person and eventually more than one vehicle run the book, and
+who did the work and which vehicle did it have to be recorded to attribute time, money, and (when
+rigs multiply) maintenance, none of which a single blended record can do. Migration 0196. Decided
+2026-06-16.
+
+`single_rig_auto_assigned` (Clean: operations):
+While exactly one rig is active, every new appointment and visit is auto-assigned to it by a
+trigger (`_set_default_rig` + `_default_rig_id`) and the rig is never shown or chosen anywhere; it
+just rides along. The moment a second active rig exists, the trigger leaves `rig_id` null on new
+rows so a rig must be picked, which is the signal to turn on the rig picker. Because with one rig a
+chooser is pure noise, and modeling the rig now (invisible) means the second rig is a data change
+(insert a `rigs` row), not a rebuild. Migration 0196. Decided 2026-06-16.
+
+`time_is_money_carries_operator_and_rig` (Clean: records):
+The Time is Money backup carries OPERATOR, HELPER, and RIG columns alongside the money and clock
+columns (the 12 original columns are unchanged; the three ride at the end). Pre-2026-06-13 frozen
+history reads as Paul / (no helper) / Rig 1, the honest backfill for the years he worked solo in
+one rig; live visits resolve the pilot in command (visit operator, else appointment operator, else
+logger, else owner), the helper, and the rig name. The teeth are `_time_is_money_ledger()` plus the
+`time-is-money-backup` edge function column list, so the weekly Google Sheet grows the columns on
+its own. Because the sheet's whole purpose is rate per hour, and with more than one operator and rig
+a single blended number hides which person and which vehicle earned it; per-operator and per-rig
+rate is the number that says whether a second rig pays for itself. Migration 0196, edge function
+v3. Decided 2026-06-16.
+
+`client_books_person_or_first_available` (Clean: scheduling):
+A client booking on the website chooses EITHER first available (any operator, soonest open slot,
+when they want a visit and do not care who comes) OR a specific operator (and waits for that
+operator's open days, when they want their person). The chosen operator becomes the appointment's
+pilot in command (`bath_appointments.operator_admin_id`), the one named and pictured on the
+tracker (`who_is_coming_is_pilot`). Paul or the operator setting an appointment by hand (legacy and
+one-off clients) picks the operator the same way. Because both are real demand, soonest-visit and
+my-groomer, and forcing one model loses the other half (Paul, 2026-06-16). The booking-surface
+picker and per-operator availability are the build (parked); the data spine (operator on the
+appointment) already exists. Decided 2026-06-16.

@@ -9,7 +9,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const COLS = ["Date","Client","Inbound","Arrival","Departure","Charged","Paid","Method","Appointment Duration","Cycle Time","On Site Rate","Cycle Rate"];
+const COLS = ["Date","Client","Inbound","Arrival","Departure","Charged","Paid","Method","Appointment Duration","Cycle Time","On Site Rate","Cycle Rate","Operator","Helper","Rig"];
 const cell = (v: unknown) => '"' + String(v ?? "").replace(/"/g, '""') + '"';
 
 Deno.serve(async (req: Request) => {

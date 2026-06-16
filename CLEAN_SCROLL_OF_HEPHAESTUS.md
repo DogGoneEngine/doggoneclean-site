@@ -3804,3 +3804,37 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   distinct date+time files, the weekly Sunday run keeps one clean dated file. Charged is captured
   going forward. Master retired and preserved as a renamed "OG File" baseline. Oracle rule
   time_is_money_weekly_backup corrected in place to this shipped reality.
+
+## Decisions log (2026-06-16)
+
+- **Operators and rigs, with the Time is Money backup carrying both** (Paul 2026-06-16). The book
+  is run by operators on rigs, and the system now records both on every piece of work. Operators
+  are the `admins` rows (Paul owner, Jake operator; "operator" is the working name until a better
+  one comes). Rigs are a new `rigs` table; today one row, Rig 1, name editable so it can become a
+  truck name later without a migration. New columns: `bath_appointments.rig_id`;
+  `visits.rig_id` + `visits.operator_admin_id` (the pilot in command) + `visits.helper_admin_id`
+  (the second person on a team day, since Paul confirmed both lead and helper get recorded). All
+  history backfilled to Paul / Rig 1, the honest default for the solo-in-one-rig years. Oracle:
+  `operators_and_rigs`. Migration 0196.
+- **The rig is invisible and automatic until there are two** (Paul 2026-06-16). With exactly one
+  active rig, a BEFORE INSERT trigger (`_set_default_rig` + `_default_rig_id`) fills it in and
+  nobody ever sees or picks a rig. The day a second active rig exists, the trigger leaves `rig_id`
+  null so a rig must be chosen, which is when the picker turns on. Modeling it now made the second
+  rig a data change, not a rebuild. Oracle: `single_rig_auto_assigned`. Migration 0196.
+- **Time is Money backup now carries Operator, Helper, Rig** (Paul 2026-06-16). Added to the live
+  ledger (`_time_is_money_ledger()`) and the `time-is-money-backup` edge function column list
+  (redeployed v3). The 12 money and clock columns are unchanged; the three new columns ride at the
+  end. Frozen pre-2026-06-13 history reads Paul / (blank) / Rig 1. Verified live end to end: the
+  edge function CSV came back with the 15-column header and 1,231 history rows, last row Paul
+  Nickerson / blank / Rig 1. The weekly Sheet grows the columns on its own. Oracle:
+  `time_is_money_carries_operator_and_rig`.
+- **Client books a person OR first available** (Paul 2026-06-16). A website booking will let the
+  client take the soonest open slot with any operator, or choose a specific operator and wait for
+  that operator's open days; the chosen operator becomes the appointment's pilot in command (the
+  one named on the tracker). Decision locked; the data spine already exists. The booking-surface
+  picker and per-operator availability are parked (see CLEAN_PARKING_LOT.md). Oracle:
+  `client_books_person_or_first_available`.
+- Adjacencies flagged for Paul and parked, not built this turn: helper-capture in the visit/log
+  form and operator app; per-operator and per-rig rate view in Reports; per-rig scoping of the
+  equipment/maintenance/generator system when a second rig arrives (today `equipment` is one flat
+  list); admin rig-management RPC + UI.
