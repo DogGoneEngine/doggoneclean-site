@@ -17,7 +17,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  addInboxPhoto, signedPhotoUrl, adminSelf, teamGallery, websiteReview,
+  addInboxPhoto, addTeamPhoto, signedPhotoUrl, adminSelf, teamGallery, websiteReview,
   libraryList, librarySetTeam, librarySuggestWebsite, libraryWithdrawWebsite,
   libraryApproveWebsite, libraryUnpublishWebsite, librarySetCaption, libraryDelete,
 } from './supabase.js';
@@ -56,6 +56,43 @@ function useSignedUrls(items) {
     return () => { alive = false; };
   }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
   return urls;
+}
+
+// One obvious caption control, used on every tab: shows the caption with an Edit
+// pencil, or a clear "+ Add caption" button when empty, never faint tappable text.
+// onSave(text) persists; pass null to clear.
+function CaptionRow({ item, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const begin = () => { setText(item.caption || ''); setEditing(true); };
+  async function save() {
+    setBusy(true);
+    try { await onSave(text.trim() || null); setEditing(false); }
+    finally { setBusy(false); }
+  }
+  if (editing) {
+    return (
+      <div style={{ display: 'flex', gap: 6 }}>
+        <input className="pt-input" type="text" value={text} autoFocus placeholder="Caption"
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
+          style={{ flex: 1, fontSize: 12, padding: '5px 8px', borderRadius: 6, border: '1px solid var(--ad-outline, #d8d8de)' }} />
+        <button className="ad-btn ad-btn--sm" disabled={busy} onClick={save}>Save</button>
+      </div>
+    );
+  }
+  if (item.caption) {
+    return (
+      <div style={{ display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 13, opacity: 0.9 }}>{item.caption}</span>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={begin} title="Edit caption">✎ Edit</button>
+      </div>
+    );
+  }
+  return (
+    <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={begin} style={{ alignSelf: 'flex-start' }}>+ Add caption</button>
+  );
 }
 
 export default function LibraryView() {
@@ -117,8 +154,6 @@ function AssetsShelf() {
   const [toWeb, setToWeb] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
-  const [editKey, setEditKey] = useState(null);
-  const [editText, setEditText] = useState('');
   const urls = useSignedUrls(items);
 
   const load = useCallback(async () => {
@@ -152,10 +187,6 @@ function AssetsShelf() {
     setErr(null);
     try { await fn(); await load(); }
     catch (x) { setErr(x.message || 'action_failed'); }
-  }
-  async function saveCaption(i) {
-    await act(() => librarySetCaption(i.source, i.id, editText.trim() || null));
-    setEditKey(null); setEditText('');
   }
   async function remove(i) {
     const msg = i.source === 'upload'
@@ -211,20 +242,10 @@ function AssetsShelf() {
                   ) : <span style={{ fontSize: 12, opacity: 0.5 }}>loading…</span>}
                 </div>
 
-                {editKey === k ? (
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <input className="pt-input" type="text" value={editText} autoFocus
-                      onChange={(e) => setEditText(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveCaption(i); if (e.key === 'Escape') setEditKey(null); }}
-                      style={{ flex: 1, fontSize: 12, padding: '5px 8px', borderRadius: 6, border: '1px solid var(--ad-outline, #d8d8de)' }} />
-                    <button className="ad-btn ad-btn--sm" onClick={() => saveCaption(i)}>Save</button>
-                  </div>
-                ) : (
-                  <div style={{ fontSize: 13, opacity: i.caption ? 0.9 : 0.5, cursor: 'pointer' }} title="Tap to edit the caption"
-                    onClick={() => { setEditKey(k); setEditText(i.caption || ''); }}>
-                    {i.caption || autoCaption(i) || 'No caption. Tap to add one.'}
-                  </div>
+                {i.source === 'visit' && (
+                  <div style={{ fontSize: 11, opacity: 0.5 }}>{autoCaption({ ...i, caption: null }) || 'From a visit'}</div>
                 )}
+                <CaptionRow item={i} onSave={(t) => act(() => librarySetCaption(i.source, i.id, t))} />
 
                 {/* Share controls: Team toggle + Website state. Pulling either keeps the master. */}
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -269,33 +290,73 @@ function AssetsShelf() {
 }
 
 // ---- Team gallery (internal, all roles) -------------------------------------
+// Any signed-in crew member can upload straight here and caption a photo; an
+// upload also lands in the owner's Assets master, where the owner can override the
+// caption or remove it.
 function TeamGallery() {
   const [items, setItems] = useState(null);
   const [err, setErr] = useState(null);
-  useEffect(() => { teamGallery().then((d) => setItems(d || [])).catch((e) => setErr(e.message || 'load_failed')); }, []);
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(async () => {
+    try { const d = await teamGallery(); setItems(d || []); }
+    catch (e) { setErr(e.message || 'load_failed'); }
+  }, []);
+  useEffect(() => { load(); }, [load]);
   const urls = useSignedUrls(items || []);
-  if (err) return <div className="ad-error">{err}</div>;
-  if (!items) return <div className="ad-panel" style={{ opacity: 0.6 }}>Loading the gallery…</div>;
-  if (items.length === 0) return <div className="ad-panel" style={{ opacity: 0.6 }}>No team photos yet. Tap Team on any visit photo, or share an Asset to the team.</div>;
+
+  async function pick(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) { setErr('That file is over 50MB, the storage limit. Put big videos in Google Drive instead.'); return; }
+    setBusy(true); setErr(null);
+    try { await addTeamPhoto(file, note.trim() || null); setNote(''); await load(); }
+    catch (x) { setErr(x.message === 'Failed to fetch' ? 'Upload died mid-transfer. Try on wifi.' : (x.message || 'upload_failed')); }
+    finally { setBusy(false); }
+  }
+
   return (
-    <div style={GRID}>
-      {items.map((i) => {
-        const k = itemKey(i);
-        return (
-          <figure key={k} className="ad-panel" style={{ padding: 8, margin: 0 }}>
-            <div style={{ aspectRatio: '1 / 1', borderRadius: 8, overflow: 'hidden', background: 'var(--ad-surface-container, #f5f4f1)' }}>
-              {urls[k]
-                ? <a href={urls[k]} target="_blank" rel="noreferrer"><img src={urls[k]} alt={autoCaption(i)} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></a>
-                : <span style={{ fontSize: 11, opacity: 0.5 }}>…</span>}
-            </div>
-            <figcaption style={{ fontSize: 12, opacity: 0.7, marginTop: 6, display: 'flex', justifyContent: 'space-between', gap: 6 }}>
-              <span>{autoCaption(i)}</span>
-              {i.website_state === 'live' && <span title="Live on the website" style={{ color: 'var(--ad-warn, #b9770a)' }}>web</span>}
-            </figcaption>
-          </figure>
-        );
-      })}
-    </div>
+    <>
+      <div className="ad-panel" style={{ marginBottom: 16 }}>
+        <input className="pt-input" type="text" value={note} placeholder="Caption (optional, you can add or change it later)"
+          onChange={(e) => setNote(e.target.value)}
+          style={{ width: '100%', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', marginBottom: 8 }} />
+        <label className="ad-btn ad-btn--sm" style={{ cursor: 'pointer' }}>
+          {busy ? 'Uploading…' : 'Add a photo to the team gallery'}
+          <input type="file" accept="image/*,video/*" onChange={pick} disabled={busy} style={{ display: 'none' }} />
+        </label>
+        <span style={{ fontSize: 12, opacity: 0.55, marginLeft: 10 }}>Up to 50MB. Great shots from the road, kept so they aren't lost.</span>
+        {err && <div className="ad-error" style={{ fontSize: 12, marginTop: 6 }}>{err}</div>}
+      </div>
+
+      {!items ? (
+        <div className="ad-panel" style={{ opacity: 0.6 }}>Loading the gallery…</div>
+      ) : items.length === 0 ? (
+        <div className="ad-panel" style={{ opacity: 0.6 }}>No team photos yet. Add one above, or tap Team on any visit photo.</div>
+      ) : (
+        <div style={GRID}>
+          {items.map((i) => {
+            const k = itemKey(i);
+            return (
+              <figure key={k} className="ad-panel" style={{ padding: 8, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ aspectRatio: '1 / 1', borderRadius: 8, overflow: 'hidden', background: 'var(--ad-surface-container, #f5f4f1)' }}>
+                  {urls[k]
+                    ? <a href={urls[k]} target="_blank" rel="noreferrer"><img src={urls[k]} alt={autoCaption(i)} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></a>
+                    : <span style={{ fontSize: 11, opacity: 0.5 }}>…</span>}
+                </div>
+                {i.source === 'visit' && (
+                  <div style={{ fontSize: 11, opacity: 0.5, display: 'flex', justifyContent: 'space-between', gap: 6 }}>
+                    <span>{autoCaption({ ...i, caption: null })}</span>
+                    {i.website_state === 'live' && <span title="Live on the website" style={{ color: 'var(--ad-warn, #b9770a)' }}>web</span>}
+                  </div>
+                )}
+                <CaptionRow item={i} onSave={(t) => librarySetCaption(i.source, i.id, t).then(load)} />
+              </figure>
+            );
+          })}
+        </div>
+      )}
+    </>
   );
 }
 

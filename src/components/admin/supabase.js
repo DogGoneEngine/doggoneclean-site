@@ -591,6 +591,17 @@ export async function addInboxPhoto(file, note) {
   if (error) throw new Error(error.message);
   return rpc('admin_add_inbox', { p_path: path, p_note: note || null });
 }
+// Crew path: upload straight to the Team gallery. Same storage upload as an owner
+// asset, but it lands as a team-shared row (which also shows in the owner's Assets
+// master). Any active admin can call it.
+export async function addTeamPhoto(file, note) {
+  const f = await compressForUpload(file);
+  const ext = (f.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `inbox/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, f, { contentType: f.type || 'application/octet-stream', upsert: false });
+  if (error) throw new Error(error.message);
+  return rpc('admin_add_team_photo', { p_path: path, p_note: note || null });
+}
 export async function listInbox() {
   return rpc('admin_list_inbox');
 }

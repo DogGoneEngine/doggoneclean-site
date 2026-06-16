@@ -2231,16 +2231,26 @@ oldest off) are unchanged and now union both origins. Because Paul's mental mode
 the right one: one master with shares hanging off it is simpler than three
 disconnected piles, it makes moving a photo where he wants trivial, and it
 guarantees the only way to truly lose a photo is a deliberate delete, never an
-accidental un-share. Migration 0196. Paul, 2026-06-15.
+accidental un-share. Migration 0196. Paul, 2026-06-15. Captions use one obvious
+control everywhere (a caption with an edit pencil, or a clear "+ Add caption"
+button, never faint tappable text) and are editable by any admin: a crew member
+can caption a team photo and the owner can override it, since the owner sees every
+item in Assets and is the final word. A crew member can also upload straight to the
+Team gallery (`admin_add_team_photo`), which lands the photo in the owner's Assets
+master too; the owner's general upload (`admin_add_inbox`) stays owner-only.
+Migration 0197. Paul, 2026-06-16.
 
 `library_tabs_by_role` (Clean: engineering):
 The Library has three shelves and they are not all for everyone. The Team gallery
 opens to the whole crew (employees and stakeholders); Assets (the owner's master
 list) and the Website approval queue are owner-only. A non-owner
 opening the Library sees only the Team tab. This is a real boundary, not a hidden
-tab: the Assets (site_inbox) RPCs and the website approve and review RPCs require
-the owner role server-side, so a teammate on the Library floor cannot read Assets
-or publish by calling an RPC directly. Because a teammate's default should be the
+tab: the Assets master list, the owner upload, and the website approve and review
+RPCs require the owner role server-side, so a teammate on the Library floor cannot
+read the Assets master or publish by calling an RPC directly. What a teammate CAN
+do from the Team tab is contribute: upload a photo to the team gallery and caption
+a team photo (both land in the owner's Assets, where the owner can override or
+remove); publishing to the public web stays owner-only. Because a teammate's default should be the
 least that does the job, the fun internal wall, not the owner's working shelves or
 the public-publishing controls; more is granted when there is a reason, never on
 by default. Paul, 2026-06-13.
