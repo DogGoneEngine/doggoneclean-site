@@ -171,7 +171,7 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
-### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0197)
+### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a
 caption: replaced the faint tap-the-text with one control everywhere, a caption plus an edit
@@ -185,7 +185,7 @@ the Team tab now has its own upload panel). The owner's general upload (`admin_a
 owner-only. Confirmed two things for Paul: anything a crew member shares to the team already copies
 into Assets (that is the master-superset model working), and keeping only curated/special photos in
 Assets, not the raw appointment firehose, is the right call (already locked as
-`library_assets_are_the_master`). Migration 0197 applied to dgc-prod and verified live in a
+`library_assets_are_the_master`). Migration 0198 applied to dgc-prod and verified live in a
 rolled-back round trip as an actual crew admin (upload created, team_visible true, present in the
 Assets master, crew caption edit succeeded). Oracle `library_assets_are_the_master` and
 `library_tabs_by_role` updated; build green.

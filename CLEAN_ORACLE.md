@@ -2238,7 +2238,7 @@ can caption a team photo and the owner can override it, since the owner sees eve
 item in Assets and is the final word. A crew member can also upload straight to the
 Team gallery (`admin_add_team_photo`), which lands the photo in the owner's Assets
 master too; the owner's general upload (`admin_add_inbox`) stays owner-only.
-Migration 0197. Paul, 2026-06-16.
+Migration 0198. Paul, 2026-06-16.
 
 `library_tabs_by_role` (Clean: engineering):
 The Library has three shelves and they are not all for everyone. The Team gallery

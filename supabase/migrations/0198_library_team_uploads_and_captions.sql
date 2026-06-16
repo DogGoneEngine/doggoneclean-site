@@ -1,4 +1,4 @@
--- 0197_library_team_uploads_and_captions.sql
+-- 0198_library_team_uploads_and_captions.sql
 -- Two follow-ons to the unified Library (library_assets_are_the_master):
 --
 -- 1) Crew can upload straight to the Team gallery (Paul, 2026-06-15). An upload
