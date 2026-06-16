@@ -1075,7 +1075,7 @@ types the request carefully himself; "Their words" works with no AI.
 
 ## Operators, rigs, and operator-aware booking (parked 2026-06-16)
 
-The data spine shipped 2026-06-16 (migration 0196, Oracle `operators_and_rigs` +
+The data spine shipped 2026-06-16 (migration 0197, Oracle `operators_and_rigs` +
 `single_rig_auto_assigned` + `time_is_money_carries_operator_and_rig` +
 `client_books_person_or_first_available`). These are the follow-on builds, each with a real
 trigger so they are not built before they are needed:

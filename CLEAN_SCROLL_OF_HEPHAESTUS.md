@@ -3815,12 +3815,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   `visits.rig_id` + `visits.operator_admin_id` (the pilot in command) + `visits.helper_admin_id`
   (the second person on a team day, since Paul confirmed both lead and helper get recorded). All
   history backfilled to Paul / Rig 1, the honest default for the solo-in-one-rig years. Oracle:
-  `operators_and_rigs`. Migration 0196.
+  `operators_and_rigs`. Migration 0197.
 - **The rig is invisible and automatic until there are two** (Paul 2026-06-16). With exactly one
   active rig, a BEFORE INSERT trigger (`_set_default_rig` + `_default_rig_id`) fills it in and
   nobody ever sees or picks a rig. The day a second active rig exists, the trigger leaves `rig_id`
   null so a rig must be chosen, which is when the picker turns on. Modeling it now made the second
-  rig a data change, not a rebuild. Oracle: `single_rig_auto_assigned`. Migration 0196.
+  rig a data change, not a rebuild. Oracle: `single_rig_auto_assigned`. Migration 0197.
 - **Time is Money backup now carries Operator, Helper, Rig** (Paul 2026-06-16). Added to the live
   ledger (`_time_is_money_ledger()`) and the `time-is-money-backup` edge function column list
   (redeployed v3). The 12 money and clock columns are unchanged; the three new columns ride at the

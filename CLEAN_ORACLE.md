@@ -2820,7 +2820,7 @@ command (`visits.operator_admin_id`), an optional helper (`visits.helper_admin_i
 person on a team day), and its rig (`visits.rig_id`). The client only ever chooses a person,
 never a rig. Because more than one person and eventually more than one vehicle run the book, and
 who did the work and which vehicle did it have to be recorded to attribute time, money, and (when
-rigs multiply) maintenance, none of which a single blended record can do. Migration 0196. Decided
+rigs multiply) maintenance, none of which a single blended record can do. Migration 0197. Decided
 2026-06-16.
 
 `single_rig_auto_assigned` (Clean: operations):
@@ -2829,7 +2829,7 @@ trigger (`_set_default_rig` + `_default_rig_id`) and the rig is never shown or c
 just rides along. The moment a second active rig exists, the trigger leaves `rig_id` null on new
 rows so a rig must be picked, which is the signal to turn on the rig picker. Because with one rig a
 chooser is pure noise, and modeling the rig now (invisible) means the second rig is a data change
-(insert a `rigs` row), not a rebuild. Migration 0196. Decided 2026-06-16.
+(insert a `rigs` row), not a rebuild. Migration 0197. Decided 2026-06-16.
 
 `time_is_money_carries_operator_and_rig` (Clean: records):
 The Time is Money backup carries OPERATOR, HELPER, and RIG columns alongside the money and clock
@@ -2840,7 +2840,7 @@ logger, else owner), the helper, and the rig name. The teeth are `_time_is_money
 `time-is-money-backup` edge function column list, so the weekly Google Sheet grows the columns on
 its own. Because the sheet's whole purpose is rate per hour, and with more than one operator and rig
 a single blended number hides which person and which vehicle earned it; per-operator and per-rig
-rate is the number that says whether a second rig pays for itself. Migration 0196, edge function
+rate is the number that says whether a second rig pays for itself. Migration 0197, edge function
 v3. Decided 2026-06-16.
 
 `client_books_person_or_first_available` (Clean: scheduling):
