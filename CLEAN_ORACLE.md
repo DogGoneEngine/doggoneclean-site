@@ -2208,12 +2208,35 @@ Because the website is public and hard to take back, and an employee accidentall
 or unilaterally putting a photo on the company's public site is the one sharing
 mistake with real blast radius; everything else is a one-tap undo. No content rule
 yet: the owner is the final judge of what is safe to publish (no license plates,
-faces, house numbers). Paul, 2026-06-13.
+faces, house numbers). Paul, 2026-06-13. Extended 2026-06-15
+(`library_assets_are_the_master`): Team and Website are now removable COPIES of an
+Assets master rather than separate piles, and an uploaded Asset can carry the same
+Team and Website destinations a visit photo can, through one source-keyed set of
+RPCs.
+
+`library_assets_are_the_master` (Clean: engineering):
+Assets is the master list of everything in the Library; Team gallery and Website
+are removable copies/shares of an Asset, never separate piles. An Asset has one of
+two origins, unified behind one set of owner controls keyed by source: 'upload' (a
+hand-uploaded `site_inbox` row) and 'visit' (a `visit_photos` row that has been
+kept). A visit photo enters the Library the moment it is kept (shared to Team,
+suggested to Website, or saved) and stays a member until deleted; turning a Team or
+Website copy off never clears membership, so nothing shared can be lost by
+un-sharing. The ONLY permanent loss is the red x delete in Assets: for an upload it
+removes the storage file for good; for a kept visit photo it un-keeps and unshares
+it but leaves the photo in the client's visit, so the visit record is never harmed.
+Captions are editable on any item, and destinations can be chosen at upload time.
+The owner-approval gate and the single public gallery wall (newest cap rolls the
+oldest off) are unchanged and now union both origins. Because Paul's mental model is
+the right one: one master with shares hanging off it is simpler than three
+disconnected piles, it makes moving a photo where he wants trivial, and it
+guarantees the only way to truly lose a photo is a deliberate delete, never an
+accidental un-share. Migration 0196. Paul, 2026-06-15.
 
 `library_tabs_by_role` (Clean: engineering):
 The Library has three shelves and they are not all for everyone. The Team gallery
-opens to the whole crew (employees and stakeholders); Assets (the owner's upload
-and curation shelf) and the Website approval queue are owner-only. A non-owner
+opens to the whole crew (employees and stakeholders); Assets (the owner's master
+list) and the Website approval queue are owner-only. A non-owner
 opening the Library sees only the Team tab. This is a real boundary, not a hidden
 tab: the Assets (site_inbox) RPCs and the website approve and review RPCs require
 the owner role server-side, so a teammate on the Library floor cannot read Assets

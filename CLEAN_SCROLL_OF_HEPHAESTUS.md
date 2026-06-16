@@ -171,6 +171,39 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-15 (Library rebuilt: Assets is the master, Team and Website are copies; migration 0196, `library_assets_are_the_master`)
+
+Paul walked the Library and found it backwards. Three things were wrong or confusing: "Drop"
+did not delete (it set status 'dropped' and the item stayed in the list forever; there was no
+real delete at all); the "Shelf" button was redundant (an upload was already kept the moment it
+landed); and the three tabs were three disconnected SOURCES, not one thing, so an uploaded
+marketing photo could never reach the Team gallery or the Website (those were fed only by visit
+photos). Paul's model, confirmed: Assets is the master list of everything; Team gallery and
+Website are removable COPIES of an Asset; pulling a copy never loses the original; the only
+permanent loss is a red x in Assets. Scope locked with him: Assets is the curated master
+(everything uploaded plus any visit photo someone kept), not the raw visit-photo firehose; the
+Website stays the single public gallery wall plus an editable caption (specific placement on a
+page is still a code task).
+
+Built and shipped (migration 0196 applied to dgc-prod, verified live in a rolled-back owner
+round trip): `site_inbox` gained the same team/website columns visit photos have;
+`visit_photos` gained `kept` (backfilled true for anything already shared) and an editable
+`library_caption`. One source-keyed RPC set drives both origins:
+`admin_library_list` (the Assets master = uploads + kept visit photos), `admin_library_set_team`,
+`admin_library_suggest_website` / `_withdraw_website` / `_approve_website` (owner) /
+`_unpublish_website` (owner), `admin_library_set_caption`, and `admin_library_delete` (the only
+delete: an upload's file is removed from storage for good; a kept visit photo is un-kept and
+unshared but stays in the client's visit). `admin_team_gallery`, `admin_website_review`, and the
+public `website_gallery` feed now union both origins; sharing from the visit screen
+(`admin_set_photo_team` / `admin_suggest_photo_website`) now also sets `kept`, so nothing shared
+can be lost by un-sharing. `LibraryView.jsx` rewritten: Assets is the master grid with a per-item
+Team toggle, a Website send/waiting/pull control, an editable caption, and a red x Delete with a
+source-aware confirm; destinations (Team / Website) are choosable at upload. The Shelf/Drop
+buttons and the new/shelf/used status clutter are gone. Captured as Oracle
+`library_assets_are_the_master` (with `photo_destinations` and `library_tabs_by_role` updated),
+indexed in CLEAN_BUSINESS_RULES.md. Build green (check.py + astro build); security advisors show
+only the standard SECURITY-DEFINER-with-in-function-gate pattern, no new regression.
+
 ### 2026-06-15 (NAMING COSMOLOGY AND AGENT ROSTER locked; HR-floor titles named in migration 0191)
 
 Paul locked the naming system: the three-tier cosmology (council / realm / role), the Mount

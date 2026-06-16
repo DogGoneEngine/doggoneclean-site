@@ -219,6 +219,42 @@ export async function websiteReview() {
   return rpc('admin_website_review');
 }
 
+// The unified Library (library_assets_are_the_master). Assets is the master list
+// (uploads + kept visit photos); Team and Website are removable copies. Every
+// mutation carries the item's source ('upload' | 'visit') so one set of controls
+// drives both origins.
+export async function libraryList() {
+  return rpc('admin_library_list');
+}
+export async function librarySetTeam(source, id, on) {
+  return rpc('admin_library_set_team', { p_source: source, p_id: id, p_on: on });
+}
+export async function librarySuggestWebsite(source, id) {
+  return rpc('admin_library_suggest_website', { p_source: source, p_id: id });
+}
+export async function libraryWithdrawWebsite(source, id) {
+  return rpc('admin_library_withdraw_website', { p_source: source, p_id: id });
+}
+export async function libraryApproveWebsite(source, id, publicUrl = null) {
+  return rpc('admin_library_approve_website', { p_source: source, p_id: id, p_public_url: publicUrl });
+}
+export async function libraryUnpublishWebsite(source, id) {
+  return rpc('admin_library_unpublish_website', { p_source: source, p_id: id });
+}
+export async function librarySetCaption(source, id, caption) {
+  return rpc('admin_library_set_caption', { p_source: source, p_id: id, p_caption: caption || null });
+}
+// Delete is the only permanent loss. For an upload the file is removed from
+// storage too (gone for good); for a kept visit photo it leaves the library but
+// stays in the client's visit, so the storage object is never touched here.
+export async function libraryDelete(source, id) {
+  const res = await rpc('admin_library_delete', { p_source: source, p_id: id });
+  if (res && res.source === 'upload' && res.storage_path) {
+    await sb().storage.from(PHOTO_BUCKET).remove([res.storage_path]);
+  }
+  return res;
+}
+
 export async function setClientNofly(clientId, banned, reason = null) {
   return rpc('admin_set_client_nofly', { p_client_id: clientId, p_banned: banned, p_reason: reason });
 }
