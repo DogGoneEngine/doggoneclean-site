@@ -1072,3 +1072,29 @@ in the remote tool flow (same wall as the tracker-photos redeploy). Build the ca
 toggle + the approve step anytime; wire the AI tidy when an edge function can deploy (Paul can
 deploy it from the Supabase dashboard, or extend the existing riker function). Until then Paul
 types the request carefully himself; "Their words" works with no AI.
+
+## Operators, rigs, and operator-aware booking (parked 2026-06-16)
+
+The data spine shipped 2026-06-16 (migration 0196, Oracle `operators_and_rigs` +
+`single_rig_auto_assigned` + `time_is_money_carries_operator_and_rig` +
+`client_books_person_or_first_available`). These are the follow-on builds, each with a real
+trigger so they are not built before they are needed:
+
+- **Operator-aware booking picker.** Website booking offers "first available" (any operator,
+  soonest slot) or "choose your operator" (wait for that operator's open days). Needs a
+  per-operator availability model (who works which days) layered on the existing client HARD
+  windows. Trigger: pivot to taking new clients on the website with two operators bookable.
+- **Helper capture.** A way to record the second person on a team day (`visits.helper_admin_id`)
+  in the visit/log form and the operator app. Trigger: the first real team day Paul wants logged
+  as a team day. Column already exists.
+- **Per-operator and per-rig rate view.** Slice the Time is Money rate (on-site and cycle) by
+  operator and by rig in Reports, now that both ride on the ledger. Trigger: enough post-cutover
+  visits with more than one operator or rig to make the split meaningful. This is the number that
+  says whether a second rig pays for itself.
+- **Per-rig equipment and maintenance.** Today `equipment` (0057) and the generator-hours /
+  maintenance system (0058-0059) are one flat list assuming one trailer. When a second rig
+  arrives, equipment, generator hours, filters, and service intervals must belong to a rig, or
+  hours and overdue alerts blend across trucks. Trigger: acquiring Rig 2.
+- **Admin rig management.** An RPC + small admin surface to add/rename/retire rigs (the `rigs`
+  table is RLS-locked with no UI yet; the name is editable by design). Trigger: adding or
+  renaming a rig.

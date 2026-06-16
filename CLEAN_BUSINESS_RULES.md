@@ -228,6 +228,10 @@ even DGN has many rules sitting in only one or two layers.
 | day_before_brief | Clean: operations | Oracle; `_tomorrow_brief()` + `tomorrow-brief-daily` pg_cron (22:30 UTC) + `tomorrow` agent row (0157); supersedes its own prior card; verified live with a real 4-stop card for 2026-06-12 | none |
 | sms_consent_unchecked | Clean: compliance | Oracle; BookingApp `smsConsent` defaults false (BLANK + state init); booking proceeds without it | carry the same default into any future funnel rebuild |
 | preview_before_live | Clean: engineering | Oracle; `.github/workflows/preview.yml` (push to `preview` branch -> audit -> build -> rsync to /srv/doggoneclean-preview), inert until the one-time droplet setup | one-time: DNS A record preview.hurricanebath.com + Caddy site block (droplet session); flip to preview-first per surface on Paul's word |
+| operators_and_rigs | Clean: operations | Oracle; `rigs` table; `bath_appointments.operator_admin_id` + `rig_id`; `visits.operator_admin_id` + `helper_admin_id` + `rig_id` (migration 0196, backfilled Paul / Rig 1) | helper-capture in the visit/log form and operator app; admin rig-management RPC + UI |
+| single_rig_auto_assigned | Clean: operations | Oracle; `_default_rig_id()` + `_set_default_rig` BEFORE INSERT triggers on `bath_appointments` and `visits` (migration 0196) | rig picker turns on in the admin/booking UI when a second active rig exists |
+| time_is_money_carries_operator_and_rig | Clean: records | Oracle; `_time_is_money_ledger()` Operator/Helper/Rig columns + `time-is-money-backup` edge function COLS (migration 0196, edge v3); verified live in the 15-column CSV | per-operator and per-rig rate view in Reports |
+| client_books_person_or_first_available | Clean: scheduling | Oracle; data spine live (`bath_appointments.operator_admin_id` = the pilot in command, `who_is_coming_is_pilot` tracker) | booking-surface first-available vs choose-operator picker + per-operator availability (parked) |
 
 ## How to add a row
 
