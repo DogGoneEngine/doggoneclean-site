@@ -3857,3 +3857,30 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   form and operator app; per-operator and per-rig rate view in Reports; per-rig scoping of the
   equipment/maintenance/generator system when a second rig arrives (today `equipment` is one flat
   list); admin rig-management RPC + UI.
+
+
+## Decisions log (2026-06-17)
+
+- **Mount Olympus as personal hub, a staging/approval deploy gate, and a personal Supabase
+  (direction captured, not ready to build)** (Paul 2026-06-17). Paul is thinking through three
+  linked ideas and asked to record them; he is explicitly NOT ready to build any of them, so
+  nothing here has teeth yet (no Oracle rule, no code) and the current ship-to-completion and
+  main-is-trunk rules stay fully in force until Paul says otherwise. The formal home for the
+  Mount-Olympus-specific pieces is the `mount-olympus` repo (not loaded this session); this is the
+  Clean-side capture, mirrored in the Nails repo. (1) Mount Olympus becomes the home for Paul's
+  personal projects, not only shared infrastructure, the first being a "commonplace book" that
+  gathers his notes into one strong format on a Mount Olympus surface (working idea
+  mountolympusops.com/<name>), because Mount Olympus is already the private, Access-gated "mine,
+  not a client's" layer; guardrail, personal projects never read DGN or Clean data, per
+  clean_stays_saleable. (2) The ship-to-completion rule evolves for client-facing surfaces:
+  client-facing sites (Clean, DGN) deploy to a Mount Olympus staging surface first, Paul reviews a
+  pending-promotions queue and approves before anything goes live, and personal projects keep the
+  fast auto-ship, because the threshold moved, not the principle; now that paying clients depend on
+  these surfaces the cost of a bad live deploy outweighs a short review pause. Likely mechanism,
+  not decided: gate the production step of deploy.yml with a GitHub Environment required-reviewer or
+  a Mount Olympus dashboard approve button, keeping a fast rollback and hotfix lane; when built it
+  rewrites the ship-to-completion rule in CLAUDE.md and the Oracle. (3) A separate personal Supabase
+  project for personal data, in the shared Mount Olympus org (shared org and billing soft, database
+  hard-separate), never dgc-prod or dgn-prod, because data is the hard-separation line. Durable
+  home: CLEAN_PARKING_LOT.md, the "Mount Olympus personal hub + staging/approval deploy gate"
+  entry. No Oracle rule yet by design.

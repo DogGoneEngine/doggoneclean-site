@@ -1098,3 +1098,28 @@ trigger so they are not built before they are needed:
 - **Admin rig management.** An RPC + small admin surface to add/rename/retire rigs (the `rigs`
   table is RLS-locked with no UI yet; the name is editable by design). Trigger: adding or
   renaming a rig.
+
+## Mount Olympus personal hub + staging/approval deploy gate + personal Supabase (direction, not ready - Paul 2026-06-17)
+
+Forward-looking, not yet built, Paul explicitly not ready to pull the trigger. The formal home for
+the Mount-Olympus-specific pieces is the `mount-olympus` repo (not loaded this session); this is the
+Clean-side pointer so the direction survives a reset. Recorded in the Scroll dated 2026-06-17 and
+mirrored in the Nails repo. Three linked pieces:
+
+- Personal hub. Mount Olympus becomes where Paul builds personal projects, not only shared
+  infrastructure. First one is a "commonplace book" that gathers his notes into one strong format,
+  on a Mount Olympus surface (working idea mountolympusops.com/<name>). Guardrail: personal projects
+  never touch DGN or Clean data, per clean_stays_saleable.
+- Staging plus approval gate (the piece with real teeth for Clean). Client-facing deploys (Clean,
+  DGN) go to a Mount Olympus staging surface first; Paul reviews a pending-promotions queue and
+  approves; only then does it go live. Personal projects keep the fast auto-ship. This evolves the
+  ship-to-completion and main-is-trunk rules in CLAUDE.md. Likely mechanism: gate the production
+  step of deploy.yml behind a GitHub Environment required-reviewer or a Mount Olympus dashboard
+  approve button, with a fast rollback and hotfix lane. When built, update ship-to-completion in
+  CLAUDE.md and the Oracle.
+- Personal Supabase. A separate Supabase project for personal data, in the shared Mount Olympus org
+  (shared org and billing soft, database hard-separate), never dgc-prod or dgn-prod.
+
+Why parked: Paul is still thinking and wants to look before pulling the trigger. Sizing when it
+goes: the gate is small to medium (a workflow change plus an optional dashboard surface); the
+commonplace book and the personal Supabase are their own projects, scoped when Paul starts them.
