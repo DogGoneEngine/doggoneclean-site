@@ -3,7 +3,7 @@
     "purpose": "Per-client on-site block time (minutes) for scheduling.",
     "source": "legacy/data/cycle_times.md (Claude-dgc_legacy_cycle_times sheet); value = median_cycle_min, the on-site arrive-to-depart median.",
     "built": "2026-06-07",
-    "keys": "canonical client name as in clients.json (akas resolved: Chris Votos uses the Donna Rodriquez row; Coleen Smith uses the Colleen Smith row; Donna DiPasqua uses Donna Dipasqua).",
+    "keys": "canonical client name as in clients.json (akas resolved: Chris Votos uses the Donna Rodriquez row; Donna DiPasqua uses Donna Dipasqua).",
     "confidence": "high = many visits; medium = 2-3 visits; low = single visit or mixed/odd service (Lisa Prater). Banned client carries no block time.",
     "note": "Lisa Prater's 11 min is a nails-weighted median for a mixed groom/nails client; her full-groom visits run longer and need a per-visit override."
   },
@@ -44,7 +44,7 @@
     "Arlene Calbo": {"minutes": 121, "confidence": "low"},
     "Becky Swinford": {"minutes": 168, "confidence": "low"},
     "Brooksley Sheehe": {"minutes": 368, "confidence": "high"},
-    "Coleen Smith": {"minutes": 204, "confidence": "medium"},
+    "Colleen Smith": {"minutes": 204, "confidence": "medium"},
     "Elijah Weber": {"minutes": 232, "confidence": "low"},
     "Emily Walker": {"minutes": 147, "confidence": "medium"},
     "Eric Shannon": {"minutes": 118, "confidence": "high"},

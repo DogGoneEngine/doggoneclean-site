@@ -621,7 +621,7 @@ are not routed until converted. Verify against the real sheet at conversion time
 - Emily Walker / Russ Walker account (SE) - has a sheet.
 - Brooksley Sheehe (Anthony; moved to Miami, occasional) - has a sheet; low priority.
 - Sally O'Laughlin (NW; moving to Lake Wales ~90 min S) - likely leaving service area.
-- Arlene Calbo, Becky Swinford, Coleen Smith, Elijah Weber, Maria Arvanitis, Martica Ewers
+- Arlene Calbo, Becky Swinford, Colleen Smith, Elijah Weber, Maria Arvanitis, Martica Ewers
   - calendar-only, no sheet; convert only if cadence reappears.
 
 ## Open data questions (need Paul)

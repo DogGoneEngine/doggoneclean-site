@@ -677,7 +677,10 @@
     {"name": "Arlene Calbo", "status": "one_off", "zone": "Ocala-NE", "address": "1028 NE 20th St, Ocala 34479", "routed": false},
     {"name": "Becky Swinford", "status": "one_off", "zone": "Ocala-NE", "address": "3991 NE 6th Ct, Ocala 34479", "routed": false},
     {"name": "Brooksley Sheehe", "status": "one_off", "zone": "Anthony", "address": "3505 NE 97th Street Rd, Anthony 32617", "routed": false, "note": "moved to Miami; occasional until house sells"},
-    {"name": "Coleen Smith", "status": "one_off", "zone": "Ocala-NW", "address": "3845 NW 85th Terrace, Ocala 34482", "routed": false},
+    {"name": "Colleen Smith", "status": "one_off", "zone": "Ocala-NW", "address": "3845 NW 85th Terrace, Ocala 34482", "routed": false, "dogs": [
+      {"name": "Pippa", "breed": "Cavalier King Charles Spaniel", "price": 105, "notes": "black and white", "standing_instructions": "Regular dog feet, not Cavalier King Charles feet."},
+      {"name": "Autumn Rose", "breed": "Cavalier King Charles Spaniel", "price": 105, "notes": "brown; male", "standing_instructions": "Regular dog feet, not Cavalier King Charles feet."}
+    ], "note": "name corrected from book typo 'Coleen' to 'Colleen' (2026-06-17); 2 Cavalier King Charles spaniels at $105 each ($210 total per the cycle-time sheet)"},
     {"name": "Elijah Weber", "status": "one_off", "zone": "Ocala-SW", "address": "4474 SW 113th Pl, Ocala 34476", "routed": false},
     {"name": "Emily Walker", "status": "one_off", "zone": "Ocala-SE", "address": "5280 SE 15th Ct, Ocala 34480", "routed": false, "note": "books under Russ Walker account"},
     {"name": "Eric Shannon", "status": "one_off", "zone": "Ocala-NE", "address": "818 NE 13th Ave, Ocala 34470", "routed": false, "note": "money issues; was standing"},

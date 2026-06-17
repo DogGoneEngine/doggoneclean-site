@@ -1136,7 +1136,7 @@ insert into public.schedule_adherence_history (day, client, delta_min, left_delt
 ('2026-05-13', 'Bradley Johnson', 170, 145, 91, 2),
 ('2026-05-13', 'Patricia Angelucci', 145, 141, 98, 3),
 ('2026-05-14', 'Mary Jane Hunt', 47, 30, 186, 1),
-('2026-05-14', 'Coleen Smith', 30, 14, 149, 2),
+('2026-05-14', 'Colleen Smith', 30, 14, 149, 2),
 ('2026-05-14', 'Sally O''LAUGHLIN', 110, 89, 120, 3),
 ('2026-05-15', 'Terri McDonnell', 142, 108, 266, 1),
 ('2026-05-15', 'Michelle Reiners', 103, 49, 117, 2),
