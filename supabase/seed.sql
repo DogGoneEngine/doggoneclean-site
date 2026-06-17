@@ -80,7 +80,7 @@ insert into public.clients (name, aka, roster_group, status, service_type, caden
 insert into public.clients (name, aka, roster_group, status, service_type, cadence_days, cadence_confidence, cadence_note, hardness, visit_minutes, visit_minutes_confidence, is_anchor, location_address, location_zip, location_zone, location_plus, location_geo_notes, access, availability_hard, availability_soft, availability_not_days, availability_seasonal, flags, relationships, data_gaps, routed, exclude_from_everything, note)
   values ('Brooksley Sheehe', null, 'one_off', 'one_off', null, null, null, null, null, 368, 'high', false, '3505 NE 97th Street Rd, Anthony 32617', null, 'Anthony', null, null, '{}'::jsonb, null, null, '{}', null, '{}', '{}', '{}', false, false, 'moved to Miami; occasional until house sells');
 insert into public.clients (name, aka, roster_group, status, service_type, cadence_days, cadence_confidence, cadence_note, hardness, visit_minutes, visit_minutes_confidence, is_anchor, location_address, location_zip, location_zone, location_plus, location_geo_notes, access, availability_hard, availability_soft, availability_not_days, availability_seasonal, flags, relationships, data_gaps, routed, exclude_from_everything, note)
-  values ('Coleen Smith', null, 'one_off', 'one_off', null, null, null, null, null, 204, 'medium', false, '3845 NW 85th Terrace, Ocala 34482', null, 'Ocala-NW', null, null, '{}'::jsonb, null, null, '{}', null, '{}', '{}', '{}', false, false, null);
+  values ('Colleen Smith', null, 'one_off', 'one_off', null, null, null, null, null, 204, 'medium', false, '3845 NW 85th Terrace, Ocala 34482', null, 'Ocala-NW', null, null, '{}'::jsonb, null, null, '{}', null, '{}', '{}', '{}', false, false, 'name corrected from book typo ''Coleen'' to ''Colleen'' (2026-06-17); 2 Cavalier King Charles spaniels at $105 each ($210 total per the cycle-time sheet)');
 insert into public.clients (name, aka, roster_group, status, service_type, cadence_days, cadence_confidence, cadence_note, hardness, visit_minutes, visit_minutes_confidence, is_anchor, location_address, location_zip, location_zone, location_plus, location_geo_notes, access, availability_hard, availability_soft, availability_not_days, availability_seasonal, flags, relationships, data_gaps, routed, exclude_from_everything, note)
   values ('Elijah Weber', null, 'one_off', 'one_off', null, null, null, null, null, 232, 'low', false, '4474 SW 113th Pl, Ocala 34476', null, 'Ocala-SW', null, null, '{}'::jsonb, null, null, '{}', null, '{}', '{}', '{}', false, false, null);
 insert into public.clients (name, aka, roster_group, status, service_type, cadence_days, cadence_confidence, cadence_note, hardness, visit_minutes, visit_minutes_confidence, is_anchor, location_address, location_zip, location_zone, location_plus, location_geo_notes, access, availability_hard, availability_soft, availability_not_days, availability_seasonal, flags, relationships, data_gaps, routed, exclude_from_everything, note)
@@ -117,127 +117,131 @@ insert into public.clients (name, aka, roster_group, status, service_type, caden
   values ('Bonnie DiGraziano', null, 'banned', 'banned', null, null, null, null, null, null, null, false, '4546 NW 53rd Avenue Rd, Ocala 34482', null, 'Ocala-NW', null, null, '{}'::jsonb, null, null, '{}', null, '{}', '{}', '{}', false, true, '5-star then 1-star a month later');
 
 -- dogs
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Amy Blessing'), 'Maverick', 'Australian Shepherd', 10000, '#7 on feet/hocks, leave back-leg feathers');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Amy Blessing'), 'Pax', 'Australian Shepherd', 10000, 'skin issues history (rash, cyst removed); #7 on feet/hocks, leave feathers');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Barbara Lape'), 'Manning', 'Lab/Pitbull mix', 8000, 'itchy/raw feet, ear problems; use her shampoo + ear treatment');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Bradley Johnson'), 'Bella', 'Cocker Spaniel', 7500, '$75 + $10 tip; Bradley provides special shampoo; bad knee, raw foot pads (shave first), growth on back left paw; skin tags removed 2025');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Chester Weber'), 'Ula', 'Miniature Schnauzer', 10500, 'schnauzer pattern, #7 body');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Chloe Castellano'), 'Louie', 'Boykin Spaniel', 7500, 'hunting dog in training; only dog now');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Chris Votos'), 'Maggie', 'Labradoodle', 10500, 'old (10 in 2024), tumor removed, getting unstable; #7 body, do not shorten tail; Jax deceased Sept 2022');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Cynthia Tieche'), 'Satin', 'Cavapoo', 8500, '8mm body, leave eyelashes');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Cynthia Tieche'), 'Luna', 'French Bulldog', 4500, 'on medicine/CBD; housekeeper sometimes can''t catch her');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Debra Koerner'), 'Gabe', 'Labrador Retriever (black)', 7500, 'bath; can be difficult');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Debra Koerner'), 'Gibbs', 'Labrador Retriever (yellow)', 7500, 'bath');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Donna DiPasqua'), 'Fledge', 'German Shepherd (female)', 10000, 'dry/flaky skin, heavy shedder; belly/tummy issues (vet); constantly on the move while grooming');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Erich Blunt'), 'Koby', 'Standard Poodle', 13500, 'favorite dog; only dog now');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Ginger Fink'), 'Bruce', 'Pit Bull', 8000, 'recurring fleas');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Greta Custer'), 'Stella', 'Golden Doodle', 15000, 'poodle feet/face, poodle pants (legs slightly longer)');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Greta Custer'), 'Penny', 'Standard Poodle', 15000, 'poodle pants');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Harriet Woolf'), 'Beanie', 'Poodle Mix', 15000, '10mm body, 13mm head; trim ears/eyelashes per request; exaggerated sanitary');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Heather Albinson'), 'Spero', 'Corgi', 5000, 'GROWTH ON BACK - be careful; #7 feet/hocks');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Heather Albinson'), 'Mirakel', 'Standard Poodle', 12500, 'recurring eye/ear issues; 8mm body, poodle face');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Hope Brooks'), 'Shelby', 'Toy Australian Shepherd', 8500, 'heavy shedder; #7 feet/hocks');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Jeanne Leuenberger'), 'Bella', 'Micro mini Labradoodle (10 lb)', 7500, 'VERY uncooperative; careful of declaws on back feet; 8mm body');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Kevin Cummings'), 'Klaus', 'German Shepherd', 10500, null);
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Kevin Cummings'), 'Kacey', 'German Shepherd', 10500, 'getting frail/lame');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Kevin Cummings'), 'Molly', 'Husky', 13500, 'mats heavily, skin irritation; #7 feet/hocks');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Kevin Cummings'), 'Lexi', 'Black Lab', 5500, '$55 full / $15 nails only');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Kevin Cummings'), 'Ace', 'Yellow Lab', 5500, '$55 full / $15 nails only');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Kevin Cummings'), 'Izzie', 'Black Lab', 5500, '$55 full / $15 nails only');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Kevin Cummings'), 'Kage', 'Black Lab puppy', null, 'new from a Naples breeder; uncooperative (lays flat)');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Ligia Amyotte'), 'Daisy', 'Great Pyrenees', 13000, 'the boss; bad/cauliflower ears, droopy eyes; price raised 120->130');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Ligia Amyotte'), 'Sissy', 'Great Pyrenees', 13000, 'price raised 120->130');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Ligia Amyotte'), 'Tank', 'Lab', 5000, null);
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Ligia Amyotte'), 'Lucy', 'Lab', 5000, null);
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Linda Giza'), 'Charlie', 'Wheaten Terrier', 12500, '#7 feet/hocks; wants 8mm body but uncooperative so #7 body; falls apart after ~45 min');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Lisa Irwin'), 'Mia', 'Miniature Schnauzer', 10500, '8mm body, 13mm head, ears long');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Lisa Irwin'), 'Tao', 'Great Pyrenees puppy', 7500, 'price $75 for now, may rise as he grows');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Lisa Prater'), 'Gypsy', 'Boxer', 7500, 'Paul confirmed: depends on visit - full groom ($75) some visits, nails-only between');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Marilyn Jamison'), 'Winnie', 'Shihpoo', 10000, 'no sanitary shave (gets itchy), don''t cut eyelashes (later: Mark ok''d); combs per sheet; sometimes lethargic, health watch');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Mary Beth Anderson'), 'Toby', 'Shih Tzu', 8500, 'great dog; back/ear issues history');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Mary Beth Anderson'), 'Theo', 'unknown', 8500, 'added to record fall 2025');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Mary Jane Hunt'), 'Caesar', 'Medium size mix', 5500, 'hit declaw once; health watch (lump)');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Mary Jane Hunt'), 'Ringo', 'Cavalier King Charles Spaniel', 8500, null);
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Mary Jane Hunt'), 'Pancho', 'Havanese', 8500, 'leave beard long');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Michelle Reiners'), 'Bandit', 'Small Lab Mix', 5000, 'AGGRESSION: bit Paul once (gate); skin/chewing issues');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Michelle Reiners'), 'Bruno', 'Big Lab Mix', 5000, 'on psych meds (ate the couch); pushes/leans; seizure-like episode once');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Nancy Franklin'), 'Ben', 'Labrador Retriever', 2500, '$25 nails only ($50 if full)');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Patricia Angelucci'), 'Jackpot', 'Australian Shepherd mix', 10000, 'old, difficulty standing; #7 body, 13mm head/tail');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Peter Moran'), 'Buddy', 'Shih Tzu/Poodle mix (looks like Lhasa apso)', 10000, 'GROWTH on side of front right leg; can be very uncooperative; #7 legs, 6mm body');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Ray Russell'), 'Bailey', 'Shihpoo', 8500, 'often uncooperative/ignores groomer; 13mm body, raise ears; don''t shorten stained feet');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Steve Crandall'), 'Moose', 'Miniature/Toy Poodle', null, 'nails; $65 total for all four');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Steve Crandall'), 'Pip', 'Miniature/Toy Poodle', null, 'nails');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Steve Crandall'), 'Gracie', 'Miniature/Toy Poodle', null, 'nails');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Steve Crandall'), 'Brewster', 'Miniature/Toy Poodle', null, 'nails');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Terri McDonnell'), 'Tiny Tim', 'Toy Poodle', 10500, 'missing a foot; 10mm body, round face/feet');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Terri McDonnell'), 'Rhett Butler', 'Toy Poodle', 10500, '13mm body');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Terri McDonnell'), 'Scarlett', 'Toy Poodle', 10500, '13mm body, shaved poodle feet');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Tonya Hunt'), 'Kai', 'Australian Shepherd', 10000, 'regular');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Tonya Hunt'), 'Lydia', 'Australian Shepherd', 10000, 'regular');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Tonya Hunt'), 'Koa', 'Australian Shepherd', 10000, 'sometimes');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Tonya Hunt'), 'Ruthie', 'Great Pyrenees', 15000, 'sometimes');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Patty Brown'), 'Bella', 'Pit Bull/Boxer mix', null, 'nails; $45 total for both');
-insert into public.dogs (client_id, name, breed, price_cents, notes)
-  values ((select id from public.clients where name = 'Patty Brown'), 'Gizmo', 'Chihuahua/Dachshund/Chihuahua mix', null, 'nails');
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Amy Blessing'), 'Maverick', 'Australian Shepherd', 10000, '#7 on feet/hocks, leave back-leg feathers', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Amy Blessing'), 'Pax', 'Australian Shepherd', 10000, 'skin issues history (rash, cyst removed); #7 on feet/hocks, leave feathers', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Barbara Lape'), 'Manning', 'Lab/Pitbull mix', 8000, 'itchy/raw feet, ear problems; use her shampoo + ear treatment', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Bradley Johnson'), 'Bella', 'Cocker Spaniel', 7500, '$75 + $10 tip; Bradley provides special shampoo; bad knee, raw foot pads (shave first), growth on back left paw; skin tags removed 2025', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Chester Weber'), 'Ula', 'Miniature Schnauzer', 10500, 'schnauzer pattern, #7 body', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Chloe Castellano'), 'Louie', 'Boykin Spaniel', 7500, 'hunting dog in training; only dog now', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Chris Votos'), 'Maggie', 'Labradoodle', 10500, 'old (10 in 2024), tumor removed, getting unstable; #7 body, do not shorten tail; Jax deceased Sept 2022', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Cynthia Tieche'), 'Satin', 'Cavapoo', 8500, '8mm body, leave eyelashes', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Cynthia Tieche'), 'Luna', 'French Bulldog', 4500, 'on medicine/CBD; housekeeper sometimes can''t catch her', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Debra Koerner'), 'Gabe', 'Labrador Retriever (black)', 7500, 'bath; can be difficult', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Debra Koerner'), 'Gibbs', 'Labrador Retriever (yellow)', 7500, 'bath', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Donna DiPasqua'), 'Fledge', 'German Shepherd (female)', 10000, 'dry/flaky skin, heavy shedder; belly/tummy issues (vet); constantly on the move while grooming', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Erich Blunt'), 'Koby', 'Standard Poodle', 13500, 'favorite dog; only dog now', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Ginger Fink'), 'Bruce', 'Pit Bull', 8000, 'recurring fleas', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Greta Custer'), 'Stella', 'Golden Doodle', 15000, 'poodle feet/face, poodle pants (legs slightly longer)', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Greta Custer'), 'Penny', 'Standard Poodle', 15000, 'poodle pants', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Harriet Woolf'), 'Beanie', 'Poodle Mix', 15000, '10mm body, 13mm head; trim ears/eyelashes per request; exaggerated sanitary', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Heather Albinson'), 'Spero', 'Corgi', 5000, 'GROWTH ON BACK - be careful; #7 feet/hocks', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Heather Albinson'), 'Mirakel', 'Standard Poodle', 12500, 'recurring eye/ear issues; 8mm body, poodle face', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Hope Brooks'), 'Shelby', 'Toy Australian Shepherd', 8500, 'heavy shedder; #7 feet/hocks', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Jeanne Leuenberger'), 'Bella', 'Micro mini Labradoodle (10 lb)', 7500, 'VERY uncooperative; careful of declaws on back feet; 8mm body', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Kevin Cummings'), 'Klaus', 'German Shepherd', 10500, null, null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Kevin Cummings'), 'Kacey', 'German Shepherd', 10500, 'getting frail/lame', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Kevin Cummings'), 'Molly', 'Husky', 13500, 'mats heavily, skin irritation; #7 feet/hocks', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Kevin Cummings'), 'Lexi', 'Black Lab', 5500, '$55 full / $15 nails only', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Kevin Cummings'), 'Ace', 'Yellow Lab', 5500, '$55 full / $15 nails only', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Kevin Cummings'), 'Izzie', 'Black Lab', 5500, '$55 full / $15 nails only', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Kevin Cummings'), 'Kage', 'Black Lab puppy', null, 'new from a Naples breeder; uncooperative (lays flat)', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Ligia Amyotte'), 'Daisy', 'Great Pyrenees', 13000, 'the boss; bad/cauliflower ears, droopy eyes; price raised 120->130', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Ligia Amyotte'), 'Sissy', 'Great Pyrenees', 13000, 'price raised 120->130', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Ligia Amyotte'), 'Tank', 'Lab', 5000, null, null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Ligia Amyotte'), 'Lucy', 'Lab', 5000, null, null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Linda Giza'), 'Charlie', 'Wheaten Terrier', 12500, '#7 feet/hocks; wants 8mm body but uncooperative so #7 body; falls apart after ~45 min', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Lisa Irwin'), 'Mia', 'Miniature Schnauzer', 10500, '8mm body, 13mm head, ears long', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Lisa Irwin'), 'Tao', 'Great Pyrenees puppy', 7500, 'price $75 for now, may rise as he grows', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Lisa Prater'), 'Gypsy', 'Boxer', 7500, 'Paul confirmed: depends on visit - full groom ($75) some visits, nails-only between', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Marilyn Jamison'), 'Winnie', 'Shihpoo', 10000, 'no sanitary shave (gets itchy), don''t cut eyelashes (later: Mark ok''d); combs per sheet; sometimes lethargic, health watch', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Mary Beth Anderson'), 'Toby', 'Shih Tzu', 8500, 'great dog; back/ear issues history', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Mary Beth Anderson'), 'Theo', 'unknown', 8500, 'added to record fall 2025', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Mary Jane Hunt'), 'Caesar', 'Medium size mix', 5500, 'hit declaw once; health watch (lump)', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Mary Jane Hunt'), 'Ringo', 'Cavalier King Charles Spaniel', 8500, null, null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Mary Jane Hunt'), 'Pancho', 'Havanese', 8500, 'leave beard long', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Michelle Reiners'), 'Bandit', 'Small Lab Mix', 5000, 'AGGRESSION: bit Paul once (gate); skin/chewing issues', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Michelle Reiners'), 'Bruno', 'Big Lab Mix', 5000, 'on psych meds (ate the couch); pushes/leans; seizure-like episode once', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Nancy Franklin'), 'Ben', 'Labrador Retriever', 2500, '$25 nails only ($50 if full)', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Patricia Angelucci'), 'Jackpot', 'Australian Shepherd mix', 10000, 'old, difficulty standing; #7 body, 13mm head/tail', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Peter Moran'), 'Buddy', 'Shih Tzu/Poodle mix (looks like Lhasa apso)', 10000, 'GROWTH on side of front right leg; can be very uncooperative; #7 legs, 6mm body', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Ray Russell'), 'Bailey', 'Shihpoo', 8500, 'often uncooperative/ignores groomer; 13mm body, raise ears; don''t shorten stained feet', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Steve Crandall'), 'Moose', 'Miniature/Toy Poodle', null, 'nails; $65 total for all four', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Steve Crandall'), 'Pip', 'Miniature/Toy Poodle', null, 'nails', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Steve Crandall'), 'Gracie', 'Miniature/Toy Poodle', null, 'nails', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Steve Crandall'), 'Brewster', 'Miniature/Toy Poodle', null, 'nails', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Terri McDonnell'), 'Tiny Tim', 'Toy Poodle', 10500, 'missing a foot; 10mm body, round face/feet', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Terri McDonnell'), 'Rhett Butler', 'Toy Poodle', 10500, '13mm body', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Terri McDonnell'), 'Scarlett', 'Toy Poodle', 10500, '13mm body, shaved poodle feet', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Tonya Hunt'), 'Kai', 'Australian Shepherd', 10000, 'regular', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Tonya Hunt'), 'Lydia', 'Australian Shepherd', 10000, 'regular', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Tonya Hunt'), 'Koa', 'Australian Shepherd', 10000, 'sometimes', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Tonya Hunt'), 'Ruthie', 'Great Pyrenees', 15000, 'sometimes', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Patty Brown'), 'Bella', 'Pit Bull/Boxer mix', null, 'nails; $45 total for both', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Patty Brown'), 'Gizmo', 'Chihuahua/Dachshund/Chihuahua mix', null, 'nails', null);
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Colleen Smith'), 'Pippa', 'Cavalier King Charles Spaniel', 10500, 'black and white', 'Regular dog feet, not Cavalier King Charles feet.');
+insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)
+  values ((select id from public.clients where name = 'Colleen Smith'), 'Autumn Rose', 'Cavalier King Charles Spaniel', 10500, 'brown; male', 'Regular dog feet, not Cavalier King Charles feet.');
 
 commit;

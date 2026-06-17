@@ -100,10 +100,11 @@ def dog_rows(c):
     out = []
     for d in c.get("dogs", []) or []:
         out.append(
-            "insert into public.dogs (client_id, name, breed, price_cents, notes)\n"
+            "insert into public.dogs (client_id, name, breed, price_cents, notes, standing_instructions)\n"
             "  values ((select id from public.clients where name = "
             f"{q(c['name'])}), {q(d.get('name'))}, {q(d.get('breed'))}, "
-            f"{price_cents(d.get('price'))}, {q(d.get('notes'))});"
+            f"{price_cents(d.get('price'))}, {q(d.get('notes'))}, "
+            f"{q(d.get('standing_instructions'))});"
         )
     return out
 
@@ -134,7 +135,11 @@ def main():
     lines.append("")
     OUT.write_text("\n".join(lines))
     n_clients = sum(len(data.get(g, [])) for g in ("standing", "one_off", "at_will", "banned"))
-    n_dogs = sum(len(c.get("dogs", []) or []) for g in ("standing",) for c in data.get(g, []))
+    n_dogs = sum(
+        len(c.get("dogs", []) or [])
+        for g in ("standing", "one_off", "at_will", "banned")
+        for c in data.get(g, [])
+    )
     print(f"wrote {OUT.relative_to(REPO)}: {n_clients} clients, {n_dogs} dogs")
 
 
