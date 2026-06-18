@@ -1,17 +1,18 @@
 name: Publish preview
 
-# Paul's look-before-it-goes-live channel (preview_before_live). Push a
-# candidate to the `preview` branch and this publishes it to the LIVE host under
-# /preview (/srv/doggoneclean/preview on the droplet), so Paul taps a Mount
-# Olympus link and sees the change exactly as it will look, with his real login
-# and data, at hurricanebath.com/preview/laelaps. The real site is untouched: the
-# production deploy rsyncs with --exclude='preview/', so /preview survives a main
-# deploy and a main deploy never overwrites it. Promotion to live is a normal
-# merge to main. No second domain, no DNS, no Caddy change: PREVIEW=1 builds Astro
-# under base /preview and Caddy already serves that subfolder.
+# Paul's look-before-it-goes-live channel (preview_before_live). Push a candidate
+# to the `preview` branch and this publishes it to the LIVE host under /preview
+# (/srv/doggoneclean/preview), so Paul taps a Mount Olympus link (Prometheus) and
+# sees the change exactly as it will look, with his real login and data, at
+# hurricanebath.com/preview/laelaps. The real site is untouched: the production
+# deploy rsyncs with --exclude='preview/' and never touches /preview.
 #
-# `npm run build` runs scripts/check.py first, so the preview is audit-gated the
-# same way the real deploy is: a failing check.py never publishes anywhere.
+# Idle-aware: if the preview branch has commits BEYOND main, something is staged,
+# so build it (PREVIEW=1, base /preview, audit-gated) and publish it. If the
+# preview branch has nothing beyond main (the staged change was promoted to main,
+# or nothing is staged), publish the "nothing staged" idle placeholder instead.
+# This is how "shipping takes the preview down" works WITHOUT a main deploy wiping
+# a preview that is still under review: promotion is the only thing that clears it.
 
 on:
   push:
@@ -28,20 +29,36 @@ jobs:
     timeout-minutes: 6
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Staged beyond main, or idle?
+        id: stage
+        run: |
+          git fetch origin main --quiet
+          if [ -n "$(git rev-list origin/main..HEAD)" ]; then
+            echo "staged=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "staged=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-node@v5
+        if: steps.stage.outputs.staged == 'true'
         with:
           node-version: '22'
           cache: npm
 
       - run: npm ci --omit=dev
+        if: steps.stage.outputs.staged == 'true'
 
       - run: PREVIEW=1 npm run build
+        if: steps.stage.outputs.staged == 'true'
 
-      - name: Publish dist to the /preview directory
+      - name: Publish to /preview (staged build, or the idle placeholder)
         run: |
           install -m 700 -d ~/.ssh
           printf '%s\n' "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H 178.128.144.219 >> ~/.ssh/known_hosts 2>/dev/null
-          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" dist/ cleandeploy@178.128.144.219:/srv/doggoneclean/preview/
+          if [ "${{ steps.stage.outputs.staged }}" = "true" ]; then SRC=dist/; else SRC=preview-idle/; fi
+          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" "$SRC" cleandeploy@178.128.144.219:/srv/doggoneclean/preview/
