@@ -4207,6 +4207,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the client names them and he works them). Kept `dogs.handling` (the post-grooming care note).
   Added other-dogs-on-site to the card (name + breed + photo for dogs in the household not on
   today's appointment), the same instinct as knowing the people at the door.
+- **Reports "Back up now" 401 fixed: verify_jwt off on time-is-money-backup** (Paul 2026-06-18).
+  The button returned "Backup failed: Error: Ledger fetch failed: 401
+  {code:UNAUTHORIZED_LEGACY_JWT, message:Invalid JWT}". Root cause: `time-is-money-backup` was the
+  only x-cfo-secret-gated edge function still deployed with `verify_jwt = true`, so the Supabase
+  gateway pre-checked the Apps Script's hardcoded legacy anon key and rejected it before the
+  function's own secret auth ran. Fix: redeployed v4 with `verify_jwt = false`, matching the house
+  pattern (riker / tracker-eta / calendar-export / cfo-brief all run verify_jwt off and gate on
+  x-cfo-secret). Verified live end to end: the exact Apps Script call (legacy anon header +
+  correct x-cfo-secret) now returns 200 with the full 1,231-row ledger CSV; a wrong secret now
+  returns the function's own 403, not the gateway's 401. Source comment updated to record the
+  verify_jwt requirement so a future redeploy keeps it.
 - **Now card photo is the most recent AFTER photo** (Paul 2026-06-18, migration 0203). For both
   the groomed and the on-site dogs; no after photo on record means the paw placeholder, never a
   before/incidental shot.

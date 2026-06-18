@@ -2,6 +2,11 @@
 // Read/finish/load endpoint for the weekly Time is Money backup. Called by the Google
 // Apps Script producer (which reads the master sheet directly under Paul's identity).
 // Custom auth via x-cfo-secret (matches app_secrets.cfo_cron_secret); no JWT.
+// Deployed with verify_jwt = false (house pattern, same as riker / tracker-eta /
+// calendar-export): the gateway must not pre-check a Supabase JWT, because the only
+// auth this endpoint uses is the x-cfo-secret header below. Leaving verify_jwt on made
+// the gateway reject the caller's legacy anon key with UNAUTHORIZED_LEGACY_JWT before
+// this code ever ran.
 //
 //   GET                          -> text/csv of the complete ledger (frozen history + live visits)
 //   POST {action:'load_history'} -> one-time seed of the frozen history table from the master
