@@ -280,6 +280,12 @@ export async function setDogHandling(dogId, text) {
   return rpc('admin_set_dog_handling', { p_dog_id: dogId, p_text: text });
 }
 
+// Structured door-handling toggles (dog_handling_toggles). Known keys only:
+// carry, leash, flight_risk, release_ok. Pass [] or null to clear.
+export async function setDogHandlingFlags(dogId, flags) {
+  return rpc('admin_set_dog_handling_flags', { p_dog_id: dogId, p_flags: flags });
+}
+
 export async function setClientAccess(clientId, text) {
   return rpc('admin_set_client_access', { p_client_id: clientId, p_text: text });
 }

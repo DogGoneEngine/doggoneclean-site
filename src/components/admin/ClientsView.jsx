@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogHandlingFlags, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -198,6 +198,12 @@ function ClientSheet({ clientId, onChanged }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Must-knows ride above everything: the special request for this visit and
+          each dog's standing instructions (blades/tools) plus door handling, so
+          Paul has the how-to-cut answer in one glance mid-appointment without
+          scrolling (client_sheet_surfaces_the_must_knows, Paul 2026-06-18). */}
+      <MustKnows dogs={dogs} todayVisits={todayVisits} />
+
       {/* The visit being worked RIGHT NOW: front and center so photos, notes,
           and Riker need no scrolling mid-appointment (Paul, 2026-06-11). It
           returns to the history below once the day passes. */}
@@ -993,6 +999,93 @@ function ageFromBirthDate(dateStr, approximate) {
   return `${tilde}${years} yr ${months} mo`;
 }
 
+// Door-handling toggles (dog_handling_toggles). `door` is the short chip shown on
+// the must-knows banner; `label` is the full toggle on the dog card. Keys must
+// match the dogs_handling_flags_known DB constraint (migration 0208).
+const HANDLING_FLAGS = [
+  { key: 'carry', label: 'Carry, don’t walk', door: 'Carry' },
+  { key: 'leash', label: 'Leash before the door', door: 'Leash at door' },
+  { key: 'flight_risk', label: 'Escape / runaway risk', door: 'Flight risk' },
+  { key: 'release_ok', label: 'OK to turn loose after', door: 'OK to release' },
+];
+
+// The toggles on the dog card. Optimistic: the chip flips on tap and saves; a
+// failed save reverts. Independent flags, because a dog can be both a flight risk
+// and OK to release once it is leashed.
+function HandlingToggles({ dog, onChanged }) {
+  const [flags, setFlags] = useState(dog.handling_flags || []);
+  const [saving, setSaving] = useState(false);
+  useEffect(() => { setFlags(dog.handling_flags || []); }, [dog.handling_flags]);
+  const toggle = async (key) => {
+    const next = flags.includes(key) ? flags.filter((f) => f !== key) : [...flags, key];
+    setFlags(next); setSaving(true);
+    try { await setDogHandlingFlags(dog.id, next); onChanged?.(); }
+    catch { setFlags(dog.handling_flags || []); }
+    finally { setSaving(false); }
+  };
+  return (
+    <div style={{ margin: '2px 0 6px' }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 4 }}>At the door</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {HANDLING_FLAGS.map((f) => {
+          const on = flags.includes(f.key);
+          return (
+            <button key={f.key} type="button" onClick={() => toggle(f.key)} disabled={saving}
+              style={{ fontSize: 12, padding: '4px 10px', borderRadius: 999, cursor: 'pointer',
+                border: on ? '1px solid var(--ad-primary,#2563d8)' : '1px solid var(--ad-outline,#d8d8de)',
+                background: on ? 'var(--ad-primary,#2563d8)' : 'transparent',
+                color: on ? '#fff' : 'var(--ad-text,#1c1d22)', fontWeight: on ? 600 : 400 }}>
+              {f.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// The must-knows banner that rides at the very top of the sheet
+// (client_sheet_surfaces_the_must_knows): the special request for this visit and,
+// per active dog, the standing instructions (blades and tools) plus the door
+// handling. This is what Paul needs in one glance mid-appointment, so it is
+// highlighted and never scrolled to. Renders nothing when there is nothing to say.
+function MustKnows({ dogs, todayVisits }) {
+  const active = (dogs || []).filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status));
+  const requests = (todayVisits || []).map((v) => v.special_request).filter(Boolean);
+  const dogRows = active.filter((d) => d.standing_instructions || (d.handling_flags || []).length || d.handling);
+  if (requests.length === 0 && dogRows.length === 0) return null;
+  return (
+    <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-warn,#b9770a)', background: 'var(--ad-warn-bg,#fff8ec)' }}>
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, fontWeight: 700, color: 'var(--ad-warn,#b9770a)', marginBottom: 8 }}>Before you start</div>
+      {requests.length > 0 && (
+        <div style={{ marginBottom: dogRows.length ? 12 : 0 }}>
+          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.6, marginBottom: 2 }}>Special request this visit</div>
+          {requests.map((r, i) => (<div key={i} style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.35 }}>{r}</div>))}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {dogRows.map((d) => {
+          const flags = HANDLING_FLAGS.filter((f) => (d.handling_flags || []).includes(f.key));
+          return (
+            <div key={d.id}>
+              <div style={{ fontSize: 13, fontWeight: 700 }}>{d.name}</div>
+              {d.standing_instructions && <div style={{ fontSize: 14, lineHeight: 1.4 }}>{d.standing_instructions}</div>}
+              {(flags.length > 0 || d.handling) && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', marginTop: 4 }}>
+                  {flags.map((f) => (
+                    <span key={f.key} style={{ fontSize: 12, padding: '2px 8px', borderRadius: 999, background: 'var(--ad-warn,#b9770a)', color: '#fff', fontWeight: 600 }}>{f.door}</span>
+                  ))}
+                  {d.handling && <span style={{ fontSize: 13, opacity: 0.8 }}>{d.handling}</span>}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function DogCard({ dog, onChanged }) {
   const isPast = ['former', 'deceased', 'moved'].includes(dog.roster_status);
   const age = dog.roster_status === 'deceased' ? '' : ageFromBirthDate(dog.birth_date, dog.dob_approximate);
@@ -1012,6 +1105,7 @@ function DogCard({ dog, onChanged }) {
       <DogField label="Handling (we've got this)" value={dog.handling}
         placeholder="How to handle this dog: hold this way, sore hip, give a minute to settle. A care note, not a warning."
         onSave={async (v) => { await setDogHandling(dog.id, v); onChanged?.(); }} />
+      <HandlingToggles dog={dog} onChanged={onChanged} />
       <DogField label="About this dog (always)" value={dog.notes}
         placeholder="Anything that stays true about this dog (e.g. moved to Tampa, on psych meds, sister's dog)"
         onSave={async (v) => { await setDogNote(dog.id, v); onChanged?.(); }} />
