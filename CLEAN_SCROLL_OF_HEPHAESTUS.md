@@ -461,6 +461,13 @@ she was still fully excluded via exclude_from_everything, but the value was inco
 roster_group='banned' for every nofly_level='banned' client (the value admin_set_client_status
 already writes for new bans). Live; verified all three banned clients consistent.
 
+Ship log (2026-06-18): the whole 2026-06-18 Laelaps thread is now LIVE on main (workable today's
+appointment, dogs-on-appointment, photos zone, gone/come-and-go dogs + tracker fix, shadow-ban fix,
+portal past-dogs, self-documenting help, inside-cards refresh + Space Grotesk, and the client
+type/lifecycle untangle). Going forward, once Paul has previewed and approved a change, ship it to
+completion without making him re-say "ship it" (the preview is to catch problems, not a gate to
+re-unlock). Prometheus returns to idle after a ship.
+
 Client type/lifecycle untangle (`client_type_and_lifecycle`, Paul 2026-06-18). The legacy
 `status`/`roster_group` columns conflated three things: TYPE (recurring vs on-demand), LIFECYCLE
 (active, moved away, deceased, inactive, merged, test), and the BAN, which is why a record could read
