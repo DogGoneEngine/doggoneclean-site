@@ -282,10 +282,10 @@ export async function setDogHandling(dogId, text) {
   return rpc('admin_set_dog_handling', { p_dog_id: dogId, p_text: text });
 }
 
-// Structured door-handling toggles (dog_handling_toggles). Known keys only:
-// carry, leash, flight_risk, release_ok. Pass [] or null to clear.
-export async function setDogHandlingFlags(dogId, flags) {
-  return rpc('admin_set_dog_handling_flags', { p_dog_id: dogId, p_flags: flags });
+// Structured door-handling (dog_handling_toggles). A map of known concern key ->
+// level ('usual' or 'always'). Pass {} or null to clear.
+export async function setDogDoorHandling(dogId, handling) {
+  return rpc('admin_set_dog_door_handling', { p_dog_id: dogId, p_handling: handling });
 }
 
 export async function setClientAccess(clientId, text) {

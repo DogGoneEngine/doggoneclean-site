@@ -1982,8 +1982,12 @@ setup. Release posture is still two modes by traffic: pre-traffic ship straight
 to main, fast and bold; once a surface carries real client traffic, route
 user-facing changes through the preview first, per surface on Paul's word.
 Database migrations stay careful in BOTH modes (schema has no preview copy).
-Because recklessness is free before launch and expensive after it, and Paul
-wants to look before clients (or the live site) do.
+The preview runs on the REAL live database (no mockups), so every preview screen
+wears a permanent red banner saying so, baked into the build (IS_PREVIEW from the
+/preview base): it can never be switched off by mistake and nobody, today or in
+four years, mistakes the preview for a safe sandbox. Because recklessness is free
+before launch and expensive after it, and Paul wants to look before clients (or
+the live site) do.
 
 `one_visit_per_day_per_client` (Clean: clients):
 A client has ONE visit record per Eastern day, no matter how many paths feed
@@ -2873,13 +2877,18 @@ picker and per-operator availability are the build (parked); the data spine (ope
 appointment) already exists. Decided 2026-06-16.
 
 `dog_handling_toggles` (Clean: clients):
-Each dog carries handling guidance for the moment at the door: how to hold the dog, whether it is
-carried or walked on a leash, whether it is an escape or runaway (flight) risk, and whether it can
-be turned loose after. The free-text `dogs.handling` field exists (2026-06-18, "we've got this", a
-care note not a warning); the firm safety facts get structured quick-pick TOGGLES on the dog card
-backed by a real column, and Clio learns to set them by voice. Because these are safety facts you
-want consistent and scannable at the door, not buried in a sentence or lost because they were only
-ever spoken. Toggle build pending Paul's review of the client screen. Decided 2026-06-18.
+Each dog carries door-handling guidance for the moment Paul reaches the door: carried or leashed,
+bolt/escape risk, keep away from other animals, OK to turn loose after. Crucially each concern
+carries a LEVEL, because most handling is "how I usually do it" (a preference) and only some of it
+is a firm rule: every concern is OFF, "usual", or "always". Stored as `dogs.door_handling` jsonb
+(a map of known concern key -> 'usual'|'always'; the validating gate is `admin_set_dog_door_handling`,
+replacing the first-pass flat `handling_flags`). The free-text `dogs.handling` note stays for nuance.
+On the must-knows banner the "always" rules show loud (amber, an ALWAYS badge) and the "usual" ones
+read soft; the dog card edits each concern with a No / Usually / Always control. Clio learns to set
+it by voice. Because the difference between "usually carry him" and "ALWAYS keep him from other dogs"
+(Kacey, Kevin Cummings) is the whole point of surfacing handling at the door, and flat on/off toggles
+wrongly read every preference as a hard rule. The usual/always model + keep-away concern landed
+2026-06-18; full UI pending Paul's review. Decided 2026-06-18, revised same day.
 
 `client_sheet_surfaces_the_must_knows` (Clean: clients):
 On the client sheet the things Paul needs mid-appointment ride at the TOP and are heavily
@@ -2906,3 +2915,13 @@ household note, a stray "male" in a notes blob) is obvious before he taps, not d
 later in the record. Because the confirm step is the only safety net on an LLM parse, and a summary
 of the utterance cannot catch a mis-routed or invented field the way showing the actual write does.
 Build pending Paul's review. Decided 2026-06-18.
+
+`client_screen_self_evident` (Clean: clients):
+The client screen is designed to be understood by someone who has never been told how it works:
+Paul four years from now, or whoever runs the day-to-day after him. Every control says what it is in
+plain words (No / Usually / Always, "At the door", "Before you start"), distinctions are shown not
+memorized (a firm rule looks different from a preference), and where a fact belongs is obvious from
+the screen, not from training. Because the prime directive is a business that runs without Paul, and
+a screen that depends on remembering how it works is a screen that breaks the day he forgets or hands
+it off. This is a standing design gate on the client screen, checked on every change, not a one-time
+build. Decided 2026-06-18.

@@ -208,6 +208,30 @@ Decisions locked this turn (builds pending Paul's review, NOT yet on the client 
   Paul: "that is perfect." Recorded as `clio_confirm_shows_fields`. Teach Clio to write the
   handling field too.
 
+Second pass after Paul saw the preview (still on the branch, for his review):
+- Preview-before-live built and made live: Paul asked how he can actually SEE a change before
+  it goes live. Built the channel (push to `preview` branch -> publishes to hurricanebath.com
+  under /preview, base /preview, audit-gated; production deploy excludes preview/), kept his
+  Mount Olympus doorway idea but corrected the hosting (Mount Olympus is no-build and Laelaps is
+  a built app on Clean's login). Verified live end to end. `preview_before_live` updated.
+- Real-data durability: the preview runs on the real database, and that fact must survive four
+  years and a new operator. Baked a permanent red PREVIEW banner into every preview screen
+  (IS_PREVIEW from the /preview base, AdminApp), so it can never be mistaken for a sandbox.
+- Mount Olympus preview button fixed: the first one reused brand "laelaps" and rendered as a
+  second identical Laelaps wordmark. Renamed to "Laelaps Forge", dropped the brand, taught the
+  Mount Olympus door to show a `desc` line so a button can say what it does.
+- Door handling redesigned (`dog_handling_toggles` revised): Paul's note was the flat toggles
+  read like hard rules when most handling is "how I usually do it." Replaced with a No / Usually
+  / Always control per concern (`dogs.door_handling` jsonb + `admin_set_dog_door_handling`,
+  migration 0209), added a "keep away from other animals" concern, and made the must-knows banner
+  show "always" rules loud and "usual" preferences soft. Recorded Kacey (Kevin Cummings): does not
+  get along with other dogs, keep separated from other animals = keep_separate at the "always"
+  level, so it shows as a firm rule at the door. Answer to "where does that go in the record": the
+  dog's door handling (a concern marked Always) plus the free-text handling note.
+- New durable design gate `client_screen_self_evident`: the client screen must be understood by a
+  new operator or Paul-in-four-years without being told how it works, because the prime directive
+  is a business that runs without Paul.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a

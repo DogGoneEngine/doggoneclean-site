@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogHandlingFlags, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -1002,41 +1002,65 @@ function ageFromBirthDate(dateStr, approximate) {
 // Door-handling toggles (dog_handling_toggles). `door` is the short chip shown on
 // the must-knows banner; `label` is the full toggle on the dog card. Keys must
 // match the dogs_handling_flags_known DB constraint (migration 0208).
-const HANDLING_FLAGS = [
-  { key: 'carry', label: 'Carry, don’t walk', door: 'Carry' },
-  { key: 'leash', label: 'Leash before the door', door: 'Leash at door' },
-  { key: 'flight_risk', label: 'Escape / runaway risk', door: 'Flight risk' },
-  { key: 'release_ok', label: 'OK to turn loose after', door: 'OK to release' },
+// Door handling (dog_handling_toggles). Each concern is OFF, "usually" (how Paul
+// normally does it, a preference), or "always" (a firm rule). The distinction
+// matters: most handling is a preference, but some of it (a dog that fights other
+// dogs) is a hard rule that has to jump out. Labels read plainly so a new operator
+// understands every one without being told.
+const DOOR_CONCERNS = [
+  { key: 'carry',         label: 'Carry in and out' },
+  { key: 'leash',         label: 'Leash before the door opens' },
+  { key: 'flight_risk',   label: 'Bolts / escape risk' },
+  { key: 'keep_separate', label: 'Keep away from other animals' },
+  { key: 'release_ok',    label: 'OK to turn loose after' },
 ];
+const concernLabel = (key) => DOOR_CONCERNS.find((c) => c.key === key)?.label || key;
 
-// The toggles on the dog card. Optimistic: the chip flips on tap and saves; a
-// failed save reverts. Independent flags, because a dog can be both a flight risk
-// and OK to release once it is leashed.
-function HandlingToggles({ dog, onChanged }) {
-  const [flags, setFlags] = useState(dog.handling_flags || []);
+function SegBtn({ label, on, tone, onClick, disabled, first }) {
+  const bg = !on ? 'transparent'
+    : tone === 'always' ? 'var(--ad-warn,#b9770a)'
+    : tone === 'usual' ? 'var(--ad-primary,#2563d8)'
+    : 'var(--ad-text-dim,#565b6c)';
+  return (
+    <button type="button" onClick={onClick} disabled={disabled}
+      style={{ fontSize: 12, padding: '4px 11px', border: 'none', cursor: 'pointer',
+        borderLeft: first ? 'none' : '1px solid var(--ad-outline,#ececf1)',
+        background: bg, color: on ? '#fff' : 'var(--ad-text,#1c1d22)', fontWeight: on ? 600 : 400 }}>
+      {label}
+    </button>
+  );
+}
+
+// The dog-card editor: one row per concern, each a No / Usually / Always choice.
+// Optimistic, saves on tap, reverts on failure.
+function DoorHandling({ dog, onChanged }) {
+  const [map, setMap] = useState(dog.door_handling || {});
   const [saving, setSaving] = useState(false);
-  useEffect(() => { setFlags(dog.handling_flags || []); }, [dog.handling_flags]);
-  const toggle = async (key) => {
-    const next = flags.includes(key) ? flags.filter((f) => f !== key) : [...flags, key];
-    setFlags(next); setSaving(true);
-    try { await setDogHandlingFlags(dog.id, next); onChanged?.(); }
-    catch { setFlags(dog.handling_flags || []); }
+  useEffect(() => { setMap(dog.door_handling || {}); }, [dog.door_handling]);
+  const setLevel = async (key, level) => {
+    const next = { ...map };
+    if (level === null) delete next[key]; else next[key] = level;
+    setMap(next); setSaving(true);
+    try { await setDogDoorHandling(dog.id, next); onChanged?.(); }
+    catch { setMap(dog.door_handling || {}); }
     finally { setSaving(false); }
   };
   return (
     <div style={{ margin: '2px 0 6px' }}>
-      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 4 }}>At the door</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-        {HANDLING_FLAGS.map((f) => {
-          const on = flags.includes(f.key);
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 2 }}>At the door</div>
+      <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 8 }}>Usually is how you normally do it. Always is a firm rule, and it shows up top in amber.</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {DOOR_CONCERNS.map((c) => {
+          const cur = map[c.key] || null;
           return (
-            <button key={f.key} type="button" onClick={() => toggle(f.key)} disabled={saving}
-              style={{ fontSize: 12, padding: '4px 10px', borderRadius: 999, cursor: 'pointer',
-                border: on ? '1px solid var(--ad-primary,#2563d8)' : '1px solid var(--ad-outline,#d8d8de)',
-                background: on ? 'var(--ad-primary,#2563d8)' : 'transparent',
-                color: on ? '#fff' : 'var(--ad-text,#1c1d22)', fontWeight: on ? 600 : 400 }}>
-              {f.label}
-            </button>
+            <div key={c.key} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 13, flex: 1, minWidth: 150 }}>{c.label}</span>
+              <div style={{ display: 'inline-flex', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--ad-outline,#d8d8de)' }}>
+                <SegBtn label="No" first on={cur === null} tone="off" onClick={() => setLevel(c.key, null)} disabled={saving} />
+                <SegBtn label="Usually" on={cur === 'usual'} tone="usual" onClick={() => setLevel(c.key, 'usual')} disabled={saving} />
+                <SegBtn label="Always" on={cur === 'always'} tone="always" onClick={() => setLevel(c.key, 'always')} disabled={saving} />
+              </div>
+            </div>
           );
         })}
       </div>
@@ -1044,43 +1068,53 @@ function HandlingToggles({ dog, onChanged }) {
   );
 }
 
+// Split a dog's door_handling map into the firm rules and the preferences.
+function splitHandling(dog) {
+  const dh = dog.door_handling || {};
+  const keys = Object.keys(dh);
+  return {
+    always: keys.filter((k) => dh[k] === 'always'),
+    usual: keys.filter((k) => dh[k] === 'usual'),
+  };
+}
+
 // The must-knows banner that rides at the very top of the sheet
 // (client_sheet_surfaces_the_must_knows): the special request for this visit and,
-// per active dog, the standing instructions (blades and tools) plus the door
-// handling. This is what Paul needs in one glance mid-appointment, so it is
-// highlighted and never scrolled to. Renders nothing when there is nothing to say.
+// per active dog, the firm "always" door rules (loud), the standing instructions
+// (blades and tools), then the softer "usually" handling. What Paul needs in one
+// glance mid-appointment, never scrolled to. Renders nothing when there is nothing.
 function MustKnows({ dogs, todayVisits }) {
   const active = (dogs || []).filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status));
   const requests = (todayVisits || []).map((v) => v.special_request).filter(Boolean);
-  const dogRows = active.filter((d) => d.standing_instructions || (d.handling_flags || []).length || d.handling);
-  if (requests.length === 0 && dogRows.length === 0) return null;
+  const rows = active.map((d) => ({ d, ...splitHandling(d) }))
+    .filter((r) => r.d.standing_instructions || r.always.length || r.usual.length || r.d.handling);
+  if (requests.length === 0 && rows.length === 0) return null;
   return (
     <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-warn,#b9770a)', background: 'var(--ad-warn-bg,#fff8ec)' }}>
       <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, fontWeight: 700, color: 'var(--ad-warn,#b9770a)', marginBottom: 8 }}>Before you start</div>
       {requests.length > 0 && (
-        <div style={{ marginBottom: dogRows.length ? 12 : 0 }}>
+        <div style={{ marginBottom: rows.length ? 12 : 0 }}>
           <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.6, marginBottom: 2 }}>Special request this visit</div>
           {requests.map((r, i) => (<div key={i} style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.35 }}>{r}</div>))}
         </div>
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {dogRows.map((d) => {
-          const flags = HANDLING_FLAGS.filter((f) => (d.handling_flags || []).includes(f.key));
-          return (
-            <div key={d.id}>
-              <div style={{ fontSize: 13, fontWeight: 700 }}>{d.name}</div>
-              {d.standing_instructions && <div style={{ fontSize: 14, lineHeight: 1.4 }}>{d.standing_instructions}</div>}
-              {(flags.length > 0 || d.handling) && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', marginTop: 4 }}>
-                  {flags.map((f) => (
-                    <span key={f.key} style={{ fontSize: 12, padding: '2px 8px', borderRadius: 999, background: 'var(--ad-warn,#b9770a)', color: '#fff', fontWeight: 600 }}>{f.door}</span>
-                  ))}
-                  {d.handling && <span style={{ fontSize: 13, opacity: 0.8 }}>{d.handling}</span>}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {rows.map(({ d, always, usual }) => (
+          <div key={d.id}>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>{d.name}</div>
+            {always.map((k) => (
+              <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.4, padding: '1px 6px', borderRadius: 4, background: 'var(--ad-warn,#b9770a)', color: '#fff' }}>ALWAYS</span>
+                <span style={{ fontSize: 14, fontWeight: 600 }}>{concernLabel(k)}</span>
+              </div>
+            ))}
+            {d.standing_instructions && <div style={{ fontSize: 14, lineHeight: 1.4, marginTop: 3 }}>{d.standing_instructions}</div>}
+            {usual.length > 0 && (
+              <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>Usually: {usual.map((k) => concernLabel(k).toLowerCase()).join(', ')}</div>
+            )}
+            {d.handling && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>{d.handling}</div>}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -1105,7 +1139,7 @@ function DogCard({ dog, onChanged }) {
       <DogField label="Handling (we've got this)" value={dog.handling}
         placeholder="How to handle this dog: hold this way, sore hip, give a minute to settle. A care note, not a warning."
         onSave={async (v) => { await setDogHandling(dog.id, v); onChanged?.(); }} />
-      <HandlingToggles dog={dog} onChanged={onChanged} />
+      <DoorHandling dog={dog} onChanged={onChanged} />
       <DogField label="About this dog (always)" value={dog.notes}
         placeholder="Anything that stays true about this dog (e.g. moved to Tampa, on psych meds, sister's dog)"
         onSave={async (v) => { await setDogNote(dog.id, v); onChanged?.(); }} />
