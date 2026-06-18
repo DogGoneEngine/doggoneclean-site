@@ -211,6 +211,17 @@ them with someone standing over their shoulder; a powerful action that fires wit
 (banning a client from the bottom of the record was the example that surfaced this) is a trap,
 not a feature.
 
+`module_contract_before_redesign` (engineering):
+Every module has a written contract in CLEAN_MODULE_MAP.md: its purpose, the features it must keep,
+and where its teeth live. Before redesigning a module, read its contract; after, walk its "must not
+break" list and confirm each item still works on real data before shipping; when you add a
+capability, add the bullet in the same commit. Because the repeated field breaks this thread (the
+tracker no longer advancing on the before photo, the photo share options vanishing) were the same
+failure every time: a module redesigned without a checklist of what it already did, so a feature was
+silently dropped. A redesign that drops a contracted feature is rejected, the same as one that drops
+a rule. If a module's contract is missing or thin, audit the live module and write it FIRST; a
+contract that is not kept current is how the net fails.
+
 `recovery_from_a_bad_session` (process):
 When a prior session has hallucinated, gaslit, or looped and Paul is bringing the wreckage
 into a fresh session, the new session does five things, in order: (1) listen first and let

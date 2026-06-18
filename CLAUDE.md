@@ -75,6 +75,9 @@ only on the exact wording.
    equipment, power, climate, trailer, maintenance). Reference manual, not a read-every-session
    doc: read it when doing field, equipment, or operator-app-feature work. Absorbed from Paul's
    original Drive journal (`the_oracle_journal`).
+7. **CLEAN_MODULE_MAP.md** - the per-module contract: what each module does and the
+   "must not break" checklist a redesign has to satisfy. Read a module's contract before
+   redesigning it, walk the checklist after (`module_contract_before_redesign`).
 
 That read-order link is the only thing holding the set together. Keep the file names exact.
 These are Clean's own scrolls; never share or merge them with DGN's.
@@ -141,7 +144,12 @@ See `lock_it_in_capture` in the Oracle.
   lists for tool-accessible work. His plate is decisions, physical-world actions, and
   credentials/dashboards no tool exposes.
 - **Read before redesign.** Before any redesign, read CLEAN_SCROLL_OF_HEPHAESTUS.md and
-  CLEAN_ORACLE.md in full. A redesign that drops an existing rule is rejected.
+  CLEAN_ORACLE.md in full, and the module's contract in CLEAN_MODULE_MAP.md. A redesign that
+  drops an existing rule OR a contracted "must not break" feature is rejected. After the
+  redesign, walk that module's checklist on real data before shipping
+  (`module_contract_before_redesign`). When recreating a DB function, dump the LIVE definition
+  first; never rebuild from an old migration file (that reverted the tracker's before-photo
+  rule on 2026-06-18).
 - **No unilateral deviation from what is decided.** Never change a settled decision (locked copy,
   locked timing, settled scope, a standing rule) on your own. If something already decided looks
   wrong or improvable, stop and bring it to Paul first with the exact change and your reason, and

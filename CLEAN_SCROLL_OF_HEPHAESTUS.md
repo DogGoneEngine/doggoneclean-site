@@ -468,6 +468,23 @@ type/lifecycle untangle). Going forward, once Paul has previewed and approved a 
 completion without making him re-say "ship it" (the preview is to catch problems, not a gate to
 re-unlock). Prometheus returns to idle after a ship.
 
+Photo share options were hidden, not broken (2026-06-18 field): after the photo redesign moved the
+per-photo destinations (client / team / website / answer) into the tap-to-open editor, there was no
+sign you tap a photo to get there, so Paul thought sharing was gone (the data + RPCs were fine,
+verified admin_get_client still returns all the fields). Fix: a visible "Tap a photo to choose where
+it goes" hint, plus auto-open the editor right after a single photo is added. Shipped live.
+
+Module contracts to stop redesigns breaking things (`module_contract_before_redesign`, Paul
+2026-06-18: "we need a description of what each module does so a redesign doesn't just break
+everything"). New doc CLEAN_MODULE_MAP.md: per module, its purpose, the "must not break" feature
+checklist, and where its teeth live. Wired in as Oracle rule + index row + read-order item 7 + the
+read-before-redesign rule. This is the durable fix for the root cause of this thread's repeated field
+breaks (tracker before-photo, photo sharing): a module was redesigned with no checklist of what it
+already did. Contracts written for VisitPhotos, ClientSheet, TodayView, Tracker, RikerCapture, the
+portal pack, and ban/no-fly; the rest are listed to fill in before their next redesign. Also captured
+in the redesign rule: when recreating a DB function, dump the LIVE definition first, never rebuild
+from an old migration file (the cause of the tracker regression).
+
 Regression + fix (2026-06-18, same day): the tracker showed "arrived / in the driveway" while Paul
 was already in the trailer with the first before photo taken; it should read "underway." Cause: the
 before photo is what flips arrived -> underway (0148, deliberately not a 10-minute timer, which would
