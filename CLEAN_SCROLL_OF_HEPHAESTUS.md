@@ -312,15 +312,21 @@ Website, Answer) each with a one-line "what this does", a clear which-dog picker
 and a Remove button. Every prior capability preserved (optimistic toggles, dog tagging, website
 suggest-only, worth-a-look / owner flags). VisitPhotos.jsx only; staged on the preview branch.
 
-Start the visit from the client record (`start_visit_from_record`, Paul 2026-06-18 field test: on
-Kevin's record the today's-appointment card "just says there's an appointment today at 1:00, it
-doesn't have any place for me to add photos or do anything"). The cause: photos hang off a STARTED
-visit, and a visit row was only created by tapping "I'm here" on the Today sheet (the arrival stamp,
-`admin_arrived` -> `admin_stamp_appointment_time`, creates it). From inside the record there was no
-path to begin, so the appointment card was read-only. Fix: a "Start the visit · add photos" button
-on that card calls the same `admin_arrived` path; once the visit exists the working "Today's visit"
-card with the photo grid and notes takes over. One visit-creation path reachable from both surfaces,
-no duplicate. ClientsView.jsx only; staged in Prometheus and verified live there.
+Add photos straight from the floated today's-appointment card (`today_appt_card_is_workable`, Paul
+2026-06-18 field test: on Kevin's record the card "just says there's an appointment today at 1:00,
+it doesn't have any place for me to add photos or do anything"). The cause: photos hang off a
+STARTED visit, and a visit row was only created by tapping "I'm here" on the Today sheet. FIRST
+attempt added a "Start the visit" button to the card; Paul rejected it ("stop fighting with me. I
+said if an appointment is today then it's okay for today's appointment to float to the top. I
+thought this was settled"). The float is settled and an appointment being TODAY is reason enough to
+work it; a "start"/"underway" tap is exactly the gate he already killed. Corrected: migration 0211
+adds `admin_ensure_visit(p_appointment)`, which creates a BARE visit (no inbound/arrived/departed
+stamp, no status change) if none exists and is idempotent. The client record's load() calls it
+whenever an appointment falls today with no visit yet, so the floated card simply IS the working
+"Today's visit" card with the photo grid and notes, no button. The Today-sheet arrival stamp later
+lands on the same single visit (admin_stamp reuses it), so there is never a duplicate. ClientsView
+load() + supabase.js `ensureVisit` + migration 0211; insert logic verified against Kevin's live
+1:00 appointment (bare visit, arrived_at null) and rolled back.
 
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 

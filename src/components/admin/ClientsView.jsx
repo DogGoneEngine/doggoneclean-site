@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, adminArrived } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, ensureVisit } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -188,38 +188,36 @@ function ClientSheet({ clientId, onChanged }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [starting, setStarting] = useState(false);
 
+  // Load the sheet. If an appointment falls today and no visit exists for it yet,
+  // ensure one (a bare visit, no arrival stamp) so the floated today's-appointment
+  // card simply IS the working card with the photo grid and notes. An appointment
+  // being today is reason enough to work it; there is no "start" or "underway"
+  // gate (Paul, 2026-06-18: the float is settled, and the card must let me add
+  // photos without tapping anything first). Idempotent: the Today-sheet arrival
+  // stamp lands on this same single visit later, so there is never a duplicate.
+  const easternToday = easternDay(Date.now());
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      setData(await getClient(clientId));
+      let d = await getClient(clientId);
+      const hasTodayVisit = (d.visits || []).some(
+        (v) => easternDay(v.visited_at) === easternToday && !v.departed_at,
+      );
+      const todayAppt = !hasTodayVisit
+        ? (d.upcoming || []).find((a) => easternDay(a.scheduled_start) === easternToday)
+        : null;
+      if (todayAppt) {
+        try { await ensureVisit(todayAppt.id); d = await getClient(clientId); } catch { /* fall back to the read-only card */ }
+      }
+      setData(d);
     } catch (e) {
       setError(e.message || 'load_failed');
     } finally {
       setLoading(false);
     }
-  }, [clientId]);
+  }, [clientId, easternToday]);
   useEffect(() => { load(); }, [load]);
-
-  // Start the visit from inside the client record: the same arrival path as
-  // "I'm here" on the Today sheet (admin_arrived stamps arrival and creates the
-  // visit row). Once it exists, the "Today's visit" card with photos and notes
-  // takes over from the read-only appointment card, so Paul can add photos from
-  // the record without going to the Today screen first. One visit-creation path,
-  // not two (Paul, 2026-06-18: the appointment card "had no place to add photos").
-  const startVisit = useCallback(async (apptId) => {
-    setStarting(true);
-    try {
-      await adminArrived(apptId);
-      await load();
-      onChanged?.();
-    } catch (e) {
-      setError(e.message || 'start_failed');
-    } finally {
-      setStarting(false);
-    }
-  }, [load, onChanged]);
 
   if (loading) return <div className="ad-panel">Opening the sheet…</div>;
   if (error) return <div className="ad-panel"><div className="ad-error">{error}</div></div>;
@@ -237,11 +235,11 @@ function ClientSheet({ clientId, onChanged }) {
   const todayVisits = visits.filter(isPinned);
   const pastVisits = visits.filter((v) => !isPinned(v));
   const upcoming = data.upcoming || [];
-  // Today's appointment floats to the top too, not only a started visit: when
-  // Paul opens a client he is about to groom, the appointment must be right there
-  // (Paul's original rule, current appointment at the top). Once he starts it a
-  // visit row exists and the "Today's visit" card takes over; until then this
-  // surfaces the scheduled appointment instead of burying it in Upcoming.
+  // Today's appointment floats to the top (Paul's settled rule: an appointment
+  // being today is enough, no "underway" needed). load() ensures a visit row for
+  // it, so normally the working "Today's visit" card below (with the photo grid)
+  // is what shows. This read-only card is only the fallback for the rare case
+  // where ensuring the visit failed, so the appointment is never buried.
   const todayAppt = !todayVisits.length
     ? upcoming.find((a) => easternDay(a.scheduled_start) === todayKey)
     : null;
@@ -276,12 +274,6 @@ function ClientSheet({ clientId, onChanged }) {
             {(() => { try { return new Date(todayAppt.scheduled_start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ''; } })()}
             {todayAppt.service_type ? ` · ${SERVICE_LABELS[todayAppt.service_type] || todayAppt.service_type}` : ''}
           </div>
-          {/* The appointment is read-only until it is started. This turns it into
-              the working visit (photos, notes, vibe) right here, so Paul never has
-              to leave the record to begin. */}
-          <button className="ad-btn" style={{ marginTop: 10 }} onClick={() => startVisit(todayAppt.id)} disabled={starting}>
-            {starting ? 'Starting…' : 'Start the visit · add photos'}
-          </button>
         </div>
       )}
 

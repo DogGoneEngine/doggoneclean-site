@@ -484,6 +484,15 @@ export async function adminArrived(appointmentId) {
   return rpc('admin_arrived', { p_appointment: appointmentId });
 }
 
+// Ensure a visit row exists for an appointment WITHOUT stamping arrival or
+// touching status. The client record calls this when today's appointment floats
+// to the top so the photo grid and notes are simply there, no "start" gate. It
+// reuses the existing visit if one already exists, so the Today-sheet arrival
+// stamp still lands on the same single visit.
+export async function ensureVisit(appointmentId) {
+  return rpc('admin_ensure_visit', { p_appointment: appointmentId });
+}
+
 // One tap when walking the dogs back: flips the appointment to returning so
 // the tracker tells the client to watch the door. Deliberately manual (Paul):
 // only he knows the moment the dogs are headed back.
