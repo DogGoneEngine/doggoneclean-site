@@ -16,7 +16,7 @@ import './portal.css';
 import {
   pauseSubscription, resumeSubscription, cancelSubscription, changeCadence,
   skipAppointment, rescheduleAppointment, getOpenSlots,
-  addDog, updateDog, removeDog,
+  addDog, updateDog, removeDog, reactivateDog,
   updateProfile, updateServiceAddress, toE164US,
   getNotificationPrefs, setNotificationPrefs,
   confirmProfile, myVisitPhotos, visitPhotoUrl,
@@ -233,6 +233,7 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
 
   const { subscriber, subscription, city } = data;
   const dogs = (data.dogs || []).filter(d => d.active !== false);
+  const pastDogs = (data.dogs || []).filter(d => d.active === false);
   const appts = data.appointments || [];
 
   const now = Date.now();
@@ -300,6 +301,7 @@ export function PortalHome({ data, onLogout, onChanged, toast }) {
 export function WelcomeBack({ data, onConfirmed, onLogout, onChanged, toast }) {
   const { subscriber, city } = data;
   const dogs = (data.dogs || []).filter(d => d.active !== false);
+  const pastDogs = (data.dogs || []).filter(d => d.active === false);
   const first = subscriber.first_name || pickFirstName(data.authUser);
   const [editingAddr, setEditingAddr] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -351,7 +353,7 @@ export function WelcomeBack({ data, onConfirmed, onLogout, onChanged, toast }) {
 
       <section className="pt-section">
         <h2 className="pt-section__title">Your pack</h2>
-        <PackSection dogs={dogs} subscriberId={subscriber.id} onChanged={onChanged} toast={toast} />
+        <PackSection dogs={dogs} pastDogs={pastDogs} subscriberId={subscriber.id} onChanged={onChanged} toast={toast} />
       </section>
 
       <button className="pt-btn pt-btn-primary pt-wb-confirm" disabled={submitting} onClick={confirm}>
@@ -587,7 +589,7 @@ function PackView({ ctx }) {
     <div className="pt-content">
       <section className="pt-section">
         <h2 className="pt-section__title">Your pack</h2>
-        <PackSection dogs={dogs} subscriberId={subscriber.id} onChanged={onChanged} toast={toast} />
+        <PackSection dogs={dogs} pastDogs={pastDogs} subscriberId={subscriber.id} onChanged={onChanged} toast={toast} />
       </section>
     </div>
   );
@@ -1087,7 +1089,7 @@ function SlotPicker({ city, busy, onPick, onCancel }) {
 // dog). Edit keeps coat tier read-only, because coat tier sets the price
 // tier and the in-person assessment owns that. The 3-dog cap is enforced by
 // the database trigger; here the Add control simply hides at 3.
-function PackSection({ dogs, subscriberId, onChanged, toast }) {
+function PackSection({ dogs, pastDogs = [], subscriberId, onChanged, toast }) {
   const [editing, setEditing] = useState(null); // null | dogId | 'new'
   const [busy, setBusy] = useState(false);
 
@@ -1164,6 +1166,35 @@ function PackSection({ dogs, subscriberId, onChanged, toast }) {
             Add a dog
           </button>
         )
+      )}
+
+      {/* Past dogs: ones taken off the plan are kept, not deleted, so the owner
+          can see them and bring one back. The names show in the summary so it is
+          findable at a glance. Mirrors the operator's archived-dogs section. */}
+      {pastDogs.length > 0 && (
+        <details className="pt-card" style={{ marginTop: 'var(--space-sm)' }}>
+          <summary style={{ cursor: 'pointer', fontWeight: 600 }}>
+            Past dogs ({pastDogs.length}) · {pastDogs.map(d => d.name).join(', ')}
+          </summary>
+          <p className="pt-muted" style={{ marginTop: 'var(--space-xs)' }}>
+            Dogs you have taken off your plan are kept here. Bring one back any time and it returns to your pack.
+          </p>
+          {pastDogs.map(d => (
+            <div className="pt-dog" key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-sm)' }}>
+              <div>
+                <div className="pt-dog__name">{d.name}</div>
+                {(() => {
+                  const bits = [d.breed, coatLabel(d.coat_tier)].filter(Boolean);
+                  return bits.length > 0 ? <div className="pt-dog__meta">{bits.join(' · ')}</div> : null;
+                })()}
+              </div>
+              <button className="pt-btn pt-btn-secondary pt-btn-sm" disabled={busy}
+                onClick={() => run(() => reactivateDog(d.id), `${d.name} is back in your pack.`)}>
+                Bring back
+              </button>
+            </div>
+          ))}
+        </details>
       )}
     </>
   );

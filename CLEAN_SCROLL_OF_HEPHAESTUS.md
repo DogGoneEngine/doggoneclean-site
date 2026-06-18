@@ -409,6 +409,18 @@ and the price reflects it. The earlier "no, the price would change" framing was 
 following the dogs is correct, not a reason to block. Operator-only is just the per-appointment
 one-time subset toggle and the archived-legacy-dog reveal, not adding a dog.
 
+Clients manage their own past dogs in the portal (`portal_owns_its_past_dogs`, Paul 2026-06-18: "the
+client should be able to do the same thing in their portal", mirroring the operator's archived-dogs
+section). The portal already let an owner remove a dog (soft-delete, bath_dogs.active=false) but then
+hid it with no way back. Added a "Past dogs (N) · names" section in the pack with a "Bring back"
+button per dog (`reactivateDog` flips active=true); the names show in the summary so it is findable
+at a glance. To stop a legacy client recreating the moved-dog-on-tracker drift from the portal side,
+migration 0215 adds `trg_sync_dogs_roster_from_bath`: a bath_dogs active change syncs the matching
+public.dogs.roster_status (active -> regular if it was archived; inactive -> former if it was
+working), matched by subscriber + name. Written to never fight admin_set_dog_status (0213 syncs the
+other direction; this one only acts when active crosses the line, so 'occasional'/'deceased' nuance
+is preserved). Verified both directions against Kage and rolled back.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a

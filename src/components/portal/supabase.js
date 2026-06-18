@@ -444,6 +444,20 @@ export async function removeDog(dogId) {
   return { ok: true };
 }
 
+// Bring an archived dog back: the mirror of removeDog, so the owner can manage
+// their own past dogs the way the operator can. A DB trigger keeps the legacy
+// operator record (public.dogs.roster_status) in step.
+export async function reactivateDog(dogId) {
+  const client = sb();
+  if (!client) return { ok: false, error: 'no_client' };
+  const { error } = await client
+    .from('bath_dogs')
+    .update({ active: true, updated_at: new Date().toISOString() })
+    .eq('id', dogId);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 // ── Per-visit actions (portal self-service) ───────────────────────────
 // Skip one upcoming visit. Returns { ok, status } or { ok:false, error }.
 export async function skipAppointment(appointmentId) {
