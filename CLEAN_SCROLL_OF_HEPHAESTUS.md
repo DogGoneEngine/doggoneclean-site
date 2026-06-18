@@ -443,8 +443,23 @@ hairline colored edge via color-mix, replacing the hard stripe), and `.ad-keyval
 grid). Applied across the client record (the surface Paul lives in during appointments): the
 must-knows banner, today's-visit and today's-appointment cards now read as soft tonal cards; the
 section labels are eyebrows; the header info grid is the clean keyval (no more uppercase low-opacity
-dt). Staged in Prometheus for review. Scoped to the client record this pass; the same treatment can
-roll to the visit rows, the remaining stripe panels, and the other views once Paul likes the look.
+dt). Reviewed in Prometheus and SHIPPED LIVE (Paul "ship it", 2026-06-18). Scoped to the client
+record this pass; the same treatment can roll to the visit rows, the remaining stripe panels, and the
+other views once Paul has lived with it (the one remaining optional follow-on from this session).
+
+Snappy heading font (`cards_inside_refresh`, same thread; Paul: "maybe I'm not excited about the
+font?"). Decided snappy headings, workhorse body: Space Grotesk on headings, panel titles, and the
+eyebrow labels; Inter stays on all body and dense data so field legibility never suffers (the regret
+case for a tool read on a phone in the sun). Loaded via the existing Google Fonts link; a new
+`--ad-font-display` token drives it; admin-only. NOTE this does NOT contradict the marketing site's
+`neural_expressive_design` "no special typeface" rule, which governs the public WEBSITE; Laelaps is
+the operator tool, a separate surface. SHIPPED LIVE 2026-06-18.
+
+Banned roster_group consistency (small data cleanup, 2026-06-18). While verifying the ban, found one
+hard-banned client (Lynne Bottomley) with roster_group='active' while the other two read 'banned';
+she was still fully excluded via exclude_from_everything, but the value was inconsistent. Set
+roster_group='banned' for every nofly_level='banned' client (the value admin_set_client_status
+already writes for new bans). Live; verified all three banned clients consistent.
 
 Client type/lifecycle untangle (`client_type_and_lifecycle`, Paul 2026-06-18). The legacy
 `status`/`roster_group` columns conflated three things: TYPE (recurring vs on-demand), LIFECYCLE
