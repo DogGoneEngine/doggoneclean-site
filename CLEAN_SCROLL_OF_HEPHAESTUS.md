@@ -354,6 +354,22 @@ rebuilt: the mismatched ghost buttons of different widths became a clean 2-by-2 
 are of", restyled in slate (not the bold blue of the appointment chips), and shown only while
 adding, so the two dog rows never read as the same control. VisitPhotos.jsx + VisitEntry wrapper.
 
+Gone / come-and-go dogs handled end to end (`archived_dogs_off_roster_and_tracker`, Paul 2026-06-18,
+Ace and Kage as the model for every client: keep them off the everyday screen and off the tracker
+"do not say we are grooming them today", but make an appointment WITH them when they are actually
+back). Root cause: a legacy client carries each dog twice, `public.dogs` (roster_status, the client
+record) and `public.bath_dogs` (active, what the tracker fallback reads), and they had drifted (Ace
+and Kage were 'moved' in public.dogs but still active=true in bath_dogs, so a normal appointment's
+tracker would announce them). Migration 0213: (1) `admin_set_dog_status` now also syncs
+`bath_dogs.active` (matched by the client's subscriber + dog name) so one archive action moves both
+records; (2) `tracker_status` only announces ACTIVE bath_dogs in its fallback branch, so a gone dog
+never shows as being groomed unless it is explicitly on the appointment's `dog_ids` (it really is
+back on the stop); (3) a backfill aligned every `bath_dogs.active` with roster_status (fixed Ace,
+Kage; verified zero drift across all clients). UI: the "Dogs on this appointment" picker keeps gone
+dogs off the everyday chips and adds a "+ A dog who's back" reveal listing moved/former dogs; adding
+one (marked "· back") puts it on THIS appointment only, never un-archiving it. Deceased dogs are
+never offered. onDogs now includes an on-appointment returned dog so its photos and scores work.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a

@@ -1878,10 +1878,18 @@ function VisitEntry({ v, clientId, dogs, onChanged }) {
   // only partly groomed in one stop). Older or manual visits with no dog list keep
   // the whole roster, so nothing regresses.
   const activeDogs = dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status));
+  // Dogs that are gone but can come back (moved or former, never deceased). They
+  // stay off the everyday picker; the picker reveals them so one can be added to a
+  // specific appointment when it actually shows up.
+  const returningDogs = dogs.filter((d) => d.roster_status === 'former' || d.roster_status === 'moved');
   const apptDogIds = (v.dog_ids && v.dog_ids.length) ? v.dog_ids : null;
-  const onDogs = apptDogIds ? activeDogs.filter((d) => apptDogIds.includes(d.id)) : activeDogs;
+  // Dogs actually on this appointment (drives photos and scores): whatever is on
+  // the appointment's list, including a returned archived dog, but never deceased.
+  const onDogs = apptDogIds
+    ? dogs.filter((d) => apptDogIds.includes(d.id) && d.roster_status !== 'deceased')
+    : activeDogs;
   const isToday = easternDay(v.visited_at) === easternDay(Date.now());
-  const canPickDogs = isToday && v.appointment_id && activeDogs.length > 1;
+  const canPickDogs = isToday && v.appointment_id && (activeDogs.length + returningDogs.length > 1);
   return (
               <div style={{ borderLeft: '3px solid var(--ad-primary, #2563d8)', paddingLeft: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
@@ -1896,7 +1904,8 @@ function VisitEntry({ v, clientId, dogs, onChanged }) {
                 {canPickDogs && (
                   <AppointmentDogs
                     appointmentId={v.appointment_id}
-                    allDogs={activeDogs}
+                    roster={activeDogs}
+                    returning={returningDogs}
                     value={onDogs.map((d) => d.id)}
                     onSaved={onChanged}
                   />
@@ -1938,8 +1947,14 @@ function VisitEntry({ v, clientId, dogs, onChanged }) {
 // roster, so Paul drops the dogs not being groomed today. Saves the set in one
 // write (re-prices to the dogs going and syncs the visit), rather than a write per
 // tap. Scoping this also shrinks the photo dog-picker to just the dogs going.
-function AppointmentDogs({ appointmentId, allDogs, value, onSaved }) {
+//
+// Gone-but-may-return dogs (moved/former) are not in the everyday roster. They
+// hide behind a "a dog who's back" reveal; adding one puts it on THIS appointment
+// only (it does not un-archive the dog or bring it back to the everyday screen or
+// the tracker for other days).
+function AppointmentDogs({ appointmentId, roster, returning = [], value, onSaved }) {
   const [sel, setSel] = useState(() => new Set(value));
+  const [reveal, setReveal] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
   const toggle = (id) => setSel((s) => {
@@ -1949,6 +1964,11 @@ function AppointmentDogs({ appointmentId, allDogs, value, onSaved }) {
   });
   const base = new Set(value);
   const dirty = sel.size !== base.size || [...sel].some((id) => !base.has(id));
+  // A returning dog already on this appointment shows inline (so it can be toggled
+  // off); the rest stay hidden behind the reveal.
+  const shownReturning = returning.filter((d) => sel.has(d.id));
+  const hiddenReturning = returning.filter((d) => !sel.has(d.id));
+  const returningIds = new Set(returning.map((d) => d.id));
   async function save() {
     if (sel.size === 0) { setErr('Pick at least one dog.'); return; }
     setBusy(true); setErr(null);
@@ -1956,30 +1976,56 @@ function AppointmentDogs({ appointmentId, allDogs, value, onSaved }) {
     catch (e) { setErr(e.message || 'save_failed'); }
     finally { setBusy(false); }
   }
+  const chip = (d) => {
+    const on = sel.has(d.id);
+    const back = returningIds.has(d.id);
+    return (
+      <button key={d.id} type="button" onClick={() => toggle(d.id)} disabled={busy}
+        style={{ fontSize: 13, fontWeight: 600, padding: '7px 13px', borderRadius: 999, cursor: 'pointer',
+          border: on ? '1px solid' : '1px dashed',
+          borderColor: on ? 'var(--ad-accent, #2563d8)' : 'var(--ad-outline, #c7c7cf)',
+          background: on ? 'var(--ad-accent, #2563d8)' : 'transparent',
+          color: on ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}>
+        {on ? '✓ ' : ''}{d.name}{back ? ' · back' : ''}
+      </button>
+    );
+  };
   return (
     <div style={{ marginTop: 8, marginBottom: 4 }}>
       <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 5 }}>
         Dogs on this appointment
       </div>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-        {allDogs.map((d) => {
-          const on = sel.has(d.id);
-          return (
-            <button key={d.id} type="button" onClick={() => toggle(d.id)} disabled={busy}
-              style={{ fontSize: 13, fontWeight: 600, padding: '7px 13px', borderRadius: 999, cursor: 'pointer',
-                border: '1px solid', borderColor: on ? 'var(--ad-accent, #2563d8)' : 'var(--ad-outline, #d5d5dd)',
-                background: on ? 'var(--ad-accent, #2563d8)' : 'transparent',
-                color: on ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}>
-              {on ? '✓ ' : ''}{d.name}
-            </button>
-          );
-        })}
+        {roster.map(chip)}
+        {shownReturning.map(chip)}
         {dirty && (
           <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy} style={{ marginLeft: 2 }}>
             {busy ? 'Saving…' : 'Save dogs'}
           </button>
         )}
       </div>
+      {hiddenReturning.length > 0 && (
+        reveal ? (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 5 }}>Back today? Add a dog who moved away or left:</div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {hiddenReturning.map((d) => (
+                <button key={d.id} type="button" onClick={() => toggle(d.id)} disabled={busy}
+                  style={{ fontSize: 13, fontWeight: 600, padding: '7px 13px', borderRadius: 999, cursor: 'pointer',
+                    border: '1px dashed var(--ad-outline, #c7c7cf)', background: 'transparent', color: 'var(--ad-text-dim, #565b6c)' }}>
+                  + {d.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <button type="button" onClick={() => setReveal(true)}
+            style={{ marginTop: 7, fontSize: 12.5, fontWeight: 600, padding: 0, border: 'none', background: 'none',
+              color: 'var(--ad-accent, #2563d8)', cursor: 'pointer' }}>
+            + A dog who's back
+          </button>
+        )
+      )}
       {err && <div className="ad-error" style={{ fontSize: 12, marginTop: 5 }}>{err}</div>}
     </div>
   );
