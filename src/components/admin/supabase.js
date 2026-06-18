@@ -62,7 +62,9 @@ export async function signInWithGoogle() {
   const { error } = await sb().auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/laelaps`,
+      // BASE_URL is '/' on the real site and '/preview/' in a preview build, so a
+      // fresh sign-in returns to the same copy Paul started from, not production.
+      redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}laelaps`,
       queryParams: { prompt: 'select_account' },
     },
   });

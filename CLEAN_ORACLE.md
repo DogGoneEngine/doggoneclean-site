@@ -1965,17 +1965,25 @@ consent that was pre-checked is not consent: A2P registration expects opt-in,
 and a client who never noticed the box did not agree to anything.
 
 `preview_before_live` (Clean: engineering):
-Two release modes, switched by whether real clients are using the surface.
-Pre-traffic (today): ship straight to main, fast and bold, because there is
-nobody to break. Once a surface carries real client traffic, user-facing
-changes go out for a look first: push the candidate to the `preview` branch,
-which publishes the whole site to preview.hurricanebath.com (same audit gate,
-separate directory), Paul clicks through it, says ship, and only then does it
-merge to main and reach clients. Database migrations are the exception that
-stays careful in BOTH modes, because schema has no preview copy. The flip to
-preview-first happens per surface on Paul's word, not on a date. Because
-recklessness is free before launch and expensive after it, and Paul wants to
-see a change with his own eyes before clients do.
+Paul sees a change with his own eyes before it reaches the real site. The
+mechanism (rebuilt 2026-06-18 on Paul's pick of the no-setup option): push the
+candidate to the `preview` branch and `.github/workflows/preview.yml` publishes
+it to the LIVE host UNDER /preview (PREVIEW=1 builds Astro with base /preview;
+rsync to /srv/doggoneclean/preview), so Paul taps a Mount Olympus link and opens
+hurricanebath.com/preview/laelaps with his real login (the admin session
+persists) and real data. The real site is untouched: the production deploy
+rsyncs with --exclude='preview/', so a main deploy never overwrites /preview and
+/preview never leaks into the real site. Promotion to live is a normal merge to
+main. Same audit gate (npm run build runs check.py first), so a failing audit
+publishes nowhere. No second domain, no DNS, no Caddy change: the earlier
+preview.hurricanebath.com subdomain plan (inert, needing a DNS record + Caddy
+block) is superseded by this subpath approach because it needs zero one-time
+setup. Release posture is still two modes by traffic: pre-traffic ship straight
+to main, fast and bold; once a surface carries real client traffic, route
+user-facing changes through the preview first, per surface on Paul's word.
+Database migrations stay careful in BOTH modes (schema has no preview copy).
+Because recklessness is free before launch and expensive after it, and Paul
+wants to look before clients (or the live site) do.
 
 `one_visit_per_day_per_client` (Clean: clients):
 A client has ONE visit record per Eastern day, no matter how many paths feed

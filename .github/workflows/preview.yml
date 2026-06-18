@@ -1,13 +1,17 @@
-name: Deploy preview
+name: Publish preview
 
-# Paul's look-before-it-goes-live channel. Push a candidate to the `preview`
-# branch and this publishes it to /srv/doggoneclean-preview on the droplet,
-# where a Caddy block serves it at preview.hurricanebath.com. Paul looks at
-# the whole site with the change in place, says "ship it," and only then does
-# the change merge to main and reach the real site. Inert until the one-time
-# droplet setup exists (DNS A record for preview.hurricanebath.com plus the
-# Caddy site block; see the parking lot). Same audit gate as production: a
-# failing check.py never publishes anywhere, preview included.
+# Paul's look-before-it-goes-live channel (preview_before_live). Push a
+# candidate to the `preview` branch and this publishes it to the LIVE host under
+# /preview (/srv/doggoneclean/preview on the droplet), so Paul taps a Mount
+# Olympus link and sees the change exactly as it will look, with his real login
+# and data, at hurricanebath.com/preview/laelaps. The real site is untouched: the
+# production deploy rsyncs with --exclude='preview/', so /preview survives a main
+# deploy and a main deploy never overwrites it. Promotion to live is a normal
+# merge to main. No second domain, no DNS, no Caddy change: PREVIEW=1 builds Astro
+# under base /preview and Caddy already serves that subfolder.
+#
+# `npm run build` runs scripts/check.py first, so the preview is audit-gated the
+# same way the real deploy is: a failing check.py never publishes anywhere.
 
 on:
   push:
@@ -19,20 +23,9 @@ permissions:
   contents: read
 
 jobs:
-  audit:
+  preview:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: python3 scripts/check.py
-
-  deploy:
-    needs: audit
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v5
 
@@ -43,12 +36,12 @@ jobs:
 
       - run: npm ci --omit=dev
 
-      - run: npm run build
+      - run: PREVIEW=1 npm run build
 
-      - name: Publish dist to the preview directory
+      - name: Publish dist to the /preview directory
         run: |
           install -m 700 -d ~/.ssh
           printf '%s\n' "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H 178.128.144.219 >> ~/.ssh/known_hosts 2>/dev/null
-          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" dist/ cleandeploy@178.128.144.219:/srv/doggoneclean-preview/
+          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" dist/ cleandeploy@178.128.144.219:/srv/doggoneclean/preview/
