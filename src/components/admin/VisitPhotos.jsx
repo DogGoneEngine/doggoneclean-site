@@ -11,7 +11,7 @@
 // dog, flags, remove), so nothing has to be pinch-zoomed to tap. The old version
 // crammed four 9px chips plus a flag and a remove button under a 64px thumbnail.
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { uploadVisitPhoto, signedPhotoUrl, deleteVisitPhoto, setPhotoVisibility, setPhotoAnswersRequest, setPhotoTeam, suggestPhotoWebsite, withdrawPhotoWebsite, setWorthALook, flagForOwner, setPhotoDog, adminSelf } from './supabase.js';
 
 // "With dog" reads wrong; the photo is the dog WITH the person running the
@@ -59,6 +59,20 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
   const selected = photos.find((p) => p.id === selectedId) || null;
   useEffect(() => { if (selectedId && !photos.some((p) => p.id === selectedId)) setSelectedId(null); }, [photos, selectedId]);
 
+  // After adding a single photo, open its editor right away so the share options
+  // (client / team / website) are in front of Paul, not hidden behind a tap he
+  // has to know about. A batch of extras skips this so it does not thrash.
+  const autoOpenRef = useRef(false);
+  const prevCountRef = useRef(photos.length);
+  useEffect(() => {
+    if (autoOpenRef.current && photos.length > prevCountRef.current) {
+      const newest = photos[photos.length - 1];
+      if (newest) setSelectedId(newest.id);
+      autoOpenRef.current = false;
+    }
+    prevCountRef.current = photos.length;
+  }, [photos]);
+
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -77,6 +91,7 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
   const onPick = useCallback((kind, files) => {
     if (!files || !files.length) return;
     setError(null);
+    if (files.length === 1) autoOpenRef.current = true;
     const dog = tagDog;
     for (const f of Array.from(files)) {
       setPending((n) => n + 1);
@@ -165,6 +180,11 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
 
   return (
     <div style={{ marginTop: 6 }}>
+      {photos.length > 0 && !selected && (
+        <div style={{ fontSize: 12.5, color: 'var(--ad-text-dim, #565b6c)', marginBottom: 8 }}>
+          Tap a photo to choose where it goes: client, team, or website.
+        </div>
+      )}
       {photos.length > 0 && (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
           {photos.map((p) => {
