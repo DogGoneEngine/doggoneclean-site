@@ -317,6 +317,8 @@ function PhotoEditor({ photo, url, label, dogs = [], busy, dest, onClient, onTea
         </div>
       </div>
 
+      <PhotoFlag photo={photo} onChanged={onChanged} />
+
       {multiDog && (
         <div style={{ marginTop: 12 }}>
           <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 5 }}>Which dog</div>
@@ -335,8 +337,6 @@ function PhotoEditor({ photo, url, label, dogs = [], busy, dest, onClient, onTea
           </div>
         </div>
       )}
-
-      <PhotoFlag photo={photo} onChanged={onChanged} />
 
       <div style={{ marginTop: 12, borderTop: '1px solid var(--ad-outline, #ececf1)', paddingTop: 10 }}>
         <button onClick={onRemove} disabled={busy}
@@ -397,10 +397,15 @@ function PhotoFlag({ photo, onChanged }) {
   });
 
   return (
-    <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--ad-outline, #ececf1)' }}>
-      <div style={{ fontSize: 13, fontWeight: 700 }}>Show the client a closer look</div>
-      <div style={{ fontSize: 12.5, color: 'var(--ad-text-dim, #565b6c)', lineHeight: 1.45, marginTop: 3 }}>
-        Flag a photo and the client gets a heads-up to look it over and tell you what they want. Or flag it just for yourself.
+    <div style={{ marginTop: 12, padding: '12px 14px', borderRadius: 12,
+      border: '1px solid var(--ad-accent, #2563d8)', background: 'rgba(37,99,216,0.05)' }}>
+      <div style={{ fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 7 }}>
+        <span style={{ fontSize: 17 }}>&#128064;</span> Point something out to the client
+      </div>
+      <div style={{ fontSize: 12.5, color: 'var(--ad-text-dim, #565b6c)', lineHeight: 1.45, marginTop: 4 }}>
+        Write a note and the client gets a heads-up to look at THIS photo and tell you what they want
+        (for example: "matting behind the ears, want it shaved short?"). Different from just sharing the photo.
+        You can also keep a note for yourself instead.
       </div>
 
       {wal && (
@@ -434,13 +439,13 @@ function PhotoFlag({ photo, onChanged }) {
             {!wal && (
               <button className="ad-btn ad-btn--sm" disabled={busy}
                 onClick={() => save(() => setWorthALook(photo.id, true, note.trim() || null), { wal: true }, 'The client will get a heads-up to take a look.')}>
-                Show the client
+                Point it out to the client
               </button>
             )}
             {!fld && (
               <button className="ad-btn ad-btn--sm ad-btn--ghost" disabled={busy}
                 onClick={() => save(() => flagForOwner(photo.id, note.trim() || null), { fld: true }, 'Saved to your private notes.')}>
-                Just for me
+                Keep a note for myself
               </button>
             )}
           </div>
