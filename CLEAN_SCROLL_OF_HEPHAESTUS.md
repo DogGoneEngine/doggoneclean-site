@@ -370,6 +370,24 @@ dogs off the everyday chips and adds a "+ A dog who's back" reveal listing moved
 one (marked "· back") puts it on THIS appointment only, never un-archiving it. Deceased dogs are
 never offered. onDogs now includes an on-appointment returned dog so its photos and scores work.
 
+Decision locked (Paul 2026-06-18): dropping a dog from an appointment re-prices to the dogs kept,
+and it stays that way. This confirms `price_by_dogs_going` extends to post-booking edits, not just
+booking. (Paul flagged that a related issue might surface later and chose to deal with it then.)
+
+Self-documenting UI (`self_documenting_ui`, Paul 2026-06-18: the app must be figure-out-able cold by
+a forgetful Paul, a brand-new helper, or a future operator, with no guide; the trigger was noticing
+you can hard-ban a client from the bottom of the record with no instructions). New Oracle rule. Acted
+on it in the client record: the Client status / ban panel now shows a plain-language line while
+collapsed ("Flag, shadow-ban, or hard-ban this client. Rare, deliberate, and reversible.") instead of
+just "manage"; the record's help toggle was refreshed for truth and coverage, adding "Today at the
+top", "Dogs on this appointment" (incl. the returning-dog reveal), "Past and other dogs" (where
+moved/former/deceased dogs live), and "Client status / ban" (says it is at the very bottom), and
+expanding "On each dog" to mention Roster status. Confirmed for Paul: portal clients do NOT get the
+"a dog who's back" control (it is operator-only, per-appointment, and re-prices, so it is the
+operator's call); the portal hides inactive dogs (filters active !== false on both views), so a
+client never sees an archived dog. Photos display in a clean uniform grid (116px thumbnails with
+labels and share-destination dots), so added photos land orderly.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a

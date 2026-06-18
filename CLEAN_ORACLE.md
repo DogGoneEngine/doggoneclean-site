@@ -199,6 +199,18 @@ and saying "done" on unverified work compounds (errors aren't caught until later
 in past sessions' "done" claims is destroyed, which is what blew up the afternoon of
 2026-05-26).
 
+`self_documenting_ui` (ux):
+The operator app must be figure-out-able cold, at the point of use, with no guide. Any control
+whose purpose is not obvious from its own label, and any power that is rare or tucked away
+(collapsed panels, anything at the bottom of a long sheet, anything not used often), carries a
+short plain-language line right there saying what it does and what happens, not only inside a
+help toggle. Where things live (archived dogs, the ban control) is stated near where someone
+would look for them. Because the people who must operate this are a Paul who forgets the rarely
+used corners, a brand-new helper, and whoever runs day-to-day operations in the future, none of
+them with someone standing over their shoulder; a powerful action that fires with no explanation
+(banning a client from the bottom of the record was the example that surfaced this) is a trap,
+not a feature.
+
 `recovery_from_a_bad_session` (process):
 When a prior session has hallucinated, gaslit, or looped and Paul is bringing the wreckage
 into a fresh session, the new session does five things, in order: (1) listen first and let

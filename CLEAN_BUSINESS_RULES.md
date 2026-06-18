@@ -26,6 +26,7 @@ even DGN has many rules sitting in only one or two layers.
 | no_pr_activity_subscription_nudge | Process | CLAUDE.md "Shipping" | `business_rules` row |
 | verify_the_change_before_done | Process | CLAUDE.md "Stack and commands"; session-start orient footer; convention | `business_rules` row |
 | recovery_from_a_bad_session | Process | CLAUDE.md "How Paul works"; Oracle; convention | `business_rules` row |
+| self_documenting_ui | UX | Oracle; ClientsView inline control descriptions + Help toggle items (status/ban subtitle, "Dogs on this appointment", "Past and other dogs", roster-status hint); convention | `business_rules` row |
 | ci_workflows_capped_and_validated | Engineering | `.github/workflows/*.yml` (every job declares timeout-minutes); convention | `check.py` lint that scans workflows for the timeout setting |
 | transient_ci_rerun_first | Engineering | CLAUDE.md "Stack and commands"; Oracle; convention | `business_rules` row |
 | no_merge_across_repos | Process | CLAUDE.md "Repo separation" | n/a |

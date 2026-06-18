@@ -284,11 +284,14 @@ function ClientSheet({ clientId, onChanged }) {
       <div className="ad-panel" style={{ position: 'relative' }}>
         <HelpToggle corner items={[
           ['Tap any field', 'Most details (access notes, gate codes, who is home, your private thoughts) edit right here: tap the value, type, it saves.'],
+          ['Today at the top', 'When there is an appointment today it floats to the top as the working card. Add this visit\'s photos and notes right there, no button to start it.'],
+          ['Dogs on this appointment', 'Tap a dog off to drop it from today (the visit re-prices to the dogs kept). A dog that moved away or left is hidden; tap "A dog who\'s back" to add one for this one visit, without un-archiving it.'],
+          ['On each dog', 'Set breed, price, notes, birthday, and handling. The price is what the visit charges. Open "Roster status" to mark a dog Sometimes, Moved away, Former, or Deceased.'],
+          ['Past and other dogs', 'Dogs that moved away, left, or passed are kept, folded shut below the roster, so they stay findable without cluttering the day or the tracker.'],
           ['Add alternate address', 'Records a second place you sometimes groom this client, clickable to Maps.'],
-          ['Status / No-fly', 'Flags a client (watch, or do-not-book) so the booking funnel and the rest of the app know.'],
-          ['On each dog', 'Set breed, price, notes, and birthday. The price is what the visit charges.'],
           ['Log a visit', 'Adds a visit to the history below, with what you did, time, and what was collected.'],
           ['Photos', 'Each visit photo can go to the client, the Team gallery, the website, or be flagged. Their own help sits by the photos.'],
+          ['Client status / ban', 'At the very bottom of the record: flag, shadow-ban (keep serving but stop chasing them), or hard-ban (remove everywhere). Rare, deliberate, and reversible.'],
         ]} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, paddingRight: 24 }}>
           <h2 style={{ margin: 0 }}>{c.name}{c.aka ? <span className="ad-mono" style={{ marginLeft: 8, opacity: 0.6, fontSize: 14 }}>{c.aka}</span> : null}</h2>
@@ -1414,11 +1417,20 @@ function ClientStatusControl({ client, onChanged }) {
 
   return (
     <div className="ad-panel">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen((o) => !o)}>
-        <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>
-          Client status{current ? ` · ${current === 'banned' ? 'banned' : 'shadow ban'}` : ''}
-        </span>
-        <span style={{ fontSize: 12, opacity: 0.5 }}>{open ? 'hide' : 'manage'}</span>
+      <div style={{ cursor: 'pointer' }} onClick={() => setOpen((o) => !o)}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>
+            Client status{current ? ` · ${current === 'banned' ? 'banned' : 'shadow ban'}` : ''}
+          </span>
+          <span style={{ fontSize: 12, opacity: 0.5 }}>{open ? 'hide' : 'manage'}</span>
+        </div>
+        {!open && (
+          <div style={{ fontSize: 12.5, opacity: 0.62, marginTop: 4 }}>
+            {current
+              ? 'This client is flagged. Tap to see why or to clear it.'
+              : 'Flag, shadow-ban, or hard-ban this client. Rare, deliberate, and reversible. Tap to manage.'}
+          </div>
+        )}
       </div>
       {open && (
         <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
