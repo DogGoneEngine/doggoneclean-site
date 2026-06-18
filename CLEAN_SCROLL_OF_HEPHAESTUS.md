@@ -3857,3 +3857,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   form and operator app; per-operator and per-rig rate view in Reports; per-rig scoping of the
   equipment/maintenance/generator system when a second rig arrives (today `equipment` is one flat
   list); admin rig-management RPC + UI.
+
+- **Block-fit adherence + weekly money pager** (Paul 2026-06-18, migration 0199). Reports now
+  shows "Started in the block" and "Finished in the block" beside the existing arrival numbers
+  (percent of tracked stops that arrived, and wrapped, on or before the appointment's
+  `scheduled_end`). No new capture: the tracker already stamps arrived/departed. Finance gained a
+  Monday-to-Saturday weekly money pager at the top of the tab, pageable forward and back; current
+  and future weeks show the booked plan, past weeks show collected, pencilled money on a separate
+  line (`admin_weekly_money`). Arrival/finish time stamping already existed (the On-my-way / I'm
+  here / Bringing them back / All done flow); confirmed, not rebuilt.
+- **Operator "right now" card: parked for its own design pass** (Paul 2026-06-18). A pinned
+  "what I'm working on right now" card above today's stops (appointment-only dog photos + names,
+  standing instructions, door people). All data exists; Paul wants it thought through, not
+  batched. Open questions in CLEAN_PARKING_LOT.md.
+- **Ship to completion beats the session feature-branch wrapper** (Paul 2026-06-18). When a
+  session is started on a `claude/*` branch with a "do not push elsewhere" instruction, that does
+  not override ship-to-completion: routine work still folds into `main` the same turn and deploys.
+  Everything ships unless Paul says otherwise beforehand for that specific change. Hardened in
+  CLAUDE.md's ship-to-completion rule.
