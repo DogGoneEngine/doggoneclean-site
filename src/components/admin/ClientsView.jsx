@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, adminArrived } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -188,6 +188,7 @@ function ClientSheet({ clientId, onChanged }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [starting, setStarting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -200,6 +201,25 @@ function ClientSheet({ clientId, onChanged }) {
     }
   }, [clientId]);
   useEffect(() => { load(); }, [load]);
+
+  // Start the visit from inside the client record: the same arrival path as
+  // "I'm here" on the Today sheet (admin_arrived stamps arrival and creates the
+  // visit row). Once it exists, the "Today's visit" card with photos and notes
+  // takes over from the read-only appointment card, so Paul can add photos from
+  // the record without going to the Today screen first. One visit-creation path,
+  // not two (Paul, 2026-06-18: the appointment card "had no place to add photos").
+  const startVisit = useCallback(async (apptId) => {
+    setStarting(true);
+    try {
+      await adminArrived(apptId);
+      await load();
+      onChanged?.();
+    } catch (e) {
+      setError(e.message || 'start_failed');
+    } finally {
+      setStarting(false);
+    }
+  }, [load, onChanged]);
 
   if (loading) return <div className="ad-panel">Opening the sheet…</div>;
   if (error) return <div className="ad-panel"><div className="ad-error">{error}</div></div>;
@@ -256,6 +276,12 @@ function ClientSheet({ clientId, onChanged }) {
             {(() => { try { return new Date(todayAppt.scheduled_start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ''; } })()}
             {todayAppt.service_type ? ` · ${SERVICE_LABELS[todayAppt.service_type] || todayAppt.service_type}` : ''}
           </div>
+          {/* The appointment is read-only until it is started. This turns it into
+              the working visit (photos, notes, vibe) right here, so Paul never has
+              to leave the record to begin. */}
+          <button className="ad-btn" style={{ marginTop: 10 }} onClick={() => startVisit(todayAppt.id)} disabled={starting}>
+            {starting ? 'Starting…' : 'Start the visit · add photos'}
+          </button>
         </div>
       )}
 
