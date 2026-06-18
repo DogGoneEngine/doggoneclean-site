@@ -296,6 +296,15 @@ known phone from context when Paul does not say one, and the summary says plainl
 known. riker edge function v9 (prompt + alias_add in the schema), RikerCapture shows and applies
 alias_add, the help text gained a "Household names" line.
 
+Photos screen rethought (`photos_clean_grid_and_editor`, in Prometheus for review): the old UI
+crammed four 9px destination chips plus a flag and a remove button under a 64px thumbnail, so Paul
+had to pinch-zoom to tap anything ("a junk drawer"). New: a clean grid of larger (116px)
+thumbnails showing only small coloured dots for where each photo is shared; tap a photo to open a
+roomy editor with finger-sized controls, the destinations as full-width toggle rows (Client, Team,
+Website, Answer) each with a one-line "what this does", a clear which-dog picker, the flag tools,
+and a Remove button. Every prior capability preserved (optimistic toggles, dog tagging, website
+suggest-only, worth-a-look / owner flags). VisitPhotos.jsx only; staged on the preview branch.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a
