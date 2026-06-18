@@ -4,7 +4,7 @@
 // newest window around today. Read-only for now; the booking surface is the
 // /book funnel. This is the operator's view of what is coming.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { calendar } from './supabase.js';
 
 const SERVICE = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -23,6 +23,11 @@ export default function CalendarView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [window, setWindow] = useState(30);
+  // The calendar floor opens on today, not on last week. The window loads 7 days
+  // of history for context, so without this the floor lands a week in the past
+  // and Paul has to scroll forward every time. Pin today's group to the top of
+  // the view once the appointments land (Paul, 2026-06-18).
+  const todayRef = useRef(null);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -31,6 +36,10 @@ export default function CalendarView() {
     finally { setLoading(false); }
   }, [window]);
   useEffect(() => { load(); }, [load]);
+  // After the list renders, bring today (or the next future day) to the top.
+  useEffect(() => {
+    if (todayRef.current) todayRef.current.scrollIntoView({ block: 'start' });
+  }, [appts]);
 
   if (error) return <><h1>Calendar</h1><div className="ad-error">{error}</div></>;
   if (loading || !appts) return <><h1>Calendar</h1><div className="ad-panel">Loading…</div></>;
@@ -39,13 +48,16 @@ export default function CalendarView() {
   const upcoming = appts.filter((a) => new Date(a.scheduled_start).getTime() >= now).length;
 
   // group by day
+  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
   const groups = [];
   let cur = null;
   for (const a of appts) {
     const k = dayKey(a.scheduled_start);
-    if (!cur || cur.key !== k) { cur = { key: k, items: [], isPast: new Date(a.scheduled_start).getTime() < now }; groups.push(cur); }
+    if (!cur || cur.key !== k) { cur = { key: k, items: [], isPast: new Date(a.scheduled_start).getTime() < now, isFuture: new Date(a.scheduled_start).getTime() >= todayStart.getTime() }; groups.push(cur); }
     cur.items.push(a);
   }
+  // The first group on or after today is where the floor should open.
+  const anchor = groups.find((g) => g.isFuture);
 
   return (
     <>
@@ -63,7 +75,8 @@ export default function CalendarView() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {groups.map((g) => (
-            <div key={g.key} className="ad-panel" style={{ opacity: g.isPast ? 0.6 : 1 }}>
+            <div key={g.key} ref={g === anchor ? todayRef : null} style={{ scrollMarginTop: 12 }}>
+            <div className="ad-panel" style={{ opacity: g.isPast ? 0.6 : 1 }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{g.key}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {g.items.map((a) => (
@@ -80,6 +93,7 @@ export default function CalendarView() {
                   </div>
                 ))}
               </div>
+            </div>
             </div>
           ))}
         </div>
