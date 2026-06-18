@@ -468,6 +468,18 @@ type/lifecycle untangle). Going forward, once Paul has previewed and approved a 
 completion without making him re-say "ship it" (the preview is to catch problems, not a gate to
 re-unlock). Prometheus returns to idle after a ship.
 
+Regression + fix (2026-06-18, same day): the tracker showed "arrived / in the driveway" while Paul
+was already in the trailer with the first before photo taken; it should read "underway." Cause: the
+before photo is what flips arrived -> underway (0148, deliberately not a 10-minute timer, which would
+lie while he is still on a client's couch). My 0213 rewrite of `tracker_status` was based on the 0182
+FILE, which carried the old 10-minute-timer branch, so it reverted the before-photo behavior that was
+live. This is the exact "verify against the live function, not the migration file" lesson (the same
+one that saved the ban check) and I missed it for tracker_status. Migration 0217 restores the
+before-photo check, preserving every 0213 addition (appointment dog_ids filter, active bath_dogs
+fallback, legacy roster fallback, operator, photo_credits). Verified live on Kevin's appointment:
+stage now 'underway'. Lesson reinforced: when re-creating an existing function, dump the LIVE
+definition first, never rebuild from an old migration file.
+
 Client type/lifecycle untangle (`client_type_and_lifecycle`, Paul 2026-06-18). The legacy
 `status`/`roster_group` columns conflated three things: TYPE (recurring vs on-demand), LIFECYCLE
 (active, moved away, deceased, inactive, merged, test), and the BAN, which is why a record could read
