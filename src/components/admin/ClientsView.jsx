@@ -1036,7 +1036,7 @@ const TRANSPORT_LABEL = { carry: 'Carry in and out', leash: 'Walk on a leash' };
 const DOOR_FLAGS = [
   { key: 'escape',        label: 'Escape risk',                  warn: true },
   { key: 'keep_separate', label: 'Keep apart from other animals', warn: true },
-  { key: 'loose_ok',      label: 'Can be let loose after',        warn: false },
+  { key: 'loose_ok',      label: 'OK to turn loose',              warn: false },
 ];
 const WARN_LABEL = { escape: 'Escape risk, keep control at the door', keep_separate: 'Keep away from other animals' };
 
@@ -1098,11 +1098,11 @@ function DoorHandling({ dog, onChanged }) {
 // Pull the loud warnings and the calm facts out of a dog's door handling.
 function doorBits(dog) {
   const dh = dog.door_handling || {};
-  const warns = ['escape', 'keep_separate'].filter((k) => dh[k]);
-  const calm = [];
-  if (dh.transport) calm.push(TRANSPORT_LABEL[dh.transport]);
-  if (dh.loose_ok) calm.push('OK to let loose after');
-  return { warns, calm };
+  return {
+    warns: ['escape', 'keep_separate'].filter((k) => dh[k]),
+    transport: dh.transport ? TRANSPORT_LABEL[dh.transport] : null,
+    looseOk: !!dh.loose_ok,
+  };
 }
 
 // The must-knows banner that rides at the very top of the sheet
@@ -1113,7 +1113,7 @@ function MustKnows({ dogs, todayVisits }) {
   const active = (dogs || []).filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status));
   const requests = (todayVisits || []).map((v) => v.special_request).filter(Boolean);
   const rows = active.map((d) => ({ d, ...doorBits(d) }))
-    .filter((r) => r.d.standing_instructions || r.warns.length || r.calm.length || r.d.handling);
+    .filter((r) => r.d.standing_instructions || r.warns.length || r.transport || r.looseOk || r.d.handling);
   if (requests.length === 0 && rows.length === 0) return null;
   return (
     <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-warn,#b9770a)', background: 'var(--ad-warn-bg,#fff8ec)' }}>
@@ -1125,7 +1125,7 @@ function MustKnows({ dogs, todayVisits }) {
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {rows.map(({ d, warns, calm }) => (
+        {rows.map(({ d, warns, transport, looseOk }) => (
           <div key={d.id}>
             <div style={{ fontSize: 13, fontWeight: 700 }}>{d.name}</div>
             {warns.map((k) => (
@@ -1135,7 +1135,13 @@ function MustKnows({ dogs, todayVisits }) {
               </div>
             ))}
             {d.standing_instructions && <div style={{ fontSize: 14, lineHeight: 1.4, marginTop: 3 }}>{d.standing_instructions}</div>}
-            {calm.length > 0 && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>{calm.join(' · ')}</div>}
+            {transport && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>{transport}</div>}
+            {looseOk && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.4, padding: '1px 6px', borderRadius: 4, background: 'var(--ad-primary,#2563d8)', color: '#fff' }}>ASK</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>OK to turn loose, but verify with the client first</span>
+              </div>
+            )}
             {d.handling && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>{d.handling}</div>}
           </div>
         ))}

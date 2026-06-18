@@ -2888,8 +2888,11 @@ preferences with a gradient: Paul ran the scenarios and found "usually a bolt ri
 dog either bolts or it does not. (History: a 2026-06-18 first pass used a No/Usually/Always level on
 every concern, plus a redundant "leash before the door"; Paul cut both, the level fit none of them
 and "leash" duplicated escape control. Migrations 0208 flat flags, 0209 usual/always, 0210 the
-simplified shape.) Clio learns to set it by voice. Full UI pending Paul's review. Decided
-2026-06-18, simplified same day.
+simplified shape.) Clio learns to set it by voice. Turn-loose is special: it surfaces on the
+banner as "OK to turn loose, but verify with the client first", because turning a dog loose is a
+usually-but-confirm thing, not a guarantee. Paul confirms with the client at hand-off every time
+(a rare dog may be a known always-OK, but the default is ask, and asking again never hurts). Full
+UI pending Paul's review. Decided 2026-06-18, simplified same day.
 
 `client_sheet_surfaces_the_must_knows` (Clean: clients):
 On the client sheet the things Paul needs mid-appointment ride at the TOP and are heavily

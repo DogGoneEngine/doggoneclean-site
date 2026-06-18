@@ -257,6 +257,21 @@ Third pass (Paul tried it in Prometheus, the preview):
   inside the current-appointment card, still Paul's call), special-request-before-arrival (a small
   server tweak), and the deeper client status/lifecycle data separation.
 
+Fourth pass (Paul field-testing in Prometheus):
+- Turn-loose carries a confirm note. Paul (in Chester Weber's record, dog Ula): turning a dog
+  loose is "usually, but I confirm with the client at hand-off," not a guarantee. The "OK to turn
+  loose" fact now surfaces on the banner as "OK to turn loose, but verify with the client first"
+  (blue ASK tag), folded into `dog_handling_toggles`. ClientsView only, in preview.
+- Mount Olympus: moved Prometheus out of the Clean card into the Shared tools shelf (preview is
+  cross-project), kept its gold styling, added breathing room before Cerberus.
+- Clio gaps found while field-testing (feed the queued Clio pass): (1) "add only Lillian" added
+  her to BOTH who's-on-site AND notify (overreach when Paul said only); (2) the notify person had
+  no phone, and Lillian's number is already in the records, so the message could not reach her,
+  Clio should reuse a known person's phone; (3) earlier, "add X as a household name" has no alias
+  path so it fell back to who's-on-site. The Clio pass now covers: a household-name/alias action,
+  do-not-duplicate a person across fields, and reuse an existing phone for a notify person. By
+  hand still works (the sheet's + name and the notify panel).
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a
