@@ -217,6 +217,14 @@ function ClientSheet({ clientId, onChanged }) {
   const todayVisits = visits.filter(isPinned);
   const pastVisits = visits.filter((v) => !isPinned(v));
   const upcoming = data.upcoming || [];
+  // Today's appointment floats to the top too, not only a started visit: when
+  // Paul opens a client he is about to groom, the appointment must be right there
+  // (Paul's original rule, current appointment at the top). Once he starts it a
+  // visit row exists and the "Today's visit" card takes over; until then this
+  // surfaces the scheduled appointment instead of burying it in Upcoming.
+  const todayAppt = !todayVisits.length
+    ? upcoming.find((a) => easternDay(a.scheduled_start) === todayKey)
+    : null;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -235,6 +243,20 @@ function ClientSheet({ clientId, onChanged }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {todayVisits.map((v) => <VisitEntry key={v.id} v={v} clientId={clientId} dogs={dogs} onChanged={load} />)}
           </div>
+        </div>
+      )}
+
+      {/* Today's appointment, when it has not been started yet: floats to the top
+          so the current appointment is never buried in Upcoming. The Today's-visit
+          card above replaces it the moment a visit is logged. */}
+      {todayAppt && (
+        <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-good, #1f8a4b)' }}>
+          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Today's appointment</div>
+          <div style={{ fontSize: 16, fontWeight: 700 }}>
+            {(() => { try { return new Date(todayAppt.scheduled_start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ''; } })()}
+            {todayAppt.service_type ? ` · ${SERVICE_LABELS[todayAppt.service_type] || todayAppt.service_type}` : ''}
+          </div>
+          <div style={{ fontSize: 13, opacity: 0.7, marginTop: 2 }}>Not started yet. Log it below, or tell Clio, when you begin.</div>
         </div>
       )}
 
