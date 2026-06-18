@@ -125,6 +125,10 @@
   --ad-dur:      240ms;
   --ad-dur-fast: 140ms;
 
+  /* Display face for headings and labels only (the snap). Dense data and body
+     stay on Inter, which is the workhorse, so field legibility never suffers. */
+  --ad-font-display: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
+
   /* Single root keyframe drives the gradient angle for every surface
      that references --ad-ne-angle. Free where unused. */
   animation: ad-ne-spin 22s linear infinite;
@@ -499,6 +503,15 @@ html, body {
   box-shadow: var(--ad-elev-2);
 }
 .ad-panel h2 { margin: 0 0 14px; font-size: 16px; font-weight: 700; color: var(--ad-text); }
+
+/* The snap: headings and labels ride the display face; body and data stay Inter. */
+.ad-app h1, .ad-app h2, .ad-app h3,
+.ad-panel h2,
+.ad-eyebrow {
+  font-family: var(--ad-font-display);
+  letter-spacing: -0.01em;
+}
+.ad-eyebrow { letter-spacing: 0.06em; }
 
 /* ---------------- Inside-the-card refresh ----------------
    Modern primitives so card CONTENT matches the late-2020s chrome. The card
