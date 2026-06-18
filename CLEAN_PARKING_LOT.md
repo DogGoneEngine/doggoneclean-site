@@ -1130,4 +1130,35 @@ Open questions to settle WITH Paul before building:
   putting everything on it; the value is that it is short.
 - How it coexists with the existing StopCard flow (the right-now card is a focused view of the
   active StopCard, not a second source of truth).
-- Access/parking/gate notes at arrival: in or out?
+- Access/parking/gate notes at arrival: in or out? (Paul 2026-06-18: IN.)
+
+### Design refinement (Paul, 2026-06-18): start small, two moments
+
+Paul: "if we don't do it carefully, this could turn into a mess. start small." The card has two
+moments, top to bottom: ARRIVING (what I need before I knock) then THE DOGS (what I need at the
+door / while I work). v1 contents, from Paul:
+
+- ARRIVING: access instructions for the stop I am on my way to (gate code, lockbox, where to set
+  up, power/water); front-door / household people I might encounter and any info I have on each.
+- THE DOGS (only the dogs on THIS appointment): photo, name, breed, a DISAMBIGUATION line for
+  look-alikes; standing instructions per dog; the "bring up next time" follow-up from last visit.
+
+Decision needed -> Paul asked: do look-alike dogs (Colleen Smith has two Cavalier King Charles
+Spaniels: "the brown one" vs "the black-and-white one") need a separate description field?
+Recommendation: YES, a short optional `dogs.appearance` field. `dogs.notes` is a junk drawer; the
+at-a-glance disambiguator must be one short reliable phrase; it shows only when present (no noise
+for single-dog or obviously-different households); and it doubles as customer-tracker copy. NOT
+YET BUILT; build it with the card.
+
+Claude's suggested additions (Paul to accept/reject; keep it short):
+- A handling/temperament WARNING chip on a dog (bite risk, hates nails, anxious), given its own
+  visual weight, not buried in standing instructions. Safety.
+- What to collect at the door: price per dog + usual payment method (cash / check / Square),
+  already on record (dog prices + client habit).
+- Held for one tap into the record, NOT on the card: full visit history, photo gallery, ratings,
+  cycle-time stats.
+
+Layout intent: Neural Expressive. Gradient/glow header naming the client and the moment, big bold
+hierarchy, one dog per row (photo left; name + breed + appearance bold; standing instructions and
+warning chip below; follow-up as a tinted callout). Auto-surfaces the in-progress stop, falls back
+to the next.
