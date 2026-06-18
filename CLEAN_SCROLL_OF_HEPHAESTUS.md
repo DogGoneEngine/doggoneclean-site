@@ -4218,6 +4218,20 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   correct x-cfo-secret) now returns 200 with the full 1,231-row ledger CSV; a wrong secret now
   returns the function's own 403, not the gateway's 401. Source comment updated to record the
   verify_jwt requirement so a future redeploy keeps it.
+- **Time is Money "Charged" column was coming through blank; fixed at the source** (Paul 2026-06-18,
+  migration 0217). Spotted on the backup file: Colleen Smith's 6/17 bottom row had an empty Charged
+  while Paid read $252. Root cause: the "Charged" amount was only ever recorded by the explicit
+  complete form (`admin_complete_appointment`), and even that defaulted to `bath_appointments.amount_cents`
+  (0 across the full-groom book, where price lives on `dogs.price_cents`). The way stops are actually
+  finished in the field, the on-my-way / here / all done clock flow (`admin_stamp_appointment_time`),
+  created the visit and completed it on the departed stamp but never set `charged_cents`, so it came
+  through NULL. Fix: both paths now source Charged from `clean_appt_price_cents` (the same one canonical
+  price the weekly money pager uses, per 0200), only when no charge was entered by hand, so a manual
+  override still wins. Backfilled the completed post-cutover appointment visits that were blank.
+  Verified against the live ledger as the button reads it: Colleen's bottom row now reads Charged $210
+  (Pippa + Autumn Rose at $105 each), Paid $252, and no other live post-cutover row shows a blank
+  Charged (the one remaining blank is a 3/8/2025 frozen-history row, Paul's verbatim master, untouched).
+  Oracle `time_is_money_weekly_backup` corrected in place to this reality.
 - **Now card photo is the most recent AFTER photo** (Paul 2026-06-18, migration 0203). For both
   the groomed and the on-site dogs; no after photo on record means the paw placeholder, never a
   before/incidental shot.
