@@ -3936,3 +3936,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   status back to returning. So button and manual entry behave identically; the StopCard flips
   without a reload. Inbound/arrived stamps stay button-driven; departed is the one that closes the
   stop.
+- **Stop card help, on demand** (Paul 2026-06-18). The Today stop cards had no help toggle while
+  every other panel did. Added one "i" on the Today's stops header (one for the section, since the
+  cards are identical) with a full rundown of every stop action: open the record, the on-my-way to
+  rolling-out button flow, tracker link, operator, special request, fix times, forgot-to-tap manual
+  entry (and that a typed Departed time closes the stop, clearing it reopens), undo step, the
+  follow-up asks, the capture-what-only-you-know nudge, and the post-wrap thank-you draft.

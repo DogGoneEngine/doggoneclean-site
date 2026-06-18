@@ -73,6 +73,22 @@ function sortByValue(cards) {
     || new Date(b.created_at) - new Date(a.created_at));
 }
 
+// Everything you can do with a stop card, on demand (help_on_demand). One toggle
+// for the whole stops section, since every stop card works the same way.
+const STOP_HELP = [
+  ['Open the record', 'Tap the client name at the top of a stop to open their full contact sheet: dogs, history, notes, access, everything.'],
+  ['The big button', 'Your visit flow, one tap each: On my way (shares the live tracker link and starts sharing your location) then I\'m here (you arrived) then Bringing them back (tells them to watch the door) then All done, rolling out (you left and the stop closes). Every tap also stamps the time.'],
+  ['Tracker link', 'Share or copy the client\'s live tracking link any time, as many times as you need.'],
+  ['Operator', 'Set who is running this stop, you or a teammate. Their name is the one the client sees on the tracker.'],
+  ['Special request', 'Type what they asked for at the door (e.g. ears a little shorter). It shows on their tracker, then the photo you tag as the answer proves it was done. Tap Save.'],
+  ['fix times', 'Opens the three clocks: Inbound (when you left for the stop), Arrived, Departed. Tap to stamp the time now, or type the exact time.'],
+  ['Forgot to tap a button?', 'Open fix times and enter it by hand. Typing a Departed time closes the stop exactly like All done does; clearing a Departed time reopens it. The little x clears a time you entered by mistake.'],
+  ['undo step', 'Tapped a step by accident? This rolls the last one back. It names the step and asks you to confirm first, so it cannot be fat-fingered.'],
+  ['Things to ask', 'The arrow lines are reminders to bring something up with this client, carried over from last visit.'],
+  ['While you are here', 'A nudge that shows when something is missing from the record (a gate code, the visit rhythm). Tap it to fill it in on the sheet.'],
+  ['Send a thank-you', 'After a stop wraps: one tap drafts a warm, personal thank-you you can edit, copy, and send from your own messages.'],
+];
+
 export default function TodayView({ onOpenClient }) {
   const [briefings, setBriefings] = useState([]);
   const [agents, setAgents] = useState([]);
@@ -147,7 +163,10 @@ export default function TodayView({ onOpenClient }) {
 
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Today's stops</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Today's stops</span>
+            <HelpToggle label="What can I do with a stop?" items={STOP_HELP} />
+          </div>
           <span style={{ fontSize: 12, opacity: 0.6 }}>{appts.length} {appts.length === 1 ? 'stop' : 'stops'}</span>
         </div>
         {appts.length === 0 ? (
