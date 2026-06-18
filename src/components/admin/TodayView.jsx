@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, fieldFlags, markFieldSeen, uploadTaskProof, signedPhotoUrl } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, fieldFlags, markFieldSeen, uploadTaskProof, signedPhotoUrl, nowCard } from './supabase.js';
 import HelpToggle from './Help.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -142,6 +142,8 @@ export default function TodayView({ onOpenClient }) {
     <>
       <h1>Today</h1>
       <p className="ad-sub">{today}. Your stops for the day, then the feed from your AI department heads. Talk back to any of them.</p>
+
+      <NowCard reloadKey={appts} onOpenClient={onOpenClient} />
 
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -468,6 +470,122 @@ function OpenTaskRow({ t, isOwner, busy, onDone, onDrop, onTakeBack }) {
             onClick={() => onTakeBack(t)}>Take back</button>
         : <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => onDrop(t)}>Drop</button>
       )}
+    </div>
+  );
+}
+
+// The "right now" card (now_card_v1): a focused, glanceable view of the stop
+// Paul is on his way to or working. Two moments, top to bottom: ARRIVING (how to
+// get in, who is at the door) then THE DOGS on this appointment (photo to tell
+// them apart, the handling note framed as reassurance, standing instructions,
+// the follow-up, and the price for the door). Surfaces the in-progress stop,
+// else the next not-yet-wrapped stop today; hides itself when there is nothing.
+function NowCard({ reloadKey, onOpenClient }) {
+  const [card, setCard] = useState(null);
+  const [photos, setPhotos] = useState({});
+
+  useEffect(() => {
+    let alive = true;
+    nowCard().then((c) => { if (alive) setCard(c && c.found ? c : null); }).catch(() => { if (alive) setCard(null); });
+    return () => { alive = false; };
+  }, [reloadKey]);
+
+  // Sign each dog's photo once it is known.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      for (const d of (card?.dogs || [])) {
+        if (!d.photo_path || photos[d.id]) continue;
+        try { const u = await signedPhotoUrl(d.photo_path); if (alive) setPhotos((p) => ({ ...p, [d.id]: u })); } catch { /* skip */ }
+      }
+    })();
+    return () => { alive = false; };
+  }, [card]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!card) return null;
+
+  const when = apptTime(card.scheduled_start);
+  const heading = card.in_progress ? 'Right now' : 'On your way to';
+  const dogs = card.dogs || [];
+
+  return (
+    <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 16, border: '1px solid var(--ad-outline, #e6e3dc)',
+      boxShadow: 'var(--ad-brand-glow, 0 8px 24px rgba(37,99,216,0.16))' }}>
+      {/* Gradient header: the moment and who. Tap to open the full record. */}
+      <button type="button" onClick={() => card.client_id && onOpenClient?.(card.client_id)}
+        style={{ display: 'block', width: '100%', textAlign: 'left', border: 0, cursor: card.client_id ? 'pointer' : 'default',
+          color: '#fff', padding: '14px 16px', backgroundImage: 'var(--ad-ne-gradient)' }}>
+        <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.85 }}>
+          {heading}{when ? ` · ${when}` : ''}
+        </div>
+        <div style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.1, marginTop: 2 }}>{card.client || 'This stop'}</div>
+      </button>
+
+      <div style={{ background: 'var(--ad-surface, #fff)', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* ARRIVING */}
+        {(card.access_notes || card.onsite_people) && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {card.access_notes && (
+              <div>
+                <div style={{ fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5, opacity: 0.55, fontWeight: 700 }}>Getting in</div>
+                <div style={{ fontSize: 14, lineHeight: 1.45, marginTop: 1 }}>{card.access_notes}</div>
+              </div>
+            )}
+            {card.onsite_people && (
+              <div>
+                <div style={{ fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5, opacity: 0.55, fontWeight: 700 }}>At the door</div>
+                <div style={{ fontSize: 14, lineHeight: 1.45, marginTop: 1 }}>{card.onsite_people}</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* THE DOGS on this appointment */}
+        {dogs.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {dogs.map((d) => (
+              <div key={d.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start',
+                borderTop: '1px solid var(--ad-line, #eee)', paddingTop: 10 }}>
+                <div style={{ width: 60, height: 60, borderRadius: 12, flexShrink: 0, overflow: 'hidden',
+                  background: 'var(--ad-surface-container, #f1f1f4)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 22, color: 'var(--ad-text-dim, #9a9aa2)' }}>
+                  {photos[d.id] ? <img src={photos[d.id]} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🐾'}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                    <strong style={{ fontSize: 16 }}>{d.name}</strong>
+                    {d.breed && <span style={{ fontSize: 12.5, opacity: 0.6 }}>{d.breed}</span>}
+                    {d.appearance && <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--ad-primary-strong, #1d50b8)' }}>· {d.appearance}</span>}
+                  </div>
+                  {d.standing_instructions && (
+                    <div style={{ fontSize: 13, marginTop: 3, lineHeight: 1.4 }}>{d.standing_instructions}</div>
+                  )}
+                  {d.handling && (
+                    <div style={{ fontSize: 13, marginTop: 5, lineHeight: 1.4, padding: '6px 9px', borderRadius: 9,
+                      background: 'var(--ad-primary-container, #e8eefc)', color: 'var(--ad-text, #1b1b1f)' }}>
+                      <strong>We've got this:</strong> {d.handling}
+                    </div>
+                  )}
+                  {(d.followups || []).map((f, i) => (
+                    <div key={i} style={{ fontSize: 12.5, marginTop: 4, color: 'var(--ad-warn, #b9770a)' }}>↳ mention: {f}</div>
+                  ))}
+                  {d.price_cents != null && (
+                    <div style={{ fontSize: 12, marginTop: 4, opacity: 0.6 }}>{money(d.price_cents)}</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {card.total_price_cents > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+            borderTop: '1px solid var(--ad-line, #eee)', paddingTop: 8, fontSize: 14 }}>
+            <span style={{ opacity: 0.6 }}>If they ask</span>
+            <strong style={{ fontSize: 17 }}>{money(card.total_price_cents)} total</strong>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

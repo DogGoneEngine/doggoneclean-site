@@ -1099,7 +1099,7 @@ trigger so they are not built before they are needed:
   table is RLS-locked with no UI yet; the name is editable by design). Trigger: adding or
   renaming a rig.
 
-## "Right now" card on the Today screen (parked for its own thoughtful build, Paul 2026-06-18)
+## "Right now" card on the Today screen (BUILT v1 2026-06-18, migration 0201; follow-ons below)
 
 Paul wants a single "what I'm working on right now" card pinned ABOVE the list of today's
 stops on the operator Today screen: just the few things he needs in front of him for the stop
@@ -1162,3 +1162,32 @@ Layout intent: Neural Expressive. Gradient/glow header naming the client and the
 hierarchy, one dog per row (photo left; name + breed + appearance bold; standing instructions and
 warning chip below; follow-up as a tinted callout). Auto-surfaces the in-progress stop, falls back
 to the next.
+
+### BUILT v1 (2026-06-18, migration 0201)
+
+Shipped: NowCard at the top of the operator Today screen, fed by `admin_now_card` (the
+in-progress stop, else the next not-yet-wrapped stop today). Two moments: ARRIVING (access_notes
++ onsite_people) then THE DOGS on the appointment (photo from the most recent visit_photo, name,
+breed, the new `dogs.appearance` tell-apart line, standing instructions, the handling note, the
+follow-ups, price), plus a total for the door. Two new dog fields (`dogs.appearance`,
+`dogs.handling`) with setters, editable on the contact sheet (new "How to tell apart" and
+"Handling (we've got this)" rows on the dog card).
+
+Reframes Paul locked while building (2026-06-18):
+- The handling note is NOT a warning. It is the reassuring "we've got this" care note (hold this
+  way, sore hip, give a minute), a reminder for the operator and a signal to the client at the
+  door that their dog is remembered. Rendered as a calm tinted callout, never an alarm.
+- The word "muzzle" never appears: muzzle-needing dogs are not eligible for the service, so it is
+  noise. (Candidate Oracle rule if not already stated: muzzle-required dogs are ineligible.)
+- Price per dog + total IS on the card (for "how much again?" at the door). Payment METHOD is NOT
+  (after-the-fact bookkeeping, not door information).
+- The customer-facing /track tracker stays stages-only; no stamped clock times shown to clients.
+
+v1 limitations / follow-ons (not blocking):
+- The card refetches on Today's reload, not the instant a StopCard step is tapped, so after
+  "All done" it advances to the next stop on the next load rather than immediately. Wire the step
+  flow to refresh the card if the lag annoys.
+- Photo is best-effort: the most recent visit_photo for the dog, any kind. No dedicated "profile
+  photo per dog" pointer yet; pick the clearest face if this matters.
+- `appearance` / `handling` start empty for the whole book; they fill in as Paul adds them
+  (Colleen Smith's two Cavaliers are the first real case). Not invented; real data only.

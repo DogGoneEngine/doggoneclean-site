@@ -3875,3 +3875,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   not override ship-to-completion: routine work still folds into `main` the same turn and deploys.
   Everything ships unless Paul says otherwise beforehand for that specific change. Hardened in
   CLAUDE.md's ship-to-completion rule.
+- **Weekly money number was wrong; fixed at the source** (Paul 2026-06-18, migration 0200). The
+  pager summed `bath_appointments.amount_cents`, which is 0 across the calendar-synced full-groom
+  book (price lives on `dogs.price_cents`), so it showed random near-zero numbers. New
+  `clean_appt_price_cents` is the one definition of an appointment's expected price: its own
+  amount when the booking flow set it, else the sum of the dogs on it. This week $875, next week
+  $2,465 (was $0 / $120). Also added `finished_after_block_pct` ("Ran past the block") to Reports.
+- **Operator "right now" card shipped v1** (Paul 2026-06-18, migration 0201). NowCard at the top
+  of Today: ARRIVING (access + door people) then the dogs on this appointment (photo, name, breed,
+  the new tell-apart line, standing instructions, the handling note, follow-ups, price + total).
+  Reframes locked: the handling note is reassurance ("we've got this"), not a warning; the word
+  "muzzle" is banned as noise (muzzle dogs are ineligible); price yes at the door, payment method
+  no; the customer /track tracker stays stages-only (no clock times to clients). Two new dog
+  fields `appearance` + `handling`, editable on the contact sheet. Full spec and follow-ons in
+  CLEAN_PARKING_LOT.md.

@@ -276,6 +276,14 @@ export async function setDogNote(dogId, text) {
   return rpc('admin_set_dog_note', { p_dog_id: dogId, p_text: text });
 }
 
+export async function setDogAppearance(dogId, text) {
+  return rpc('admin_set_dog_appearance', { p_dog_id: dogId, p_text: text });
+}
+
+export async function setDogHandling(dogId, text) {
+  return rpc('admin_set_dog_handling', { p_dog_id: dogId, p_text: text });
+}
+
 export async function setClientAccess(clientId, text) {
   return rpc('admin_set_client_access', { p_client_id: clientId, p_text: text });
 }
@@ -442,6 +450,13 @@ export async function listBriefings(department = null, status = null) {
 export async function todayAppointments() {
   const data = await rpc('admin_today_appointments');
   return Array.isArray(data) ? data : [];
+}
+
+// The "right now" card payload: the in-progress stop, else the next not-yet-
+// wrapped stop today, with what Paul needs at the door (access, who he'll meet,
+// the dogs on this appointment with their handling notes and price).
+export async function nowCard() {
+  return rpc('admin_now_card');
 }
 
 // Stamp one clock (inbound | arrived | departed) on a stop's time_is_money
