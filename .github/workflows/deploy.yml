@@ -52,12 +52,10 @@ jobs:
           printf '%s\n' "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H 178.128.144.219 >> ~/.ssh/known_hosts 2>/dev/null
-          # The live publish leaves /preview alone (excluded), then the next step
-          # resets /preview to the idle placeholder. Together: shipping never wipes
-          # mid-rsync, and shipping does take the preview down (preview_before_live).
+          # A live deploy leaves /preview completely alone (--exclude). It must NOT
+          # reset the preview: unrelated fixes ship to main all the time while a
+          # change is staged for review, and wiping the staged preview on every
+          # main deploy destroyed it (preview_before_live). The preview goes idle
+          # only when the thing IN it is promoted, which preview.yml handles by
+          # deploying the idle placeholder when nothing is staged beyond main.
           rsync -az --delete --exclude='preview/' -e "ssh -i ~/.ssh/deploy_key" dist/ cleandeploy@178.128.144.219:/srv/doggoneclean/
-          # Shipping takes the preview down: reset /preview to the "nothing staged"
-          # placeholder so Prometheus is clean until the next change is staged on the
-          # preview branch. The staged build only lives there between a preview push
-          # and the promotion to main.
-          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" preview-idle/ cleandeploy@178.128.144.219:/srv/doggoneclean/preview/
