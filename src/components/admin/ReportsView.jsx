@@ -140,6 +140,9 @@ function AdherencePanel({ adh }) {
           <Stat label="Finished in the block" value={`${adh.finished_in_block_pct ?? 0}%`}
             sub={`wrapped before the block ended · ${adh.finished_n ?? 0} stop${(adh.finished_n ?? 0) === 1 ? '' : 's'}`}
             tone={(adh.finished_in_block_pct ?? 0) >= 80 ? 'good' : 'bad'} />
+          <Stat label="Ran past the block" value={`${adh.finished_after_block_pct ?? 0}%`}
+            sub="finished after the block ended"
+            tone={(adh.finished_after_block_pct ?? 0) <= 20 ? 'good' : 'bad'} />
         </div>
       )}
       {(adh.drift_by_stop || []).length > 1 && (
