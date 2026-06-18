@@ -171,6 +171,19 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-18 (Prometheus idle page: the "nothing staged" placeholder is now full-screen art)
+
+Replaced the plain-card `preview-idle/` placeholder (root and `/laelaps`) with a full-screen
+Prometheus page: the bronze statue raising the blue stolen fire (Paul's Gemini render, cut from
+the Drive original, watermark scrubbed, edges faded), a gradient "Nothing is staged right now"
+headline, the same explainer copy, and a gold "Open the live ..." button. Added
+`preview-idle/prometheus.png`. This is the page the idle-aware `preview.yml` publishes to
+`/srv/doggoneclean/preview/` whenever the `preview` branch has nothing beyond main, so it is what
+Paul sees at hurricanebath.com/preview/laelaps when nothing is staged. Pairs with the Mount
+Olympus change the same day: the Prometheus medallion there is now a direct one-tap link to the
+preview (no state-guessing chamber), because the preview host is the single source of truth for
+staged-vs-idle. Audit green.
+
 ### 2026-06-18 (Laelaps dog-notes/client-screen thread: calendar opens on today, Clio audit, tracker wake lock, decisions captured)
 
 Paul brought a bundle of asks against Laelaps. Shipped to main this turn: (1) the Calendar
