@@ -256,7 +256,6 @@ function ClientSheet({ clientId, onChanged }) {
             {(() => { try { return new Date(todayAppt.scheduled_start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ''; } })()}
             {todayAppt.service_type ? ` · ${SERVICE_LABELS[todayAppt.service_type] || todayAppt.service_type}` : ''}
           </div>
-          <div style={{ fontSize: 13, opacity: 0.7, marginTop: 2 }}>Not started yet. Log it below, or tell Clio, when you begin.</div>
         </div>
       )}
 
