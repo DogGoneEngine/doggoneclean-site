@@ -284,9 +284,16 @@ the Clio pass (household-name/alias action, no double-add, reuse a known phone),
 screen, the inside-the-cards visual refresh, and the client status/lifecycle untangle.
 
 Shipping takes the preview down (`preview_before_live`, Paul asked "shouldn't the preview go away
-when shipped?"): the main deploy now resets /preview to an idle "nothing staged" placeholder
-(`preview-idle/`), so Prometheus is clean after a ship until the next change is staged. Verified:
-after the client-screen ship, /preview/laelaps shows the placeholder and live /laelaps still serves.
+when shipped?"): when nothing is staged beyond `main`, Prometheus shows an idle "nothing staged"
+placeholder (`preview-idle/`). The FIRST attempt wired this into the main deploy (reset /preview on
+every push to main) and that was wrong: unrelated fixes ship to main constantly while a change sits
+staged for review, and each one wiped the staged preview ("there's nothing in Prometheus", Paul
+2026-06-18). Corrected: the main deploy now leaves /preview completely alone (`--exclude='preview/'`)
+and `preview.yml` is idle-aware. On a push to the `preview` branch it checks `git rev-list
+origin/main..HEAD`: commits beyond main means something is staged, so it builds and publishes that;
+nothing beyond main (the staged change was promoted, or nothing is staged) means it publishes the
+idle placeholder. So promotion to main is the ONLY thing that clears Prometheus, never an unrelated
+deploy. Verified live: after re-staging, /preview/laelaps serves the staged build again.
 
 Clio pass shipped LIVE (the three gaps Paul found field-testing): (1) household-name/alias action,
 "add X as a household name" now lands in alias_add and the confirm step applies it through the
@@ -304,6 +311,16 @@ roomy editor with finger-sized controls, the destinations as full-width toggle r
 Website, Answer) each with a one-line "what this does", a clear which-dog picker, the flag tools,
 and a Remove button. Every prior capability preserved (optimistic toggles, dog tagging, website
 suggest-only, worth-a-look / owner flags). VisitPhotos.jsx only; staged on the preview branch.
+
+Start the visit from the client record (`start_visit_from_record`, Paul 2026-06-18 field test: on
+Kevin's record the today's-appointment card "just says there's an appointment today at 1:00, it
+doesn't have any place for me to add photos or do anything"). The cause: photos hang off a STARTED
+visit, and a visit row was only created by tapping "I'm here" on the Today sheet (the arrival stamp,
+`admin_arrived` -> `admin_stamp_appointment_time`, creates it). From inside the record there was no
+path to begin, so the appointment card was read-only. Fix: a "Start the visit · add photos" button
+on that card calls the same `admin_arrived` path; once the visit exists the working "Today's visit"
+card with the photo grid and notes takes over. One visit-creation path reachable from both surfaces,
+no duplicate. ClientsView.jsx only; staged in Prometheus and verified live there.
 
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
