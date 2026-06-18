@@ -2877,18 +2877,19 @@ picker and per-operator availability are the build (parked); the data spine (ope
 appointment) already exists. Decided 2026-06-16.
 
 `dog_handling_toggles` (Clean: clients):
-Each dog carries door-handling guidance for the moment Paul reaches the door: carried or leashed,
-bolt/escape risk, keep away from other animals, OK to turn loose after. Crucially each concern
-carries a LEVEL, because most handling is "how I usually do it" (a preference) and only some of it
-is a firm rule: every concern is OFF, "usual", or "always". Stored as `dogs.door_handling` jsonb
-(a map of known concern key -> 'usual'|'always'; the validating gate is `admin_set_dog_door_handling`,
-replacing the first-pass flat `handling_flags`). The free-text `dogs.handling` note stays for nuance.
-On the must-knows banner the "always" rules show loud (amber, an ALWAYS badge) and the "usual" ones
-read soft; the dog card edits each concern with a No / Usually / Always control. Clio learns to set
-it by voice. Because the difference between "usually carry him" and "ALWAYS keep him from other dogs"
-(Kacey, Kevin Cummings) is the whole point of surfacing handling at the door, and flat on/off toggles
-wrongly read every preference as a hard rule. The usual/always model + keep-away concern landed
-2026-06-18; full UI pending Paul's review. Decided 2026-06-18, revised same day.
+Each dog carries door-handling guidance for the moment Paul reaches the door, in two plain parts:
+(1) HOW he takes the dog, one pick, Carry or Leash (this answers the real question, do I bring a
+leash to the door), and (2) a few on/off facts: escape risk and keep-apart-from-other-animals
+(loud red warnings) and can-be-let-loose-after (a calm yes). Stored as `dogs.door_handling` jsonb
+({transport:'carry'|'leash', escape:true, keep_separate:true, loose_ok:true}; validating gate
+`admin_set_dog_door_handling`). The free-text `dogs.handling` note stays for nuance. On the
+must-knows banner the warnings show loud and the rest read calm. Because these are FACTS, not
+preferences with a gradient: Paul ran the scenarios and found "usually a bolt risk" is nonsense, a
+dog either bolts or it does not. (History: a 2026-06-18 first pass used a No/Usually/Always level on
+every concern, plus a redundant "leash before the door"; Paul cut both, the level fit none of them
+and "leash" duplicated escape control. Migrations 0208 flat flags, 0209 usual/always, 0210 the
+simplified shape.) Clio learns to set it by voice. Full UI pending Paul's review. Decided
+2026-06-18, simplified same day.
 
 `client_sheet_surfaces_the_must_knows` (Clean: clients):
 On the client sheet the things Paul needs mid-appointment ride at the TOP and are heavily

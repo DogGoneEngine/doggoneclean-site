@@ -22,6 +22,28 @@ const SERVICE_LABELS = {
   nails_only: 'Nails only',
 };
 
+// Client type, the two real situations: Recurring (on a cadence) or On-demand
+// (they reach out when they want). The raw `status`/`roster_group` columns
+// currently conflate type with lifecycle (active, moved away, deceased, merged)
+// and even banned, which is why the sheet showed "one off one off". Until that is
+// untangled in the data, map the known values to one clean human label here.
+const CLIENT_TYPE = {
+  standing: 'Recurring', active: 'Recurring',
+  one_off: 'On-demand', one_off_for_now: 'On-demand', at_will: 'On-demand', at_will_winddown: 'On-demand',
+};
+const CLIENT_STATE = {
+  moved_away: 'Moved away', deceased: 'Deceased', inactive: 'Inactive',
+  merged: 'Merged', test_account: 'Test', banned: 'Banned',
+};
+// One clean label: the type if we can tell, plus a lifecycle note when it is not
+// a plain current client. De-duplicated, never the raw enum twice.
+function clientTag(c) {
+  const s = c.status, r = c.roster_group;
+  const type = CLIENT_TYPE[s] || CLIENT_TYPE[r] || null;
+  const state = CLIENT_STATE[s] || (CLIENT_STATE[r] && CLIENT_STATE[r] !== type ? CLIENT_STATE[r] : null);
+  return [type, state].filter(Boolean).join(' · ') || (s || '').replace(/_/g, ' ');
+}
+
 function money(cents) {
   if (cents === null || cents === undefined) return '';
   return '$' + (cents / 100).toFixed(2).replace(/\.00$/, '');
@@ -231,7 +253,7 @@ function ClientSheet({ clientId, onChanged }) {
         ]} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, paddingRight: 24 }}>
           <h2 style={{ margin: 0 }}>{c.name}{c.aka ? <span className="ad-mono" style={{ marginLeft: 8, opacity: 0.6, fontSize: 14 }}>{c.aka}</span> : null}</h2>
-          <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{c.roster_group} · {c.status}</span>
+          <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{clientTag(c)}</span>
         </div>
         {c.nofly_level && <StatusBadge level={c.nofly_level} reason={c.nofly_reason} />}
         <AliasManager clientId={clientId} onChanged={onChanged} />
@@ -1007,60 +1029,65 @@ function ageFromBirthDate(dateStr, approximate) {
 // matters: most handling is a preference, but some of it (a dog that fights other
 // dogs) is a hard rule that has to jump out. Labels read plainly so a new operator
 // understands every one without being told.
-const DOOR_CONCERNS = [
-  { key: 'carry',         label: 'Carry in and out' },
-  { key: 'leash',         label: 'Leash before the door opens' },
-  { key: 'flight_risk',   label: 'Bolts / escape risk' },
-  { key: 'keep_separate', label: 'Keep away from other animals' },
-  { key: 'release_ok',    label: 'OK to turn loose after' },
+// Door handling, simplified (dog_handling_toggles). Two parts: how the dog gets
+// to the trailer (carry or leash, one pick), and a few plain warnings. No
+// usual/always gradient, because these are facts, not preferences.
+const TRANSPORT_LABEL = { carry: 'Carry in and out', leash: 'Walk on a leash' };
+const DOOR_FLAGS = [
+  { key: 'escape',        label: 'Escape risk',                  warn: true },
+  { key: 'keep_separate', label: 'Keep apart from other animals', warn: true },
+  { key: 'loose_ok',      label: 'Can be let loose after',        warn: false },
 ];
-const concernLabel = (key) => DOOR_CONCERNS.find((c) => c.key === key)?.label || key;
+const WARN_LABEL = { escape: 'Escape risk, keep control at the door', keep_separate: 'Keep away from other animals' };
 
-function SegBtn({ label, on, tone, onClick, disabled, first }) {
-  const bg = !on ? 'transparent'
-    : tone === 'always' ? 'var(--ad-warn,#b9770a)'
-    : tone === 'usual' ? 'var(--ad-primary,#2563d8)'
-    : 'var(--ad-text-dim,#565b6c)';
+function PickBtn({ label, on, onClick, disabled, first }) {
   return (
     <button type="button" onClick={onClick} disabled={disabled}
-      style={{ fontSize: 12, padding: '4px 11px', border: 'none', cursor: 'pointer',
+      style={{ fontSize: 12, padding: '5px 14px', border: 'none', cursor: 'pointer',
         borderLeft: first ? 'none' : '1px solid var(--ad-outline,#ececf1)',
-        background: bg, color: on ? '#fff' : 'var(--ad-text,#1c1d22)', fontWeight: on ? 600 : 400 }}>
+        background: on ? 'var(--ad-primary,#2563d8)' : 'transparent',
+        color: on ? '#fff' : 'var(--ad-text,#1c1d22)', fontWeight: on ? 600 : 400 }}>
       {label}
     </button>
   );
 }
 
-// The dog-card editor: one row per concern, each a No / Usually / Always choice.
-// Optimistic, saves on tap, reverts on failure.
+// The dog-card editor: a Carry/Leash pick (which answers "bring a leash to the
+// door?") and on/off warning chips. Optimistic, saves on tap, reverts on failure.
 function DoorHandling({ dog, onChanged }) {
-  const [map, setMap] = useState(dog.door_handling || {});
+  const [dh, setDh] = useState(dog.door_handling || {});
   const [saving, setSaving] = useState(false);
-  useEffect(() => { setMap(dog.door_handling || {}); }, [dog.door_handling]);
-  const setLevel = async (key, level) => {
-    const next = { ...map };
-    if (level === null) delete next[key]; else next[key] = level;
-    setMap(next); setSaving(true);
+  useEffect(() => { setDh(dog.door_handling || {}); }, [dog.door_handling]);
+  const save = async (next) => {
+    setDh(next); setSaving(true);
     try { await setDogDoorHandling(dog.id, next); onChanged?.(); }
-    catch { setMap(dog.door_handling || {}); }
+    catch { setDh(dog.door_handling || {}); }
     finally { setSaving(false); }
   };
+  const setTransport = (t) => { const n = { ...dh }; if (n.transport === t) delete n.transport; else n.transport = t; save(n); };
+  const toggle = (k) => { const n = { ...dh }; if (n[k]) delete n[k]; else n[k] = true; save(n); };
   return (
     <div style={{ margin: '2px 0 6px' }}>
-      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 2 }}>At the door</div>
-      <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 8 }}>Usually is how you normally do it. Always is a firm rule, and it shows up top in amber.</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {DOOR_CONCERNS.map((c) => {
-          const cur = map[c.key] || null;
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 6 }}>At the door</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+        <span style={{ fontSize: 13 }}>How I take this dog</span>
+        <div style={{ display: 'inline-flex', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--ad-outline,#d8d8de)' }}>
+          <PickBtn label="Carry" first on={dh.transport === 'carry'} onClick={() => setTransport('carry')} disabled={saving} />
+          <PickBtn label="Leash" on={dh.transport === 'leash'} onClick={() => setTransport('leash')} disabled={saving} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {DOOR_FLAGS.map((c) => {
+          const on = !!dh[c.key];
+          const onColor = c.warn ? 'var(--ad-bad,#dc2626)' : 'var(--ad-good,#1f8a4b)';
           return (
-            <div key={c.key} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 13, flex: 1, minWidth: 150 }}>{c.label}</span>
-              <div style={{ display: 'inline-flex', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--ad-outline,#d8d8de)' }}>
-                <SegBtn label="No" first on={cur === null} tone="off" onClick={() => setLevel(c.key, null)} disabled={saving} />
-                <SegBtn label="Usually" on={cur === 'usual'} tone="usual" onClick={() => setLevel(c.key, 'usual')} disabled={saving} />
-                <SegBtn label="Always" on={cur === 'always'} tone="always" onClick={() => setLevel(c.key, 'always')} disabled={saving} />
-              </div>
-            </div>
+            <button key={c.key} type="button" onClick={() => toggle(c.key)} disabled={saving}
+              style={{ fontSize: 12, padding: '5px 11px', borderRadius: 999, cursor: 'pointer',
+                border: on ? `1px solid ${onColor}` : '1px solid var(--ad-outline,#d8d8de)',
+                background: on ? onColor : 'transparent',
+                color: on ? '#fff' : 'var(--ad-text,#1c1d22)', fontWeight: on ? 600 : 400 }}>
+              {c.label}
+            </button>
           );
         })}
       </div>
@@ -1068,26 +1095,25 @@ function DoorHandling({ dog, onChanged }) {
   );
 }
 
-// Split a dog's door_handling map into the firm rules and the preferences.
-function splitHandling(dog) {
+// Pull the loud warnings and the calm facts out of a dog's door handling.
+function doorBits(dog) {
   const dh = dog.door_handling || {};
-  const keys = Object.keys(dh);
-  return {
-    always: keys.filter((k) => dh[k] === 'always'),
-    usual: keys.filter((k) => dh[k] === 'usual'),
-  };
+  const warns = ['escape', 'keep_separate'].filter((k) => dh[k]);
+  const calm = [];
+  if (dh.transport) calm.push(TRANSPORT_LABEL[dh.transport]);
+  if (dh.loose_ok) calm.push('OK to let loose after');
+  return { warns, calm };
 }
 
 // The must-knows banner that rides at the very top of the sheet
 // (client_sheet_surfaces_the_must_knows): the special request for this visit and,
-// per active dog, the firm "always" door rules (loud), the standing instructions
-// (blades and tools), then the softer "usually" handling. What Paul needs in one
-// glance mid-appointment, never scrolled to. Renders nothing when there is nothing.
+// per active dog, the loud door warnings (red), the standing instructions (blades
+// and tools), then the calm door facts. What Paul needs in one glance, no scroll.
 function MustKnows({ dogs, todayVisits }) {
   const active = (dogs || []).filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status));
   const requests = (todayVisits || []).map((v) => v.special_request).filter(Boolean);
-  const rows = active.map((d) => ({ d, ...splitHandling(d) }))
-    .filter((r) => r.d.standing_instructions || r.always.length || r.usual.length || r.d.handling);
+  const rows = active.map((d) => ({ d, ...doorBits(d) }))
+    .filter((r) => r.d.standing_instructions || r.warns.length || r.calm.length || r.d.handling);
   if (requests.length === 0 && rows.length === 0) return null;
   return (
     <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-warn,#b9770a)', background: 'var(--ad-warn-bg,#fff8ec)' }}>
@@ -1099,19 +1125,17 @@ function MustKnows({ dogs, todayVisits }) {
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {rows.map(({ d, always, usual }) => (
+        {rows.map(({ d, warns, calm }) => (
           <div key={d.id}>
             <div style={{ fontSize: 13, fontWeight: 700 }}>{d.name}</div>
-            {always.map((k) => (
+            {warns.map((k) => (
               <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.4, padding: '1px 6px', borderRadius: 4, background: 'var(--ad-warn,#b9770a)', color: '#fff' }}>ALWAYS</span>
-                <span style={{ fontSize: 14, fontWeight: 600 }}>{concernLabel(k)}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.4, padding: '1px 6px', borderRadius: 4, background: 'var(--ad-bad,#dc2626)', color: '#fff' }}>HEADS UP</span>
+                <span style={{ fontSize: 14, fontWeight: 600 }}>{WARN_LABEL[k]}</span>
               </div>
             ))}
             {d.standing_instructions && <div style={{ fontSize: 14, lineHeight: 1.4, marginTop: 3 }}>{d.standing_instructions}</div>}
-            {usual.length > 0 && (
-              <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>Usually: {usual.map((k) => concernLabel(k).toLowerCase()).join(', ')}</div>
-            )}
+            {calm.length > 0 && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>{calm.join(' · ')}</div>}
             {d.handling && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>{d.handling}</div>}
           </div>
         ))}

@@ -232,6 +232,31 @@ Second pass after Paul saw the preview (still on the branch, for his review):
   new operator or Paul-in-four-years without being told how it works, because the prime directive
   is a business that runs without Paul.
 
+Third pass (Paul tried it in Prometheus, the preview):
+- Preview is council-tier, renamed Proteus -> Prometheus in Mount Olympus. Paul corrected the
+  naming tier: previewing is invoked from Mount Olympus across every project, so it is a council
+  capability, not a per-realm lesser technique. I had applied his own rule backwards. Prometheus
+  (forethought) is the council name; recorded in NAMING_COSMOLOGY's council section, gold-lit door.
+- Door handling simplified again (`dog_handling_toggles`): the No/Usually/Always level fit none of
+  the concerns (a dog either bolts or it does not), and "leash before the door" duplicated escape
+  control. New shape: one Carry/Leash pick (answers "bring a leash to the door?") plus on/off
+  warnings (escape, keep-apart) and a calm "can be let loose after". Migration 0210. The word
+  "Always" is gone with the levels.
+- Client categories: Paul has exactly two, Recurring and On-demand. Found the real problem: the
+  `status`/`roster_group` columns conflate client TYPE with lifecycle (active, moved away,
+  deceased, merged) and even banned, which is why Colleen showed "one off one off". Did the safe
+  visible fix now (one clean humanized `clientTag`, Recurring/On-demand, de-duplicated); the deeper
+  data separation (type vs lifecycle vs the already-separate nofly ban) is a careful migration to
+  plan with Paul, not a blind one (server booking/winback read these). Banned is already its own
+  `nofly_level` flag, so the banned list at the top of the sheet is untouched.
+- Clio confirm screen shipped LIVE (`clio_confirm_shows_fields`, Paul: ship it and I will field
+  test): the one-tap confirm now shows the exact fields and values she will write, not a prose
+  summary of what Paul said (the rambly "$105 each... wait" summary is gone from the display).
+- Queued, surfaced for next rounds: photos screen redesign (junk drawer, zoom-to-tap), the
+  inside-the-cards visual refresh (2017 -> late 2020s), must-knows banner placement (above vs
+  inside the current-appointment card, still Paul's call), special-request-before-arrival (a small
+  server tweak), and the deeper client status/lifecycle data separation.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a
