@@ -253,6 +253,30 @@ Gates: Twilio (the sends), Stripe (online tips).
    cannot copy (`dig_the_moat`). Spec to be shaped with Paul before build; recommendation drafted
    in the 2026-06-13 thread.
 
+## Tracker live-location off-screen: needs a native app (parked 2026-06-18)
+
+What it would take for the Dog Gone Tracker to keep updating the client's live position when
+Paul is NOT looking at it on his own phone. Today the operator share uses `watchPosition`
+running in the page's JavaScript (`startLocationShare` in TodayView.jsx). Android Chrome only
+delivers GPS fixes while that tab is alive and foreground, so the moment Paul switches apps,
+locks the phone, or navigates away, the pushes stop and the client's tracker freezes on the
+last fix (it shows the fix's age, so it never lies, but it goes stale). This is a hard browser
+limit, not a bug we can patch: a backgrounded web tab cannot reliably send GPS on Android.
+
+The only robust fix is to ship the operator app as an INSTALLED Android app (a Trusted Web
+Activity or a Capacitor wrapper) with a foreground location service, the
+ACCESS_BACKGROUND_LOCATION permission, and a persistent "sharing your location" notification.
+That is real native scope: Play Store presence, a permission prompt, an always-on notification
+while sharing, and ongoing native maintenance. Paul's call 2026-06-18: KNOWN, not now. Note it
+so the requirement is on the record; do not build it yet.
+
+Done in the meantime (2026-06-18, `tracker_wake_lock`): a Screen Wake Lock holds the phone
+screen awake while a stop is actively sharing, so the tab stays foreground and fixes keep
+flowing while Paul is looking at Laelaps. It releases the instant the share stops and only
+holds while Laelaps is the visible tab (Android drops it on app-switch / screen-off), so it is
+the cheap 80%, not the off-screen fix. Revisit the native app only if multiple operators are
+driving and clients actually complain about staleness.
+
 ## Access map: data-level Preview as (parked 2026-06-13)
 
 The Access page's "Preview as" shows another role's MENU live, and lists what is masked inside on

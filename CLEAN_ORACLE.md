@@ -2863,3 +2863,38 @@ one-off clients) picks the operator the same way. Because both are real demand, 
 my-groomer, and forcing one model loses the other half (Paul, 2026-06-16). The booking-surface
 picker and per-operator availability are the build (parked); the data spine (operator on the
 appointment) already exists. Decided 2026-06-16.
+
+`dog_handling_toggles` (Clean: clients):
+Each dog carries handling guidance for the moment at the door: how to hold the dog, whether it is
+carried or walked on a leash, whether it is an escape or runaway (flight) risk, and whether it can
+be turned loose after. The free-text `dogs.handling` field exists (2026-06-18, "we've got this", a
+care note not a warning); the firm safety facts get structured quick-pick TOGGLES on the dog card
+backed by a real column, and Clio learns to set them by voice. Because these are safety facts you
+want consistent and scannable at the door, not buried in a sentence or lost because they were only
+ever spoken. Toggle build pending Paul's review of the client screen. Decided 2026-06-18.
+
+`client_sheet_surfaces_the_must_knows` (Clean: clients):
+On the client sheet the things Paul needs mid-appointment ride at the TOP and are heavily
+highlighted, not scrolled to: the dogs' standing instructions (which blades and tools, how short)
+and any per-appointment special instruction for this visit. Everything else (contact facts,
+access, history, ban controls) sits below and may collapse. Because in the middle of grooming he
+needs the how-to-cut answer in one glance, and a screen that buries it behind a dozen equal panels
+fails the one job it has on site. The standing-instruction and special-request data already exist;
+the surfacing-at-top build is pending Paul's review. Decided 2026-06-18.
+
+`client_screen_reviewed_before_live` (Clean: process):
+Changes to the client screen develop on the working branch and are NOT merged to main (the live
+site) until Paul has seen them, because the screen is taste-heavy and he has said there will be
+edits every time. This is a standing per-surface hold that overrides the default ship-to-completion
+for the client screen ONLY; other surfaces still ship to completion. Because shipping a client-sheet
+redesign Paul has not laid eyes on guarantees a live site that does not match how he works on a
+stop. Decided 2026-06-18.
+
+`clio_confirm_shows_fields` (Clean: clients):
+The Clio (Riker) one-tap confirm shows the exact target FIELDS and the values she will write into
+each, not a prose summary of what Paul said. He confirms field-by-field ("standing instruction ->
+both dogs: #7 blade on feet and hocks"), so a wrong drawer (a standing instruction landing as a
+household note, a stray "male" in a notes blob) is obvious before he taps, not discovered weeks
+later in the record. Because the confirm step is the only safety net on an LLM parse, and a summary
+of the utterance cannot catch a mis-routed or invented field the way showing the actual write does.
+Build pending Paul's review. Decided 2026-06-18.

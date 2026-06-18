@@ -171,6 +171,43 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-18 (Laelaps dog-notes/client-screen thread: calendar opens on today, Clio audit, tracker wake lock, decisions captured)
+
+Paul brought a bundle of asks against Laelaps. Shipped to main this turn: (1) the Calendar
+floor now opens on today instead of a week in the past (the window loads 7 days of history for
+context, which was landing the view in last week); the first day on or after today pins to the
+top on load. (2) `tracker_wake_lock`: a Screen Wake Lock holds the phone screen awake while a
+stop is actively sharing location, so Chrome keeps Laelaps foreground and the live fixes keep
+flowing while Paul is looking at it. It releases when the share stops and only holds while
+Laelaps is the visible tab. The off-screen "never stops" fix needs a native Android app with a
+foreground location service, parked in CLEAN_PARKING_LOT.md per Paul (KNOWN, not now).
+
+Clio audit (Paul: "things go into the void and things get made up"). Confirmed from `riker_log`
+and Colleen Smith's record: (a) "void" was the actual word, mis-transcribed by voice input as
+"Boyd"; there is no Boyd anywhere. (b) The "made up male": Autumn Rose's free-text notes read
+"brown; male" though none of today's three recordings mention sex; it was written when the dog
+was first created, not today. Corrected in place (now "brown"); both dogs are female. (c) A real
+wrong-drawer: Paul said "add to standing instructions: #7 blade on feet and hocks" and Clio filed
+it as a household client_note, not onto the dogs' `standing_instructions` (both dogs, same
+instruction). (d) The confirm summary showed the model thinking out loud ("$105 each... wait...").
+
+Decisions locked this turn (builds pending Paul's review, NOT yet on the client screen):
+- Dog handling: the `handling` text field (added 2026-06-18, "we've got this", how to hold the
+  dog at the door) gets structured quick-pick TOGGLES. Paul confirmed the set should cover
+  carried vs leashed, escape/runaway (flight) risk, and OK-to-release-after. Because these are
+  safety facts you want consistent and scannable, not buried in prose. Recorded as
+  `dog_handling_toggles`.
+- Client screen makeover: Paul must SEE it before it ships to the live site (there will be
+  edits), so client-screen work develops on the branch and does not merge to main until he okays
+  it. His non-negotiable big ones: standing instructions (which blades/tools) must be at the TOP
+  of the screen and heavily highlighted; a per-appointment special instruction must ALSO be at
+  the top and heavily highlighted. Recorded as `client_sheet_surfaces_the_must_knows` +
+  `client_screen_reviewed_before_live`.
+- Clio confirm screen: instead of a prose summary of what Paul said, show the exact FIELDS and
+  the values she will write into each, so a wrong drawer is obvious before the one-tap Confirm.
+  Paul: "that is perfect." Recorded as `clio_confirm_shows_fields`. Teach Clio to write the
+  handling field too.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a

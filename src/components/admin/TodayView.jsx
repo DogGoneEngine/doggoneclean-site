@@ -37,6 +37,7 @@ function startLocationShare(apptId) {
     () => {},
     { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 },
   );
+  requestWakeLock();
 }
 function stopLocationShare() {
   if (locShare.watchId != null && navigator.geolocation) {
@@ -45,6 +46,35 @@ function stopLocationShare() {
   locShare.apptId = null;
   locShare.watchId = null;
   locShare.lastPush = 0;
+  releaseWakeLock();
+}
+
+// Screen Wake Lock: while a stop is actively sharing location (you are driving
+// it), hold the phone screen awake so Chrome keeps this tab in the foreground
+// and the live fixes keep flowing. It is released the instant the share stops.
+// Honest limit (same as the tracker itself): the lock only holds while Laelaps
+// is the visible tab. Android drops it the moment you switch apps or the screen
+// goes off, so it cannot keep the tracker alive off-screen. Truly surviving a
+// backgrounded tab needs a native app, parked in CLEAN_PARKING_LOT.md.
+const wake = { sentinel: null };
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator && !wake.sentinel) {
+      wake.sentinel = await navigator.wakeLock.request('screen');
+      wake.sentinel.addEventListener('release', () => { wake.sentinel = null; });
+    }
+  } catch { /* a denied wake lock never blocks the share */ }
+}
+function releaseWakeLock() {
+  try { wake.sentinel?.release(); } catch { /* ignore */ }
+  wake.sentinel = null;
+}
+// The OS auto-releases the lock when the tab hides; re-take it when Paul comes
+// back to Laelaps if a stop is still sharing, so a glance away does not end it.
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && locShare.apptId != null) requestWakeLock();
+  });
 }
 
 const SEV = {
