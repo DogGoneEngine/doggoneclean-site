@@ -777,6 +777,12 @@ export async function scheduleAdherence(days = 90) {
   return rpc('admin_schedule_adherence', { p_days: days });
 }
 
+// Weekly money pager: a band of Monday-to-Saturday weeks centred on this week.
+// Future/current weeks show the booked plan, past weeks show what was collected.
+export async function weeklyMoney(back = 12, fwd = 12) {
+  return rpc('admin_weekly_money', { p_back: back, p_fwd: fwd });
+}
+
 // Recurring costs (subscriptions / tech-stack burn) --------------------------
 
 export async function listRecurringCosts() {

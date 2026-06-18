@@ -1098,3 +1098,36 @@ trigger so they are not built before they are needed:
 - **Admin rig management.** An RPC + small admin surface to add/rename/retire rigs (the `rigs`
   table is RLS-locked with no UI yet; the name is editable by design). Trigger: adding or
   renaming a rig.
+
+## "Right now" card on the Today screen (parked for its own thoughtful build, Paul 2026-06-18)
+
+Paul wants a single "what I'm working on right now" card pinned ABOVE the list of today's
+stops on the operator Today screen: just the few things he needs in front of him for the stop
+he is actively on, with everything historical one tap away on the contact sheet. He named the
+contents he is sure about so far:
+
+- **Dog photos + names, only the dogs in THIS appointment.** Solves the real-world
+  embarrassment of a client bringing out two dogs and not remembering which is which. Must
+  respect per-appointment dog assignment, not the whole roster.
+- **Standing instructions** for those dogs, surfaced (not buried on the sheet).
+- **Door / who you'll meet** when you arrive: the names of the people he might see at the door.
+
+This is deliberately NOT being swept into a batch with other work. Paul's call (2026-06-18):
+"this is going to be a big thing... really needs to be thought about. what do I need in front
+of me right now. we need to gather more information and not rush into building this." So it gets
+its own design pass first.
+
+All the data already exists, so this is surfacing, not new capture:
+- dog profile photos (migration 0179) and the client-visible photo plumbing,
+- per-appointment `bath_appointments.dog_ids` (0153) to show only the assigned dogs,
+- `dogs.standing_instructions` (0081/0082/0089),
+- `clients.onsite_people` / door notes (0084) and `client_access_notes` (0083).
+
+Open questions to settle WITH Paul before building:
+- Trigger: auto-surface the in-progress stop (the one tapped On-my-way / I'm here), fall back
+  to the next stop, or only show after he taps into a stop? (leaning auto, but undecided)
+- Exactly what makes the cut for "what I need in front of me right now" vs one tap away. Resist
+  putting everything on it; the value is that it is short.
+- How it coexists with the existing StopCard flow (the right-now card is a focused view of the
+  active StopCard, not a second source of truth).
+- Access/parking/gate notes at arrival: in or out?

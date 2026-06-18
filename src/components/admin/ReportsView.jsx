@@ -132,6 +132,16 @@ function AdherencePanel({ adh }) {
         <Stat label="Over 30 min behind" value={`${adh.late_30_pct ?? 0}%`} sub={`worst tenth: ${fmtDelta(adh.p90_delta_min)}`}
           tone={(adh.late_30_pct ?? 0) <= 10 ? 'good' : 'bad'} />
       </div>
+      {adh.block_n > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <Stat label="Started in the block" value={`${adh.started_in_block_pct ?? 0}%`}
+            sub={`arrived before the block ended · ${adh.block_n} stop${adh.block_n === 1 ? '' : 's'}`}
+            tone={(adh.started_in_block_pct ?? 0) >= 80 ? 'good' : 'bad'} />
+          <Stat label="Finished in the block" value={`${adh.finished_in_block_pct ?? 0}%`}
+            sub={`wrapped before the block ended · ${adh.finished_n ?? 0} stop${(adh.finished_n ?? 0) === 1 ? '' : 's'}`}
+            tone={(adh.finished_in_block_pct ?? 0) >= 80 ? 'good' : 'bad'} />
+        </div>
+      )}
       {(adh.drift_by_stop || []).length > 1 && (
         <div style={{ fontSize: 12, marginBottom: 10 }}>
           <span style={{ opacity: 0.6 }}>Drift across the day: </span>

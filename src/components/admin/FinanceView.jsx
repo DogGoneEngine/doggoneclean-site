@@ -6,7 +6,7 @@
 // the clients carrying the most weight.
 
 import { useCallback, useEffect, useState } from 'react';
-import { financeSummary, businessValue } from './supabase.js';
+import { financeSummary, businessValue, weeklyMoney } from './supabase.js';
 import RecurringCosts from './RecurringCosts.jsx';
 import BankImport from './BankImport.jsx';
 import ExpensesLedger from './ExpensesLedger.jsx';
@@ -38,6 +38,8 @@ export default function FinanceView() {
       <h1>Finance</h1>
       <p className="ad-sub">The money, from the books. Revenue per hour is the number you run on.</p>
 
+      <WeeklyMoneyPager />
+
       <ValuePanel />
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -64,6 +66,82 @@ export default function FinanceView() {
       <p className="ad-sub" style={{ marginTop: 0 }}>The recurring ones to watch, with the day of the month each hits.</p>
       <RecurringCosts />
     </>
+  );
+}
+
+// Weekly money pager (Paul, 2026-06-18): "how much will I make this week, next
+// week, the week after; how much last week, the week before." A week runs Monday
+// through the end of Saturday (Eastern). Current and future weeks show the booked
+// plan; past weeks show what was actually collected. Pages with no refetch: the
+// RPC returns a band of weeks and the arrows just move the cursor.
+function fmtDayLabel(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+function weekTitle(offset) {
+  if (offset === 0) return 'This week';
+  if (offset === 1) return 'Next week';
+  if (offset === -1) return 'Last week';
+  if (offset > 1) return `In ${offset} weeks`;
+  return `${-offset} weeks ago`;
+}
+function WeeklyMoneyPager() {
+  const [weeks, setWeeks] = useState(null);
+  const [idx, setIdx] = useState(0);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    weeklyMoney().then((res) => {
+      if (!alive) return;
+      const w = (res && res.weeks) || [];
+      setWeeks(w);
+      const here = w.findIndex((x) => x.wk_offset === 0);
+      setIdx(here >= 0 ? here : 0);
+    }).catch((e) => alive && setError(e.message || 'load_failed'));
+    return () => { alive = false; };
+  }, []);
+
+  if (error) return null; // the rest of Finance still loads; no need to shout
+  const week = weeks && weeks[idx];
+
+  return (
+    <div className="ad-panel" style={{ marginBottom: 16 }}>
+      <Cap>Money by week · Monday to Saturday</Cap>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" aria-label="earlier week"
+          disabled={!weeks || idx <= 0} onClick={() => setIdx((i) => Math.max(0, i - 1))}>◀</button>
+        <div style={{ flex: 1, textAlign: 'center' }}>
+          {!weeks ? (
+            <div style={{ opacity: 0.6, fontSize: 14 }}>Adding up the week…</div>
+          ) : !week ? (
+            <div style={{ opacity: 0.6, fontSize: 14 }}>No data for this week.</div>
+          ) : (
+            <>
+              <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>
+                {weekTitle(week.wk_offset)}
+              </div>
+              <div style={{ fontSize: 30, fontWeight: 700, margin: '2px 0', lineHeight: 1.1 }}>
+                {money(week.amount_cents)}
+              </div>
+              <div style={{ fontSize: 12.5, color: 'var(--ad-text-dim, #565b6c)' }}>
+                {fmtDayLabel(week.week_start)} to {fmtDayLabel(week.week_sat)} ·{' '}
+                {week.basis === 'collected' ? 'collected' : 'booked so far'} ·{' '}
+                {week.stops} {week.stops === 1 ? 'stop' : 'stops'}
+              </div>
+              {week.basis === 'booked' && week.tentative_cents > 0 && (
+                <div style={{ fontSize: 12, opacity: 0.65, marginTop: 2 }}>
+                  + {money(week.tentative_cents)} pencilled in
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        <button className="ad-btn ad-btn--ghost ad-btn--sm" aria-label="later week"
+          disabled={!weeks || idx >= weeks.length - 1} onClick={() => setIdx((i) => Math.min((weeks.length - 1), i + 1))}>▶</button>
+      </div>
+    </div>
   );
 }
 
