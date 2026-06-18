@@ -52,4 +52,6 @@ jobs:
           printf '%s\n' "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H 178.128.144.219 >> ~/.ssh/known_hosts 2>/dev/null
-          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" dist/ cleandeploy@178.128.144.219:/srv/doggoneclean/
+          # Exclude preview/: the review preview lives in that subfolder and must
+          # survive a production deploy (preview_before_live).
+          rsync -az --delete --exclude='preview/' -e "ssh -i ~/.ssh/deploy_key" dist/ cleandeploy@178.128.144.219:/srv/doggoneclean/
