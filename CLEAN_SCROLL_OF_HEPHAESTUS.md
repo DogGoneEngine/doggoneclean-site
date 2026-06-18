@@ -208,6 +208,22 @@ Decisions locked this turn (builds pending Paul's review, NOT yet on the client 
   Paul: "that is perfect." Recorded as `clio_confirm_shows_fields`. Teach Clio to write the
   handling field too.
 
+Preview-before-live channel rebuilt and made live (`preview_before_live`). Paul asked how he can
+actually SEE a change before it goes live without reading GitHub; his instinct was to ship it to
+his private Mount Olympus site. Corrected the hosting (Mount Olympus is a no-build static site and
+Laelaps is a built app bolted to Clean's login/DB; hosting it there would entangle Clean and break
+auth) but kept his doorway idea: the preview lives on Clean's OWN host under /preview, and Mount
+Olympus gets the tap-link. Picked the subpath over a preview.hurricanebath.com subdomain because
+it needs zero one-time setup (no DNS, no Caddy change). Mechanism: push to the `preview` branch ->
+`preview.yml` builds with PREVIEW=1 (Astro base /preview, audit-gated) -> rsync to
+/srv/doggoneclean/preview; production `deploy.yml` now rsyncs with `--exclude='preview/'` so a main
+deploy never wipes or leaks it; admin login redirect made base-aware; the inert subdomain
+preview.yml from a prior session replaced. Verified live end to end: hurricanebath.com/preview/laelaps
+returns 200, its island loads from /preview/_astro, production /laelaps is untouched. The current
+client-screen first pass (must-knows banner + handling toggles) is published there for Paul's
+review; Mount Olympus link "Laelaps PREVIEW (not live yet)" points at it. Promotion to live is a
+normal merge of the branch to main.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a
