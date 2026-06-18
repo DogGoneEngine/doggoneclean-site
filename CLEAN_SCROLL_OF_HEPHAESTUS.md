@@ -328,6 +328,22 @@ lands on the same single visit (admin_stamp reuses it), so there is never a dupl
 load() + supabase.js `ensureVisit` + migration 0211; insert logic verified against Kevin's live
 1:00 appointment (bare visit, arrived_at null) and rolled back.
 
+Which dogs are on the appointment, editable after booking (`appointment_dogs_editable`, Paul
+2026-06-18: "not all of the dogs at Kevin's are going to be groomed in this appointment"; Kevin has
+seven dogs). Booking already recorded `bath_appointments.dog_ids` and priced by the dogs going
+(`price_by_dogs_going`, 0181), but there was no way to CHANGE the set on an appointment that already
+exists. Migration 0212 adds `admin_set_appointment_dogs(p_appointment, p_dog_ids)`: validates the
+dogs are this client's, re-prices to the sum of the dogs going (keeping the prior amount only if the
+picked dogs carry no price, so a missing price never zeroes a charge), updates dog_ids/dog_count,
+and syncs the linked visit's dog_ids so photos and scores follow the same subset. The same migration
+exposes `appointment_id` and `dog_ids` on each visit (and `dog_ids` on upcoming) in admin_get_client
+so the picker pre-checks correctly. UI: a "Dogs on this appointment" chip selector on a today's-visit
+card (covers Kevin's appointment and Colleen's that happened today, since a departed-today visit is
+still pinned), saving the whole set in one write; the photo dog-picker is scoped to the dogs going,
+so a one-dog appointment shows no dog row and the add-photo controls stop being a junk drawer.
+Re-pricing verified against Kevin's live appointment (Ace + Kacey = $160) and rolled back. Default
+when no subset is set yet is the whole working roster, so Paul drops the dogs not coming.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a

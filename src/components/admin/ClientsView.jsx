@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, ensureVisit } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, ensureVisit, setAppointmentDogs } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -1873,6 +1873,15 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
 // One visit record: the unit of the history list AND the pinned today's-visit
 // panel, so the two can never drift apart.
 function VisitEntry({ v, clientId, dogs, onChanged }) {
+  // The client's working roster (drop past/other dogs). Which of THESE are on this
+  // appointment is editable for a today's visit (a multi-dog household is often
+  // only partly groomed in one stop). Older or manual visits with no dog list keep
+  // the whole roster, so nothing regresses.
+  const activeDogs = dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status));
+  const apptDogIds = (v.dog_ids && v.dog_ids.length) ? v.dog_ids : null;
+  const onDogs = apptDogIds ? activeDogs.filter((d) => apptDogIds.includes(d.id)) : activeDogs;
+  const isToday = easternDay(v.visited_at) === easternDay(Date.now());
+  const canPickDogs = isToday && v.appointment_id && activeDogs.length > 1;
   return (
               <div style={{ borderLeft: '3px solid var(--ad-primary, #2563d8)', paddingLeft: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
@@ -1884,6 +1893,14 @@ function VisitEntry({ v, clientId, dogs, onChanged }) {
                     {v.tip_cents ? ` (+${money(v.tip_cents)} tip)` : ''}
                   </span>
                 </div>
+                {canPickDogs && (
+                  <AppointmentDogs
+                    appointmentId={v.appointment_id}
+                    allDogs={activeDogs}
+                    value={onDogs.map((d) => d.id)}
+                    onSaved={onChanged}
+                  />
+                )}
                 {(v.dog_ratings || []).length > 0 && (
                   <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {v.dog_ratings.map((r) => (
@@ -1904,7 +1921,58 @@ function VisitEntry({ v, clientId, dogs, onChanged }) {
                     ))}
                   </div>
                 )}
-                <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} dogs={dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status))} onChanged={onChanged} />
+                <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} dogs={onDogs} onChanged={onChanged} />
               </div>
+  );
+}
+
+// Which dogs are on this appointment: toggle chips over the client's working
+// roster, so Paul drops the dogs not being groomed today. Saves the set in one
+// write (re-prices to the dogs going and syncs the visit), rather than a write per
+// tap. Scoping this also shrinks the photo dog-picker to just the dogs going.
+function AppointmentDogs({ appointmentId, allDogs, value, onSaved }) {
+  const [sel, setSel] = useState(() => new Set(value));
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const toggle = (id) => setSel((s) => {
+    const n = new Set(s);
+    n.has(id) ? n.delete(id) : n.add(id);
+    return n;
+  });
+  const base = new Set(value);
+  const dirty = sel.size !== base.size || [...sel].some((id) => !base.has(id));
+  async function save() {
+    if (sel.size === 0) { setErr('Pick at least one dog.'); return; }
+    setBusy(true); setErr(null);
+    try { await setAppointmentDogs(appointmentId, [...sel]); onSaved?.(); }
+    catch (e) { setErr(e.message || 'save_failed'); }
+    finally { setBusy(false); }
+  }
+  return (
+    <div style={{ marginTop: 8, marginBottom: 4 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 5 }}>
+        Dogs on this appointment
+      </div>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+        {allDogs.map((d) => {
+          const on = sel.has(d.id);
+          return (
+            <button key={d.id} type="button" onClick={() => toggle(d.id)} disabled={busy}
+              style={{ fontSize: 13, fontWeight: 600, padding: '7px 13px', borderRadius: 999, cursor: 'pointer',
+                border: '1px solid', borderColor: on ? 'var(--ad-accent, #2563d8)' : 'var(--ad-outline, #d5d5dd)',
+                background: on ? 'var(--ad-accent, #2563d8)' : 'transparent',
+                color: on ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}>
+              {on ? '✓ ' : ''}{d.name}
+            </button>
+          );
+        })}
+        {dirty && (
+          <button className="ad-btn ad-btn--sm" onClick={save} disabled={busy} style={{ marginLeft: 2 }}>
+            {busy ? 'Saving…' : 'Save dogs'}
+          </button>
+        )}
+      </div>
+      {err && <div className="ad-error" style={{ fontSize: 12, marginTop: 5 }}>{err}</div>}
+    </div>
   );
 }

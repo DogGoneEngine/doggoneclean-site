@@ -136,6 +136,14 @@ export async function setPhotoDog(photoId, dogId) {
   return rpc('admin_set_photo_dog', { p_id: photoId, p_dog_id: dogId });
 }
 
+// Set which dogs are on an appointment (a subset of the client's roster: not all
+// of a multi-dog household is always groomed). Re-prices to the dogs going
+// (price_by_dogs_going) and keeps the linked visit's dog list in step, so the
+// photo picker and scores follow the same subset.
+export async function setAppointmentDogs(appointmentId, dogIds) {
+  return rpc('admin_set_appointment_dogs', { p_appointment: appointmentId, p_dog_ids: dogIds });
+}
+
 // People to notify (extra_notification_people): a spouse who also gets the
 // appointment messages, or a temporary stand-in like a dog sitter, in
 // addition to or instead of the client, optionally until a date.
