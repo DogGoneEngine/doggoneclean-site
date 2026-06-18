@@ -1982,8 +1982,12 @@ setup. Release posture is still two modes by traffic: pre-traffic ship straight
 to main, fast and bold; once a surface carries real client traffic, route
 user-facing changes through the preview first, per surface on Paul's word.
 Database migrations stay careful in BOTH modes (schema has no preview copy).
-Because recklessness is free before launch and expensive after it, and Paul
-wants to look before clients (or the live site) do.
+The preview runs on the REAL live database (no mockups), so every preview screen
+wears a permanent red banner saying so, baked into the build (IS_PREVIEW from the
+/preview base): it can never be switched off by mistake and nobody, today or in
+four years, mistakes the preview for a safe sandbox. Because recklessness is free
+before launch and expensive after it, and Paul wants to look before clients (or
+the live site) do.
 
 `one_visit_per_day_per_client` (Clean: clients):
 A client has ONE visit record per Eastern day, no matter how many paths feed
@@ -2873,13 +2877,22 @@ picker and per-operator availability are the build (parked); the data spine (ope
 appointment) already exists. Decided 2026-06-16.
 
 `dog_handling_toggles` (Clean: clients):
-Each dog carries handling guidance for the moment at the door: how to hold the dog, whether it is
-carried or walked on a leash, whether it is an escape or runaway (flight) risk, and whether it can
-be turned loose after. The free-text `dogs.handling` field exists (2026-06-18, "we've got this", a
-care note not a warning); the firm safety facts get structured quick-pick TOGGLES on the dog card
-backed by a real column, and Clio learns to set them by voice. Because these are safety facts you
-want consistent and scannable at the door, not buried in a sentence or lost because they were only
-ever spoken. Toggle build pending Paul's review of the client screen. Decided 2026-06-18.
+Each dog carries door-handling guidance for the moment Paul reaches the door, in two plain parts:
+(1) HOW he takes the dog, one pick, Carry or Leash (this answers the real question, do I bring a
+leash to the door), and (2) a few on/off facts: escape risk and keep-apart-from-other-animals
+(loud red warnings) and can-be-let-loose-after (a calm yes). Stored as `dogs.door_handling` jsonb
+({transport:'carry'|'leash', escape:true, keep_separate:true, loose_ok:true}; validating gate
+`admin_set_dog_door_handling`). The free-text `dogs.handling` note stays for nuance. On the
+must-knows banner the warnings show loud and the rest read calm. Because these are FACTS, not
+preferences with a gradient: Paul ran the scenarios and found "usually a bolt risk" is nonsense, a
+dog either bolts or it does not. (History: a 2026-06-18 first pass used a No/Usually/Always level on
+every concern, plus a redundant "leash before the door"; Paul cut both, the level fit none of them
+and "leash" duplicated escape control. Migrations 0208 flat flags, 0209 usual/always, 0210 the
+simplified shape.) Clio learns to set it by voice. Turn-loose is special: it surfaces on the
+banner as "OK to turn loose, but verify with the client first", because turning a dog loose is a
+usually-but-confirm thing, not a guarantee. Paul confirms with the client at hand-off every time
+(a rare dog may be a known always-OK, but the default is ask, and asking again never hurts). Full
+UI pending Paul's review. Decided 2026-06-18, simplified same day.
 
 `client_sheet_surfaces_the_must_knows` (Clean: clients):
 On the client sheet the things Paul needs mid-appointment ride at the TOP and are heavily
@@ -2906,3 +2919,13 @@ household note, a stray "male" in a notes blob) is obvious before he taps, not d
 later in the record. Because the confirm step is the only safety net on an LLM parse, and a summary
 of the utterance cannot catch a mis-routed or invented field the way showing the actual write does.
 Build pending Paul's review. Decided 2026-06-18.
+
+`client_screen_self_evident` (Clean: clients):
+The client screen is designed to be understood by someone who has never been told how it works:
+Paul four years from now, or whoever runs the day-to-day after him. Every control says what it is in
+plain words (No / Usually / Always, "At the door", "Before you start"), distinctions are shown not
+memorized (a firm rule looks different from a preference), and where a fact belongs is obvious from
+the screen, not from training. Because the prime directive is a business that runs without Paul, and
+a screen that depends on remembering how it works is a screen that breaks the day he forgets or hands
+it off. This is a standing design gate on the client screen, checked on every change, not a one-time
+build. Decided 2026-06-18.

@@ -282,6 +282,12 @@ export async function setDogHandling(dogId, text) {
   return rpc('admin_set_dog_handling', { p_dog_id: dogId, p_text: text });
 }
 
+// Structured door-handling (dog_handling_toggles). A map of known concern key ->
+// level ('usual' or 'always'). Pass {} or null to clear.
+export async function setDogDoorHandling(dogId, handling) {
+  return rpc('admin_set_dog_door_handling', { p_dog_id: dogId, p_handling: handling });
+}
+
 export async function setClientAccess(clientId, text) {
   return rpc('admin_set_client_access', { p_client_id: clientId, p_text: text });
 }

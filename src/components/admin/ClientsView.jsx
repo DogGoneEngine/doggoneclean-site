@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -21,6 +21,28 @@ const SERVICE_LABELS = {
   mixed_groom_and_nails: 'Groom + nails',
   nails_only: 'Nails only',
 };
+
+// Client type, the two real situations: Recurring (on a cadence) or On-demand
+// (they reach out when they want). The raw `status`/`roster_group` columns
+// currently conflate type with lifecycle (active, moved away, deceased, merged)
+// and even banned, which is why the sheet showed "one off one off". Until that is
+// untangled in the data, map the known values to one clean human label here.
+const CLIENT_TYPE = {
+  standing: 'Recurring', active: 'Recurring',
+  one_off: 'On-demand', one_off_for_now: 'On-demand', at_will: 'On-demand', at_will_winddown: 'On-demand',
+};
+const CLIENT_STATE = {
+  moved_away: 'Moved away', deceased: 'Deceased', inactive: 'Inactive',
+  merged: 'Merged', test_account: 'Test', banned: 'Banned',
+};
+// One clean label: the type if we can tell, plus a lifecycle note when it is not
+// a plain current client. De-duplicated, never the raw enum twice.
+function clientTag(c) {
+  const s = c.status, r = c.roster_group;
+  const type = CLIENT_TYPE[s] || CLIENT_TYPE[r] || null;
+  const state = CLIENT_STATE[s] || (CLIENT_STATE[r] && CLIENT_STATE[r] !== type ? CLIENT_STATE[r] : null);
+  return [type, state].filter(Boolean).join(' · ') || (s || '').replace(/_/g, ' ');
+}
 
 function money(cents) {
   if (cents === null || cents === undefined) return '';
@@ -198,6 +220,12 @@ function ClientSheet({ clientId, onChanged }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Must-knows ride above everything: the special request for this visit and
+          each dog's standing instructions (blades/tools) plus door handling, so
+          Paul has the how-to-cut answer in one glance mid-appointment without
+          scrolling (client_sheet_surfaces_the_must_knows, Paul 2026-06-18). */}
+      <MustKnows dogs={dogs} todayVisits={todayVisits} />
+
       {/* The visit being worked RIGHT NOW: front and center so photos, notes,
           and Riker need no scrolling mid-appointment (Paul, 2026-06-11). It
           returns to the history below once the day passes. */}
@@ -225,7 +253,7 @@ function ClientSheet({ clientId, onChanged }) {
         ]} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, paddingRight: 24 }}>
           <h2 style={{ margin: 0 }}>{c.name}{c.aka ? <span className="ad-mono" style={{ marginLeft: 8, opacity: 0.6, fontSize: 14 }}>{c.aka}</span> : null}</h2>
-          <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{c.roster_group} · {c.status}</span>
+          <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{clientTag(c)}</span>
         </div>
         {c.nofly_level && <StatusBadge level={c.nofly_level} reason={c.nofly_reason} />}
         <AliasManager clientId={clientId} onChanged={onChanged} />
@@ -993,6 +1021,135 @@ function ageFromBirthDate(dateStr, approximate) {
   return `${tilde}${years} yr ${months} mo`;
 }
 
+// Door-handling toggles (dog_handling_toggles). `door` is the short chip shown on
+// the must-knows banner; `label` is the full toggle on the dog card. Keys must
+// match the dogs_handling_flags_known DB constraint (migration 0208).
+// Door handling (dog_handling_toggles). Each concern is OFF, "usually" (how Paul
+// normally does it, a preference), or "always" (a firm rule). The distinction
+// matters: most handling is a preference, but some of it (a dog that fights other
+// dogs) is a hard rule that has to jump out. Labels read plainly so a new operator
+// understands every one without being told.
+// Door handling, simplified (dog_handling_toggles). Two parts: how the dog gets
+// to the trailer (carry or leash, one pick), and a few plain warnings. No
+// usual/always gradient, because these are facts, not preferences.
+const TRANSPORT_LABEL = { carry: 'Carry in and out', leash: 'Walk on a leash' };
+const DOOR_FLAGS = [
+  { key: 'escape',        label: 'Escape risk',                  warn: true },
+  { key: 'keep_separate', label: 'Keep apart from other animals', warn: true },
+  { key: 'loose_ok',      label: 'OK to turn loose',              warn: false },
+];
+const WARN_LABEL = { escape: 'Escape risk, keep control at the door', keep_separate: 'Keep away from other animals' };
+
+function PickBtn({ label, on, onClick, disabled, first }) {
+  return (
+    <button type="button" onClick={onClick} disabled={disabled}
+      style={{ fontSize: 12, padding: '5px 14px', border: 'none', cursor: 'pointer',
+        borderLeft: first ? 'none' : '1px solid var(--ad-outline,#ececf1)',
+        background: on ? 'var(--ad-primary,#2563d8)' : 'transparent',
+        color: on ? '#fff' : 'var(--ad-text,#1c1d22)', fontWeight: on ? 600 : 400 }}>
+      {label}
+    </button>
+  );
+}
+
+// The dog-card editor: a Carry/Leash pick (which answers "bring a leash to the
+// door?") and on/off warning chips. Optimistic, saves on tap, reverts on failure.
+function DoorHandling({ dog, onChanged }) {
+  const [dh, setDh] = useState(dog.door_handling || {});
+  const [saving, setSaving] = useState(false);
+  useEffect(() => { setDh(dog.door_handling || {}); }, [dog.door_handling]);
+  const save = async (next) => {
+    setDh(next); setSaving(true);
+    try { await setDogDoorHandling(dog.id, next); onChanged?.(); }
+    catch { setDh(dog.door_handling || {}); }
+    finally { setSaving(false); }
+  };
+  const setTransport = (t) => { const n = { ...dh }; if (n.transport === t) delete n.transport; else n.transport = t; save(n); };
+  const toggle = (k) => { const n = { ...dh }; if (n[k]) delete n[k]; else n[k] = true; save(n); };
+  return (
+    <div style={{ margin: '2px 0 6px' }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 6 }}>At the door</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+        <span style={{ fontSize: 13 }}>How I take this dog</span>
+        <div style={{ display: 'inline-flex', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--ad-outline,#d8d8de)' }}>
+          <PickBtn label="Carry" first on={dh.transport === 'carry'} onClick={() => setTransport('carry')} disabled={saving} />
+          <PickBtn label="Leash" on={dh.transport === 'leash'} onClick={() => setTransport('leash')} disabled={saving} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {DOOR_FLAGS.map((c) => {
+          const on = !!dh[c.key];
+          const onColor = c.warn ? 'var(--ad-bad,#dc2626)' : 'var(--ad-good,#1f8a4b)';
+          return (
+            <button key={c.key} type="button" onClick={() => toggle(c.key)} disabled={saving}
+              style={{ fontSize: 12, padding: '5px 11px', borderRadius: 999, cursor: 'pointer',
+                border: on ? `1px solid ${onColor}` : '1px solid var(--ad-outline,#d8d8de)',
+                background: on ? onColor : 'transparent',
+                color: on ? '#fff' : 'var(--ad-text,#1c1d22)', fontWeight: on ? 600 : 400 }}>
+              {c.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Pull the loud warnings and the calm facts out of a dog's door handling.
+function doorBits(dog) {
+  const dh = dog.door_handling || {};
+  return {
+    warns: ['escape', 'keep_separate'].filter((k) => dh[k]),
+    transport: dh.transport ? TRANSPORT_LABEL[dh.transport] : null,
+    looseOk: !!dh.loose_ok,
+  };
+}
+
+// The must-knows banner that rides at the very top of the sheet
+// (client_sheet_surfaces_the_must_knows): the special request for this visit and,
+// per active dog, the loud door warnings (red), the standing instructions (blades
+// and tools), then the calm door facts. What Paul needs in one glance, no scroll.
+function MustKnows({ dogs, todayVisits }) {
+  const active = (dogs || []).filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status));
+  const requests = (todayVisits || []).map((v) => v.special_request).filter(Boolean);
+  const rows = active.map((d) => ({ d, ...doorBits(d) }))
+    .filter((r) => r.d.standing_instructions || r.warns.length || r.transport || r.looseOk || r.d.handling);
+  if (requests.length === 0 && rows.length === 0) return null;
+  return (
+    <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-warn,#b9770a)', background: 'var(--ad-warn-bg,#fff8ec)' }}>
+      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, fontWeight: 700, color: 'var(--ad-warn,#b9770a)', marginBottom: 8 }}>Before you start</div>
+      {requests.length > 0 && (
+        <div style={{ marginBottom: rows.length ? 12 : 0 }}>
+          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.6, marginBottom: 2 }}>Special request this visit</div>
+          {requests.map((r, i) => (<div key={i} style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.35 }}>{r}</div>))}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {rows.map(({ d, warns, transport, looseOk }) => (
+          <div key={d.id}>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>{d.name}</div>
+            {warns.map((k) => (
+              <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.4, padding: '1px 6px', borderRadius: 4, background: 'var(--ad-bad,#dc2626)', color: '#fff' }}>HEADS UP</span>
+                <span style={{ fontSize: 14, fontWeight: 600 }}>{WARN_LABEL[k]}</span>
+              </div>
+            ))}
+            {d.standing_instructions && <div style={{ fontSize: 14, lineHeight: 1.4, marginTop: 3 }}>{d.standing_instructions}</div>}
+            {transport && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>{transport}</div>}
+            {looseOk && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.4, padding: '1px 6px', borderRadius: 4, background: 'var(--ad-primary,#2563d8)', color: '#fff' }}>ASK</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>OK to turn loose, but verify with the client first</span>
+              </div>
+            )}
+            {d.handling && <div style={{ fontSize: 13, opacity: 0.8, marginTop: 3 }}>{d.handling}</div>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function DogCard({ dog, onChanged }) {
   const isPast = ['former', 'deceased', 'moved'].includes(dog.roster_status);
   const age = dog.roster_status === 'deceased' ? '' : ageFromBirthDate(dog.birth_date, dog.dob_approximate);
@@ -1012,6 +1169,7 @@ function DogCard({ dog, onChanged }) {
       <DogField label="Handling (we've got this)" value={dog.handling}
         placeholder="How to handle this dog: hold this way, sore hip, give a minute to settle. A care note, not a warning."
         onSave={async (v) => { await setDogHandling(dog.id, v); onChanged?.(); }} />
+      <DoorHandling dog={dog} onChanged={onChanged} />
       <DogField label="About this dog (always)" value={dog.notes}
         placeholder="Anything that stays true about this dog (e.g. moved to Tampa, on psych meds, sister's dog)"
         onSave={async (v) => { await setDogNote(dog.id, v); onChanged?.(); }} />

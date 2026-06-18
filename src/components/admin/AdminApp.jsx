@@ -36,6 +36,22 @@ import './admin.css';
 // SECTIONS, the floor lists, and the role definitions live in roles.js so the
 // access map and this nav read one source of truth and cannot drift apart.
 
+// A preview build is served under /preview, so its bundle bakes BASE_URL as
+// '/preview/'. That is how the app knows to wear the preview banner. It is baked
+// in at build time, so it cannot be turned off by mistake and it is impossible to
+// confuse the preview with the live site, today or in four years (preview_before_live).
+const IS_PREVIEW = (import.meta.env?.BASE_URL || '/').includes('preview');
+function PreviewBanner() {
+  return (
+    <div style={{
+      position: 'sticky', top: 0, zIndex: 70, background: '#b9170a', color: '#fff',
+      textAlign: 'center', padding: '7px 12px', fontSize: 13, fontWeight: 600, lineHeight: 1.35,
+    }}>
+      PREVIEW BUILD, not the live site. It runs on the REAL live database, so anything you change here really saves.
+    </div>
+  );
+}
+
 export default function AdminApp() {
   const [session, setSession] = useState(null);
   const [authReady, setAuthReady] = useState(false);
@@ -84,6 +100,8 @@ export default function AdminApp() {
 
   if (!session) {
     return (
+      <>
+      {IS_PREVIEW && <PreviewBanner />}
       <div className="ad-center">
         <div className="ad-gate">
           <h1>Laelaps sign-in</h1>
@@ -93,6 +111,7 @@ export default function AdminApp() {
           </button>
         </div>
       </div>
+      </>
     );
   }
 
@@ -143,6 +162,7 @@ export default function AdminApp() {
 
   return (
     <div className={'ad-app ' + (drawerOpen ? 'ad-app--drawer-open' : '')}>
+      {IS_PREVIEW && <PreviewBanner />}
       {isOwner && previewRole && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60,

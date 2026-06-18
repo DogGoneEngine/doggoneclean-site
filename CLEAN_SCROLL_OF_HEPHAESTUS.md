@@ -208,21 +208,80 @@ Decisions locked this turn (builds pending Paul's review, NOT yet on the client 
   Paul: "that is perfect." Recorded as `clio_confirm_shows_fields`. Teach Clio to write the
   handling field too.
 
-Preview-before-live channel rebuilt and made live (`preview_before_live`). Paul asked how he can
-actually SEE a change before it goes live without reading GitHub; his instinct was to ship it to
-his private Mount Olympus site. Corrected the hosting (Mount Olympus is a no-build static site and
-Laelaps is a built app bolted to Clean's login/DB; hosting it there would entangle Clean and break
-auth) but kept his doorway idea: the preview lives on Clean's OWN host under /preview, and Mount
-Olympus gets the tap-link. Picked the subpath over a preview.hurricanebath.com subdomain because
-it needs zero one-time setup (no DNS, no Caddy change). Mechanism: push to the `preview` branch ->
-`preview.yml` builds with PREVIEW=1 (Astro base /preview, audit-gated) -> rsync to
-/srv/doggoneclean/preview; production `deploy.yml` now rsyncs with `--exclude='preview/'` so a main
-deploy never wipes or leaks it; admin login redirect made base-aware; the inert subdomain
-preview.yml from a prior session replaced. Verified live end to end: hurricanebath.com/preview/laelaps
-returns 200, its island loads from /preview/_astro, production /laelaps is untouched. The current
-client-screen first pass (must-knows banner + handling toggles) is published there for Paul's
-review; Mount Olympus link "Laelaps PREVIEW (not live yet)" points at it. Promotion to live is a
-normal merge of the branch to main.
+Second pass after Paul saw the preview:
+- Preview-before-live built and made live: Paul asked how he can actually SEE a change before
+  it goes live. Built the channel (push to `preview` branch -> publishes to hurricanebath.com
+  under /preview, base /preview, audit-gated; production deploy excludes preview/), kept his
+  Mount Olympus doorway idea but corrected the hosting (Mount Olympus is no-build and Laelaps is
+  a built app on Clean's login). Verified live end to end. `preview_before_live` updated.
+- Real-data durability: the preview runs on the real database, and that fact must survive four
+  years and a new operator. Baked a permanent red PREVIEW banner into every preview screen
+  (IS_PREVIEW from the /preview base, AdminApp), so it can never be mistaken for a sandbox.
+- Mount Olympus preview button fixed: the first one reused brand "laelaps" and rendered as a
+  second identical Laelaps wordmark. Renamed to "Laelaps Forge", dropped the brand, taught the
+  Mount Olympus door to show a `desc` line so a button can say what it does.
+- Door handling redesigned (`dog_handling_toggles` revised): Paul's note was the flat toggles
+  read like hard rules when most handling is "how I usually do it." Replaced with a No / Usually
+  / Always control per concern (`dogs.door_handling` jsonb + `admin_set_dog_door_handling`,
+  migration 0209), added a "keep away from other animals" concern, and made the must-knows banner
+  show "always" rules loud and "usual" preferences soft. Recorded Kacey (Kevin Cummings): does not
+  get along with other dogs, keep separated from other animals = keep_separate at the "always"
+  level, so it shows as a firm rule at the door. Answer to "where does that go in the record": the
+  dog's door handling (a concern marked Always) plus the free-text handling note.
+- New durable design gate `client_screen_self_evident`: the client screen must be understood by a
+  new operator or Paul-in-four-years without being told how it works, because the prime directive
+  is a business that runs without Paul.
+
+Third pass (Paul tried it in Prometheus, the preview):
+- Preview is council-tier, renamed Proteus -> Prometheus in Mount Olympus. Paul corrected the
+  naming tier: previewing is invoked from Mount Olympus across every project, so it is a council
+  capability, not a per-realm lesser technique. I had applied his own rule backwards. Prometheus
+  (forethought) is the council name; recorded in NAMING_COSMOLOGY's council section, gold-lit door.
+- Door handling simplified again (`dog_handling_toggles`): the No/Usually/Always level fit none of
+  the concerns (a dog either bolts or it does not), and "leash before the door" duplicated escape
+  control. New shape: one Carry/Leash pick (answers "bring a leash to the door?") plus on/off
+  warnings (escape, keep-apart) and a calm "can be let loose after". Migration 0210. The word
+  "Always" is gone with the levels.
+- Client categories: Paul has exactly two, Recurring and On-demand. Found the real problem: the
+  `status`/`roster_group` columns conflate client TYPE with lifecycle (active, moved away,
+  deceased, merged) and even banned, which is why Colleen showed "one off one off". Did the safe
+  visible fix now (one clean humanized `clientTag`, Recurring/On-demand, de-duplicated); the deeper
+  data separation (type vs lifecycle vs the already-separate nofly ban) is a careful migration to
+  plan with Paul, not a blind one (server booking/winback read these). Banned is already its own
+  `nofly_level` flag, so the banned list at the top of the sheet is untouched.
+- Clio confirm screen shipped LIVE (`clio_confirm_shows_fields`, Paul: ship it and I will field
+  test): the one-tap confirm now shows the exact fields and values she will write, not a prose
+  summary of what Paul said (the rambly "$105 each... wait" summary is gone from the display).
+- Queued, surfaced for next rounds: photos screen redesign (junk drawer, zoom-to-tap), the
+  inside-the-cards visual refresh (2017 -> late 2020s), must-knows banner placement (above vs
+  inside the current-appointment card, still Paul's call), special-request-before-arrival (a small
+  server tweak), and the deeper client status/lifecycle data separation.
+
+Fourth pass (Paul field-testing in Prometheus):
+- Turn-loose carries a confirm note. Paul (in Chester Weber's record, dog Ula): turning a dog
+  loose is "usually, but I confirm with the client at hand-off," not a guarantee. The "OK to turn
+  loose" fact now surfaces on the banner as "OK to turn loose, but verify with the client first"
+  (blue ASK tag), folded into `dog_handling_toggles`. ClientsView only, in preview.
+- Mount Olympus: moved Prometheus out of the Clean card into the Shared tools shelf (preview is
+  cross-project), kept its gold styling, added breathing room before Cerberus.
+- Clio gaps found while field-testing (feed the queued Clio pass): (1) "add only Lillian" added
+  her to BOTH who's-on-site AND notify (overreach when Paul said only); (2) the notify person had
+  no phone, and Lillian's number is already in the records, so the message could not reach her,
+  Clio should reuse a known person's phone; (3) earlier, "add X as a household name" has no alias
+  path so it fell back to who's-on-site. The Clio pass now covers: a household-name/alias action,
+  do-not-duplicate a person across fields, and reuse an existing phone for a notify person. By
+  hand still works (the sheet's + name and the notify panel).
+
+Shipped to live 2026-06-18 (Paul: "it's time to ship what you've done"): the whole client-screen
+redesign merged from the preview branch to main. Live now: the must-knows banner (special request,
+red HEADS UP warnings, standing instructions, Carry/Leash, the blue ASK turn-loose note), the
+simplified door handling, the Recurring/On-demand client label, and the preview real-data banner.
+The Prometheus preview channel stays as the standing look-before-live door; after this ship it
+mirrors live until the next change is pushed to the `preview` branch. Paul's working-style note,
+captured: he prefers I lead with what he wants (propose and recommend) rather than him trying to
+fully specify it, because I often land on something better than he would have asked for. Next up:
+the Clio pass (household-name/alias action, no double-add, reuse a known phone), then the photos
+screen, the inside-the-cards visual refresh, and the client status/lifecycle untangle.
 
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
