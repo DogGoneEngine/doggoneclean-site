@@ -217,6 +217,7 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
 
       {selected && (
         <PhotoEditor
+          key={selected.id}
           photo={selected}
           url={urls[selected.id]}
           label={photoLabel(selected)}
@@ -365,48 +366,87 @@ function DestRow({ on, color, label, desc, onClick, disabled }) {
   );
 }
 
-// Per-photo "look at this" flags: Worth a look (to the client) and For the owner
-// (private), each with a short note. Lives inside the editor now, with real buttons.
+// Per-photo "look at this" flags: Worth a look (the client gets a heads-up to look
+// it over) and For the owner (private). Rewritten 2026-06-18 to be unmistakable:
+// the on-state shows instantly as a clear banner the moment you tap, plus a "Saved"
+// line, so there is never any doubt it took (Paul: "I couldn't see if it saved").
 function PhotoFlag({ photo, onChanged }) {
-  const [open, setOpen] = useState(false);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
-  const wal = !!photo.worth_a_look;
-  const fld = !!photo.field_flag;
+  const [optimistic, setOptimistic] = useState({}); // instant overlay {wal?, fld?}
+  const [flash, setFlash] = useState(null);          // transient "Saved" line
+  const wal = optimistic.wal ?? !!photo.worth_a_look;
+  const fld = optimistic.fld ?? !!photo.field_flag;
 
-  async function run(fn) {
+  async function save(fn, overlay, msg) {
     setBusy(true); setErr(null);
-    try { await fn(); setOpen(false); setNote(''); onChanged?.(); }
-    catch (e) { setErr(e.message || 'flag_failed'); setBusy(false); }
+    setOptimistic((o) => ({ ...o, ...overlay })); // show the result immediately
+    if (msg) { setFlash(msg); setTimeout(() => setFlash(null), 3500); }
+    try { await fn(); setNote(''); onChanged?.(); }
+    catch (e) {
+      setOptimistic((o) => { const n = { ...o }; Object.keys(overlay).forEach((k) => delete n[k]); return n; });
+      setFlash(null);
+      setErr(e.message || 'flag_failed');
+    } finally { setBusy(false); }
   }
 
+  const bannerBox = (color, bg) => ({
+    display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 12px', borderRadius: 10,
+    background: bg, border: `1px solid ${color}`, marginTop: 8,
+  });
+
   return (
-    <div style={{ marginTop: 12 }}>
-      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 5 }}>Flag this photo</div>
-      {(wal || fld) && (
-        <div style={{ fontSize: 12, marginBottom: 6 }}>
-          {wal && <span style={{ color: 'var(--ad-accent, #2563d8)' }}>Worth a look, the client gets a heads-up. </span>}
-          {fld && <span style={{ color: 'var(--ad-warn, #b9770a)' }}>Sent to the owner.</span>}
+    <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--ad-outline, #ececf1)' }}>
+      <div style={{ fontSize: 13, fontWeight: 700 }}>Show the client a closer look</div>
+      <div style={{ fontSize: 12.5, color: 'var(--ad-text-dim, #565b6c)', lineHeight: 1.45, marginTop: 3 }}>
+        Flag a photo and the client gets a heads-up to look it over and tell you what they want. Or flag it just for yourself.
+      </div>
+
+      {wal && (
+        <div style={bannerBox('var(--ad-accent, #2563d8)', 'rgba(37,99,216,0.10)')}>
+          <span style={{ fontSize: 18, lineHeight: 1 }}>✓</span>
+          <span style={{ flex: 1, fontSize: 13 }}>
+            <strong style={{ color: 'var(--ad-accent, #2563d8)' }}>The client will see this</strong> and get a heads-up to take a look.
+            {photo.note ? <span style={{ display: 'block', marginTop: 2, color: 'var(--ad-text, #1a1d28)' }}>&ldquo;{photo.note}&rdquo;</span> : null}
+          </span>
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy}
+            onClick={() => save(() => setWorthALook(photo.id, false), { wal: false }, null)}>Remove</button>
         </div>
       )}
-      {!open ? (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button className="ad-btn ad-btn--ghost ad-btn--sm" type="button" onClick={() => setOpen(true)}>Flag this photo…</button>
-          {wal && <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => run(() => setWorthALook(photo.id, false))}>Remove worth-a-look</button>}
+      {fld && (
+        <div style={bannerBox('var(--ad-warn, #b9770a)', 'rgba(185,119,10,0.10)')}>
+          <span style={{ fontSize: 18, lineHeight: 1 }}>✓</span>
+          <span style={{ flex: 1, fontSize: 13 }}>
+            <strong style={{ color: 'var(--ad-warn, #b9770a)' }}>Flagged just for you</strong> (private, the client never sees it).
+            {photo.field_note ? <span style={{ display: 'block', marginTop: 2, color: 'var(--ad-text, #1a1d28)' }}>&ldquo;{photo.field_note}&rdquo;</span> : null}
+          </span>
         </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 420 }}>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="What you noticed (optional)"
-            style={{ width: '100%', fontSize: 13, padding: '7px 9px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit' }} />
+      )}
+      {flash && <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ad-good, #1f8a4b)', marginTop: 8 }}>Saved. {flash}</div>}
+
+      {(!wal || !fld) && (
+        <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 460 }}>
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2}
+            placeholder="What you noticed (optional): e.g. matting behind the ears, want it shaved short?"
+            style={{ width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit' }} />
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => run(() => setWorthALook(photo.id, true, note.trim() || null))}>Worth a look (client)</button>
-            <button className="ad-btn ad-btn--sm ad-btn--ghost" disabled={busy} onClick={() => run(() => flagForOwner(photo.id, note.trim() || null))}>For the owner</button>
-            <button type="button" onClick={() => { setOpen(false); setErr(null); }} className="ad-btn ad-btn--ghost ad-btn--sm">Cancel</button>
+            {!wal && (
+              <button className="ad-btn ad-btn--sm" disabled={busy}
+                onClick={() => save(() => setWorthALook(photo.id, true, note.trim() || null), { wal: true }, 'The client will get a heads-up to take a look.')}>
+                Show the client
+              </button>
+            )}
+            {!fld && (
+              <button className="ad-btn ad-btn--sm ad-btn--ghost" disabled={busy}
+                onClick={() => save(() => flagForOwner(photo.id, note.trim() || null), { fld: true }, 'Saved to your private notes.')}>
+                Just for me
+              </button>
+            )}
           </div>
-          {err && <div className="ad-error" style={{ fontSize: 12 }}>{err}</div>}
         </div>
       )}
+      {err && <div className="ad-error" style={{ fontSize: 12, marginTop: 6 }}>{err}</div>}
     </div>
   );
 }

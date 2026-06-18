@@ -32,7 +32,9 @@ the teeth live (the durable layer that survives a page rewrite).
     into a tap-to-open editor with no hint, so they looked gone).
   - Tag which dog a photo shows (multi-dog), and the photo picker is scoped to the
     dogs on the appointment.
-  - Flag a photo (worth-a-look to the client / for the owner) with a note.
+  - Flag a photo: "Show the client" (worth-a-look, the client gets a heads-up) or
+    "Just for me" (private), each with a note, and an UNMISTAKABLE saved/on state
+    (a clear banner that appears instantly) so there is never doubt it took.
   - Remove a photo. Thumbnails show small dots for where each photo is shared.
   - Taking the first **before** photo is the signal the tracker uses to flip to
     underway (see Tracker) - the photo's `kind='before'` must be preserved.
