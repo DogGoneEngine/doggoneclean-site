@@ -500,6 +500,48 @@ html, body {
 }
 .ad-panel h2 { margin: 0 0 14px; font-size: 16px; font-weight: 700; color: var(--ad-text); }
 
+/* ---------------- Inside-the-card refresh ----------------
+   Modern primitives so card CONTENT matches the late-2020s chrome. The card
+   shells were already tonal/elevated; this brings the same language inside:
+   a clean eyebrow label (replacing low-opacity uppercase divs), soft tonal
+   accent cards (replacing hard left-border stripes), and a refined key-value
+   grid. */
+.ad-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ad-text-faint);
+  margin: 0 0 10px;
+}
+
+/* A highlighted region inside (or as) a card: a soft tint and a hairline edge
+   in the meaning color, instead of a hard left stripe. --ad-ac sets the hue. */
+.ad-accent-card {
+  --ad-ac: var(--ad-primary);
+  position: relative;
+  border-radius: var(--ad-r-md);
+  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--ad-ac) 24%, var(--ad-line));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--ad-ac) 10%, transparent),
+      color-mix(in srgb, var(--ad-ac) 3%, transparent)),
+    var(--ad-surface-container-low);
+  box-shadow: var(--ad-elev-1);
+}
+.ad-accent-card--good { --ad-ac: var(--ad-good); }
+.ad-accent-card--warn { --ad-ac: var(--ad-warn); }
+.ad-accent-card--bad  { --ad-ac: var(--ad-bad); }
+.ad-accent-card--info { --ad-ac: var(--ad-primary); }
+/* The eyebrow inside an accent card carries the accent hue. */
+.ad-accent-card > .ad-eyebrow { color: color-mix(in srgb, var(--ad-ac) 78%, var(--ad-text-dim)); }
+
+/* Key-value grid for the record header (replaces the inline dl styling). */
+.ad-keyval { display: grid; grid-template-columns: max-content 1fr; gap: 9px 16px; margin: 14px 0 0; }
+.ad-keyval > dt { color: var(--ad-text-faint); font-size: 13px; align-self: baseline; }
+.ad-keyval > dd { margin: 0; color: var(--ad-text); font-size: 14px; line-height: 1.4; }
+
 /* ---------------- Rows / Inputs ---------------- */
 
 .ad-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }

@@ -256,8 +256,8 @@ function ClientSheet({ clientId, onChanged }) {
           and Riker need no scrolling mid-appointment (Paul, 2026-06-11). It
           returns to the history below once the day passes. */}
       {todayVisits.length > 0 && (
-        <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-good, #1f8a4b)' }}>
-          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>Today's visit</div>
+        <div className="ad-accent-card ad-accent-card--good">
+          <div className="ad-eyebrow">Today's visit</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {todayVisits.map((v) => <VisitEntry key={v.id} v={v} clientId={clientId} dogs={dogs} onChanged={load} />)}
           </div>
@@ -268,8 +268,8 @@ function ClientSheet({ clientId, onChanged }) {
           so the current appointment is never buried in Upcoming. The Today's-visit
           card above replaces it the moment a visit is logged. */}
       {todayAppt && (
-        <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-good, #1f8a4b)' }}>
-          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Today's appointment</div>
+        <div className="ad-accent-card ad-accent-card--good">
+          <div className="ad-eyebrow">Today's appointment</div>
           <div style={{ fontSize: 16, fontWeight: 700 }}>
             {(() => { try { return new Date(todayAppt.scheduled_start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ''; } })()}
             {todayAppt.service_type ? ` · ${SERVICE_LABELS[todayAppt.service_type] || todayAppt.service_type}` : ''}
@@ -299,7 +299,7 @@ function ClientSheet({ clientId, onChanged }) {
         </div>
         {c.nofly_level && <StatusBadge level={c.nofly_level} reason={c.nofly_reason} />}
         <AliasManager clientId={clientId} onChanged={onChanged} />
-        <dl style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: '4px 14px', margin: '12px 0 0' }}>
+        <dl className="ad-keyval">
           <Field label="Service" value={SERVICE_LABELS[c.service_type] || c.service_type} />
           <Field label="Frequency" value={c.cadence_days ? `every ${c.cadence_days} days${c.cadence_confidence ? ` (${c.cadence_confidence})` : ''}` : c.cadence_note} />
           <Field label="Hardness" value={c.hardness} />
@@ -330,7 +330,7 @@ function ClientSheet({ clientId, onChanged }) {
           const reload = () => { load(); onChanged?.(); };
           return (
             <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Dogs</div>
+              <div className="ad-eyebrow">Dogs</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {active.map((d) => (<DogCard key={d.id} dog={d} onChanged={reload} />))}
               </div>
@@ -378,7 +378,7 @@ function ClientSheet({ clientId, onChanged }) {
       {/* Upcoming */}
       {upcoming.length > 0 && (
         <div className="ad-panel">
-          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>Upcoming</div>
+          <div className="ad-eyebrow">Upcoming</div>
           {upcoming.map((a) => (
             <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 14 }}>
               <span>{fmtDate(a.scheduled_start)} · {SERVICE_LABELS[a.service_type] || a.service_type}</span>
@@ -390,7 +390,7 @@ function ClientSheet({ clientId, onChanged }) {
 
       {/* Visit history (the growing bottom) */}
       <div className="ad-panel">
-        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 8 }}>
+        <div className="ad-eyebrow">
           Visit history · {pastVisits.length}
         </div>
         {visits.length === 0 ? (
@@ -415,8 +415,8 @@ function Field({ label, value }) {
   if (!value) return null;
   return (
     <>
-      <dt style={{ fontSize: 12, opacity: 0.55, textTransform: 'uppercase', letterSpacing: 0.3 }}>{label}</dt>
-      <dd style={{ margin: 0, fontSize: 14 }}>{value}</dd>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </>
   );
 }
@@ -1162,8 +1162,8 @@ function MustKnows({ dogs, todayVisits }) {
     .filter((r) => r.d.standing_instructions || r.warns.length || r.transport || r.looseOk || r.d.handling);
   if (requests.length === 0 && rows.length === 0) return null;
   return (
-    <div className="ad-panel" style={{ borderLeft: '4px solid var(--ad-warn,#b9770a)', background: 'var(--ad-warn-bg,#fff8ec)' }}>
-      <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, fontWeight: 700, color: 'var(--ad-warn,#b9770a)', marginBottom: 8 }}>Before you start</div>
+    <div className="ad-accent-card ad-accent-card--warn">
+      <div className="ad-eyebrow">Before you start</div>
       {requests.length > 0 && (
         <div style={{ marginBottom: rows.length ? 12 : 0 }}>
           <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.6, marginBottom: 2 }}>Special request this visit</div>

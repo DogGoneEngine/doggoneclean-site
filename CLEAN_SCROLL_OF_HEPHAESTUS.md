@@ -434,6 +434,18 @@ working), matched by subscriber + name. Written to never fight admin_set_dog_sta
 other direction; this one only acts when active crosses the line, so 'occasional'/'deceased' nuance
 is preserved). Verified both directions against Kage and rolled back.
 
+Inside-the-cards visual refresh, first pass (`cards_inside_refresh`, Paul 2026-06-18). The card shells
+in admin.css were already late-2020s (tonal surfaces, soft radii, elevation, pill buttons); the dated
+feel was the CONTENT, built from flat inline styles (low-opacity uppercase labels, hard left-border
+"stripe" cards, a cramped dl grid). Added modern primitives to admin.css: `.ad-eyebrow` (clean
+section label), `.ad-accent-card` + `--good/--warn/--bad/--info` (soft tonal tinted surface with a
+hairline colored edge via color-mix, replacing the hard stripe), and `.ad-keyval` (refined key-value
+grid). Applied across the client record (the surface Paul lives in during appointments): the
+must-knows banner, today's-visit and today's-appointment cards now read as soft tonal cards; the
+section labels are eyebrows; the header info grid is the clean keyval (no more uppercase low-opacity
+dt). Staged in Prometheus for review. Scoped to the client record this pass; the same treatment can
+roll to the visit rows, the remaining stripe panels, and the other views once Paul likes the look.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a
