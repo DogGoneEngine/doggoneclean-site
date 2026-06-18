@@ -112,7 +112,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
       {phase === 'review' && plan && (
         <div style={{ marginTop: 4 }}>
           <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>
-            Clio will record
+            Clio will write exactly this
           </div>
           {plan.matched === false ? (
             <div>
@@ -127,8 +127,13 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
             </div>
           ) : (
             <div style={{ fontSize: 14, lineHeight: 1.5 }}>
-              <div><strong>{plan.client_name || (plan.wisdom ? 'Business wisdom' : 'Client')}</strong></div>
-              {plan.summary && <div style={{ opacity: 0.8, margin: '2px 0 8px' }}>{plan.summary}</div>}
+              {/* Show the exact fields and values she will write, not a prose
+                  summary of what Paul said. A wrong drawer or an invented value is
+                  then obvious before the one-tap Confirm (clio_confirm_shows_fields). */}
+              <div style={{ marginBottom: 6 }}>
+                <span style={{ opacity: 0.55 }}>Record: </span>
+                <strong>{plan.client_name || (plan.wisdom ? 'Business wisdom' : 'Client')}</strong>
+              </div>
               <ul style={{ margin: '6px 0', paddingLeft: 18, fontSize: 13 }}>
                 {v && (
                   <li>
