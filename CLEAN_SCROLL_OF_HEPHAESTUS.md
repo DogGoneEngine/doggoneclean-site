@@ -3894,3 +3894,14 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the client names them and he works them). Kept `dogs.handling` (the post-grooming care note).
   Added other-dogs-on-site to the card (name + breed + photo for dogs in the household not on
   today's appointment), the same instinct as knowing the people at the door.
+- **Now card photo is the most recent AFTER photo** (Paul 2026-06-18, migration 0203). For both
+  the groomed and the on-site dogs; no after photo on record means the paw placeholder, never a
+  before/incidental shot.
+- **Now card v1 goes to field test** (Paul 2026-06-18). Shipped and live; Paul will try it on real
+  stops tomorrow and adjust from the field. Readiness as built: prices populated across the book
+  (totals correct); access notes + door people filled only for some clients (Lisa Irwin, Cynthia
+  Tieche among the next stops) and the section hides until filled; after photos exist only where a
+  dog has been groomed and shot (Colleen Smith's two Cavaliers so far), else the placeholder;
+  handling notes empty everywhere until added. Blanks are data gaps that fill in with use, not
+  bugs. Open follow-on: the card advances to the next stop on a Today reload, not the instant a
+  StopCard step is tapped (wire it if the lag annoys in the field).
