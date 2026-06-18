@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, fieldFlags, markFieldSeen, uploadTaskProof, signedPhotoUrl, nowCard } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, adminDepart, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, fieldFlags, markFieldSeen, uploadTaskProof, signedPhotoUrl, nowCard } from './supabase.js';
 import HelpToggle from './Help.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -726,7 +726,10 @@ function StopCard({ appt, onOpenClient }) {
         await adminReturning(appt.id);
         setStatus('returning');
       } else if (status === 'returning') {
-        await set('departed', new Date().toISOString());
+        const at = new Date().toISOString();
+        setTimes((t) => ({ ...t, departed: at }));   // optimistic
+        await adminDepart(appt.id, at);              // stamps departed AND completes the stop
+        setStatus('completed');
       }
     } catch { setErr(true); }
     finally { setBusyStep(false); }

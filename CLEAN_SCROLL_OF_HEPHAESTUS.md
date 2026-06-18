@@ -3918,5 +3918,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   of Pearls: app bookings set `bath_appointments.dog_ids`, and the card already honors it (only the
   assigned dogs are "today's," the rest of the household drops to "Also home, not today"). The
   synced legacy appointments have `dog_ids` null, which is why they show the whole active roster.
-  Interim option offered (not yet built): a "which dogs today" control to pin dogs on an existing
-  appointment without rebooking, for the transition period.
+  Interim "which dogs today" control was offered but Paul declined (2026-06-18): it is an edge
+  case that fixes itself when he switches to booking through String of Pearls, not worth building.
+- **Bug fix: "All done, rolling out" now completes the stop** (Paul 2026-06-18, migration 0205).
+  Field bug from Colleen Smith's 2026-06-17 visit: the final Today step stamped the departed time
+  but never flipped the appointment off 'returning', so the StopCard looked wrapped (it reads a
+  departed stamp as wrapped) while the appointment was stuck mid-stage and anything reading status
+  saw an unfinished stop. New lightweight `admin_depart` stamps departed AND sets status
+  'completed' (mirrors admin_returning / admin_arrived); the Today final step calls it. One-time
+  cleanup completed any stop left active with a departed stamp (Colleen's). Does not charge;
+  admin_complete_appointment stays the separate heavier visit-logging/charge path.

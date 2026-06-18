@@ -482,6 +482,11 @@ export async function adminArrived(appointmentId) {
 export async function adminReturning(appointmentId) {
   return rpc('admin_returning', { p_appointment: appointmentId });
 }
+// "All done, rolling out": stamps departed AND flips the appointment to
+// completed (the final step; admin_returning etc. only flip the earlier stages).
+export async function adminDepart(appointmentId, at = null) {
+  return rpc('admin_depart', { p_appointment: appointmentId, p_at: at || new Date().toISOString() });
+}
 // One deliberate step back: reverts the appointment status and clears the
 // matching time_is_money stamp so the button, the client tracker, and the
 // clocks agree again after a fat-fingered tap (tracker_undo_is_deliberate).
