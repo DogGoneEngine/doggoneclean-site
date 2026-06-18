@@ -3905,3 +3905,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   handling notes empty everywhere until added. Blanks are data gaps that fill in with use, not
   bugs. Open follow-on: the card advances to the next stop on a Today reload, not the instant a
   StopCard step is tapped (wire it if the lag annoys in the field).
+- **Now card shows only during the active window** (Paul 2026-06-18, migration 0204). First field
+  note: it is called Right Now, so it appears when Paul taps "I'm on my way" and is gone when he
+  taps "All done, rolling out," not lingering on the next stop. Now shows only an in-progress stop
+  (on_the_way / on_site / in_service / returning) with no departed_at stamped yet (the real "I have
+  left" signal, since All-done stamps departed without always flipping status). The earlier "else
+  next stop today" preview was dropped on purpose.
+- **Per-appointment dog assignment resolves the legacy "which dogs today" gap** (Paul 2026-06-18).
+  Field case: Paul groomed only Colleen Smith's two Cavaliers, then added her two German Shepherds
+  to the record when she asked; the legacy/calendar-synced appointment has no per-dog list, so the
+  card showed all four as today's. This self-resolves once appointments are booked through String
+  of Pearls: app bookings set `bath_appointments.dog_ids`, and the card already honors it (only the
+  assigned dogs are "today's," the rest of the household drops to "Also home, not today"). The
+  synced legacy appointments have `dog_ids` null, which is why they show the whole active roster.
+  Interim option offered (not yet built): a "which dogs today" control to pin dogs on an existing
+  appointment without rebooking, for the transition period.
