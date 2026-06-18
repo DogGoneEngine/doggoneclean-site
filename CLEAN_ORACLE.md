@@ -1974,8 +1974,11 @@ hurricanebath.com/preview/laelaps with his real login (the admin session
 persists) and real data. The real site is untouched: the production deploy
 rsyncs with --exclude='preview/', so a main deploy never overwrites /preview and
 /preview never leaks into the real site. Promotion to live is a normal merge to
-main. Same audit gate (npm run build runs check.py first), so a failing audit
-publishes nowhere. No second domain, no DNS, no Caddy change: the earlier
+main, and shipping TAKES THE PREVIEW DOWN: the main deploy resets /preview to an
+idle "nothing staged" placeholder (rsync of `preview-idle/`), so Prometheus is
+clean after a ship and the staged build only lives there between a preview-branch
+push and the promotion. Same audit gate (npm run build runs check.py first), so a
+failing audit publishes nowhere. No second domain, no DNS, no Caddy change: the earlier
 preview.hurricanebath.com subdomain plan (inert, needing a DNS record + Caddy
 block) is superseded by this subpath approach because it needs zero one-time
 setup. Release posture is still two modes by traffic: pre-traffic ship straight
