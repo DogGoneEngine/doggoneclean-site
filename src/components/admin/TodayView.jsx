@@ -690,7 +690,12 @@ function StopCard({ appt, onOpenClient }) {
     const prev = times;
     setTimes((t) => ({ ...t, [field]: at }));   // optimistic
     setBusyCell(field); setErr(false);
-    try { await stampAppointmentTime(appt.id, field, at); }
+    try {
+      await stampAppointmentTime(appt.id, field, at);
+      // A departed time closes the stop wherever it is entered; clearing it
+      // reopens it. Mirror the server so the card flips without a reload.
+      if (field === 'departed') setStatus(at ? 'completed' : 'returning');
+    }
     catch { setTimes(prev); setErr(true); }     // revert on failure
     finally { setBusyCell(null); }
   }

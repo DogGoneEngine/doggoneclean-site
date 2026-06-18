@@ -3928,3 +3928,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   'completed' (mirrors admin_returning / admin_arrived); the Today final step calls it. One-time
   cleanup completed any stop left active with a departed stamp (Colleen's). Does not charge;
   admin_complete_appointment stays the separate heavier visit-logging/charge path.
+- **A departed time completes the stop however it is entered** (Paul 2026-06-18, migration 0206).
+  Paul's follow-up: the other way to reach Departed is the manual "fix times" entry (drove away,
+  forgot to tap done, type the time later), which previously only wrote the time and left status
+  stuck, the same bug from the other direction. Moved the rule to the source: in
+  admin_stamp_appointment_time, a departed time set -> status completed, departed cleared ->
+  status back to returning. So button and manual entry behave identically; the StopCard flips
+  without a reload. Inbound/arrived stamps stay button-driven; departed is the one that closes the
+  stop.
