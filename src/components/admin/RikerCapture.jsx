@@ -8,7 +8,7 @@
 // Paul says). The AI proposes; the tap writes. See riker_capture_agent.
 
 import { useState } from 'react';
-import { rikerParse, rikerApply } from './supabase.js';
+import { rikerParse, rikerApply, addAlias } from './supabase.js';
 
 const SERVICE = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const PAY = { square_in_person: 'Square', stripe_card: 'Stripe', cash: 'Cash', wallet: 'Wallet' };
@@ -56,7 +56,14 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
     setPhase('applying'); setError(null);
     try {
       const res = await rikerApply(plan);
-      setDone(describeApplied(res));
+      // Household names go through the tested admin_add_alias RPC, not the big
+      // apply RPC. Paul already saw them listed before tapping Confirm.
+      const aliases = (plan.client_id && Array.isArray(plan.alias_add)) ? plan.alias_add.filter(Boolean) : [];
+      let aliasCount = 0;
+      for (const a of aliases) { try { await addAlias(plan.client_id, a); aliasCount++; } catch { /* one bad alias never blocks the rest */ } }
+      const d = describeApplied(res);
+      if (aliasCount > 0) d.bits.push(`${aliasCount} household name${aliasCount === 1 ? '' : 's'} added`);
+      setDone(d);
       setPlan(null); setText(''); setPhase('idle');
       onApplied?.();
     } catch (e) { setError(e.message || 'apply_failed'); setPhase('review'); }
@@ -181,6 +188,9 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                   </li>
                 )}
                 {plan.onsite_update && <li>Who's on site: {plan.onsite_update}</li>}
+                {(plan.alias_add || []).map((a, i) => (
+                  <li key={`al${i}`}>Household name (also known as): <strong>{a}</strong></li>
+                ))}
                 {plan.client_note && <li>Add to the contact sheet: {plan.client_note}</li>}
                 {(plan.dog_notes || []).map((d, i) => (
                   <li key={i}>Note on {d.dog_name || 'dog'}: {d.text}</li>
@@ -238,7 +248,8 @@ export function RikerManual() {
         <li><strong>Vibe scores:</strong> per dog, 1 to 5, only when you actually give one.</li>
         <li><strong>New dogs:</strong> "Add Maverick, French Bulldog, 75 dollars, and Sammy, mini Aussie, 105." Real dog cards with breed and price.</li>
         <li><strong>Price and breed changes:</strong> "Change the price to 50 dollars each." Lands on the dog cards, not as a note.</li>
-        <li><strong>Household people:</strong> "Alan is Becky's husband." Lands in the Who's-on-site field on the sheet.</li>
+        <li><strong>Who is at the house:</strong> "Alan answers the door." Lands in the Who's-on-site field.</li>
+        <li><strong>Household names:</strong> "Add her husband Zach as a household name." Lands in the Also-known-as field, so a search for that name opens the household.</li>
         <li><strong>Contact facts:</strong> "Her phone number is 352-875-4172" or a new email or address. Lands in the contact fields, not as a note.</li>
         <li><strong>Corrections:</strong> "That last visit should have been nails, not a full groom." Fixes the existing visit record instead of creating a new one.</li>
         <li><strong>Moved away or paused:</strong> "She moved away, may or may not be back, no need to chase her." Marks the client moved away and turns off win-back outreach.</li>

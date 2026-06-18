@@ -283,6 +283,19 @@ fully specify it, because I often land on something better than he would have as
 the Clio pass (household-name/alias action, no double-add, reuse a known phone), then the photos
 screen, the inside-the-cards visual refresh, and the client status/lifecycle untangle.
 
+Shipping takes the preview down (`preview_before_live`, Paul asked "shouldn't the preview go away
+when shipped?"): the main deploy now resets /preview to an idle "nothing staged" placeholder
+(`preview-idle/`), so Prometheus is clean after a ship until the next change is staged. Verified:
+after the client-screen ship, /preview/laelaps shows the placeholder and live /laelaps still serves.
+
+Clio pass shipped LIVE (the three gaps Paul found field-testing): (1) household-name/alias action,
+"add X as a household name" now lands in alias_add and the confirm step applies it through the
+tested `admin_add_alias` RPC (no risky rewrite of the big apply RPC); (2) one person goes in ONE
+field, "add only X" no longer fans across who's-on-site AND notify; (3) a notify person reuses a
+known phone from context when Paul does not say one, and the summary says plainly when no phone is
+known. riker edge function v9 (prompt + alias_add in the schema), RikerCapture shows and applies
+alias_add, the help text gained a "Household names" line.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a
