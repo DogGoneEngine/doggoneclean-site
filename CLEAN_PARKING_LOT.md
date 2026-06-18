@@ -1187,8 +1187,11 @@ v1 limitations / follow-ons (not blocking):
 - The card refetches on Today's reload, not the instant a StopCard step is tapped, so after
   "All done" it advances to the next stop on the next load rather than immediately. Wire the step
   flow to refresh the card if the lag annoys.
-- Photo is best-effort: the most recent visit_photo for the dog, any kind. No dedicated "profile
-  photo per dog" pointer yet; pick the clearest face if this matters.
+- Photo is the most recent AFTER photo for the dog (migration 0203). The after shot is the clean
+  full view of the freshly groomed dog, the best ID at the door. Paul's standard: if you cannot
+  tell the dog's features from its after photo, you took a bad photo. No after photo on record ->
+  paw placeholder, never a worse fallback. (Candidate field-manual / wisdom note: shoot a clean,
+  recognizable after photo of every dog; it is the door-recognition photo.)
 - `appearance` / `handling` start empty for the whole book; they fill in as Paul adds them
   (Colleen Smith's two Cavaliers are the first real case). Not invented; real data only.
 
