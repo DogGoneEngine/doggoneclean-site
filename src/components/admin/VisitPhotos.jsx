@@ -30,6 +30,17 @@ const kindLabels = (op) => ({ before: 'Before', after: 'After', with_dog: `With 
 
 const DEST_COLOR = { client: '#2563d8', team: '#1f8a4b', web: '#b9770a', answer: '#7c3aed' };
 
+// Shared styling for the add-photo area: a small section label and an equal-sized
+// tile (a file-input dressed as a card), so the upload choices are a clean grid
+// instead of a jumble of mismatched buttons.
+const ADD_LABEL = { fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 6 };
+const ADD_TILE = {
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  padding: '16px 8px', borderRadius: 12, cursor: 'pointer', textAlign: 'center',
+  border: '1px solid var(--ad-outline, #d8d8de)', background: 'var(--ad-surface-container, #f5f6f8)',
+  fontSize: 14, fontWeight: 600, color: 'var(--ad-text, #1c1d22)',
+};
+
 export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [], onChanged }) {
   const [urls, setUrls] = useState({});
   const [open, setOpen] = useState(false);
@@ -204,36 +215,51 @@ export default function VisitPhotos({ visitId, clientId, photos = [], dogs = [],
       )}
 
       {open ? (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginTop: photos.length ? 6 : 0 }}>
+        <div style={{ marginTop: photos.length ? 4 : 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Whose photos these are. Deliberately styled apart from the bold blue
+              "Dogs on this appointment" chips above (lighter, its own label, only
+              here while adding) so the two dog rows never read as the same control. */}
           {multiDog && (
-            <span style={{ display: 'inline-flex', gap: 5, alignItems: 'center', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 12, opacity: 0.55 }}>Of:</span>
-              {[{ id: null, name: 'Pack' }, ...dogs].map((d) => (
-                <button key={d.id || 'all'} onClick={() => setTagDog(d.id)} disabled={busy}
-                  style={{ fontSize: 12, fontWeight: 700, padding: '5px 11px', borderRadius: 999, cursor: 'pointer',
-                    border: '1px solid', borderColor: tagDog === d.id ? 'var(--ad-accent, #2563d8)' : 'var(--ad-outline, #d5d5dd)',
-                    background: tagDog === d.id ? 'var(--ad-accent, #2563d8)' : 'transparent',
-                    color: tagDog === d.id ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}>
-                  {d.name}
-                </button>
-              ))}
-            </span>
+            <div>
+              <div style={ADD_LABEL}>These photos are of</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {[{ id: null, name: 'Whole pack' }, ...dogs].map((d) => {
+                  const on = tagDog === d.id;
+                  return (
+                    <button key={d.id || 'all'} onClick={() => setTagDog(d.id)} disabled={busy}
+                      style={{ fontSize: 13, fontWeight: 600, padding: '6px 12px', borderRadius: 999, cursor: 'pointer',
+                        border: '1px solid', borderColor: on ? '#475569' : 'var(--ad-outline, #d5d5dd)',
+                        background: on ? '#475569' : 'transparent', color: on ? '#fff' : 'var(--ad-text-dim, #565b6c)' }}>
+                      {d.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           )}
-          {SLOTS.map(([kind, label]) => (
-            <label key={kind} className="ad-btn ad-btn--ghost" style={{ cursor: 'pointer' }}>
-              + {label}
-              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => { onPick(kind, e.target.files); e.target.value = ''; }} />
-            </label>
-          ))}
-          <label className="ad-btn ad-btn--ghost" style={{ cursor: 'pointer' }}>
-            + Extras
-            <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={(e) => { onPick('extra', e.target.files); e.target.value = ''; }} />
-          </label>
-          <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)}>Done</button>
-          {pending > 0 && <span style={{ fontSize: 12, opacity: 0.6 }}>Uploading {pending}…</span>}
+          {/* The shot to add: four equal tiles, no more mismatched button widths. */}
+          <div>
+            <div style={ADD_LABEL}>Add a photo</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+              {SLOTS.map(([kind, label]) => (
+                <label key={kind} style={ADD_TILE}>
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => { onPick(kind, e.target.files); e.target.value = ''; }} />
+                  {label}
+                </label>
+              ))}
+              <label style={ADD_TILE}>
+                <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={(e) => { onPick('extra', e.target.files); e.target.value = ''; }} />
+                Extras
+              </label>
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, opacity: 0.6 }}>{pending > 0 ? `Uploading ${pending}…` : ''}</span>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(false)}>Done</button>
+          </div>
         </div>
       ) : (
-        <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => setOpen(true)}>+ Photos</button>
+        <button className="ad-btn" onClick={() => setOpen(true)}>+ Add photos</button>
       )}
       {error && <div className="ad-error" style={{ marginTop: 6 }}>{error}</div>}
     </div>

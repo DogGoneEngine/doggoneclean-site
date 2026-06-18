@@ -344,6 +344,16 @@ so a one-dog appointment shows no dog row and the add-photo controls stop being 
 Re-pricing verified against Kevin's live appointment (Ace + Kacey = $160) and rolled back. Default
 when no subset is set yet is the whole working roster, so Paul drops the dogs not coming.
 
+Photos add-flow walled off and cleaned up (`photos_zone_separated`, Paul 2026-06-18 with a
+screenshot: the photo controls were "all one big jumble", and the photo dog-picker sat right under
+the appointment-dog chips so "the dogs we're choosing for the appointment and the dogs for photos"
+lived in the same space). Fix: photos now sit in their own zone under a divider and a "Photos"
+header, separated from the visit details and the appointment-dog chips. The add controls were
+rebuilt: the mismatched ghost buttons of different widths became a clean 2-by-2 grid of equal tiles
+(Before / After / With <op> / Extras), and the "whose photos" dog-picker is relabeled "These photos
+are of", restyled in slate (not the bold blue of the appointment chips), and shown only while
+adding, so the two dog rows never read as the same control. VisitPhotos.jsx + VisitEntry wrapper.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a

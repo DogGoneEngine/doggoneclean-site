@@ -1921,7 +1921,15 @@ function VisitEntry({ v, clientId, dogs, onChanged }) {
                     ))}
                   </div>
                 )}
-                <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} dogs={onDogs} onChanged={onChanged} />
+                {/* Photos are their own zone, walled off from the visit details and
+                    the appointment-dog chips above, so choosing dogs and working
+                    with photos never share the same space (Paul, 2026-06-18). */}
+                <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--ad-outline, #e6e6ec)' }}>
+                  <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.3, opacity: 0.55, marginBottom: 8 }}>
+                    Photos
+                  </div>
+                  <VisitPhotos visitId={v.id} clientId={clientId} photos={v.photos || []} dogs={onDogs} onChanged={onChanged} />
+                </div>
               </div>
   );
 }
