@@ -336,8 +336,12 @@ function ClientSheet({ clientId, onChanged }) {
               </div>
               {past.length > 0 && (
                 <details style={{ marginTop: 10 }}>
-                  <summary style={{ cursor: 'pointer', fontSize: 12, opacity: 0.6 }}>
-                    Past and other dogs ({past.length})
+                  <summary style={{ cursor: 'pointer', fontSize: 13, lineHeight: 1.4, padding: '8px 11px', borderRadius: 8,
+                    background: 'var(--ad-surface-container, #f3f3f6)', border: '1px solid var(--ad-outline, #e6e6ec)' }}>
+                    <strong>Past &amp; archived dogs ({past.length})</strong>
+                    <span style={{ opacity: 0.65 }}>
+                      {' · '}{past.map((d) => d.name).join(', ')}. Moved away, former, or passed. Tap to view or bring one back.
+                    </span>
                   </summary>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
                     {past.map((d) => (<DogCard key={d.id} dog={d} onChanged={reload} />))}

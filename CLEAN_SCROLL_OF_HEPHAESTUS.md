@@ -388,6 +388,27 @@ operator's call); the portal hides inactive dogs (filters active !== false on bo
 client never sees an archived dog. Photos display in a clean uniform grid (116px thumbnails with
 labels and share-destination dots), so added photos land orderly.
 
+Ban enforcement verified, and shadow ban given real teeth (Paul 2026-06-18: "confirm what banning
+does, I hope it is not just tagging"). Verified against the LIVE database, not the migration files
+(which were stale, and would have made me misreport). Hard ban: real, sets nofly + nofly_level
+'banned' + exclude_from_everything + roster_group 'banned'; enforced by the booking-block trigger
+(`_block_banned_subscriber`) and by ~30 queries filtering `exclude_from_everything`, so they vanish
+from booking and every working list. Shadow ban: keeps them a served client but must stop the chase.
+The live win-back already honored it (`nofly_level is distinct from 'shadow'` + `suppress_winback`),
+but two growth agents did NOT: `_retention_scan` ("Overdue, send a message to rebook") and
+`_capacity_scan` (only excluded 'banned'). Migration 0214 adds the shadow guard to both, so shadow
+ban genuinely silences win-back, retention, and capacity nudges while service-side views (book,
+reports, sync, Riker) still show the client. Verified both guards are live.
+
+Self-documenting follow-through (`self_documenting_ui`): the "Past and other dogs" section on the
+client record now shows the archived dogs' NAMES inline in its collapsed row ("Past & archived dogs
+(2) · Ace, Kage. Moved away, former, or passed. Tap to view or bring one back.") on a real boxed
+control, so where archived dogs live is obvious without expanding or asking. Corrected for Paul: a
+portal client CAN add a dog themselves (the "Add a dog" button in their pack); it joins their visits
+and the price reflects it. The earlier "no, the price would change" framing was wrong; price
+following the dogs is correct, not a reason to block. Operator-only is just the per-appointment
+one-time subset toggle and the archived-legacy-dog reveal, not adding a dog.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a
