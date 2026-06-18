@@ -502,12 +502,28 @@ function OpenTaskRow({ t, isOwner, busy, onDone, onDrop, onTakeBack }) {
 function NowCard({ reloadKey, onOpenClient }) {
   const [card, setCard] = useState(null);
   const [photos, setPhotos] = useState({});
+  const [request, setRequest] = useState('');
+  const [reqBusy, setReqBusy] = useState(false);
+  const [reqSaved, setReqSaved] = useState(false);
 
   useEffect(() => {
     let alive = true;
     nowCard().then((c) => { if (alive) setCard(c && c.found ? c : null); }).catch(() => { if (alive) setCard(null); });
     return () => { alive = false; };
   }, [reloadKey]);
+
+  // Keep the request box in sync with whatever is on record for this stop.
+  useEffect(() => { setRequest(card?.special_request || ''); }, [card]);
+
+  async function saveRequest() {
+    if (!card) return;
+    setReqBusy(true);
+    try {
+      await setVisitRequest(card.appointment_id, request);
+      setReqSaved(true); setTimeout(() => setReqSaved(false), 2000);
+    } catch { /* leave the text in the box to retry */ }
+    finally { setReqBusy(false); }
+  }
 
   // Sign each dog's photo once it is known.
   useEffect(() => {
@@ -559,6 +575,22 @@ function NowCard({ reloadKey, onOpenClient }) {
             )}
           </div>
         )}
+
+        {/* Special request the client makes at the door (heard-and-delivered):
+            shows on their tracker as "you asked for", proven by the answer photo. */}
+        <div>
+          <div style={{ fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5, opacity: 0.55, fontWeight: 700, marginBottom: 4 }}>Special request at the door</div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+            <input
+              type="text" value={request} onChange={(e) => setRequest(e.target.value)}
+              placeholder="What did they ask for? (e.g. ears a little shorter)"
+              style={{ flex: 1, minWidth: 180, fontSize: 14, padding: '9px 11px', borderRadius: 9, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box' }}
+            />
+            <button type="button" className="ad-btn ad-btn--sm" disabled={reqBusy || request === (card.special_request || '')} onClick={saveRequest}>
+              {reqBusy ? '…' : reqSaved ? 'Saved' : 'Save'}
+            </button>
+          </div>
+        </div>
 
         {/* THE DOGS on this appointment */}
         {dogs.length > 0 && (

@@ -3942,3 +3942,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   rolling-out button flow, tracker link, operator, special request, fix times, forgot-to-tap manual
   entry (and that a typed Departed time closes the stop, clearing it reopens), undo step, the
   follow-up asks, the capture-what-only-you-know nudge, and the post-wrap thank-you draft.
+- **Special request capture on the right-now card** (Paul 2026-06-18, migration 0207). Recording
+  what the client asks for at the door is a door action, and the right-now card is the door card,
+  but the request box only lived on the stop card down the list. admin_now_card now returns the
+  visit's special_request and the card has its own request input writing through the existing
+  admin_set_visit_request (the heard-and-delivered loop: shows on the client tracker as "you asked
+  for", proven by the answer photo). Per-visit, same field the stop card and tracker already use.
