@@ -2728,11 +2728,22 @@ Script reading the master directly, so no human or model ever transcribes a mone
 frozen past with live Laelaps visits after the cutover (`visits.arrived_at` not null), in the master's
 exact 12-column format (Date, Client, Inbound, Arrival, Departure, Charged, Paid, Method, Appointment
 Duration, Cycle Time, On Site Rate, Cycle Rate), computing the duration and rate columns for live rows via
-`_fmt_hms`. Charged is captured going forward in the Log-a-visit form and the appointment-completion path
-(`admin_complete_appointment` gained `p_charged_cents`, migration 0195). The producer is a time-triggered
+`_fmt_hms`. Charged is captured at completion from `clean_appt_price_cents` (the one canonical price: the
+appointment row's amount when set, else the sum of the dogs on it), in BOTH completion paths and only when
+no charge was entered by hand, so Paul can still override any single visit (migration 0217). This corrected
+an earlier gap: `admin_complete_appointment` (the explicit form, migration 0195) had defaulted Charged to
+`bath_appointments.amount_cents`, which is 0 across the whole full-groom book (price lives on
+`dogs.price_cents` per `clean_appt_price_cents`), and the field clock flow `admin_stamp_appointment_time`
+(on-my-way / here / all done, the way stops are actually finished) never set `charged_cents` at all, so it
+came through blank; both now source the real price and the affected post-cutover rows were backfilled
+(found 2026-06-18 on Colleen Smith's $210 stop showing a blank Charged). The producer is a time-triggered
 Google Apps Script (same pattern as calendar sync, because Google blocks service-account keys on new
 projects): it reads the ledger as CSV through the secret-guarded `time-is-money-backup` edge function
-(x-cfo-secret, no JWT), writes a dated Google Sheet into a dedicated Drive folder (folder id in
+(x-cfo-secret, and the function MUST be deployed with verify_jwt OFF, the house pattern: the gateway must
+not pre-check a Supabase JWT because the only auth here is the x-cfo-secret header; leaving verify_jwt on
+made the gateway reject the Apps Script's legacy anon key with UNAUTHORIZED_LEGACY_JWT before the function
+ran, which broke the "Back up now" button on 2026-06-18 until it was redeployed verify_jwt off), writes a
+dated Google Sheet into a dedicated Drive folder (folder id in
 `app_secrets`), and calls `time_is_money_snapshot_finish()` to log the run and post a Today card linking
 the file. The weekly Sunday run files ONE clean dated file per day (replacing the same day's); a manual run
 (the Reports "Back up now" button, which opens the script's web-app `doGet` whose `/exec` URL lives in
