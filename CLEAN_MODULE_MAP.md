@@ -87,11 +87,22 @@ the teeth live (the durable layer that survives a page rewrite).
   - Only the dogs actually on the appointment show (appointment `dog_ids`, else the
     ACTIVE funnel dogs, else the legacy regular/occasional roster). A gone dog never
     shows unless explicitly added to the stop.
-  - The heard-and-delivered loop (special request shown, then the answer photo).
+  - The heard-and-delivered loop: `special_request` shown, then the answer photos
+    (`answer_photo_ids`).
+  - "Worth a look" photos: a flagged photo flips from a plain Moment to a worth-a-look
+    card WITH Paul's comment. Rides `tracker_status` as the `worth_a_look` array
+    (`[{id, note, by}]`); the page reads `data.worth_a_look`.
   - Operator name/bio; client-visible photo credits.
+- **`tracker_status` must return every field the /track page reads:** found, stage,
+  scheduled_start, scheduled_end, first_name, dogs, special_request,
+  request_delivered, **answer_photo_ids**, **worth_a_look**, operator, photo_credits.
+  Dropping any one silently breaks the page (the 2026-06-18 breaks: stage's
+  before-photo trigger, then worth_a_look + answer_photo_ids, were each dropped when
+  the function was rebuilt from an old migration file).
 - **Teeth:** entirely in `tracker_status` (anon RPC) - this is the redesign-proof
   layer; the /track page is a thin renderer. CHANGE IT BY DUMPING THE LIVE FUNCTION
-  FIRST, never by rebuilding from an old migration file.
+  FIRST, never by rebuilding from an old migration file; then diff the returned keys
+  against the `data.<field>` reads in `src/pages/track.astro`.
 
 ## RikerCapture - Clio, the voice scribe
 - **File:** `src/components/admin/RikerCapture.jsx` + `riker` edge function +
