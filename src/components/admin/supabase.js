@@ -276,10 +276,6 @@ export async function setDogNote(dogId, text) {
   return rpc('admin_set_dog_note', { p_dog_id: dogId, p_text: text });
 }
 
-export async function setDogAppearance(dogId, text) {
-  return rpc('admin_set_dog_appearance', { p_dog_id: dogId, p_text: text });
-}
-
 export async function setDogHandling(dogId, text) {
   return rpc('admin_set_dog_handling', { p_dog_id: dogId, p_text: text });
 }

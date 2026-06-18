@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogAppearance, setDogHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -1009,9 +1009,6 @@ function DogCard({ dog, onChanged }) {
       <DogField label="Standing instructions" variant="standing" value={dog.standing_instructions}
         placeholder="How to handle this dog every time (e.g. 8mm comb on body, hates the dryer, do nails first)"
         onSave={async (v) => { await setDogStanding(dog.id, v); onChanged?.(); }} />
-      <DogField label="How to tell apart" value={dog.appearance}
-        placeholder="For look-alike dogs in the home (e.g. the brown one, the smaller one). Shows on the right-now card."
-        onSave={async (v) => { await setDogAppearance(dog.id, v); onChanged?.(); }} />
       <DogField label="Handling (we've got this)" value={dog.handling}
         placeholder="How to handle this dog: hold this way, sore hip, give a minute to settle. A care note, not a warning."
         onSave={async (v) => { await setDogHandling(dog.id, v); onChanged?.(); }} />

@@ -494,7 +494,7 @@ function NowCard({ reloadKey, onOpenClient }) {
   useEffect(() => {
     let alive = true;
     (async () => {
-      for (const d of (card?.dogs || [])) {
+      for (const d of [...(card?.dogs || []), ...(card?.other_dogs || [])]) {
         if (!d.photo_path || photos[d.id]) continue;
         try { const u = await signedPhotoUrl(d.photo_path); if (alive) setPhotos((p) => ({ ...p, [d.id]: u })); } catch { /* skip */ }
       }
@@ -507,6 +507,7 @@ function NowCard({ reloadKey, onOpenClient }) {
   const when = apptTime(card.scheduled_start);
   const heading = card.in_progress ? 'Right now' : 'On your way to';
   const dogs = card.dogs || [];
+  const otherDogs = card.other_dogs || [];
 
   return (
     <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 16, border: '1px solid var(--ad-outline, #e6e3dc)',
@@ -555,7 +556,6 @@ function NowCard({ reloadKey, onOpenClient }) {
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
                     <strong style={{ fontSize: 16 }}>{d.name}</strong>
                     {d.breed && <span style={{ fontSize: 12.5, opacity: 0.6 }}>{d.breed}</span>}
-                    {d.appearance && <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--ad-primary-strong, #1d50b8)' }}>· {d.appearance}</span>}
                   </div>
                   {d.standing_instructions && (
                     <div style={{ fontSize: 13, marginTop: 3, lineHeight: 1.4 }}>{d.standing_instructions}</div>
@@ -575,6 +575,28 @@ function NowCard({ reloadKey, onOpenClient }) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Other dogs on site, not being groomed today: know them at the door. */}
+        {otherDogs.length > 0 && (
+          <div style={{ borderTop: '1px solid var(--ad-line, #eee)', paddingTop: 10 }}>
+            <div style={{ fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5, opacity: 0.55, fontWeight: 700, marginBottom: 6 }}>Also home, not today</div>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {otherDogs.map((d) => (
+                <div key={d.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 9, flexShrink: 0, overflow: 'hidden',
+                    background: 'var(--ad-surface-container, #f1f1f4)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 15, color: 'var(--ad-text-dim, #9a9aa2)' }}>
+                    {photos[d.id] ? <img src={photos[d.id]} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🐾'}
+                  </div>
+                  <div style={{ lineHeight: 1.2 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{d.name}</div>
+                    {d.breed && <div style={{ fontSize: 11, opacity: 0.6 }}>{d.breed}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

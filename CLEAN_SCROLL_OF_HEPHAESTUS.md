@@ -3886,6 +3886,11 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   the new tell-apart line, standing instructions, the handling note, follow-ups, price + total).
   Reframes locked: the handling note is reassurance ("we've got this"), not a warning; the word
   "muzzle" is banned as noise (muzzle dogs are ineligible); price yes at the door, payment method
-  no; the customer /track tracker stays stages-only (no clock times to clients). Two new dog
-  fields `appearance` + `handling`, editable on the contact sheet. Full spec and follow-ons in
-  CLEAN_PARKING_LOT.md.
+  no; the customer /track tracker stays stages-only (no clock times to clients). Full spec and
+  follow-ons in CLEAN_PARKING_LOT.md.
+- **Now card corrected same day** (Paul 2026-06-18, migration 0202). Dropped the `dogs.appearance`
+  tell-apart field: the dog's photo + name already disambiguates, and a description is premature
+  for a dog not yet groomed (Paul is not expected to know more than "two German Shepherds" until
+  the client names them and he works them). Kept `dogs.handling` (the post-grooming care note).
+  Added other-dogs-on-site to the card (name + breed + photo for dogs in the household not on
+  today's appointment), the same instinct as knowing the people at the door.

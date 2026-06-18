@@ -1191,3 +1191,16 @@ v1 limitations / follow-ons (not blocking):
   photo per dog" pointer yet; pick the clearest face if this matters.
 - `appearance` / `handling` start empty for the whole book; they fill in as Paul adds them
   (Colleen Smith's two Cavaliers are the first real case). Not invented; real data only.
+
+### Correction (2026-06-18, migration 0202): appearance dropped, on-site dogs added
+
+Reality over the note above: the `dogs.appearance` tell-apart field was PULLED the same day.
+The photo of each dog with its name already disambiguates, and a tell-apart line is premature
+anyway: a dog Paul has not groomed yet (Colleen's two German Shepherds, no names known) is one
+he is not expected to know anything about beyond "there are two German Shepherds" until the
+client tells him and he works the dog. Only `dogs.handling` (the post-grooming "we've got this"
+care note) remains as a new field. Also added: the card now lists OTHER dogs on site that are not
+on today's appointment (name + breed + photo only), the same instinct as knowing the people at
+the door; you might meet the dog even when you are not grooming it. So the v1 dog data on the
+card is: photo + name + breed + standing instructions + handling + follow-ups + price for the
+groomed dogs, and photo + name + breed for the others on site.
