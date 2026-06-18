@@ -274,6 +274,16 @@ export async function setClientStatus(clientId, level, reason = null) {
   return rpc('admin_set_client_status', { p_client_id: clientId, p_level: level, p_reason: reason });
 }
 
+// Clean, separate dimensions (migration 0216), no longer conflated in status:
+// client_type is recurring | on_demand; lifecycle is active | moved_away |
+// deceased | inactive | merged | test. Banning stays its own thing (above).
+export async function setClientType(clientId, type) {
+  return rpc('admin_set_client_type', { p_client_id: clientId, p_type: type });
+}
+export async function setClientLifecycle(clientId, state) {
+  return rpc('admin_set_client_lifecycle', { p_client_id: clientId, p_state: state });
+}
+
 export async function setDogStanding(dogId, text) {
   return rpc('admin_set_dog_standing', { p_dog_id: dogId, p_text: text });
 }

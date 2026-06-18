@@ -446,6 +446,22 @@ section labels are eyebrows; the header info grid is the clean keyval (no more u
 dt). Staged in Prometheus for review. Scoped to the client record this pass; the same treatment can
 roll to the visit rows, the remaining stripe panels, and the other views once Paul likes the look.
 
+Client type/lifecycle untangle (`client_type_and_lifecycle`, Paul 2026-06-18). The legacy
+`status`/`roster_group` columns conflated three things: TYPE (recurring vs on-demand), LIFECYCLE
+(active, moved away, deceased, inactive, merged, test), and the BAN, which is why a record could read
+"one off one off". Migration 0216 adds two clean single-purpose columns, `client_type` (recurring |
+on_demand) and `lifecycle` (active | moved_away | deceased | inactive | merged | test), backfilled
+from the existing data (explicit type label wins, else cadence decides type; real lifecycle states
+kept, everything else active). Ban stays orthogonal in nofly_level, never folded in. The legacy
+columns are LEFT in place on purpose: ~30 queries read roster_group ('standing' for the legacy book /
+retention / win-back, 'banned' for the ban), so the clean columns are the truth going forward and
+drive the UI while the legacy columns stay as compatibility until a later reader migration. Setters
+`admin_set_client_type` / `admin_set_client_lifecycle`; admin_list_clients now returns both
+(admin_get_client already returns the whole row). UI: clientTag reads the clean fields (no more
+stopgap maps), and a collapsed "Type & status" control under the name edits them, with a help entry.
+Backfill verified: no nulls, no recurring-without-cadence anomalies, 3 banned clients orthogonal to
+lifecycle. Staged in Prometheus.
+
 ### 2026-06-16 (Library follow-ons: obvious caption control, captions by any admin, crew upload-to-team; migration 0198)
 
 Paul's follow-up on the rebuilt Library, three asks. (1) A more obvious way to add or edit a

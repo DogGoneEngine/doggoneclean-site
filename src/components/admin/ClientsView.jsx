@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, ensureVisit, setAppointmentDogs } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, ensureVisit, setAppointmentDogs, setClientType, setClientLifecycle } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -22,26 +22,20 @@ const SERVICE_LABELS = {
   nails_only: 'Nails only',
 };
 
-// Client type, the two real situations: Recurring (on a cadence) or On-demand
-// (they reach out when they want). The raw `status`/`roster_group` columns
-// currently conflate type with lifecycle (active, moved away, deceased, merged)
-// and even banned, which is why the sheet showed "one off one off". Until that is
-// untangled in the data, map the known values to one clean human label here.
-const CLIENT_TYPE = {
-  standing: 'Recurring', active: 'Recurring',
-  one_off: 'On-demand', one_off_for_now: 'On-demand', at_will: 'On-demand', at_will_winddown: 'On-demand',
+// Client type and lifecycle are now their own clean columns (migration 0216),
+// no longer conflated in status/roster_group. Ban is a separate dimension
+// (nofly_level), shown by StatusBadge, never folded into the tag.
+const TYPE_LABEL = { recurring: 'Recurring', on_demand: 'On-demand' };
+const LIFECYCLE_LABEL = {
+  active: '', moved_away: 'Moved away', deceased: 'Deceased',
+  inactive: 'Inactive', merged: 'Merged', test: 'Test',
 };
-const CLIENT_STATE = {
-  moved_away: 'Moved away', deceased: 'Deceased', inactive: 'Inactive',
-  merged: 'Merged', test_account: 'Test', banned: 'Banned',
-};
-// One clean label: the type if we can tell, plus a lifecycle note when it is not
-// a plain current client. De-duplicated, never the raw enum twice.
+// One clean label: type, plus a lifecycle note when it is not a plain current
+// client. Falls back to cadence only if the type column is somehow unset.
 function clientTag(c) {
-  const s = c.status, r = c.roster_group;
-  const type = CLIENT_TYPE[s] || CLIENT_TYPE[r] || null;
-  const state = CLIENT_STATE[s] || (CLIENT_STATE[r] && CLIENT_STATE[r] !== type ? CLIENT_STATE[r] : null);
-  return [type, state].filter(Boolean).join(' · ') || (s || '').replace(/_/g, ' ');
+  const type = TYPE_LABEL[c.client_type] || (c.cadence_days ? 'Recurring' : '');
+  const state = LIFECYCLE_LABEL[c.lifecycle] || '';
+  return [type, state].filter(Boolean).join(' · ');
 }
 
 function money(cents) {
@@ -288,6 +282,7 @@ function ClientSheet({ clientId, onChanged }) {
           ['Dogs on this appointment', 'Tap a dog off to drop it from today (the visit re-prices to the dogs kept). A dog that moved away or left is hidden; tap "A dog who\'s back" to add one for this one visit, without un-archiving it.'],
           ['On each dog', 'Set breed, price, notes, birthday, and handling. The price is what the visit charges. Open "Roster status" to mark a dog Sometimes, Moved away, Former, or Deceased.'],
           ['Past and other dogs', 'Dogs that moved away, left, or passed are kept, folded shut below the roster, so they stay findable without cluttering the day or the tracker.'],
+          ['Type & status', 'Under the name: set Recurring (on a cadence) vs On-demand (books when they want), and the lifecycle (active, moved away, deceased, inactive, merged, test). These are separate from banning, which is at the bottom.'],
           ['Add alternate address', 'Records a second place you sometimes groom this client, clickable to Maps.'],
           ['Log a visit', 'Adds a visit to the history below, with what you did, time, and what was collected.'],
           ['Photos', 'Each visit photo can go to the client, the Team gallery, the website, or be flagged. Their own help sits by the photos.'],
@@ -299,6 +294,7 @@ function ClientSheet({ clientId, onChanged }) {
         </div>
         {c.nofly_level && <StatusBadge level={c.nofly_level} reason={c.nofly_reason} />}
         <AliasManager clientId={clientId} onChanged={onChanged} />
+        <ClientTypeControl client={c} onChanged={() => { load(); onChanged?.(); }} />
         <dl className="ad-keyval">
           <Field label="Service" value={SERVICE_LABELS[c.service_type] || c.service_type} />
           <Field label="Frequency" value={c.cadence_days ? `every ${c.cadence_days} days${c.cadence_confidence ? ` (${c.cadence_confidence})` : ''}` : c.cadence_note} />
@@ -408,6 +404,47 @@ function ClientSheet({ clientId, onChanged }) {
           a rare, deliberate action, not something to fat-finger from the header. */}
       <ClientStatusControl client={c} onChanged={() => { load(); onChanged?.(); }} />
     </div>
+  );
+}
+
+// Type and lifecycle, the clean separated dimensions (migration 0216). Collapsed
+// so it does not crowd the header; the summary states what it is. Recurring vs
+// on-demand is the relationship; lifecycle is where they are in their life as a
+// client. Banning is a separate, stronger action at the bottom of the sheet.
+function ClientTypeControl({ client, onChanged }) {
+  const [busy, setBusy] = useState(false);
+  const type = client.client_type || '';
+  const life = client.lifecycle || 'active';
+  async function change(fn, v) { setBusy(true); try { await fn(client.id, v); onChanged?.(); } finally { setBusy(false); } }
+  return (
+    <details style={{ marginTop: 8 }}>
+      <summary style={{ cursor: 'pointer', fontSize: 12, color: 'var(--ad-text-faint, #8b8f9e)' }}>Type &amp; status</summary>
+      <div style={{ marginTop: 8, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <label style={{ fontSize: 13 }}>
+          Type<br />
+          <select className="ad-select" value={type} disabled={busy} onChange={(e) => change(setClientType, e.target.value)}>
+            {!type && <option value="" disabled>—</option>}
+            <option value="recurring">Recurring</option>
+            <option value="on_demand">On-demand</option>
+          </select>
+        </label>
+        <label style={{ fontSize: 13 }}>
+          Status<br />
+          <select className="ad-select" value={life} disabled={busy} onChange={(e) => change(setClientLifecycle, e.target.value)}>
+            <option value="active">Active</option>
+            <option value="moved_away">Moved away</option>
+            <option value="deceased">Deceased</option>
+            <option value="inactive">Inactive</option>
+            <option value="merged">Merged</option>
+            <option value="test">Test</option>
+          </select>
+        </label>
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--ad-text-faint, #8b8f9e)', marginTop: 6, maxWidth: 460, lineHeight: 1.45 }}>
+        Recurring means they are on a cadence; on-demand means they book when they want. Status is where they
+        are as a client. Banning is separate, at the very bottom of the record.
+      </div>
+    </details>
   );
 }
 
