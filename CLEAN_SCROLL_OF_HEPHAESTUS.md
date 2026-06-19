@@ -4366,3 +4366,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   serializes the whole row via `to_jsonb(c.*)`), so this was a UI-only gap: added an Email field right
   after Phone, rendered as a tappable `mailto:` link, null-guarded so clients without an email show no
   row. Applies to every client, not just Emily. Build clean.
+
+- **"Got it" on a field note clears it from Today now, not in a week** (Paul 2026-06-19, migration
+  0223). The "From the field" feed (`admin_field_flags`, the owner's inbox of notes a teammate flagged
+  on a visit) kept a seen note in the daily feed, greyed out, for 7 days before it aged off (0176). Paul,
+  looking at a day-old Lexi (Kevin Cummings) toe note he had already marked seen the night before: it is
+  noise today, how do I say I saw it and I'm done with it. The honest finding (from the live row) was that
+  he HAD marked it seen; the lingering week was the only reason it still showed, and there was no
+  clear-it-now control. Decision: a seen field note leaves Today immediately. Dropped the
+  `or field_seen_at > now() - 7 days` arm so the feed returns unseen flags only; once the owner taps Got
+  it, the reload no longer returns it and it disappears. Nothing is deleted: `field_seen_at` plus the
+  photo and the private note stay on the `visit_photos` row and on the dog's record, so the finding is
+  still findable, it just stops riding along in the feed (the card's help already promised "it moves out
+  of the way"). The teeth live in the RPC, no Oracle rule existed for the old linger. Verified against
+  live data: 1 field flag total (the Lexi note), now 0 unseen, so the feed is empty and the panel drops
+  off Paul's Today; the seen row is retained on the record.
