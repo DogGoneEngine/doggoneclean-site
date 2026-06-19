@@ -187,7 +187,7 @@ export default function TodayView({ onOpenClient }) {
   return (
     <>
       <h1>Today</h1>
-      <p className="ad-sub">{today}. Your stops for the day, then the feed from your AI department heads. Talk back to any of them.</p>
+      <p className="ad-sub">{today}. {isOwner ? 'Your stops for the day, then the feed from your AI department heads. Talk back to any of them.' : 'Your stops for the day.'}</p>
 
       <NowCard reloadKey={appts} onOpenClient={onOpenClient} />
 
@@ -208,7 +208,7 @@ export default function TodayView({ onOpenClient }) {
         )}
       </div>
 
-      {reminders.length > 0 && (
+      {isOwner && reminders.length > 0 && (
         <div className="ad-panel" style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>On your plate</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -240,7 +240,11 @@ export default function TodayView({ onOpenClient }) {
 
       {error && <div className="ad-error">{error}</div>}
 
-      {loading ? (
+      {/* The AI department-head feed is the Emperor's crystal ball: owner-only.
+          An operator's Today is the route (stops + the Now card) and their
+          assigned tasks, with money masked. The server (admin_list_briefings)
+          returns nothing to a non-owner regardless; this is the matching UI. */}
+      {isOwner && (loading ? (
         <div className="ad-panel">Loading the feed…</div>
       ) : briefings.length === 0 ? (
         <div className="ad-panel" style={{ opacity: 0.7 }}>
@@ -250,7 +254,7 @@ export default function TodayView({ onOpenClient }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {briefings.map((b) => <BriefingCard key={b.id} b={b} team={team} isOwner={isOwner} onChanged={load} onError={setError} />)}
         </div>
-      )}
+      ))}
     </>
   );
 }

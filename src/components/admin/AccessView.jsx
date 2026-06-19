@@ -21,6 +21,8 @@ const FIELD_LABELS = {
   message_thoughts: 'your private thoughts',
   amount_collected_cents: 'amount collected', tip_cents: 'tips',
   payment_method: 'payment method', amount_cents: 'appointment price',
+  briefing_feed: 'the AI department-head feed (win-back, pricing, churn, money counsel)',
+  reminders_feed: 'your "On your plate" reminders',
 };
 const CONTACT = new Set(['phone_e164', 'email', 'note', 'message_thoughts']);
 const MONEY = new Set(['amount_collected_cents', 'tip_cents', 'payment_method', 'amount_cents']);
@@ -30,6 +32,7 @@ function hiddenSummary(probeRole) {
   const all = new Set([
     ...(probeRole.client || []), ...(probeRole.visit || []),
     ...(probeRole.upcoming || []), ...(probeRole.today || []),
+    ...(probeRole.feeds || []),
   ]);
   if (all.size === 0) return null;
   const contact = [], money = [], other = [];
