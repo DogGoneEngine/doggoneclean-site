@@ -835,14 +835,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     worthEl.replaceChildren(...worthItems.map((w) => {
       const card = document.createElement('div');
       card.className = 'trk-worth__card';
+      const p = byId.get(w.id);
+      const dogName = p && p.dog_name ? p.dog_name : null;
       const by = document.createElement('p');
       by.className = 'trk-worth__by';
-      by.textContent = 'From ' + (w.by || 'Dog Gone Clean');
+      // Name the dog when the photo is tagged, so a close-up reads for the right
+      // dog in a multi-dog household ("From Paul - Manning").
+      by.textContent = 'From ' + (w.by || 'Dog Gone Clean') + (dogName ? ' · ' + dogName : '');
       const msg = document.createElement('p');
       msg.className = 'trk-worth__msg';
       msg.textContent = WORTH_MSG;
       card.append(by, msg);
-      const p = byId.get(w.id);
       if (p && p.url) {
         const a = document.createElement('a');
         a.href = p.url; a.target = '_blank'; a.rel = 'noreferrer';

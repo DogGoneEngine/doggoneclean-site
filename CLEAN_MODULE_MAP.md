@@ -90,8 +90,10 @@ the teeth live (the durable layer that survives a page rewrite).
   - The heard-and-delivered loop: `special_request` shown, then the answer photos
     (`answer_photo_ids`).
   - "Worth a look" photos: a flagged photo flips from a plain Moment to a worth-a-look
-    card WITH Paul's comment. Rides `tracker_status` as the `worth_a_look` array
-    (`[{id, note, by}]`); the page reads `data.worth_a_look`.
+    card WITH Paul's comment AND the tagged dog's name (so a close-up reads for the
+    right dog in a multi-dog household). Rides `tracker_status` as the `worth_a_look`
+    array (`[{id, note, by}]`); the dog name comes from the matched photo's `dog_name`
+    in the photos feed; the page reads `data.worth_a_look`.
   - Operator name/bio; client-visible photo credits.
 - **`tracker_status` must return every field the /track page reads:** found, stage,
   scheduled_start, scheduled_end, first_name, dogs, special_request,

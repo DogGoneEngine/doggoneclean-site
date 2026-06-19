@@ -317,7 +317,7 @@ function PhotoEditor({ photo, url, label, dogs = [], busy, dest, onClient, onTea
         </div>
       </div>
 
-      <PhotoFlag photo={photo} onChanged={onChanged} />
+      <PhotoFlag photo={photo} multiDog={multiDog} onChanged={onChanged} />
 
       {multiDog && (
         <div style={{ marginTop: 12 }}>
@@ -370,7 +370,7 @@ function DestRow({ on, color, label, desc, onClick, disabled }) {
 // it over) and For the owner (private). Rewritten 2026-06-18 to be unmistakable:
 // the on-state shows instantly as a clear banner the moment you tap, plus a "Saved"
 // line, so there is never any doubt it took (Paul: "I couldn't see if it saved").
-function PhotoFlag({ photo, onChanged }) {
+function PhotoFlag({ photo, multiDog = false, onChanged }) {
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
@@ -407,6 +407,11 @@ function PhotoFlag({ photo, onChanged }) {
         (for example: "matting behind the ears, want it shaved short?"). Different from just sharing the photo.
         You can also keep a note for yourself instead.
       </div>
+      {multiDog && !photo.dog_id && (
+        <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ad-warn, #b9770a)', marginTop: 7 }}>
+          More than one dog here: tag which dog below so the client knows which one this photo shows.
+        </div>
+      )}
 
       {wal && (
         <div style={bannerBox('var(--ad-accent, #2563d8)', 'rgba(37,99,216,0.10)')}>
