@@ -4359,3 +4359,10 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   so post-seed operational moves live in the DB via migrations, not in the seed file. Verified: Emily's
   client/dog/subscriber/subscription/bath_dog all read correct, Klaus carries his 23 history rows, and
   Klaus is gone from Kevin in both `public.dogs` and `bath_dogs`.
+
+- **Client sheet now shows Email** (Paul 2026-06-19, while looking for Emily's email). The Orbit client
+  sheet (`ClientsView.jsx`) rendered Phone and a "Text the client" SMS link but had no Email row at all,
+  so an email on file (`clients.email`) was invisible there. The detail RPC already returns it (it
+  serializes the whole row via `to_jsonb(c.*)`), so this was a UI-only gap: added an Email field right
+  after Phone, rendered as a tappable `mailto:` link, null-guarded so clients without an email show no
+  row. Applies to every client, not just Emily. Build clean.

@@ -305,6 +305,7 @@ function ClientSheet({ clientId, onChanged }) {
           <LocationField client={c} />
           <Field label="Geo notes" value={c.location_geo_notes} />
           <Field label="Phone" value={c.phone_e164} />
+          <Field label="Email" value={c.email ? <a href={`mailto:${c.email}`}>{c.email}</a> : null} />
           {data.contact_links?.sms && (
             <Field label="Contact" value={<a className="ad-btn ad-btn--ghost ad-btn--sm" href={data.contact_links.sms}>Text the client</a>} />
           )}
