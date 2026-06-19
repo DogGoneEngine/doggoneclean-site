@@ -901,6 +901,20 @@ console is being built emperor-mode for Paul but the business is built to run wi
 every client's personal contact and the business's money numbers; masking in the RPC instead of
 the page means no future floor can accidentally leak what the role should not see. Paul,
 2026-06-10. Foundation shipped in migration 0150.
+Extended 2026-06-19 (migration 0220): the Today floor's two owner feeds are masked the same way,
+server-side to owner only. The AI department-head briefing feed (win-back, below-rate pricing with
+per-hour revenue, retention/churn, CFO money counsel, capacity, reorder) and Paul's "On your plate"
+reminders are the Emperor's crystal ball, so admin_list_briefings and admin_list_reminders return
+an empty feed to any non-owner. An Employee's Today is the route (stops with money masked, the Now
+card when at a stop) plus the tasks assigned to them through the Tasks panel; the owner business
+intelligence is gone. admin_access_probe now also probes these feeds per role and reports them in a
+"feeds" bucket, so the Access map shows the boundary and it cannot silently regress (this leak
+shipped precisely because the probe checked field masking only, never whole feeds). Because an
+employee needs the day's work, not the owner's read on who to win back and what every client earns
+per hour. Fully owner-only for now and field-tested as such from 2026-06-19 (Paul: run it like this
+for now, adjust as we go if needed); if a real need shows, a specific agent lane (e.g. trailer
+maintenance) can be carved back to the operator without a rewrite, since the gate is role-checked
+in the RPC.
 
 `admin_console_named_laelaps` (Clean: brand):
 The admin console is named Laelaps, served at /laelaps, with /orbit and /admin kept as working
@@ -2227,10 +2241,11 @@ is built so it can never drift from reality. The menu half is generated from the
 one role-to-floors definition the live nav also gates on (roles.js), so there are
 not two lists to keep in sync, only one. The masking half is read live by
 admin_access_probe, which calls the real masking RPCs once as the owner and once
-as a representative of each other role and reports the fields that disappear, so
-the page shows what the server actually strips, not a hand-written note that can
-go stale; an unknown stripped field still shows by its raw name so nothing can
-hide. Because access creep is silent: permissions get added one at a time and a
+as a representative of each other role and reports the fields that disappear (and,
+since migration 0220, the whole owner-only feeds that disappear, like the briefing
+feed and the reminders, in a "feeds" bucket), so the page shows what the server
+actually strips, not a hand-written note that can go stale; an unknown stripped
+field still shows by its raw name so nothing can hide. Because access creep is silent: permissions get added one at a time and a
 year later no one can say who sees what, and a map you cannot trust is worse than
 no map. A description drifts; a generated map cannot. Paul, 2026-06-13.
 

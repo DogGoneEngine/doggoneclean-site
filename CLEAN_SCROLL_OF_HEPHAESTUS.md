@@ -4330,4 +4330,9 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   `admin_access_probe` was extended to probe both feeds per role and report them in a new `feeds`
   bucket, and the Access map renders it: the audit can now see this boundary so it cannot silently
   regress. Verified by impersonation: operator gets 0 briefings / 0 reminders, owner still gets the
-  full feed.
+  full feed. Verified Jake's Today is not bare: he keeps his route stop (money masked), the Now
+  card when at a stop, and his assigned tasks (3 open and his, each with a Done button). Field-test
+  decision (Paul 2026-06-19): run it fully owner-only for now and adjust as we go if it turns out an
+  employee needs a specific agent lane (e.g. trailer maintenance) surfaced; the RPC role-gate makes
+  that a one-line carve-out, no rewrite. Durable home: extended `orbit_roles_operator_masked` in the
+  Oracle (and `access_map_reads_the_truth` for the probe's new feeds bucket).
