@@ -4315,3 +4315,19 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   visit's special_request and the card has its own request input writing through the existing
   admin_set_visit_request (the heard-and-delivered loop: shows on the client tracker as "you asked
   for", proven by the answer photo). Per-visit, same field the stop card and tracker already use.
+
+- **Bug fix: the Today feeds are Emperor-only, the employee sees only the route** (Paul 2026-06-19,
+  migration 0220). Jake is set up as an Employee (operator role) to field-test employee mode, and
+  his Today matched Paul's: he saw the AI department-head briefing feed (win-back targets, below-rate
+  pricing clients with their per-hour revenue, churn/retention lists, the CFO money counsel, capacity,
+  reorder) and Paul's "On your plate" reminders. Both feeds were gated by `_is_admin()` only (true for
+  any active admin), never by role, while `admin_today_appointments` already masked money for the
+  operator. Fix: `admin_list_briefings` and `admin_list_reminders` now return empty to any non-owner,
+  so the briefing feed and the reminders are owner-only (the Emperor's crystal ball; an Employee's
+  Today is the route, money masked, plus tasks assigned to them through the Tasks panel). TodayView
+  hides both sections for non-owner to match. The leak slipped because the Access floor's
+  `admin_access_probe` only diffed client/today field masking and never looked at the feeds, so
+  `admin_access_probe` was extended to probe both feeds per role and report them in a new `feeds`
+  bucket, and the Access map renders it: the audit can now see this boundary so it cannot silently
+  regress. Verified by impersonation: operator gets 0 briefings / 0 reminders, owner still gets the
+  full feed.
