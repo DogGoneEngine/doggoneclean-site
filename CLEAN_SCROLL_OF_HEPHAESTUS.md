@@ -4336,3 +4336,26 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   employee needs a specific agent lane (e.g. trailer maintenance) surfaced; the RPC role-gate makes
   that a one-line carve-out, no rewrite. Durable home: extended `orbit_roles_operator_masked` in the
   Oracle (and `access_map_reads_the_truth` for the probe's new feeds bucket).
+
+- **Klaus relocated to a new household: Emily Cummings is her own client now** (Paul 2026-06-19,
+  migrations 0221 + 0222). Erin Cummings (Kevin's wife) reported that Klaus, the German Shepherd, moved
+  to live with their daughter Emily, and asked to schedule his grooming at Emily's house (8946 SW 69th
+  Terr, Ocala 34476, Pioneer Ranch by Publix, inside the SW Ocala cluster). Paul booked the first
+  appointment in Acuity because in-app reminders are not live yet, and asked for everything else.
+  Decision (Paul chose it over keeping Klaus on the family account as a one-off): make Emily a full
+  standing client and move Klaus to her. Unlike Kevin's Ace and Kage (0107), who moved out of service to
+  Tampa and stayed on Kevin's record as `roster_status='moved'`, Klaus is still in the service area and
+  still a client, so he gets a live record at the home he lives in. 0221: created the Emily Cummings
+  client, reparented Klaus's `public.dogs` row to her (keeping his dog_id, so all 23 rows of visit and
+  behavior history followed him; Kevin's past visits stay under Kevin, intact), recorded the family link
+  in `relationships` on both records, and took Klaus off Kevin's `bath_dogs`. 0222 (after Paul supplied
+  Emily's phone 352-445-7355 and email): finished Emily as a complete legacy-style client mirroring
+  Kevin's shape, a `bath_subscribers` row + a `bath_subscriptions` row (full_groom, square_in_person so
+  the 24h Stripe auto-charge never touches her, ~6wk cadence at $105, Ocala) + Klaus's `bath_dogs` row
+  reparented to her and reactivated. Cadence carried at `low` confidence (unconfirmed at the new home);
+  `is_anchor=false` so the new stop does not shift the service-area anchor math (her address already sits
+  inside the served SW cluster). `legacy/data/clients.json` intentionally left unchanged: it is the
+  frozen legacy seed (the audit pins it at 33 standing, and Ace/Kage are still listed under Kevin there),
+  so post-seed operational moves live in the DB via migrations, not in the seed file. Verified: Emily's
+  client/dog/subscriber/subscription/bath_dog all read correct, Klaus carries his 23 history rows, and
+  Klaus is gone from Kevin in both `public.dogs` and `bath_dogs`.
