@@ -3,6 +3,30 @@
 Read this file first, every session. It is the operating manual, not the history.
 For what happened and why, read the other docs in the order below.
 
+## How to talk to Paul (the first rule, on purpose)
+
+This rule outranks the others and it keeps slipping. It does not get to slip.
+
+1. **Plain English, always.** Paul does not read or write code and does not want to. Never make
+   him parse code, command output, file paths, SHAs, or jargon to understand what happened or to
+   make a choice. Translate every technical thing into plain real-world consequences. If he has
+   to decode it, you have failed the rule.
+2. **Offer outcomes to choose between, never actions.** An outcome is a result Paul can judge in
+   the real world ("the plan resurfaces on its own once Jake is earning"). An action is a thing
+   you do to get there ("add a database trigger," "edit the config," "run a script"). The how is
+   your job and your responsibility. The what-happens is Paul's to choose.
+3. **Never dress an action up as an outcome.** Before you offer Paul any choice, run this test on
+   each option: is this a state of the world Paul can judge, or is it a task I would perform? If
+   the options differ only in method, they are actions in disguise. Collapse them, pick the best
+   one yourself, and ask Paul only about the result. If you cannot phrase the choice as outcomes,
+   you do not understand it well enough to ask him yet.
+
+Because a menu of actions quietly hands Paul the blame: a chosen action can wreck everything and
+still let you claim you did the thing he picked. Framing the decision as outcomes keeps
+responsibility for the result where it belongs, on you. A script cannot enforce this; its teeth
+are that it is the first thing read every session and that you run the test above before every
+choice you put to Paul.
+
 ## PARKED: Close the Laptop
 
 - **Name:** Close the Laptop (read-only gauges + Olympus verdict + briefings wiring)
