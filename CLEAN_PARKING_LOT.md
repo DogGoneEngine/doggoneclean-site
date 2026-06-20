@@ -54,12 +54,12 @@ ownership track with privileges other employees will not have, and during traini
 Paul's route, so he NEEDS to see Paul's full schedule as his own work plan (Paul, 2026-06-20). His
 employee login is mostly there to pressure-test the system before there are more people.
 
-The work to do WHEN a second, regular (non-elevated) employee joins:
+The Calendar money leak is already closed (2026-06-20, migration 0226): admin_calendar now strips
+`amount_cents` and `payment_status` for the operator role, same as Today. What remains for a future
+regular employee:
 1. Restrict a regular operator's Today and Calendar to the appointments assigned to them
    (`operator_admin_id` = them), filtered server-side in the RPC so a redesign cannot drop it.
-2. Mask money on the Calendar floor for the operator role the same way Today already does (close the
-   `amount_cents` / `payment_status` leak).
-3. Keep Jake elevated through a per-person capability (a flag on his `admins` row, e.g. a
+2. Keep Jake elevated through a per-person capability (a flag on his `admins` row, e.g. a
    "sees the whole route" / lead capability), never by hardcoding his name, so the elevation is data
    and a future lead can be granted it too. Default deny for a new junior; grant up on purpose.
 

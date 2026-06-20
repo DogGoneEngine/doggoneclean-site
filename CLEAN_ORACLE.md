@@ -891,9 +891,10 @@ Laelaps has roles: 'owner' (Paul, everything) and 'operator' (a Hurricane Bath O
 route). An operator signs in with their own Google account (onboarding: insert an `admins` row
 with their email and role; their first sign-in binds it via admin_self's adopt-by-email), sees
 only the floors the route needs (Today, Calendar, Clients), and the MASKING IS SERVER-SIDE
-where a redesign cannot drop it: admin_get_client and admin_today_appointments strip contact
-details and money for the operator role and hand back a click-to-text link instead of a phone
-number. Honest limit until Twilio: an sms: link necessarily carries the number inside the href
+where a redesign cannot drop it: admin_get_client, admin_today_appointments, and admin_calendar
+strip contact details and money for the operator role and hand back a click-to-text link instead of
+a phone number (the Calendar money mask was added 2026-06-20, migration 0226, closing a leak where
+an operator could see each booking's amount and paid status). Honest limit until Twilio: an sms: link necessarily carries the number inside the href
 (not displayed, but inspectable by a technical person); true number-hiding is the Twilio relay,
 which slots in without changing the UI. Jake is the intended first test operator. Because the
 console is being built emperor-mode for Paul but the business is built to run without him

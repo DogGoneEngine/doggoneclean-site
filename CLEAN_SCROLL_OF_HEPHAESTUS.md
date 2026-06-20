@@ -4426,3 +4426,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   along on Paul's route those baths stay Paul's, so Jake's pay floor reads zero through training and
   fills once he is solo. No code change needed, the day total already counts only baths assigned to him;
   recorded in operator_commission_is_stored_share.
+
+- **Closed the Calendar money leak for operators** (Paul 2026-06-20, migration 0226). Follow-on from
+  the visibility check: the Today list already strips dollar amounts for an operator, but admin_calendar
+  did not, so an operator opening the Calendar floor saw each booking's amount and paid/unpaid status,
+  i.e. what every client pays. That contradicts orbit_roles_operator_masked (an employee never sees the
+  business's money). This was not a question for Paul, it is the standing rule, so it was just fixed:
+  admin_calendar now strips amount_cents and payment_status for the operator role, server-side, the same
+  way Today does. The Calendar UI already guarded on amount being present, so the masked payload renders
+  cleanly. Verified live: as Jake (operator) the calendar entries no longer carry amount_cents or
+  payment_status; as Paul (owner) they still do. orbit_roles_operator_masked and its index row updated
+  to list admin_calendar; the parking-lot lockdown item for the leak is marked done, leaving only the
+  per-operator row filtering for a future regular employee.
