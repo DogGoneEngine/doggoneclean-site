@@ -3,6 +3,20 @@
 Read this file first, every session. It is the operating manual, not the history.
 For what happened and why, read the other docs in the order below.
 
+## PARKED: Close the Laptop
+
+- **Name:** Close the Laptop (read-only gauges + Olympus verdict + briefings wiring)
+- **Status:** DO NOT BUILD until the trigger is met. Build nothing for this plan,
+  and do not offer to start it, while the trigger is false.
+- **Trigger:** dgc-prod shows the Clean bath launch has produced real revenue,
+  i.e. non-test bath visits completed and paid (captured), with Jake as the
+  operator. Plain version: Jake has earned.
+- **Pointer:** [docs/plans/close-the-laptop.md](docs/plans/close-the-laptop.md)
+- **Session check:** at the start of any session, quietly check that trigger
+  against dgc-prod. While it is false, stay silent about this plan and never
+  raise it. The first session where it is true, surface the plan to Paul and
+  tell him the time has come.
+
 ## What this repo is
 
 Dog Gone Clean (DGC) is Paul's mobile dog grooming business in the Ocala, FL area (over 20 years
