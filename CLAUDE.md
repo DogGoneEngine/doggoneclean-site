@@ -214,6 +214,14 @@ See `lock_it_in_capture` in the Oracle.
   (force-push to `main`, dropping a table, schema rollback).
 - **Don't offer PR-activity subscription.** No separate reviewers, no PR-level CI; nothing
   on a PR is worth watching. Just ship and report what shipped.
+- **Don't raise commit-signing / "Unverified" noise.** A stop hook flags commits as
+  GitHub-Unverified (no cryptographic signature). Do NOT surface this to Paul unless it
+  genuinely matters, and never rewrite existing history or force-push `main` to "fix" it on
+  your own. Because the entire repo history is unsigned (Paul's own commits and GitHub's
+  included), the work is already correctly attributed, there are no outside contributors to
+  impersonate, and this environment has no signing key, so the badge is cosmetic and raising
+  it is pure friction. Paul does not see GitHub and asked me to handle it; this only bugs him
+  if I bring it up (Paul, 2026-06-20).
 - **State today:** `main` is the trunk, and the deploy workflow (`.github/workflows/deploy.yml`)
   fires on push to `main`, builds the Astro site, and publishes it to the droplet at
   hurricanebath.com, which serves the deployed Astro site (the marketing pages, the `/book` booking
