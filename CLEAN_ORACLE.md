@@ -2741,6 +2741,25 @@ trusted over it. Because time_is_money is the system Paul actually ran the money
 it is the ledger of record; the sheets are his field notebook, trustworthy for observations, looser on
 exact dates and figures. Decided 2026-06-09.
 
+`visit_money_charged_paid_tip` (Clean: money):
+A visit holds money in two fields that mirror the Time is Money sheet's only two money columns, Charged
+and Paid. `visits.charged_cents` is what Paul charged: the invoice for the dogs actually groomed (a
+partial set charges only the dogs present that visit, never the app's auto estimate for the full
+roster). `visits.amount_collected_cents` is the Paid column: the full amount the client actually handed
+over, the tip INCLUDED. A tip is the gap between Paid and Charged, never a separate bucket. When a client
+pays more than was charged, that extra IS the tip and it STAYS inside amount_collected_cents. Do NOT move
+a tip out of amount_collected_cents into the `visits.tip_cents` column. The Time is Money sheet has no tip
+column, and the On Site Rate and Cycle Rate are computed off amount_collected (Paid), so siphoning the
+tip out both hides it from the money sheet and lowers Paul's money-per-hour for that visit. To log a paid
+visit: set charged_cents to what was charged, set amount_collected_cents to everything that was collected
+(tip and all), and leave tip_cents alone. The `tip_cents` column exists but is a trap; the Time is Money
+model does not read it. Because Time is Money is a money-per-hour ledger and the figure that matters is
+what landed in Paul's pocket per hour worked: a tip is part of that, so it belongs in Paid where the
+sheet and the rates can see it, not carved off to the side where they cannot. Recorded 2026-06-19 after a
+session made exactly this mistake: Kevin Cummings was charged 350 and the client paid 390; the session
+dropped Paid to 350 and tucked the 40 into tip_cents, which hid the tip and deflated the visit's rate.
+The correct record is Charged 350, Paid 390, with the 40 tip showing as the gap.
+
 `time_is_money_weekly_backup` (Clean: records):
 Paul kept a manual Time is Money sheet for years as his source of truth and retired it on 2026-06-15:
 Laelaps (the app) is now the system of record, and the weekly sheet is GENERATED FROM Laelaps, never a
