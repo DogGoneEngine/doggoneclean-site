@@ -4421,4 +4421,8 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   day's work pays. EarningsView leads with that Today number. Verified as Jake: the payload carries
   today_cents/today_count (0 today, correct, nothing assigned to him yet). Open decision raised to Paul:
   during ride-along training, do the baths Jake runs get credited to him (so his day shows real pay) or
-  is training observation-only until he is solo.
+  is training observation-only until he is solo. Paul's answer (2026-06-20): training is
+  observation-only and unpaid. Jake earns only on baths credited to him as the operator; while he rides
+  along on Paul's route those baths stay Paul's, so Jake's pay floor reads zero through training and
+  fills once he is solo. No code change needed, the day total already counts only baths assigned to him;
+  recorded in operator_commission_is_stored_share.

@@ -935,9 +935,14 @@ Operator pay is a percentage SHARE of each bath the operator runs, earned once t
 completed and the card is charged. The rate is stored as `admins.commission_bps` in basis points
 (5000 = 50%), defaults to 0 (a new admin earns nothing until a rate is set on purpose), and is
 applied server-side in admin_my_pay, never hardcoded in a page. Jake Nickerson, the founding
-Hurricane Bath Operator, is set to 5000 (50%), the same share he carries on the nails side. Because
-pay rate is durable business data that must survive a redesign and a sale, and a stored per-person
-rate lets a new operator be paid without a code change. Paul, 2026-06-20. Shipped migration 0224.
+Hurricane Bath Operator, is set to 5000 (50%), the same share he carries on the nails side. Training
+ride-alongs are observation-only and unpaid: an operator earns only on baths credited to them as the
+operator (operator_admin_id), so while Jake rides along on Paul's route (those baths stay credited to
+Paul) Jake earns nothing, and his pay begins when he runs baths under his own name. His My pay floor
+therefore reads zero through training and fills once he is solo, which needs no special code: the
+day total already counts only baths assigned to him (Paul, 2026-06-20). Because pay rate is durable
+business data that must survive a redesign and a sale, and a stored per-person rate lets a new
+operator be paid without a code change. Paul, 2026-06-20. Shipped migration 0224.
 
 `operator_pay_is_fact_not_goal` (Clean: operator):
 The My pay floor shows earnings as an accumulated fact (what has been earned), never a daily goal,
