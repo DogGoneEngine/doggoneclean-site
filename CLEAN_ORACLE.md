@@ -918,8 +918,10 @@ in the RPC.
 
 `operator_sees_own_pay` (Clean: operator):
 An operator's Laelaps has a My pay floor (the `pay` section, operator-only) that shows the
-signed-in operator their OWN earnings and nothing else: their share of their own completed-and-
-charged baths, this week, this month, all time, and the last eight weeks. It is computed server
+signed-in operator their OWN earnings and nothing else: their share of their own baths, shown as
+today's projected pay (their share of the baths assigned to them today, charged or not, so they
+can see what the day's work pays before it settles), plus this week, this month, all time, and the
+last eight weeks from completed-and-charged baths. It is computed server
 side by admin_my_pay, scoped to the caller's own `admins` row by auth.uid() with no parameter that
 could ask for anyone else's pay, so it returns no other money: not a bath's price to another
 client, not another worker's pay, not the business's books. This is the one deliberate carve-out to

@@ -4404,3 +4404,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   5000; the pay math runs and is correctly $0 today because his one bath is not charged yet and the two
   charged baths are not assigned to an operator, so the floor shows its empty state until he starts
   earning.
+
+- **My pay floor now leads with a whole-day total; confirmed Jake already sees the full route**
+  (Paul 2026-06-20, migration 0225). Two follow-ups from Paul once Jake's pay floor existed. First,
+  Jake rides along on Paul's route for training and is on a management/ownership track, so he needs to
+  see Paul's appointments as well as his own. Reality check against the live RPCs: there is no
+  per-operator row filter today. `admin_today_appointments` returns the whole day to any admin (money
+  stripped for operators) and `admin_calendar` returns the whole window to any admin (money NOT
+  stripped), so Jake already sees the full route on both Today and Calendar. The "employees only see
+  their own appointments" model was intended but never built; reality wins. That openness is correct
+  for Jake now (only operator, elevated, training ride-along); the lockdown for a future regular
+  employee, plus the Calendar money leak, is parked in CLEAN_PARKING_LOT.md ("Operator visibility
+  lockdown"). Second, Paul asked whether Jake's view shows a whole-day pay total. It did not (the floor
+  showed week / month / all-time only), so admin_my_pay now also returns `today_cents` / `today_count`:
+  the operator's share of every bath assigned to them today, charged or not, a forecast of what the
+  day's work pays. EarningsView leads with that Today number. Verified as Jake: the payload carries
+  today_cents/today_count (0 today, correct, nothing assigned to him yet). Open decision raised to Paul:
+  during ride-along training, do the baths Jake runs get credited to him (so his day shows real pay) or
+  is training observation-only until he is solo.

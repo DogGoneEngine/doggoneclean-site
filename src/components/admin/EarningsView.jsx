@@ -51,7 +51,7 @@ export default function EarningsView() {
   const pct = data ? sharePct(data.rate_bps) : null;
   const weeks = (data && Array.isArray(data.weeks)) ? data.weeks : [];
   const peak = weeks.reduce((m, w) => Math.max(m, Number(w.earned_cents || 0)), 0);
-  const nothingYet = data && Number(data.all_time_count || 0) === 0;
+  const nothingYet = data && Number(data.all_time_count || 0) === 0 && Number(data.today_count || 0) === 0;
 
   return (
     <>
@@ -68,24 +68,29 @@ export default function EarningsView() {
         <div className="ad-panel">Adding up your pay…</div>
       ) : nothingYet ? (
         <div className="ad-panel" style={{ lineHeight: 1.6 }}>
-          <div style={{ fontSize: 30, fontWeight: 700 }}>{money(0)}</div>
+          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>Today</div>
+          <div style={{ fontSize: 36, fontWeight: 800 }}>{money(0)}</div>
           <p style={{ fontSize: 14, margin: '6px 0 0', opacity: 0.75 }}>
-            No pay yet. Every bath you finish and that gets charged adds your {pct || 'share'} here,
-            and you will see it build by the week, the month, and all time.
+            No baths assigned to you yet. Each bath you run adds your {pct || 'share'} here: you
+            will see what the day pays you up top, and it builds your week, month, and all-time
+            totals as each one is charged.
           </p>
         </div>
       ) : (
         <>
-          {/* The hero: this week so far. */}
+          {/* The hero: what today's route pays. */}
           <div className="ad-panel" style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>This week so far</div>
-            <div style={{ fontSize: 40, fontWeight: 800, marginTop: 2 }}>{money(data.this_week_cents)}</div>
-            {Number(data.last_week_cents || 0) > 0 && (
-              <div style={{ fontSize: 13, marginTop: 2, opacity: 0.65 }}>{money(data.last_week_cents)} last week</div>
-            )}
+            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>Today</div>
+            <div style={{ fontSize: 40, fontWeight: 800, marginTop: 2 }}>{money(data.today_cents)}</div>
+            <div style={{ fontSize: 13, marginTop: 2, opacity: 0.65 }}>
+              {Number(data.today_count || 0) > 0
+                ? `your share of ${data.today_count} bath${Number(data.today_count) === 1 ? '' : 's'} on your route today`
+                : 'no baths assigned to you today'}
+            </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
+            <Stat label="This week" value={money(data.this_week_cents)} sub={Number(data.last_week_cents || 0) > 0 ? `${money(data.last_week_cents)} last week` : null} />
             <Stat label="This month" value={money(data.this_month_cents)} />
             <Stat label="All time" value={money(data.all_time_cents)} sub={`${data.all_time_count} bath${Number(data.all_time_count) === 1 ? '' : 's'}`} />
             <Stat label="Your share" value={pct || 'n/a'} sub="of each bath" />

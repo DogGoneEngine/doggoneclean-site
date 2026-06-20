@@ -15,7 +15,7 @@ export const SECTIONS = [
   { key: 'today',     label: 'Today',          ready: true,
     what: 'The crystal ball. Today’s route and next stop, money in motion, and the briefing feed from your AI department heads.' },
   { key: 'pay',       label: 'My pay',         ready: true,
-    what: 'Your paycheck: your share of every bath you have completed, this week, this month, and all time. Earnings as a fact, never a goal.' },
+    what: 'Your paycheck: what today’s route pays you up top, then your share of every bath this week, this month, and all time. Earnings as a fact, never a goal.' },
   { key: 'calendar',  label: 'Calendar',       ready: true,
     what: 'Every appointment across the bath book and the legacy book, month and week, with a Google Calendar import overlay.' },
   { key: 'schedule',  label: 'Schedule',       ready: true,

@@ -39,6 +39,33 @@ is the wall before the v2.0 online-payment surface and the remaining portal-pari
 (item 5) turns on text reminders. The bank/EIN/DBA (2-4) are the legal-entity spine Stripe and the
 bank sit on.
 
+## Operator visibility lockdown (deferred until a second, regular employee joins)
+
+Surfaced 2026-06-20 while wiring Jake's My pay floor. The intended design (`orbit_roles_operator_masked`)
+is that an employee sees only the floors the route needs with contact and money masked, and the
+mental model has been "employees only see their own appointments." Reality check against the live
+RPCs: that row-level restriction was never actually built. `admin_today_appointments` returns the
+WHOLE day's appointments to any admin and only strips the dollar amounts for the operator role;
+`admin_calendar` returns the whole window to any admin and does not even strip money, so an operator
+opening the Calendar floor currently sees `amount_cents` and `payment_status` on every booking.
+
+This is fine right now and actually wanted: Jake is the only operator, he is on a management /
+ownership track with privileges other employees will not have, and during training he rides along on
+Paul's route, so he NEEDS to see Paul's full schedule as his own work plan (Paul, 2026-06-20). His
+employee login is mostly there to pressure-test the system before there are more people.
+
+The work to do WHEN a second, regular (non-elevated) employee joins:
+1. Restrict a regular operator's Today and Calendar to the appointments assigned to them
+   (`operator_admin_id` = them), filtered server-side in the RPC so a redesign cannot drop it.
+2. Mask money on the Calendar floor for the operator role the same way Today already does (close the
+   `amount_cents` / `payment_status` leak).
+3. Keep Jake elevated through a per-person capability (a flag on his `admins` row, e.g. a
+   "sees the whole route" / lead capability), never by hardcoding his name, so the elevation is data
+   and a future lead can be granted it too. Default deny for a new junior; grant up on purpose.
+
+Not built now on purpose (Elon's algorithm: do not build multi-operator gating before there are
+multiple operators). The hook is here so it is not forgotten the day employee number two signs in.
+
 ## ====> CALENDAR FLIP: Google one-calendar-per-business cutover (strict order) <==== (2026-06-09)
 
 HIGH PROFILE. Read this before touching the calendar sync. The rule of record is
