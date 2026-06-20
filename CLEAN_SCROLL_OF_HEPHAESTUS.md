@@ -4438,3 +4438,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   payment_status; as Paul (owner) they still do. orbit_roles_operator_masked and its index row updated
   to list admin_calendar; the parking-lot lockdown item for the leak is marked done, leaving only the
   per-operator row filtering for a future regular employee.
+
+- **Diagnosed: the "Dog Gone Clean" Google calendar never fills (outbound half of the sync was never
+  pasted)** (Paul 2026-06-20). Paul reported his Laelaps schedule still does not show up on the Dog Gone
+  Clean calendar he made in Google. Investigated live, both sides. Findings: (1) INBOUND (Google ->
+  app) is healthy and current. bath_appointments holds 235 rows (229 source gcal_sync), last synced
+  2026-06-20 21:26 UTC, out to 2027-06-12. calendar-ingest fires every ~15 minutes, all 200s, so the
+  syncCalendar trigger in Paul's Google account is alive and the 366-day inbound script is the version
+  running. (2) OUTBOUND (app -> Dog Gone Clean calendar) has never run once. The calendar-export edge
+  function (verified working: returns all 211 in-window events correctly shaped with [dgc-mirror] tags)
+  has ZERO calls in the logs ever, and the Dog Gone Clean Google calendar is empty across a 4-month
+  window, last touched 2026-06-11 (the day Paul created it). Root cause: the outbound half
+  (calendar-export + exportToBusinessCalendar_ in apps-script-calendar.gs) was added 2026-06-13 but the
+  updated two-way Apps Script was never pasted into Paul's Apps Script project, so the version running
+  there is an older inbound-only one. Everything app-side is ready and verified (functions deployed,
+  cfo_cron_secret matches the script, gcal_calendar_id set, calendar connected, 15-min trigger live).
+  The single missing piece is loading the current apps-script-calendar.gs into Paul's Google account,
+  which only Paul can do (his Google credential). Within 15 minutes of that save the calendar fills and
+  stays current. No app-side change needed.
