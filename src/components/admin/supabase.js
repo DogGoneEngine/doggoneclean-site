@@ -469,6 +469,14 @@ export async function listBriefings(department = null, status = null) {
   return Array.isArray(data) ? data : [];
 }
 
+// My pay (operator_sees_own_pay): the signed-in operator's OWN earnings, their
+// share of their own completed-and-charged baths, computed server-side and
+// scoped to them alone. Shows no one else's money. The one carve-out to the
+// operator money mask.
+export async function myPay() {
+  return rpc('admin_my_pay');
+}
+
 export async function todayAppointments() {
   const data = await rpc('admin_today_appointments');
   return Array.isArray(data) ? data : [];

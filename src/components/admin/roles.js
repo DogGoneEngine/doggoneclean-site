@@ -14,6 +14,8 @@ export const SECTIONS = [
     what: 'The stakeholder window: how the business is doing, where Paul is today, and the dogs. Signal, not noise.' },
   { key: 'today',     label: 'Today',          ready: true,
     what: 'The crystal ball. Today’s route and next stop, money in motion, and the briefing feed from your AI department heads.' },
+  { key: 'pay',       label: 'My pay',         ready: true,
+    what: 'Your paycheck: your share of every bath you have completed, this week, this month, and all time. Earnings as a fact, never a goal.' },
   { key: 'calendar',  label: 'Calendar',       ready: true,
     what: 'Every appointment across the bath book and the legacy book, month and week, with a Google Calendar import overlay.' },
   { key: 'schedule',  label: 'Schedule',       ready: true,
@@ -61,7 +63,7 @@ export const READY = SECTIONS.filter((s) => s.ready).map((s) => s.key);
 // Library is on both lists for the Team gallery only; LibraryView shows a
 // non-owner just that tab (Assets and Website stay owner-only, enforced in the
 // RPCs too). See library_tabs_by_role.
-export const OPERATOR_FLOORS = ['today', 'calendar', 'clients', 'library'];
+export const OPERATOR_FLOORS = ['today', 'pay', 'calendar', 'clients', 'library'];
 // The viewer role (Kristin): a stakeholder, not day-to-day. The Family window
 // (family_window_into_the_business), the Prospectus, and the Team gallery, so a
 // stakeholder sees how the business is doing, what it is worth, and the crew's
@@ -88,7 +90,10 @@ export function floorsFor(role) {
 // The one definition of which section keys a role sees in the nav.
 export function visibleSectionKeysFor(role) {
   const floors = floorsFor(role);
+  // The owner default skips Family (a stakeholder floor) and My pay (an employee
+  // floor: the owner takes all and carries no commission). Both stay reachable
+  // by role, not by menu clutter.
   return floors
     ? SECTIONS.filter((s) => floors.includes(s.key)).map((s) => s.key)
-    : SECTIONS.filter((s) => s.key !== 'family').map((s) => s.key);
+    : SECTIONS.filter((s) => s.key !== 'family' && s.key !== 'pay').map((s) => s.key);
 }

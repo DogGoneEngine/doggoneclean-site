@@ -916,6 +916,33 @@ for now, adjust as we go if needed); if a real need shows, a specific agent lane
 maintenance) can be carved back to the operator without a rewrite, since the gate is role-checked
 in the RPC.
 
+`operator_sees_own_pay` (Clean: operator):
+An operator's Laelaps has a My pay floor (the `pay` section, operator-only) that shows the
+signed-in operator their OWN earnings and nothing else: their share of their own completed-and-
+charged baths, this week, this month, all time, and the last eight weeks. It is computed server
+side by admin_my_pay, scoped to the caller's own `admins` row by auth.uid() with no parameter that
+could ask for anyone else's pay, so it returns no other money: not a bath's price to another
+client, not another worker's pay, not the business's books. This is the one deliberate carve-out to
+orbit_roles_operator_masked, which strips ALL money from the operator role. Because an employee
+should be able to see their own paycheck without seeing the owner's books or a co-worker's pay, and
+scoping the money to the caller inside the RPC means the carve-out cannot widen by accident in a
+later redesign of the console. Paul, 2026-06-20. Shipped migration 0224.
+
+`operator_commission_is_stored_share` (Clean: operator):
+Operator pay is a percentage SHARE of each bath the operator runs, earned once that bath is
+completed and the card is charged. The rate is stored as `admins.commission_bps` in basis points
+(5000 = 50%), defaults to 0 (a new admin earns nothing until a rate is set on purpose), and is
+applied server-side in admin_my_pay, never hardcoded in a page. Jake Nickerson, the founding
+Hurricane Bath Operator, is set to 5000 (50%), the same share he carries on the nails side. Because
+pay rate is durable business data that must survive a redesign and a sale, and a stored per-person
+rate lets a new operator be paid without a code change. Paul, 2026-06-20. Shipped migration 0224.
+
+`operator_pay_is_fact_not_goal` (Clean: operator):
+The My pay floor shows earnings as an accumulated fact (what has been earned), never a daily goal,
+a quota, or a progress-to-target bar. Because a goal bar pushes the operator to overextend against
+the prime directive's earn-more-grind-less aim; the paycheck reports reality, it does not set a
+target. Mirrors the same decision on the nails side. Paul, 2026-06-20.
+
 `admin_console_named_laelaps` (Clean: brand):
 The admin console is named Laelaps, served at /laelaps, with /orbit and /admin kept as working
 aliases so old bookmarks never break. The Google sign-in redirect targets /laelaps, which must

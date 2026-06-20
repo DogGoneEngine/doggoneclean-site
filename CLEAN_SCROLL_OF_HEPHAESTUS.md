@@ -4381,3 +4381,26 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   of the way"). The teeth live in the RPC, no Oracle rule existed for the old linger. Verified against
   live data: 1 field flag total (the Lexi note), now 0 unseen, so the feed is empty and the panel drops
   off Paul's Today; the seen row is retained on the record.
+
+## Decisions log (2026-06-20)
+
+- **Jake gets a My pay floor in Laelaps: his share of every bath, building over time** (Paul
+  2026-06-20, migration 0224). Jake starts on Clean first (nails is parked for now) and will soon run
+  his own route, so when he opens Laelaps as an employee he needs to see what he has earned, not just
+  today's number. Decision on how he is paid: a percentage SHARE of each bath he runs, earned once the
+  visit is completed and the card is charged. Jake's share is 50%, the same as on the nails side.
+  Built as durable teeth so it survives a redesign and a sale: the rate is stored as
+  `admins.commission_bps` in basis points (Jake = 5000, default 0 so a new hire earns nothing until set
+  on purpose), and a new server function `admin_my_pay` computes the signed-in operator's OWN earnings
+  only (this week, this month, all time, last eight weeks), scoped to the caller's own `admins` row by
+  `auth.uid()` with no parameter that could ask for anyone else's pay. This is the one deliberate
+  carve-out to `orbit_roles_operator_masked` (which strips all money from the operator role): a worker
+  sees their own paycheck, never the bath's price to anyone else, a co-worker's pay, or the business's
+  books. Earnings show as an accumulated fact, never a goal or target bar (a goal bar would push him to
+  overextend, against earn-more-grind-less). New `EarningsView.jsx` renders it; `pay` added to
+  `OPERATOR_FLOORS` and excluded from the owner's default nav (the owner takes all and carries no
+  commission). Three Oracle rules recorded: `operator_sees_own_pay`, `operator_commission_is_stored_share`,
+  `operator_pay_is_fact_not_goal`. Verified on live data: Jake's row reads role operator, commission_bps
+  5000; the pay math runs and is correctly $0 today because his one bath is not charged yet and the two
+  charged baths are not assigned to an operator, so the floor shows its empty state until he starts
+  earning.

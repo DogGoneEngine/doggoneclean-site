@@ -24,6 +24,7 @@ import VendorsView from './VendorsView.jsx';
 import GrowthView from './GrowthView.jsx';
 import CalendarView from './CalendarView.jsx';
 import HRView from './HRView.jsx';
+import EarningsView from './EarningsView.jsx';
 import GeographyView from './GeographyView.jsx';
 import QuickCapture from './QuickCapture.jsx';
 import FamilyView from './FamilyView.jsx';
@@ -153,7 +154,7 @@ export default function AdminApp() {
   // it stays reachable by role, not by menu clutter.
   const visibleSections = floors
     ? SECTIONS.filter((s) => floors.includes(s.key))
-    : SECTIONS.filter((s) => s.key !== 'family');
+    : SECTIONS.filter((s) => s.key !== 'family' && s.key !== 'pay');
   const effectiveSection = floors && !floors.includes(section)
     ? floors[0]
     : (!floors && section === 'family' ? 'today' : section);
@@ -248,6 +249,7 @@ export default function AdminApp() {
       <main className="ad-main">
         {effectiveSection === 'family' && <FamilyView />}
         {effectiveSection === 'today' && <TodayView onOpenClient={openClient} />}
+        {effectiveSection === 'pay' && <EarningsView />}
         {effectiveSection === 'clients' && <ClientsView focus={clientFocus} />}
         {effectiveSection === 'schedule' && <ScheduleView />}
         {effectiveSection === 'finance' && <FinanceView />}
