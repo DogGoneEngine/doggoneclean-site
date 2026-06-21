@@ -319,8 +319,15 @@ us-east-1, in the shared "Mount Olympus" org) holds a real app database: the leg
 `public.clients` + `public.dogs` (seeded from `legacy/data/clients.json`), the recurring-service
 tables it was loaded into (`bath_subscribers`, `bath_subscriptions`, `bath_appointments`,
 `bath_dogs`), plus `cities`, `service_perimeters`, `app_secrets`, `notification_log`, and
-`notification_preferences`, all RLS-locked. Edge functions: `ocala-service-area` (drive-time +
-perimeter service-area gate) and `send-notification` (reminder/confirmation dispatcher).
+`notification_preferences`, all RLS-locked. Edge functions (17 live as of 2026-06-21, verify with
+`list_edge_functions`, not from memory): the service-area gate (`ocala-service-area`); the
+notification dispatcher (`send-notification`); the calendar bridge (`calendar-ingest` inbound from
+the Apps Script, `calendar-export` outbound mirror, and `calendar-sync` a dormant service-account
+alternative that stays OFF); the AI department heads and helpers (`cfo-brief`, `cfo-keycheck`,
+`weekly-review`, `wisdom-absorb`, `value-coach`, `riker`, `message-draft`, `inbox-fetch`); the
+tracker functions (`tracker-photos`, `tracker-eta`, `suggest-drive`); and `time-is-money-backup`.
+Scheduled work runs on 16 pg_cron jobs (the hourly `bath-reminders`, the daily department-head
+scans, the evening tomorrow-brief, and the weekly reviews); verify with `select * from cron.job`.
 Schema-as-code lives in `supabase/migrations/`, with the Drive MCP tools as the upstream reader and
 the Supabase MCP tools for the database. `legacy/data/clients.json` remains the authoritative seed
 for the legacy book.

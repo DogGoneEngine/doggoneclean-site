@@ -371,17 +371,32 @@ survive a reset:
   history); founders row and the 4wk/2wk cadence switcher correctly stay hidden. Verified against
   real data: 0 of 33 clients have a missing price or cadence.
   **PAUL ACTIONS (credentials/physical, no tool reaches them; the Chromebook is far smoother than
-  the phone for the Google Cloud bits):** (1) verify `service@doggoneclean.us` as a Resend sender and
-  hand over the API key -> stored in `app_secrets`, email turns on; (2) DONE (one-way), 2026-06-21:
-  Paul's Google Calendar is already connected via a Google Apps Script named "DGC Calendar"
-  (calendar -> app, writing `bath_appointments` with `source='gcal_sync'`, picks up a new booking
-  in ~1 minute). No further action, and do NOT build a second sync: the originally planned two-way
-  OAuth/service-account sync is NOT needed and must not be built, because a second writer would
-  double-book and double-remind. The dormant `calendar-sync` Supabase edge function (service-account
-  based, no cron) stays OFF; (3) point doggoneclean.us DNS at the droplet -> add the Caddy redirect;
+  the phone for the Google Cloud bits):** (1) DONE 2026-06-21: `service@doggoneclean.us` is a
+  verified Resend sender and the key is in `app_secrets` (`resend_api_key`, value present, updated
+  2026-06-21); a test reminder reached Paul's Gmail. Email CAN send but stays gated off by the
+  master switch (`notifications_have_a_master_live_gate`), so this is no longer a pending Paul
+  action; (2) Paul's Google Calendar is connected via his "DGC Calendar" Google Apps Script
+  (`supabase/apps-script-calendar.gs`) on a 15-minute trigger. Verified live 2026-06-21 from the
+  edge-function logs: the INBOUND half (calendar -> app, via the `calendar-ingest` edge function,
+  writing `bath_appointments` with `source='gcal_sync'`, 229 rows) has run continuously. The
+  OUTBOUND half (app -> a separate "Dog Gone Clean" Google calendar mirror, via `calendar-export`)
+  STARTED firing about 10 hours before the morning of 2026-06-21, which means a "Dog Gone Clean"
+  calendar now exists and the parallel bridge from `calendar_flip_order` is running. It is loop-safe
+  by design (the mirror tags its own events and the inbound read skips them, so there is no
+  double-booking; confirmed by the stable 229 gcal_sync + 6 app-booked row counts). SURFACED TO
+  PAUL 2026-06-21: confirm the outbound mirror is intended before relying on it. Per
+  `schedule_mirrors_real_bookings`, app-to-calendar write-back IS the standing post-cutover plan, so
+  two-way is wanted; what must stay OFF is a SECOND INBOUND writer, the dormant service-account
+  `calendar-sync` edge function (deployed, no cron, one manual test call observed), because a second
+  writer racing the live Apps Script would double-book and double-remind. The earlier note here that
+  "two-way is NOT needed and must not be built" was too broad and is corrected: it applies only to
+  that second inbound writer, never to the standing write-back; (3) point doggoneclean.us DNS at the
+  droplet -> add the Caddy redirect;
   (4) cancel Acuity, then Squarespace, once one real client is verified end to end.
-  **CUTOVER ORDER:** Resend key (emails CAN send, but stay gated off) -> connect calendar (sync on)
-  [DONE one-way 2026-06-21 via the "DGC Calendar" Apps Script; do not add a second sync]
+  **CUTOVER ORDER:** Resend key (DONE 2026-06-21; emails CAN send, but stay gated off) -> connect
+  calendar (sync on) [DONE 2026-06-21 via the "DGC Calendar" Apps Script: inbound calendar->app
+  live; outbound app->"Dog Gone Clean" mirror also firing as of 2026-06-21, see PAUL ACTIONS (2);
+  do not add the dormant service-account calendar-sync as a second inbound writer]
   -> cron + confirmation wiring live (DONE 2026-06-08, migration 0035) -> CANCEL ACUITY -> flip the
   master switch `app_secrets.notifications_live = 'true'` (migration 0036) -> the next hourly cron
   sends our first real reminders -> verify one real client got it -> flip doggoneclean.us DNS + Caddy

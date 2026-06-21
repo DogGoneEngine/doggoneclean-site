@@ -4520,3 +4520,29 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   app_secrets, no Stripe edge functions, and the booking funnel's "Confirm booking" button is a disabled
   stub), so new clients cannot pay or complete a booking online yet. Reminders remain MUTED: the master
   gate `app_secrets.notifications_live` is absent, and `notify_appointment` no-ops unless it equals 'true'.
+
+- **Correction (2026-06-21 recovery): the calendar is now running TWO-WAY, not one-way (reality wins).**
+  A second recovery session read the full doc set (CLAUDE.md, the whole Scroll, all of CLEAN_ORACLE.md,
+  CLEAN_BUSINESS_RULES.md, CLEAN_PARKING_LOT.md, CLEAN_MODULE_MAP.md) and re-checked the live edge
+  functions, which the prior pass had not done. Ground truth from the dgc-prod edge-function logs:
+  the live "DGC Calendar" Apps Script (`supabase/apps-script-calendar.gs`) runs BOTH directions on its
+  15-minute trigger. INBOUND (calendar -> app via `calendar-ingest`) has run continuously and is the
+  source of the 229 `gcal_sync` rows. OUTBOUND (app -> a separate "Dog Gone Clean" Google calendar
+  mirror via `calendar-export`) STARTED firing about 10 hours before the morning of 2026-06-21, which
+  only happens once a "Dog Gone Clean" calendar exists, so the parallel bridge from `calendar_flip_order`
+  is now active. It is loop-safe by design (the mirror tags its own events; the inbound read skips them;
+  row counts stable at 229 gcal_sync + 6 app-booked). So the prior bullet's "ONE-WAY only" and "two-way
+  is NOT needed and must NOT be built" were too broad: per the standing rule `schedule_mirrors_real_bookings`
+  app-to-calendar write-back IS the planned post-cutover behavior, so two-way is wanted. The thing that
+  must stay OFF is the SECOND INBOUND writer, the dormant service-account `calendar-sync` edge function
+  (no cron; one manual test call seen), because a second inbound writer racing the Apps Script would
+  double-book and double-remind. Surfaced to Paul: confirm the outbound mirror was started on purpose.
+
+- **Stale docs corrected (2026-06-21 recovery).** CLAUDE.md "Current state" claimed only two edge
+  functions; the project actually runs 17 edge functions and 16 pg_cron jobs (inventoried live and
+  written into CLAUDE.md). The Resend cutover step was still listed as a pending Paul action in the
+  parking lot; it is DONE (`resend_api_key` present in `app_secrets`, updated 2026-06-21, test email
+  delivered), now reconciled. Reminders stay MUTED (`notifications_live` row absent) until Acuity is
+  cancelled, exactly as `notifications_have_a_master_live_gate` requires. No Stripe yet (no key, no
+  Stripe edge functions, the booking Confirm button is still a disabled stub), so new-customer online
+  booking and payment remain the one real build gated on Paul handing over the Dog Gone Clean Stripe keys.
