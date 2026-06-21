@@ -4493,3 +4493,30 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   token), then confirm TLS, then (only on Paul's explicit confirmation the archive is complete) cancel
   Squarespace + Acuity, then flip `notifications_live`. A future session should NOT re-offer the switch
   unprompted; wait for Paul to raise it.
+
+- **Calendar sync is LIVE and one-way; do NOT build a second one (re-verified 2026-06-21).** Re-grounded
+  from the live systems after a bad session that wrongly claimed the calendar was not connected and
+  started steering toward a NEW service-account / iCal sync (which would have double-booked and
+  double-reminded). Ground truth, verified from dgc-prod and Drive: Paul's bookings flow calendar -> app
+  through a Google Apps Script named "DGC Calendar" (owned by nickerson.paul@gmail.com, modified
+  2026-06-21), which writes `bath_appointments` with `source='gcal_sync'` (229 rows, last write
+  2026-06-21 06:56 UTC, picks up a new booking within about a minute). It is ONE-WAY only. The cutover
+  item "connect Google Calendar" is therefore effectively DONE (one-way); the originally planned two-way
+  OAuth/service-account sync is NOT needed and must NOT be built. The Supabase edge function
+  `calendar-sync` (service-account based) is a DORMANT DUPLICATE: no cron, no wiring, OFF, and it stays
+  OFF. Leave the Apps Script running untouched.
+
+- **Cutover Caddy/DNS lever re-verified, with one precision (2026-06-21).** The prior note's core claim
+  holds: hurricanebath.com serves the new Astro site (Caddy, has /book and /portal) while doggoneclean.us
+  still shows the old Squarespace site. Precision from probing the droplet today: doggoneclean.us DNS
+  currently resolves straight to Squarespace's IPs (198.185.159.x / 198.49.23.x = ext-cust.squarespace.com),
+  NOT to the droplet, so live visitors hit Squarespace directly today. The droplet does also carry a
+  doggoneclean.us block that reverse-proxies to Squarespace (forcing the droplet with that Host header
+  returns Squarespace's own headers). So go-live still needs BOTH a droplet Caddy edit (serve the new site
+  root for doggoneclean.us) AND a DNS repoint of doggoneclean.us + www to 178.128.144.219 (the Cloudflare
+  token is already stored in app_secrets). Also re-verified the same night, reality over the old notes:
+  `bath_start_subscription` DOES enforce a service-area gate (requires a verified lat/lng and runs a
+  point-in-polygon check against the city route), and there is still NO Stripe (no Clean Stripe key in
+  app_secrets, no Stripe edge functions, and the booking funnel's "Confirm booking" button is a disabled
+  stub), so new clients cannot pay or complete a booking online yet. Reminders remain MUTED: the master
+  gate `app_secrets.notifications_live` is absent, and `notify_appointment` no-ops unless it equals 'true'.

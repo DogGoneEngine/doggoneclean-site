@@ -372,11 +372,16 @@ survive a reset:
   real data: 0 of 33 clients have a missing price or cadence.
   **PAUL ACTIONS (credentials/physical, no tool reaches them; the Chromebook is far smoother than
   the phone for the Google Cloud bits):** (1) verify `service@doggoneclean.us` as a Resend sender and
-  hand over the API key -> stored in `app_secrets`, email turns on; (2) connect Paul's Google Calendar
-  once (OAuth, or share it with a Clean service account) -> the live two-way sync turns on so Paul
-  never runs two systems; (3) point doggoneclean.us DNS at the droplet -> add the Caddy redirect;
+  hand over the API key -> stored in `app_secrets`, email turns on; (2) DONE (one-way), 2026-06-21:
+  Paul's Google Calendar is already connected via a Google Apps Script named "DGC Calendar"
+  (calendar -> app, writing `bath_appointments` with `source='gcal_sync'`, picks up a new booking
+  in ~1 minute). No further action, and do NOT build a second sync: the originally planned two-way
+  OAuth/service-account sync is NOT needed and must not be built, because a second writer would
+  double-book and double-remind. The dormant `calendar-sync` Supabase edge function (service-account
+  based, no cron) stays OFF; (3) point doggoneclean.us DNS at the droplet -> add the Caddy redirect;
   (4) cancel Acuity, then Squarespace, once one real client is verified end to end.
   **CUTOVER ORDER:** Resend key (emails CAN send, but stay gated off) -> connect calendar (sync on)
+  [DONE one-way 2026-06-21 via the "DGC Calendar" Apps Script; do not add a second sync]
   -> cron + confirmation wiring live (DONE 2026-06-08, migration 0035) -> CANCEL ACUITY -> flip the
   master switch `app_secrets.notifications_live = 'true'` (migration 0036) -> the next hourly cron
   sends our first real reminders -> verify one real client got it -> flip doggoneclean.us DNS + Caddy
