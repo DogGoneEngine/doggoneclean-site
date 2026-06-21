@@ -4481,3 +4481,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   copy is saved as plain text in `legacy/squarespace_site_archive.txt`, kept out of `src/` and
   stored as `.txt` so the build audit never scans its dashes and bare "grooming"; a pointer lives in
   CLAUDE.md under "Source of truth and data model". Reference only, not used by the build or site.
+
+- **Cutover deliberately HELD by Paul (2026-06-21), not forgotten.** After verifying the state above,
+  Paul chose to hold the doggoneclean.us switch for now. Tonight's verification and documentation
+  stand; the new site stays at hurricanebath.com and doggoneclean.us keeps showing the old Squarespace
+  site. CORRECTION found during verification: the droplet's `doggoneclean.us` Caddy block currently
+  relays the OLD Squarespace site (curling the droplet for that host returns Squarespace HTML; /book
+  and /portal 404), while the NEW Astro site is served at hurricanebath.com (has /book, /portal). So
+  the real go-live lever is a droplet Caddy edit to point doggoneclean.us at the new site root (a
+  Chromebook-terminal task), then repoint Cloudflare A/www to 178.128.144.219 (doable with the stored
+  token), then confirm TLS, then (only on Paul's explicit confirmation the archive is complete) cancel
+  Squarespace + Acuity, then flip `notifications_live`. A future session should NOT re-offer the switch
+  unprompted; wait for Paul to raise it.
