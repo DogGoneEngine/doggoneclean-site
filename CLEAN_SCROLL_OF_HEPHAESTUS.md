@@ -4456,3 +4456,16 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   The single missing piece is loading the current apps-script-calendar.gs into Paul's Google account,
   which only Paul can do (his Google credential). Within 15 minutes of that save the calendar fills and
   stays current. No app-side change needed.
+
+- **Resolved: the Dog Gone Clean calendar now mirrors the app, verified live** (Paul 2026-06-20). Paul
+  pasted the current two-way apps-script-calendar.gs into his Apps Script project and clicked Run.
+  Confirmed from the Google Calendar side: the Dog Gone Clean calendar, empty since 2026-06-11, now
+  carries the full app schedule (Terri McDonnell, Emily Cummings, Lisa Irwin, Cynthia Tieche, Emily
+  Walker, and the rest of the route), each event created by nickerson.paul@gmail.com, tagged
+  [dgc-mirror] with the bath_appointment id, dog counts and addresses matching the app. Both directions
+  now run on the 15-minute trigger, so it stays current on its own and only touches its own tagged
+  events. This is the parallel side-by-side cutover view Paul wanted (calendar_sync_moves_orbit /
+  the calendar mirror). Lesson worth keeping: when the outbound code was added 2026-06-13 the running
+  Apps Script silently stayed inbound-only because the helper lives in Paul's Google account and a code
+  change there is not live until Paul re-pastes it. Any future change to apps-script-calendar.gs needs
+  a paste into his account to take effect.
