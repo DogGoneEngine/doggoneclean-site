@@ -1469,6 +1469,24 @@ belongs in the same Supabase that owns the appointments, on the same scheduled-f
 pattern DGN already proved, rather than in a separate automation tool that would split the
 system and complicate a future sale.
 
+`notifications_have_a_master_live_gate` (architecture: safety):
+Real confirmations and reminders only leave the building when a single deliberate switch is on.
+The switch is the `notifications_live` row in `app_secrets`: the DB function `notify_appointment`
+reads it and sends nothing unless its value is exactly the text `true`. The OFF state is the
+ABSENCE of the row (a missing value coalesces to `false`), so the system is silent by default and
+goes live only when someone creates that row on purpose. This is why the hourly
+`bath_dispatch_reminders` cron can run against real appointments, find matches, and still send
+zero email: every send short-circuits at the gate. Status as of 2026-06-21: the row does NOT
+exist, so reminders are muted; the `send-notification` edge function, the Resend key, the verified
+`doggoneclean.us` sending domain, and the cron are all in place and tested (a test reminder reached
+Paul's Gmail 2026-06-21), waiting only on this switch. Do NOT create the `notifications_live=true`
+row until Acuity is cancelled, or clients get doubled reminders from both systems. Because
+automated messages reaching real clients is the single most expensive mistake this system can
+make, the safe state must be the default-on-absence one, and the go-live must be one explicit,
+reversible act, not a side effect of any other change. Corrects the loose earlier description of a
+row "set to off"; reality is the row is absent and absence is off. Pairs with
+`confirmations_and_reminders_via_supabase` and `legacy_folds_into_v2`.
+
 `if_payments_added_handle_money_safely` (money):
 If online payment is ever added, store all money in cents (convert to dollars only at the
 render boundary), fail loud rather than guess on a price lookup, and verify every payment

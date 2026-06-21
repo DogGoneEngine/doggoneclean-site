@@ -4438,3 +4438,46 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   payment_status; as Paul (owner) they still do. orbit_roles_operator_masked and its index row updated
   to list admin_calendar; the parking-lot lockdown item for the leak is marked done, leaving only the
   per-operator row filtering for a future regular employee.
+
+## Decisions log (2026-06-21)
+
+- **Email reminders are wired, tested, and deliberately muted; verified against live systems, not
+  prior-session claims** (Paul brought in a low-trust session that overclaimed; this entry is what
+  actually checks out). Confirmed real: a Resend account with the `doggoneclean.us` sending domain
+  verified (DNS shows the four Resend records live: `send` MX to Amazon SES, `send` SPF,
+  `resend._domainkey` DKIM, and `_dmarc`); `resend_api_key` stored in dgc-prod `app_secrets`
+  (updated 2026-06-21 02:47); the `send-notification` edge function (v7) and the hourly
+  `bath_dispatch_reminders` pg_cron job (jobid 1) both exist and are active; and a test reminder
+  genuinely landed in Paul's Gmail at 2026-06-21 02:56 (subject "Heads up, your appointment is
+  Wednesday, June 24", from service@doggoneclean.us). CORRECTION to the prior session's wording:
+  there is no `notifications_live` row "set to off". There is no such row at all, and the dispatch
+  function `notify_appointment` treats a MISSING row as off (it sends only when the value is exactly
+  `true`). So reminders are muted by default-absence, which is the safe state: the cron runs hourly,
+  finds the 5 appointments currently in a reminder window, and sends nothing. Recorded as durable
+  teeth in the new Oracle rule `notifications_have_a_master_live_gate` (+ index row), and the
+  `confirmations_and_reminders_via_supabase` index row was updated from "pending build" to BUILT.
+  The switch must NOT be flipped on until Acuity is cancelled, or clients get doubled reminders.
+
+- **doggoneclean.us DNS moved to Cloudflare; mail and the old site preserved; verified by lookup.**
+  Nameservers are now `ashton.ns.cloudflare.com` / `millie.ns.cloudflare.com` (Cloudflare).
+  Google email is intact (MX still points at `aspmx.l.google.com` and the alts). The root and `www`
+  still resolve to Squarespace (A records `198.185.159.x` / `198.49.23.x`; `www` CNAME
+  `ext-cust.squarespace.com`), so the OLD site is still live and serving. A Cloudflare API token is
+  stored in dgc-prod `app_secrets` row `cloudflare_token` (updated 2026-06-21 03:57) so DNS can be
+  repointed directly when we cut over. NOTHING has been switched yet.
+
+- **The site cutover itself is NOT done (the remaining work).** To move doggoneclean.us onto the new
+  app, in order: (1) add a Caddy site block for `doggoneclean.us` + `www` serving `/srv/doggoneclean`
+  on the droplet (needs the Chromebook terminal / SERVER_TASKS.md, this session has no droplet SSH);
+  (2) repoint the Cloudflare A/`www` records to the droplet IP `178.128.144.219` (doable directly
+  with the stored `cloudflare_token`); (3) confirm TLS; (4) ONLY after Paul confirms he has
+  everything he wants off the old site, cancel Squarespace and Acuity. The Squarespace text archive
+  (`legacy/squarespace_site_archive.txt`, 562 lines, captured 2026-06-21) is PARTIAL and unverified
+  by its own note (zip-code router pages and images not transcribed); per Paul's hard rule, do NOT
+  let him cancel Squarespace until he has personally confirmed the capture is complete, because once
+  it is off anything uncaptured is gone for good.
+
+- **Squarespace site text archived for reference** (commit on this branch). The verbatim old-site
+  copy is saved as plain text in `legacy/squarespace_site_archive.txt`, kept out of `src/` and
+  stored as `.txt` so the build audit never scans its dashes and bare "grooming"; a pointer lives in
+  CLAUDE.md under "Source of truth and data model". Reference only, not used by the build or site.
