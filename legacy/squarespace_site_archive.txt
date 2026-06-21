@@ -1,11 +1,3 @@
-ARCHIVE (reference only). Not used by the website build or the live site.
-Stored as plain text on purpose so the build audit never scans it for style;
-it preserves the old Squarespace site's wording verbatim, dashes and all. If
-Paul asks "how did we word something on the old site," this file is the source.
-A pointer to it lives in CLAUDE.md under "Source of truth and data model."
-
-================================================================================
-
 # Dog Gone Clean — Squarespace Site Text Archive
 
 **Source:** www.doggoneclean.us (Squarespace)
@@ -553,10 +545,133 @@ Become an approved client today. No appointment required. You'll be pre-approved
 ## Are you new to us or coming back?
 
 **I'm New** → /new-clients-start-here
-First visit or it has been more than 12 months since you
+First visit or it has been more than 12 months since your last appointment.
 
-[ARCHIVE NOTE: the captured text ends here mid-sentence. The source paste was
-cut off at this point, so this archive is partial. Still missing: the rest of
-the Schedule interstitial page, any pages after it, and the image-file URL list
-the capture header said would be at the bottom. If the full capture is needed,
-paste the remainder and it will be appended here.]
+**I'm Returning** → /schedule-now
+If we have groomed your dog within the last 12 months.
+
+If it has been over 12 months we confirm your details again to keep scheduling accurate.
+
+---
+
+# Page: Become an Approved Client
+
+**URL:** https://www.doggoneclean.us/approved-client
+**Title:** Become an Approved Client
+
+---
+
+# Become an Approved Client
+
+No appointment required. We'll contact you when availability aligns with your area.
+
+No obligation. Pre-approval remains active for 90 days.
+
+---
+
+# Page: Schedule Now (Returning Clients)
+
+**URL:** https://www.doggoneclean.us/schedule-now
+**Title:** Schedule Appointment
+**Note:** NOINDEX. Returning-client routing page. Contains some unfinished/placeholder content from the live site (noted inline).
+
+---
+
+[Tabs] Nail Clipping Only → /nail-clipping | Full Grooming Service → /full-grooming
+
+## Ocala, Florida
+
+### Precision Nail Care Only
+Per-zip-code Acuity booking links: 34470, 34471, 34474, 34475, 34476, 34479, 34480, 34481, 34482.
+
+### Full Grooming
+*(Live site placeholder: "Description text goes here.")*
+
+## St. Simons Island, Georgia
+
+### Precision Nail Care — Select Number of Dogs
+1 Dog has an Acuity link (appointment type 85871899); 2–6 Dogs were listed but not yet linked.
+*(Remaining accordion items were live-site placeholders: "Description text goes here.")*
+
+---
+
+# Page: Nail Clipping Only
+
+**URL:** https://www.doggoneclean.us/nail-clipping
+**Title:** Nail Clipping Only
+**Note:** NOINDEX. Returning-client nail booking router.
+
+---
+
+# Prices for Nail Clipping Only
+
+- 1 Dog … $30
+- 2 Dogs … $45
+- 3 Dogs … $60
+- 4 Dogs … $75
+- 5 Dogs … $90
+- 6 Dogs … $105
+
+# Click Your Zip Code
+
+Zip-to-zone routing (each links to a zone page that forwards to Acuity):
+- 34470 → zone-1
+- 34471 → zone-2
+- 34474 → zone-3
+- 34475 → zone-1
+- 34476 → zone-4
+- 34479 → zone-1
+- 34480 → zone-2
+- 34481 → zone-5
+- 34482 → zone-6
+
+# Don't see your zip code?
+
+If you don't see your zip code above, our service isn't available at your address yet. If you fill out the petition below we'll let you know if our service becomes available in your neighborhood.
+
+---
+
+# Page: Full Grooming Appointment
+
+**URL:** https://www.doggoneclean.us/full-grooming
+**Title:** Full Grooming Appointment
+**Note:** Returning-client full-grooming booking router.
+
+---
+
+# Click Your Zip Code
+
+Each zip links to its own full-grooming page that forwards to Acuity:
+- 34470 → /full-grooming-34470
+- 34471 → /full-grooming-34471
+- 34474 → /full-grooming-34474
+- 34475 → /full-grooming-34475
+- 34476 → /full-grooming-34476
+- 34479 → /full-grooming-34479
+- 34480 → /full-grooming-34480
+- 34481 → /full-grooming-34481
+- 34482 → /full-grooming-34482
+
+# Don't see your zip code?
+
+If you don't see your zip code above, our service isn't available at your address yet. If you fill out the petition below we'll let you know if our service becomes available in your neighborhood.
+
+---
+
+# Appendix A — Pages NOT transcribed (no prose content)
+
+These leaf pages existed only to forward visitors to Acuity scheduling and held no text worth archiving:
+
+- /zone-1, /zone-2, /zone-3, /zone-4, /zone-5, /zone-6 (nail-clipping zip routers)
+- /full-grooming-34470 through /full-grooming-34482 (full-grooming zip routers)
+- /cart (Squarespace commerce cart, empty)
+
+# Appendix B — Scheduling backend reference
+
+- **Scheduler:** Acuity Scheduling, owner ID **15997204**
+- New-client appointment type IDs are listed under the New Client Access page above.
+- The returning-client flow routes by zip code through intermediate zone/zip pages into Acuity.
+
+# Appendix C — Image asset URLs (Squarespace CDN)
+
+All hosted under `https://images.squarespace-cdn.com/content/v1/57c79853e6f2e1eaa6e702a2/`. Squarespace static ID: **57c79853e6f2e1eaa6e702a2**. If you want the actual image files preserved before cancellation, they must be downloaded separately from the CDN — they will go offline when the site does. Key images referenced across the site include the horizontal logo master PNG, the homepage photo set (PXL_ dated filenames 2021–2026), and the gallery's before/after set (processed_10000186xx series) plus older Instagram-embedded shots.
