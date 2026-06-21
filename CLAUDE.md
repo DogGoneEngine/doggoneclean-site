@@ -302,6 +302,10 @@ existing DogGoneClean.us content into this look; do not reinvent the copy. See
 - **`legacy/data/sources.md`** - source priority and the corrected contact-sheet doc-ID
   index.
 - **`legacy/data/README.md`** - provenance, resolved conflicts, open gaps.
+- **`legacy/squarespace_site_archive.txt`** - verbatim text archive of the old Squarespace
+  doggoneclean.us site (captured 2026-06-21, before cancellation). Reference only: NOT used by
+  the build or the live site, and kept as plain text on purpose so the audit never scans it.
+  This is the place to look when Paul asks how the old site worded something.
 - The calendar extract (`dgc_active_enriched`) is rough and unreliable, especially dog info
   and some cadences. Cross-check only, never a record source.
 - The active roster was determined in a prior session by referencing Paul's calendar (past

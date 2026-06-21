@@ -1,0 +1,562 @@
+ARCHIVE (reference only). Not used by the website build or the live site.
+Stored as plain text on purpose so the build audit never scans it for style;
+it preserves the old Squarespace site's wording verbatim, dashes and all. If
+Paul asks "how did we word something on the old site," this file is the source.
+A pointer to it lives in CLAUDE.md under "Source of truth and data model."
+
+================================================================================
+
+# Dog Gone Clean — Squarespace Site Text Archive
+
+**Source:** www.doggoneclean.us (Squarespace)
+**Captured:** June 21, 2026
+**Purpose:** Full text archive of the legacy Squarespace site, captured before cancellation. Hand to Claude Code for filing into the Dog Gone Clean documents.
+**Scope:** All pages with prose content. Navigation chrome and repeated footers stripped. Image files not included (URLs listed separately at the bottom). Zip-code router leaf pages noted but not transcribed — they contained only scheduling links, no text.
+
+---
+
+## Standard Footer (appeared on every page)
+
+> **LOCATIONS: Ocala, Florida**
+> We serve most Ocala mailing addresses with the following exceptions:
+> - We do not drive on unpaved roads.
+> - We do not travel to Silver Springs Shores, Summer Glen, or Marion Oaks.
+>
+> We accept: Cash, Credit Cards, and PayPal. NO CHECKS!
+>
+> Socials: YouTube (UCKEmzCwCe-Z2hShaErkcBug) · Facebook (/DogNails) · Instagram (@doggoneclean.us)
+
+---
+
+# Page: Home
+
+**URL:** https://www.doggoneclean.us/
+**Title:** Dog Gone Clean
+**Meta description:** Premium mobile dog grooming in Ocala, FL. One dog at a time. No cages. New clients can book online in under 3 minutes.
+
+---
+
+Premium Mobile Dog Grooming in Ocala, Florida.
+
+Schedule Your First Appointment in about 3 Minutes.
+
+[CTA] See If We're the Right Fit — 2 Minutes → /new-clients-start-here
+
+Returning client? Schedule here → /schedule-now
+
+## ***Focused Grooming. No Chaos.***
+
+Dogs are the reason. The system is how we do it right.
+
+Every appointment runs on a structured system built over two decades. We groom one household at a time in a fully self-contained, climate-controlled mobile unit. No cages. No assembly line. No crowded lobby.
+
+The process is deliberate. The workflow is repeatable. The results are consistent.
+
+Calm handling. Clear communication. Clean dogs.
+
+Your dog is treated with patience and control from start to finish.
+
+Paul Nickerson
+Owner, Dog Gone Clean
+
+*Structured. Reliable. Personal.*
+
+## ***GROOMING IN COMFORT***
+
+Your dog is groomed in a fully self-contained, climate-controlled mobile unit. No cages. No lobby. No waiting room.
+
+We work with one household at a time so the environment stays calm and predictable. The process is structured. The handling is deliberate.
+
+Comfort is engineered.
+
+## ***SERVICE AT YOUR DOORSTEP***
+
+We bring the entire grooming system to your driveway.
+
+Our mobile unit carries its own water, power, and climate control. We park at your home, complete the groom, and send arrival notifications along the way.
+
+No driving across town. No sitting in a lobby. No disruption to your day.
+
+You stay home. Your dog gets focused care. The route keeps moving.
+
+## Meet Paul Nickerson
+
+Paul did not fall into this business by accident. He chose dogs.
+
+He wanted to build his life around working with them. So he trained at the Florida Institute of Animal Arts and built Dog Gone Clean from the ground up in Ocala, Florida.
+
+What started as one trailer and one decision became a focused mobile dog grooming service built on calm handling and full attention.
+
+The system came later. The dogs came first.
+
+---
+
+# Page: New Clients – Start Here
+
+**URL:** https://www.doggoneclean.us/new-clients-start-here
+**Title:** New Clients – Start Here
+
+---
+
+## Make sure we're a good fit
+
+Before scheduling, take a moment to confirm our service matches what you and your dog need. We care about doing things the right way, and that starts with making sure expectations are clear on both sides. A quick review now keeps the experience smooth, predictable, and comfortable for everyone.
+
+This takes about 2 minutes.
+
+[CTA] Confirm We're a Fit → /safety-temperament
+
+---
+
+# Page: How We Operate
+
+**URL:** https://www.doggoneclean.us/how-we-operate
+**Title:** How Mobile Dog Grooming Works in Ocala | Dog Gone Clean
+
+---
+
+# How We Operate
+
+Not a spa.
+Not a salon.
+A structured mobile dog grooming system built for calm dogs and consistent results.
+
+**The dogs came first. The system came second.**
+
+Every decision exists to produce clean dogs and predictable results.
+
+## Built for Function
+
+Most mobile grooming units rely on RV-style water pumps. They trickle.
+
+We don't.
+
+Our bathing system delivers water flow similar to what you expect from city water. That flow allows shampoo and rinse water to move fully through the coat instead of sitting on the surface.
+
+Inside the trailer, the environment is controlled.
+
+Oversized generators power true climate control. Air conditioning and heat are supported by a dedicated dehumidifier that maintains humidity around 30 percent regardless of what Florida is doing outside.
+
+Hot and humid. Cold and rainy. Doesn't matter.
+
+The dog stands in a stable, controlled environment from start to finish.
+
+Powerful vacuums contain loose coat. High-output dryers move moisture efficiently so dogs can get back to their day.
+
+Built for performance. Designed for dogs.
+
+## The Hurricane Bath
+
+We use a recirculating bathing system we call the Hurricane Bath.
+
+Instead of applying shampoo by hand and hoping it works through the coat, the Hurricane Bath continuously circulates a shampoo and water mixture through the coat at strong, steady flow.
+
+The movement lifts dirt, debris, and loose undercoat from deep within the coat while using less total water than traditional hand washing.
+
+It is controlled. It is efficient. It is thorough.
+
+The result is a cleaner coat and a better rinse without unnecessary product buildup.
+
+A controlled storm that leaves the coat refreshed and balanced.
+
+## Dogs We Specialize In
+
+**We specialize in dogs that do not require haircuts.**
+
+Short coats. Double coats. Heavy shedders. Working breeds.
+
+We groom haircut breeds as well, but our core focus is efficient, low-stress grooming for natural coats.
+
+When multiple dogs live together, we usually groom them together. Dogs live as a pack. Grooming is not a reason to separate them unless there is a practical reason to do so.
+
+If they are calm together, they stay together. If one needs space to relax while the other is being worked on, we adjust.
+
+The goal is always the same: reduce stress and keep the experience stable.
+
+## Safety & Temperament
+
+We groom friendly dogs.
+
+For safety reasons, dogs must be able to be handled without aggression.
+
+Snapping, attempting to bite, or aggressive behavior of any kind results in the appointment ending immediately.
+
+Excessive resistance that prevents safe, efficient grooming may also result in service being declined.
+
+This is not personal. It is a safety boundary. We are not willing to risk a dog bite injury that puts a dog groomer out of work.
+
+If you have concerns about your dog's behavior, disclose them before booking so we can determine whether we are a good fit.
+
+## Online Communication Only. No Phone Calls.
+
+We do not take or return phone calls for any reason. We are working hands on with dogs throughout the day and cannot step away to answer or return calls.
+
+All scheduling, updates, and questions are handled through our online system so everything stays documented and clear.
+
+## Arrival Windows & Scheduling Commitment
+
+Appointments are scheduled in arrival windows, not exact timestamps.
+
+Grooming time varies based on coat condition, behavior, and real-world variables. Exact minute-by-minute predictions are not realistic in a mobile operation.
+
+Before arrival, you will receive a heads-up text. Most of the time, that message includes a live Google Maps link so you can follow our progress toward your home.
+
+You will know we are coming.
+
+We operate by route and service area. Once the grace window passes, that time is reserved.
+
+Your appointment time is reserved exclusively for you. Same-day cancellations are billed 100%.
+
+## If this works for you, we're ready.
+
+You can schedule your first appointment online in under 3 minutes.
+
+[CTA] New Clients — Start Here → /new-clients-start-here
+
+---
+
+# Page: Prices
+
+**URL:** https://www.doggoneclean.us/prices
+**Title:** Ocala Mobile Dog Grooming Prices
+**Meta description:** See starting prices for bath grooming, haircuts, and precision nail care. Premium mobile dog grooming serving Ocala, FL. Clear pricing. Book online in under 3 minutes.
+
+---
+
+# Pricing
+
+### Clear pricing for dogs we're great at grooming.
+
+Find your dog's category, confirm the price, and schedule when you're ready.
+
+### Precision Nail Care starts at $30
+
+**$30 first dog • $15 each additional dog**
+
+This price is if we're coming to your house for nail care only. Nail Care is included with bath and haircut service.
+
+We use a rotary tool to sculpt each nail to its ideal length and shape. This method allows the nail to be shaped shorter and finished smooth, leaving a rounded edge that reduces scratching and improves comfort.
+
+### Bath Grooming starts at $75
+
+Every dog receives sanitary area shaving including paw pads, belly, underarms, and under tail, a Hurricane Bath, blow dry, deshedding when applicable, and precision nail care using a rotary tool.
+
+### Haircut Grooming starts at $105
+
+Includes haircut + sanitary area shaving including paw pads, belly, underarms, and under tail, a Hurricane Bath, blow dry, deshedding when applicable, and precision nail care using a rotary tool.
+
+**Have one dog getting groomed and another that only needs nail care?**
+
+If a dog is scheduled for full grooming, nail care for that dog is already included. Any additional dogs in your household that only need nail care are $15 each. No separate appointment needed. Just let us know when we arrive that you have additional dogs that only need nail care.
+
+## Full Breed Price List A to Z
+
+(Prices are the starting/standard price. "with haircut" lines show the haircut/shave-down upcharge price. Breeds marked "not currently accepted" were flagged on the live site.)
+
+| Breed | Price | Note |
+|---|---|---|
+| Affenpinscher | 105 | |
+| American Bulldog | 75 | |
+| American Bully | 75 | |
+| American Eskimo | 175 | |
+| Australian Cattle Dog | 105 | |
+| Australian Shepherd | 105 | |
+| Basset Hound | 75 | |
+| Beagle | 75 | |
+| Bearded Collie | 250 | |
+| Bedlington Terrier | 200 | not currently accepted |
+| Belgian Malinois | 125 | |
+| Bernese Mountain Dog | 175 | |
+| Bichon Frise | 105 | |
+| Black Russian Terrier | 250 | not currently accepted |
+| Bloodhound | 75 | |
+| Border Collie | 105 | |
+| Boston Terrier | 75 | |
+| Bouvier des Flandres | 250 | not currently accepted |
+| Boxer | 75 | |
+| Boykin Spaniel | 105 | |
+| Boykin Spaniel with haircut | 150 | |
+| Brittany | 150 | |
+| Bull Mastiff | 105 | |
+| Cairn Terrier | 105 | |
+| Catahoula Leopard Dog | 75 | |
+| Cavalier King Charles Spaniel | 105 | |
+| Chihuahua | 75 | |
+| Chihuahua with haircut | 105 | |
+| Chow | 225 | |
+| Cocker Spaniel | 175 | |
+| Collie | 250 | |
+| Corgi | 105 | |
+| Dachshund | 75 | |
+| Dalmatian | 75 | |
+| Doberman | 75 | |
+| Doodle (any doodle mix) | 250 | |
+| English Bulldog | 75 | |
+| English Setter | 175 | |
+| French Bulldog | 75 | |
+| German Shepherd | 105 | |
+| German Shorthair Pointer | 75 | |
+| Giant Schnauzer | 250 | not currently accepted |
+| Golden Retriever | 125 | |
+| Golden Retriever with haircut | 150 | |
+| Goldendoodle | 250 | |
+| Gordon Setter | 250 | |
+| Great Dane | 150 | not currently accepted |
+| Great Pyrenees | 150 | |
+| Greyhound | 75 | |
+| Havanese | 105 | |
+| Jack Russell Terrier | 75 | |
+| Jack Russell Terrier with haircut | 105 | |
+| Japanese Chin | 105 | |
+| Labrador Retriever | 75 | |
+| Labrador Retriever with haircut | 150 | |
+| Labradoodle | 250 | |
+| Lhasa Apso | 105 | |
+| Maltese | 105 | |
+| Miniature Pinscher | 75 | |
+| Newfoundland | 350 | not currently accepted |
+| Norwich Terrier | 105 | |
+| Old English Mastiff | 300 | not currently accepted |
+| Old English Sheepdog | 300 | |
+| Papillon | 75 | |
+| Papillon with haircut | 105 | |
+| Pekingese | 105 | |
+| Petit Basset Griffon Vendéen | 105 | |
+| Pit Bull | 75 | |
+| Pomeranian | 105 | |
+| Poodle Miniature or Toy | 105 | |
+| Poodle Standard | 200 | |
+| Pug | 75 | |
+| Pug with haircut | 105 | |
+| Rottweiler | 105 | |
+| Rottweiler with haircut | 250 | |
+| Saint Bernard | 350 | not currently accepted |
+| Schnauzer Miniature | 105 | |
+| Schnauzer Standard or Giant | 250 | |
+| Scottish Terrier | 105 | |
+| Shiba Inu | 75 | |
+| Shiba Inu with haircut | 150 | |
+| Shih Tzu | 105 | |
+| Shetland Sheepdog | 200 | |
+| Siberian Husky | 175 | |
+| Small Terrier Mix | 105 | |
+| Springer Spaniel | 125 | |
+| Weimaraner | 75 | |
+| West Highland White Terrier | 105 | |
+| Wheaten Terrier | 150 | |
+| Yorkshire Terrier | 105 | |
+
+**We specialize in dogs that do not require haircuts.** Short coats. Double coats. Heavy shedders. Working breeds. We groom haircut breeds as well, but our core focus is efficient, low-stress grooming for natural coats.
+
+---
+
+# Page: Contact
+
+**URL:** https://www.doggoneclean.us/contact-1
+**Title:** Contact Mobile Dog Grooming in Ocala | Dog Gone Clean
+**Meta description:** Contact Dog Gone Clean for premium mobile dog grooming in Ocala, FL. One dog at a time. No cages. New clients can book online in under 3 minutes.
+
+---
+
+# How to Reach Us
+
+We're a hands-on operation. This system keeps everything running smoothly for you and your dog.
+
+We operate by text and email to stay on schedule. No phone calls.
+
+Most questions about pricing, services, and availability are answered on the website. If you're looking to schedule, start there.
+
+[CTA] New Clients — Start Here → /new-clients-start-here
+
+## Questions Not Covered on the Website?
+
+Send a message below and we'll respond as soon as possible.
+
+## Why No Phone Number?
+
+Phone calls interrupt active grooming and delay the route. We operate by text and email only. We respond quickly.
+
+Our system is built for speed and clarity. You can:
+- View pricing
+- Understand how we operate
+- Schedule
+- Receive arrival notifications
+- Manage appointments
+
+All without waiting on hold.
+
+Clear systems create reliable service.
+
+## Scheduling for Someone Else?
+
+If you're booking for someone else, you become the point of contact from start to finish.
+
+All scheduling, notifications, and updates will be sent to you.
+
+You are responsible for:
+- Receiving arrival notifications
+- Relaying updates
+- Confirming access
+- Handling payment if needed
+
+We operate fully by text and email.
+
+#### If you're ready, start here.
+
+[CTA] New Clients — Start Here → /new-clients-start-here
+
+---
+
+# Page: Safety & Temperament
+
+**URL:** https://www.doggoneclean.us/safety-temperament
+**Title:** Safety & Temperament
+**Note:** NOINDEX. Funnel step: New Clients → **Safety & Temperament** → Pricing Fit → Service Area → New Client.
+
+---
+
+# Safety & Temperament
+
+**We groom only friendly, non-aggressive dogs.**
+
+If your dog is clearly friendly toward people and reasonably cooperative you can skip right to the button at the bottom of the page. Not sure? Keep reading.
+
+Dogs that wiggle a little are all in a days work, but a dog that is excessively uncooperative to the point it can't be groomed safely needs some training before it will be eligible to schedule with us.
+
+We have zero tolerance for dogs displaying aggressive behavior toward the groomer.
+
+Snapping, biting, or attempting to bite will result in the appointment ending immediately.
+
+Excessive resistance that prevents safe, efficient grooming may also result in service being declined.
+
+We do not use muzzles. If a dog requires a muzzle for grooming, we are not the right fit.
+
+We are not willing to risk a dog bite injury that puts a dog groomer out of work.
+
+If you have concerns about your dog's behavior, disclose them before booking so we can determine whether we are a good fit.
+
+Florida law holds dog owners responsible for bites, so we require dogs to be safe and non-aggressive.
+
+[CTA] My Dog Is Friendly and Safe to Handle → /pricing-fit
+
+---
+
+# Page: Pricing Fit
+
+**URL:** https://www.doggoneclean.us/pricing-fit
+**Title:** Pricing Fit
+**Note:** NOINDEX. Funnel step. Contains the same full breed price list as the Prices page (see above — not repeated here).
+
+---
+
+# Pricing Fit
+
+## Dog Gone Clean is a premium mobile dog grooming service.
+
+**Dogs That Just Get Baths start at $75.**
+
+Every dog receives sanitary area shaving including paw pads, belly, underarms, and under tail, a Hurricane Bath, blow dry, deshedding when applicable, and precision nail care using a rotary tool.
+
+**Dogs That Get Haircuts start at $105.**
+
+Haircut dogs receive everything listed above plus a full haircut or shave down.
+
+**Precision Nail Care Only is $30 for the first dog and $15 for each additional dog.**
+
+This pricing applies when we come to your home specifically for nail service. Nail care is included with bath and haircut services.
+
+Some breeds are usually bath only, but if you want a haircut or shave down, that price is listed below where applicable.
+
+[Full Breed Price List A to Z — identical to the Prices page list above.]
+
+[CTA] These Prices Work → /service-area-property-access
+
+---
+
+# Page: Service Area & Property Access
+
+**URL:** https://www.doggoneclean.us/service-area-property-access
+**Title:** Service Area & Property Access
+**Note:** NOINDEX. Funnel step.
+
+---
+
+# Service Area & Property Access
+
+Our service is not available at **apartments**, **nursing homes**, **assisted living facilities**, or homes located on **unpaved roads**.
+
+## Ocala Service Area Boundaries
+
+- **North:** We do not travel north of Highway 326.
+- **South:** We do not travel south of the Florida Greenway.
+- **East:** We do not travel east of Baseline Road.
+- **West:** We do not travel west of SW 110th Avenue.
+
+If your address falls outside these boundaries, we are not able to schedule service.
+
+## Property & Access Requirements
+
+- My location is inside the service area on the map and description above.
+- My home is on a paved road. (Unpaved driveways are fine.)
+- I have space for a truck and trailer approximately two standard parking spaces long, or five standard parking spaces side by side if parking across spaces.
+- If I live in a gated community, I am aware of the hours service providers are allowed to enter and will schedule within those hours.
+- I understand apartments, nursing homes, and assisted living facilities are not eligible for service.
+
+[CTA] Yes, This Location Is Eligible → /new-client
+
+---
+
+# Page: New Client Access
+
+**URL:** https://www.doggoneclean.us/new-client
+**Title:** New Client Access
+**Note:** Funnel endpoint. Links out to Acuity Scheduling appointment types (owner ID 15997204).
+
+---
+
+# Welcome, New Friend!
+
+You made it through the gates, and we're glad you're here.
+
+We open a limited number of priority onboarding spots for new clients so you can get started without waiting for the regular calendar.
+
+⚠️ Cancellations within 24 hours of the appointment are charged the full service price.
+
+## Let's Get You Scheduled
+
+What does your dog need and how many dogs are you scheduling?
+
+### Full Grooming or Bath (Includes Nail Care)
+Booking links for 1–6 dogs (Acuity appointment types 64341192 / 64341629 / 64341667 / 64341704 / 64341747 / 64341766).
+
+### Nail Care Only
+Booking links for 1–6 dogs (Acuity appointment types 90181400 / 90181620 / 90181703 / 90181813 / 90181841 / 90181862).
+
+**Like what you see but not ready to schedule?**
+
+Become an approved client today. No appointment required. You'll be pre-approved for 90 days. You can schedule anytime during that window. We'll also contact you if availability opens in your area. No obligation.
+
+[CTA] Become an approved client → /approved-client
+
+---
+
+# Page: Schedule an Appointment (Interstitial)
+
+**URL:** https://www.doggoneclean.us/interstitial-schedule
+**Title:** Schedule Mobile Dog Grooming in Ocala | Dog Gone Clean
+**Meta description:** Book your mobile dog grooming appointment in Ocala, FL in under 3 minutes. Premium, one-on-one grooming. No cages. Clear pricing. Simple online scheduling.
+
+---
+
+# Schedule an Appointment
+
+## Are you new to us or coming back?
+
+**I'm New** → /new-clients-start-here
+First visit or it has been more than 12 months since you
+
+[ARCHIVE NOTE: the captured text ends here mid-sentence. The source paste was
+cut off at this point, so this archive is partial. Still missing: the rest of
+the Schedule interstitial page, any pages after it, and the image-file URL list
+the capture header said would be at the bottom. If the full capture is needed,
+paste the remainder and it will be appended here.]
