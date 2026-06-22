@@ -380,13 +380,16 @@ survive a reset:
   double-book and double-remind. The dormant `calendar-sync` Supabase edge function (service-account
   based, no cron) stays OFF; (3) point doggoneclean.us DNS at the droplet -> add the Caddy redirect;
   (4) cancel Acuity, then Squarespace, once one real client is verified end to end.
-  **CUTOVER ORDER:** Resend key (emails CAN send, but stay gated off) -> connect calendar (sync on)
-  [DONE one-way 2026-06-21 via the "DGC Calendar" Apps Script; do not add a second sync]
-  -> cron + confirmation wiring live (DONE 2026-06-08, migration 0035) -> CANCEL ACUITY -> flip the
-  master switch `app_secrets.notifications_live = 'true'` (migration 0036) -> the next hourly cron
-  sends our first real reminders -> verify one real client got it -> flip doggoneclean.us DNS + Caddy
-  redirect -> cancel Squarespace. SMS/Twilio stays off this path: Acuity emailed reminders only, so
-  email fully replaces it; text is a later bonus.
+  **CUTOVER ORDER (status 2026-06-22):** Resend key [DONE, key in app_secrets] -> connect calendar
+  (sync on) [DONE one-way 2026-06-21 via the "DGC Calendar" Apps Script; do not add a second sync]
+  -> cron + confirmation wiring live [DONE 2026-06-08, migration 0035] -> **doggoneclean.us DNS +
+  Caddy redirect [DONE / LIVE 2026-06-22]** -> [STILL OPEN, Paul] CANCEL ACUITY -> [STILL OPEN, then
+  Claude] test send to Paul's inbox, suppress already-open reminder windows, flip the master switch
+  `app_secrets.notifications_live = 'true'` (migration 0036), watch the next hourly cron send the
+  first real reminders, verify -> [STILL OPEN, Paul] cancel Squarespace. NOTE: the website redirect
+  was done BEFORE the reminder flip this time (the order above had it after); both are independent,
+  and reminders are still safely OFF. SMS/Twilio stays off this path: Acuity emailed reminders only,
+  so email fully replaces it; text is a later bonus.
   **DOUBLE-SEND GUARD (why the switch exists):** the existing legacy appointments are ALREADY on
   Acuity's reminder schedule, so our pipeline must stay silent until Acuity is off or every client is
   reminded twice. `notifications_live` defaults OFF; even with the Resend key in place nothing fires.

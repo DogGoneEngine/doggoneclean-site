@@ -250,10 +250,14 @@ See `lock_it_in_capture` in the Oracle.
   fires on push to `main`, builds the Astro site, and publishes it to the droplet at
   hurricanebath.com, which serves the deployed Astro site (the marketing pages, the `/book` booking
   funnel, and the `/portal` client portal all build and publish on push). hurricanebath.com is the
-  Dog Gone Clean v2.0 surface (bath, plus the legacy full-grooming book folded in). Per
-  `legacy_folds_into_v2`, doggoneclean.us is being retired and redirected into this one app rather
-  than given a separate rebuild, and the Squarespace site and Acuity are being torn down (see the
-  parking-lot teardown). The deploy is now gated on the audit: `.github/workflows/deploy.yml`
+  Dog Gone Clean v2.0 surface (bath, plus the legacy full-grooming book folded in), and as of the
+  cutover (2026-06-22) it is the canonical PUBLIC site, not just staging. Per `legacy_folds_into_v2`,
+  doggoneclean.us NOW REDIRECTS (live 2026-06-22) to hurricanebath.com: a permanent 301 at the Caddy
+  layer with an old-page map, with DNS pointed at the droplet and Google MX / email left untouched.
+  The staging `X-Robots-Tag: noindex` was removed from hurricanebath.com at cutover so the live site
+  is indexable (noindex now lives only on `/preview`). Still open and Paul's: cancel Squarespace
+  (billing) and the reminder flip (stop Acuity, then flip `notifications_live` with in-window
+  suppression). See the parking-lot teardown. The deploy is now gated on the audit: `.github/workflows/deploy.yml`
   runs `scripts/check.py` as a required `audit` job and the publish step `needs` it, so a push
   to `main` that fails the audit never reaches the droplet (wired 2026-05-29). A failing audit
   therefore cannot become a live deploy: live means it passed.
