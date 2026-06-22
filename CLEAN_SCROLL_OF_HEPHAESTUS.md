@@ -4677,3 +4677,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   app_secrets, no Stripe edge functions, and the booking funnel's "Confirm booking" button is a disabled
   stub), so new clients cannot pay or complete a booking online yet. Reminders remain MUTED: the master
   gate `app_secrets.notifications_live` is absent, and `notify_appointment` no-ops unless it equals 'true'.
+
+## Decisions log (2026-06-22)
+
+- **Karen Anderson (Paul's mother) set up as a comp family client; Willie's groom booked (2026-06-22).**
+  The roster stub "Willie (Paul's mom's dog)" (client d4d1c957, SW 114th Ct, Ocala, calendar-sourced,
+  flagged TEST RECORD) is now a complete client: renamed Karen Anderson, email nickersonkaren@gmail.com,
+  phone +13528955311, marked comp / no charge (family). Wired into the appointment + reminder world the
+  same way every legacy client is (migration 0229, mirroring 0222 Emily Cummings): a bath_subscribers row
+  plus a $0 square_in_person, non-recurring bath_subscriptions row, and Willie's dog price set to $0, so
+  nothing can ever charge her (no card on file, and Clean has no auto-charge). A full_groom visit was
+  booked live for today, noon to 2:00 PM ET (app-native, source NULL, amount 0, payment_status
+  not_applicable). That fired the standard booking-confirmation email to her (logged 'sent'), and the
+  day-of "Today's the day" reminder fires from the hourly cron in its 6-hours-before band; the 3-day and
+  day-before reminders are correctly skipped because the booking is same-day. Texts stay dormant (Twilio
+  not wired), so all of this reaches her by email only. None of the sent copy shows a dollar amount.
