@@ -171,6 +171,32 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-22 (Owner schedule alerts: Today card live + dormant Telegram tail)
+- Built what Paul asked for right after the Acuity cutover: he is told when a visit is booked, moved,
+  or canceled, on his Today screen now, and by Telegram DM for the first little while. Migration 0227.
+  Detection is one trigger, `bath_appointment_owner_alert_trg`, on `bath_appointments` AFTER
+  INSERT/UPDATE, for EVERY source (app booking, calendar sync, portal), calling
+  `bath_owner_alert_emit(kind, appt_id)`. Guards: 'booked' on insert of a future requested/confirmed
+  visit (never the tentative pencil placeholders); 'canceled' when a real booking flips to
+  cancelled/skipped; 'rescheduled' only when scheduled_start moves >= 60s, so the routine same-time
+  re-sync never fires. Separate from the client-facing `bath_appointment_notify` (source-null only);
+  both coexist.
+- The Today card reuses the existing briefings feed: a new "Front desk" department head, agent_key
+  `front_desk` (label "Iris, Front desk"; required because briefings.agent_key has an FK to agents),
+  writes an `info` briefing ("New booking: NAME / time / dogs / service"). No frontend change needed:
+  the existing Today briefings feed renders it with its Handle/Dismiss actions. Verified the emit
+  builds a correct card on a real upcoming visit, then deleted the test card.
+- Telegram tail is DORMANT by design until armed: the emit sends a Telegram DM via `net.http_post`
+  only when app_secrets `owner_alerts_telegram`='true' AND `telegram_bot_token` AND
+  `telegram_owner_chat_id` are present. The switch is seeded 'false' and no telegram token lives in
+  dgc-prod yet. OPEN, Paul's: provide a bot token + his chat id (either a new Dog Gone Clean bot, the
+  clean/sellable choice, or the existing Mount Olympus ops bot token), then store the two secrets and
+  flip the switch on. Meant to be switched off once he trusts it; the card stays.
+- Security: both functions are SECURITY DEFINER with a fixed search_path, and EXECUTE was revoked from
+  public/anon/authenticated so neither is reachable through the REST RPC endpoint (trigger-only).
+- Distinct from the PARKED "Close the Laptop" plan (the automated watchdog that pings when something
+  is WRONG, on hold until Jake earns); this is a routine here-and-now booking confirmation.
+
 ### 2026-06-22 (Acuity retired: legacy book made app-owned, reminders flipped LIVE)
 - Paul canceled Acuity. It bundles under Squarespace, so the full account delete is blocked until
   mid-July; the cancel dropped it to the legacy Free plan. Acuity's automated email reminders likely
