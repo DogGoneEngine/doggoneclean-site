@@ -34,6 +34,7 @@ export function describeApplied(res) {
   if (n(res.dogs_updated) > 0) bits.push(`${n(res.dogs_updated)} dog card${n(res.dogs_updated) === 1 ? '' : 's'} changed`);
   if (res.client_updated) bits.push('contact sheet facts updated');
   if (res.onsite_appended) bits.push("added to who's on site");
+  if (res.access_appended) bits.push("saved to the getting-in note (shows on the appointment)");
   if (res.client_note_appended) bits.push('household note added');
   if (n(res.dog_notes_appended) > 0) bits.push(`${n(res.dog_notes_appended)} dog note${n(res.dog_notes_appended) === 1 ? '' : 's'} added`);
   if (n(res.dog_status_changes) > 0) bits.push('dog roster updated');
@@ -158,7 +159,9 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                   <li>
                     Visit logged{v.visited_at ? ` for ${v.visited_at}` : ''}{v.service_type ? ` (${SERVICE[v.service_type] || v.service_type})` : ''}
                     {v.actual_minutes ? `, ${v.actual_minutes} min` : ''}
-                    {v.amount_cents != null ? `, ${money(v.amount_cents)}` : ''}
+                    {v.charged_cents != null ? `, charged ${money(v.charged_cents)}` : ''}
+                    {v.amount_cents != null ? `, ${v.charged_cents != null ? 'paid ' : ''}${money(v.amount_cents)}` : ''}
+                    {v.tip_cents ? ` (includes ${money(v.tip_cents)} tip)` : ''}
                     {v.payment_method ? ` ${PAY[v.payment_method] || v.payment_method}` : ''}
                   </li>
                 )}
@@ -208,6 +211,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                   </li>
                 )}
                 {plan.onsite_update && <li>Who's on site: {plan.onsite_update}</li>}
+                {plan.access_note && <li>Getting in (shows on the appointment): {plan.access_note}</li>}
                 {(plan.alias_add || []).map((a, i) => (
                   <li key={`al${i}`}>Household name (also known as): <strong>{a}</strong></li>
                 ))}
@@ -272,6 +276,7 @@ export function RikerManual() {
         <li><strong>New dogs:</strong> "Add Maverick, French Bulldog, 75 dollars, and Sammy, mini Aussie, 105." Real dog cards with breed and price.</li>
         <li><strong>Price and breed changes:</strong> "Change the price to 50 dollars each." Lands on the dog cards, not as a note.</li>
         <li><strong>Who is at the house:</strong> "Alan answers the door." Lands in the Who's-on-site field.</li>
+        <li><strong>Getting in:</strong> "Do not knock, text on arrival, a baby may be sleeping" or "gate code is 4411." Lands in the Getting-in line that shows on the appointment, kept in your words.</li>
         <li><strong>Household names:</strong> "Add her husband Zach as a household name." Lands in the Also-known-as field, so a search for that name opens the household.</li>
         <li><strong>Contact facts:</strong> "Her phone number is 352-875-4172" or a new email or address. Lands in the contact fields, not as a note.</li>
         <li><strong>Corrections:</strong> "That last visit should have been nails, not a full groom." Fixes the existing visit record instead of creating a new one.</li>

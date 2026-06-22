@@ -151,7 +151,13 @@ an `agent_runs` provenance log per capture, broader field coverage (cadence/avai
 as first-class structured updates, not just freeform notes), and Paul's final name for it. Original
 spec kept below for the next passes.
 
-### Field gaps found in real use (2026-06-22, Emily Cummings appointment)
+### Field gaps found in real use (2026-06-22, Emily Cummings appointment) - DONE 2026-06-22 (migration 0231 + riker deploy v10)
+
+Both fixed: Riker now emits `access_note` (written to `clients.access_notes`, the "Getting in"
+line shown on the appointment, kept in Paul's words) and `charged_cents` / `tip_cents` on the
+visit, so "charged X, paid Y" records the charge, the payment, and the tip separately. The confirm
+screen shows both, the help list advertises the getting-in power, and `admin_riker_apply` was
+rebuilt from its live definition. Original capture kept below.
 
 Two concrete misroutes Clio made on a live appointment note ("make a note so it shows on the
 appointments to be careful about knocking, a baby may be sleeping"; and "Klaus was a 5, charged

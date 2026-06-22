@@ -4716,3 +4716,19 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   was added to Amy Blessing's notify list directly with the number Paul already gave (+13528121328,
   in addition, until 2026-06-28), so his field goal was done on the spot. Texts still reach no one until
   Twilio is wired; the row is correct for when it is.
+
+- **Clio learns getting-in instructions and full charge/tip capture (2026-06-22).** At Emily Cummings'
+  appointment Paul said to note "be careful about knocking, a baby may be sleeping" and "Klaus was a 5,
+  charged $105, paid $120 Apple Pay." Clio softened the instruction to "knock quietly" and filed it in
+  the household note, which does NOT show on the appointment card (the card shows access_notes under
+  "Getting in" and onsite_people under "At the door"), and it collapsed the money to a single $105. Paul
+  clarified the real rule is "do not knock, text instead." All of Emily's data was corrected by hand
+  (access_notes set, Klaus a 5, charged $105 / collected $120 / $15 tip / wallet). Then, on Paul's
+  standing instruction that reported Clio misses become permanent fixes, Clio was taught three things:
+  arrival/getting-in instructions go in a new access_note field written to clients.access_notes in Paul's
+  own words (not softened), and "charged X, paid Y" fills charged_cents, amount_collected_cents, and
+  tip_cents separately. Migration 0231 rebuilt admin_riker_apply from its live definition (adds the
+  access_note branch, the two visit columns, and access_appended), the riker edge function was redeployed
+  (v10) with the new prompt rules and JSON schema, and the confirm screen plus the "What can I tell Clio?"
+  help list now show the getting-in note and the charge/paid/tip split. The live model parse proves out on
+  the next real use; the database and UI halves are verified.
