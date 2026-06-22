@@ -34,20 +34,21 @@ const BOOKING_OPEN = false;
 ) : (
   <BaseLayout
     title="Get on the list | Dog Gone Clean"
-    description="Dog Gone Clean is at capacity right now. New client spots open soon. Get on the list and we will message you the moment a spot is yours."
+    description="Full for 20 years, and a rare round of brand-new seats is opening. Get on the list and be first in line the second a spot opens."
     noIndex={true}
   >
     <section class="wl">
       <div class="wl__glow"></div>
       <div class="container">
         <div class="wl__inner">
-          <span class="wl__tag">New clients</span>
-          <h1 class="wl__title">We're at capacity<br /><span class="grad">right now.</span></h1>
+          <span class="wl__tag">A rare opening</span>
+          <h1 class="wl__title">We're full.<br /><span class="grad">You're early.</span></h1>
           <p class="wl__lede">
-            Dog Gone Clean has kept a full book for over 20 years. We are opening
-            a fresh round of new-client spots over the next week or two. Get on
-            the list and we will message you the moment a spot is yours, so you
-            can pick your time and start.
+            For over 20 years the book has been full and stayed full. Right now,
+            for a short window, we are cutting a fresh round of brand-new seats.
+            This list is how you get one. Get on it and you are first in line,
+            ahead of everyone, the second a seat opens. These go fast. Being
+            early is the whole game.
           </p>
           <p class="wl__sub">
             Already a client? <a href="/portal">Your portal is ready.</a>
@@ -84,9 +85,9 @@ const BOOKING_OPEN = false;
                 </select>
               </div>
 
-              <button type="submit" class="button button--primary button--lg button--block">Get on the list</button>
+              <button type="submit" class="button button--primary button--lg button--block">Get me in line</button>
               <p class="wl__note" id="wl-msg" hidden></p>
-              <p class="wl__fine">First on the list is first in line for a new spot.</p>
+              <p class="wl__fine">First on the list, first into the new seats.</p>
             </form>
           </div>
         </div>
@@ -216,7 +217,7 @@ const BOOKING_OPEN = false;
         });
         if (!res.ok) throw new Error(await res.text());
         msg.classList.add('wl__note--success');
-        msg.textContent = "You're on the list. We'll message you the moment a new-client spot opens.";
+        msg.textContent = "You're in, and near the front of the line. The second a new seat opens, you hear from us first.";
         form.reset();
       } catch {
         msg.classList.add('wl__note--error');
