@@ -390,6 +390,22 @@ survive a reset:
   was done BEFORE the reminder flip this time (the order above had it after); both are independent,
   and reminders are still safely OFF. SMS/Twilio stays off this path: Acuity emailed reminders only,
   so email fully replaces it; text is a later bonus.
+  **RETIRE ACUITY (the booking front door) - the real path, found 2026-06-22.** New clients are on the
+  waitlist, so the ONLY job Acuity still does is let existing legacy clients book/reschedule. The
+  portal already does this and it is CARD-FREE in the DB (`bath_start_subscription` allows null card;
+  `bath_reschedule_appointment` needs no card). It offers zero times only because
+  `bath_availability_windows` is EMPTY, so `bath_open_slots` returns nothing (verified: 0 slots for
+  Ocala AND The Villages, 2026-06-22). To kill Acuity, NO Stripe needed (legacy pays in person):
+  (1) populate `bath_availability_windows` for Ocala (`city_id`, `weekday`, `start_time`, `end_time`,
+  `active`) with Paul's real route hours/days, using `cities.hb_week_parity_anchor` for biweekly if
+  needed; (2) confirm Ocala `cities` config (`hb_slot_minutes`, `hb_booking_horizon_days`,
+  `hb_timezone` set) and flip Ocala `hb_active=true` so the portal booking UI turns on for Ocala;
+  (3) verify a real existing Ocala client can pick a time in the portal with no card, the visit lands
+  on Paul's calendar/route and reminds; (4) tell clients to use the portal, then cancel Acuity. The
+  route-fit nuance (windows are per-city weekly, not per-zone) is acceptable for a first cut because
+  Paul still places each visit on his route. This is the next session's headline task; Paul was
+  (rightly) furious that it kept getting framed as a Stripe/build problem when it is a data-loading
+  problem.
   **DOUBLE-SEND GUARD (why the switch exists):** the existing legacy appointments are ALREADY on
   Acuity's reminder schedule, so our pipeline must stay silent until Acuity is off or every client is
   reminded twice. `notifications_live` defaults OFF; even with the Resend key in place nothing fires.

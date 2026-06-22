@@ -171,6 +171,31 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-22 (reminder pipeline proven; the REAL Acuity blocker found: empty availability windows)
+- Reminder pipeline proven end-to-end: fired a `reminder_3d` through the `send-notification` edge
+  function (POST with `x-notifications-secret`) for a test subscriber on Paul's own email; Resend
+  delivered it to his inbox ("Heads up, your appointment is Thursday, June 25"); reverted the test
+  appointment to its prior cancelled state. `notify_appointment` is gated by `notifications_live`
+  (still OFF); the edge function itself is NOT gated, which is how an isolated test sends.
+- Acuity reality mapped: Acuity is the BOOKING front door for the legacy book (not just reminders).
+  Clients self-book/reschedule in Acuity; Acuity writes events onto Paul's PRIMARY Google calendar
+  (`gcal_calendar_id = nickerson.paul@gmail.com`); the "DGC Calendar" Apps Script reads primary into
+  `bath_appointments` (`source='gcal_sync'`); the app then MIRRORS them to the separate "Dog Gone
+  Clean" Google calendar (that calendar is an app OUTPUT, not a source). Confirmations are clean:
+  `bath_appointment_notify` returns early when `source is not null`, so our app only confirms
+  `/book` (source-null) bookings, never the gcal_sync ones, so no double with Acuity's confirmations.
+- THE REAL ACUITY BLOCKER (corrects the earlier "needs Stripe / needs a big build" framing, which was
+  wrong): the portal scheduling system is fully built and CARD-FREE at the DB level
+  (`bath_start_subscription` allows a null `stripe_payment_method_id`; `bath_reschedule_appointment`
+  needs no card; the "add a card" line is new-client UI copy only). The ONLY reason existing clients
+  cannot book is that `bath_open_slots` returns 0 slots for BOTH cities, because the
+  `bath_availability_windows` table (the weekday hours Paul works per city) is EMPTY. `bath_open_slots`
+  builds slots from `bath_availability_windows` (recurring weekday windows) minus
+  `bath_availability_exceptions` minus booked appointments, with optional biweekly parity via
+  `cities.hb_week_parity_anchor`. Load Paul's availability and existing clients book/reschedule in the
+  portal with no card. It is configuration/data, not a rebuild. Full retire-Acuity steps in the
+  parking lot.
+
 ### 2026-06-22 (CUTOVER LIVE: doggoneclean.us now redirects to hurricanebath.com)
 - The domain cutover shipped and is verified. Typing doggoneclean.us (or following an old link)
   now 301-redirects to hurricanebath.com with a valid cert. The site itself was NOT edited for the
