@@ -111,6 +111,11 @@ export default function QuickCapture() {
                         Could not find the visit you wanted corrected; open the sheet and check the visit history.
                       </div>
                     )}
+                    {saved.noNotifyContact && (
+                      <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
+                        Did not add the notify person: no phone or email was given, so they cannot be messaged. Say the name again with a phone number to add them.
+                      </div>
+                    )}
                   </div>
                 )}
                 <RikerManual />

@@ -4702,3 +4702,17 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   missing it. Fixed RikerCapture.jsx so the dog_update line lists every field it will write (price, breed,
   birthday, with an approximate tag when set), serving clio_confirm_shows_fields. Willie's birthday was
   also written directly (2015-05-20, exact) so Paul's field goal was done on the spot.
+
+- **A contactless notify person no longer errors out the whole Clio save (2026-06-22).** At the Amy
+  Blessing sheet Paul gave Melody Humphrey's number as a who's-on-site entry, then a breath later said
+  "Notify Melody as well... for this week only" without repeating the number. That parse carried a
+  notify_person with no phone and no email; admin_upsert_notify_person correctly raises on that, but the
+  raise aborted the ENTIRE admin_riker_apply, so Paul got a bare error and nothing saved. Migration 0230
+  recreates admin_riker_apply (from the live definition, which already had the equipment_service branch)
+  so the notify_person step now checks for a phone or email first: with neither it skips that one person
+  and returns notify_person_missing_contact=true instead of throwing, so every other change in the plan
+  still applies. The confirm screen now flags a contactless notify person before the tap, and the
+  after-save line says plainly it was skipped and to repeat the name with a number. Separately, Melody
+  was added to Amy Blessing's notify list directly with the number Paul already gave (+13528121328,
+  in addition, until 2026-06-28), so his field goal was done on the spot. Texts still reach no one until
+  Twilio is wired; the row is correct for when it is.

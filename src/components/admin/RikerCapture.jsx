@@ -40,7 +40,7 @@ export function describeApplied(res) {
   if (res.notify_person_id) bits.push('notify person saved');
   if (res.reminder_id) bits.push('reminder set, it will surface on Today when due');
   if (res.wisdom_saved) bits.push('filed to the wisdom inbox');
-  return { bits, missed: !!res.visit_update_missed };
+  return { bits, missed: !!res.visit_update_missed, noNotifyContact: !!res.notify_person_missing_contact };
 }
 
 export default function RikerCapture({ clientId = null, clientName = null, onApplied }) {
@@ -113,6 +113,11 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
               {done.missed && (
                 <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
                   Could not find the visit you wanted corrected; open the sheet and check the visit history.
+                </div>
+              )}
+              {done.noNotifyContact && (
+                <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
+                  Did not add the notify person: no phone or email was given, so they cannot be messaged. Say the name again with a phone number to add them.
                 </div>
               )}
             </div>
@@ -229,6 +234,9 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                     {plan.notify_person.phone ? ` (${plan.notify_person.phone})` : plan.notify_person.email ? ` (${plan.notify_person.email})` : ''}
                     {plan.notify_person.mode === 'instead' ? ' instead of the client' : ''}
                     {plan.notify_person.until ? `, until ${plan.notify_person.until}` : ''}
+                    {!plan.notify_person.phone && !plan.notify_person.email && (
+                      <span style={{ color: 'var(--ad-warn, #b9770a)' }}> (no phone or email yet, so this person will be skipped until you add one)</span>
+                    )}
                   </li>
                 )}
               </ul>
