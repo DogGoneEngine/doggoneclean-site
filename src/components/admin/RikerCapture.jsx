@@ -13,6 +13,13 @@ import { rikerParse, rikerApply, addAlias } from './supabase.js';
 const SERVICE = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const PAY = { square_in_person: 'Square', stripe_card: 'Stripe', cash: 'Cash', wallet: 'Wallet' };
 function money(c) { return c == null ? null : '$' + (c / 100).toFixed(2).replace(/\.00$/, ''); }
+// Format a YYYY-MM-DD birthday for the confirm line without a timezone shift
+// (new Date('2015-05-20') would render the day before in US time zones).
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+function birthday(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || '');
+  return m ? `${MONTHS[+m[2] - 1]} ${+m[3]}, ${m[1]}` : null;
+}
 
 // Turn the apply result into the plain acknowledgment Paul asked for: after
 // Confirm he hears exactly what landed, never a silent void.
@@ -157,13 +164,21 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                     {d.notes ? ` (${d.notes})` : ''}
                   </li>
                 ))}
-                {(plan.dog_update || []).map((d, i) => (
-                  <li key={`upd${i}`}>
-                    Card change for <strong>{d.dog_name || 'dog'}</strong>:
-                    {d.price_cents != null ? ` price to ${money(d.price_cents)}` : ''}
-                    {d.breed ? `${d.price_cents != null ? ',' : ''} breed to ${d.breed}` : ''}
-                  </li>
-                ))}
+                {(plan.dog_update || []).map((d, i) => {
+                  // Show every field the apply RPC will write (price, breed,
+                  // birthday), so a birthday-only change is never a blank line
+                  // (clio_confirm_shows_fields). The apply path writes the
+                  // birthday too, per migration 0185.
+                  const parts = [];
+                  if (d.price_cents != null) parts.push(`price to ${money(d.price_cents)}`);
+                  if (d.breed) parts.push(`breed to ${d.breed}`);
+                  if (birthday(d.birthday)) parts.push(`birthday to ${birthday(d.birthday)}${d.dob_approximate ? ' (approximate)' : ''}`);
+                  return (
+                    <li key={`upd${i}`}>
+                      Card change for <strong>{d.dog_name || 'dog'}</strong>{parts.length ? `: ${parts.join(', ')}` : ''}
+                    </li>
+                  );
+                })}
                 {(v?.dog_scores || []).map((s) => (
                   <li key={s.dog_id}>Vibe score for {s.dog_name || 'dog'}: <strong>{s.score}</strong></li>
                 ))}
