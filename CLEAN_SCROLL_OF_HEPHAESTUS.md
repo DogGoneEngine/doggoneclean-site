@@ -4692,3 +4692,13 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   day-of "Today's the day" reminder fires from the hourly cron in its 6-hours-before band; the 3-day and
   day-before reminders are correctly skipped because the booking is same-day. Texts stay dormant (Twilio
   not wired), so all of this reaches her by email only. None of the sent copy shows a dollar amount.
+
+- **Clio confirm screen now shows a birthday change; Willie's birthday set (2026-06-22).** At the Karen
+  Anderson appointment Paul told Clio "Willie's birthday is May 20th, 2015." Clio parsed it correctly
+  (riker_log: dog_update carried birthday 2015-05-20) but the on-sheet confirm review only rendered
+  price and breed for a dog_update, so a birthday-only change showed as a blank "Card change for Willie:"
+  line. It looked like Clio would do nothing, so Paul cancelled and nothing was written. The apply path
+  already writes the birthday (migration 0185, the earlier Gypsy fix); only the confirm display was
+  missing it. Fixed RikerCapture.jsx so the dog_update line lists every field it will write (price, breed,
+  birthday, with an approximate tag when set), serving clio_confirm_shows_fields. Willie's birthday was
+  also written directly (2015-05-20, exact) so Paul's field goal was done on the spot.
