@@ -393,6 +393,17 @@ survive a reset:
   Acuity is cancelled FIRST, then the switch is flipped. Pre-flip verification uses a test
   appointment (is_test subscriber, Paul's own email, source NULL so it was never in Acuity), never a
   real Acuity client.
+  CORRECTION (2026-06-22, verified against the live `bath_dispatch_reminders` source): cancelling
+  Acuity is NOT sufficient on its own. The dispatcher dedups only against OUR `notification_log`
+  (per appointment_id + kind, a `status='sent'` row suppresses forever), so it knows nothing about
+  what Acuity already sent. Any appointment ALREADY inside a reminder window at flip time (3d =
+  26-72h out, 26h = 6-26h, day = 0-6h) was already reminded by Acuity, and flipping on would send a
+  duplicate. So the flip is a sequence, not a single toggle: (1) Acuity off, (2) test send to Paul's
+  inbox proves delivery, (3) SUPPRESS the already-open windows by inserting `status='sent'`
+  `notification_log` rows (skip_reason e.g. `acuity_covered_pre_cutover`) for every non-test
+  appointment within 72h, for each window whose lower bound has already passed, (4) set
+  `notifications_live='true'`. Result: our engine starts from the next window that newly opens; the
+  transition appointments get no duplicate, everything further out gets the full 72/26/6 sequence.
 - **Portal add-a-dog coat tier for legacy clients.** The Add-a-dog form requires a bath coat tier
   (smooth/double) to save, which is a bath pricing concept that is inert for a full-groom client.
   It does not break anything (it just asks an odd question and stores harmless metadata). DECIDED

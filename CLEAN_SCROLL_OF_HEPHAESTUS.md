@@ -185,6 +185,19 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   wired and tested brings it straight back. The waitlist becomes Jake's opening book.
 - Staged to the Prometheus preview channel (hurricanebath.com/preview/) for Paul to look at on Mount
   Olympus before any public cutover; promotes to live on his go.
+- Cutover facts confirmed live (DNS-over-HTTPS + RDAP) for doggoneclean.us: email runs on Google
+  Workspace (MX = aspmx.l.google.com et al), DNS is managed at Cloudflare (NS = *.ns.cloudflare.com),
+  and Squarespace hosts ONLY the website (apex A = Squarespace IPs 198.185.159/198.49.23, www CNAME
+  ext-cust.squarespace.com). So cancelling Squarespace and repointing the website touches neither
+  email nor DNS control; the ST-3 DNS task moves only the website A/www records and explicitly leaves
+  MX/TXT/DKIM alone. Registrar not retrievable from public .us records; domains live at GoDaddy per
+  the toolset, nothing ties the domain itself to Squarespace.
+- Reminder double-send hole found and fixed in the plan (Paul caught it): cancelling Acuity is not
+  enough, because the dispatcher only dedups against our own log and would re-send the windows Acuity
+  already covered for in-window appointments. Fix recorded in the parking-lot double-send guard:
+  suppress already-open windows (insert `status='sent'` log rows) right before flipping
+  `notifications_live` on. notifications_live is currently unset (off); 6 deliverable appointments
+  sit within 72h right now, which is exactly the duplicate exposure the suppression closes.
 
 ### 2026-06-18 (Prometheus idle page: the "nothing staged" placeholder is now full-screen art)
 
