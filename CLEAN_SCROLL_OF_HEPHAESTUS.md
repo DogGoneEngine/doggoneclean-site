@@ -199,7 +199,17 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   are lined up over the next 7 days. Confirmations did NOT blast the legacy book (source-gated).
 - Residual risk Paul accepted ("yolo it"): if Acuity's reminders did not fully turn off, a client
   could still get one from Acuity and one from us on a FUTURE window over the coming days; the shield
-  only covers the transition windows. Offered to watch Paul's Gmail to confirm Acuity went quiet.
+  only covers the transition windows. UPDATE (same day): Paul's Acuity Reminders settings page is
+  grayed out with 0 active templates and every appointment type sitting in Inactive (consistent with
+  reminders being unavailable on the Free plan), so Acuity is very likely sending nothing now;
+  residual risk downgraded to low. Offered to watch Paul's Gmail for a few days to confirm.
+- Acuity's appointment events REMAIN on Paul's primary "Paul" Google calendar (the cancel did not
+  delete them, which also confirms the prune scenario would not have auto-fired, though the adoption
+  protects regardless). Until they are cleared, each visit shows twice in his Google Calendar: once
+  from the Acuity copy on the primary calendar, once from the app's "Dog Gone Clean" mirror. Deleting
+  the Acuity copies is SAFE now (the book is app-owned so the sync cannot prune it, and the mirror
+  keeps its own copy). Pending and low priority; offered to clear them precisely for Paul, since the
+  app stores each Acuity event reference in `bath_appointments.external_id`.
 
 ### 2026-06-22 (reminder pipeline proven; the REAL Acuity blocker found: empty availability windows)
 - Reminder pipeline proven end-to-end: fired a `reminder_3d` through the `send-notification` edge
