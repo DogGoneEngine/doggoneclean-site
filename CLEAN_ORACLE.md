@@ -3056,3 +3056,15 @@ the screen, not from training. Because the prime directive is a business that ru
 a screen that depends on remembering how it works is a screen that breaks the day he forgets or hands
 it off. This is a standing design gate on the client screen, checked on every change, not a one-time
 build. Decided 2026-06-18.
+
+`jake_takes_new_v2_clients` (Clean: roles):
+Jake takes all new v2.0 Dog Gone Clean clients (the no-haircut Hurricane Bath book, in both Ocala
+and The Villages). Paul keeps the legacy full-grooming book and serves it himself, and that book
+shrinks only by natural attrition. New capacity for the business therefore equals Jake coming
+online: the thing that turns "we are at capacity" into open new-client spots is Jake taking the new
+book, which waits on the Dog Gone Clean Stripe account going live so new clients can pay on file.
+Because the whole point of the pivot is to earn more while asking less of Paul, and that only
+happens if the new volume lands on Jake instead of back on Paul. This drives the cutover messaging:
+until Jake is taking paid clients, new-client signup shows an honest "at capacity, get on the list"
+waitlist rather than a payment funnel a new client cannot finish, and the public site never has to
+name Jake to be truthful about it. Decided 2026-06-22.

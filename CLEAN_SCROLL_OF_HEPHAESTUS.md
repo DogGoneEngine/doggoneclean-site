@@ -171,6 +171,21 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-22 (Squarespace cutover prep: new capacity is Jake, and /book shows a capacity waitlist until Stripe is live)
+- Locked `jake_takes_new_v2_clients`: Jake takes ALL new v2.0 (no-haircut Hurricane Bath) clients
+  in both Ocala and The Villages; Paul keeps and serves the legacy full-grooming book, which shrinks
+  only by attrition. New capacity equals Jake coming online, which waits on the Dog Gone Clean Stripe
+  account so new clients can pay on file. "At capacity" is honest: Paul has been at or above capacity
+  for years.
+- Cutover messaging built: while the Stripe account is not live, `/book` is gated by `BOOKING_OPEN`
+  (false today) and shows an honest "we are at capacity, new spots open soon, get on the list, we
+  will message you" panel with a real lead-capture form writing to the existing `waitlist` table,
+  instead of sending a new client into a payment funnel they cannot finish. The full signup funnel
+  (`BookingApp`) is untouched behind the flag; flipping `BOOKING_OPEN` to true the day Stripe is
+  wired and tested brings it straight back. The waitlist becomes Jake's opening book.
+- Staged to the Prometheus preview channel (hurricanebath.com/preview/) for Paul to look at on Mount
+  Olympus before any public cutover; promotes to live on his go.
+
 ### 2026-06-18 (Prometheus idle page: the "nothing staged" placeholder is now full-screen art)
 
 Replaced the plain-card `preview-idle/` placeholder (root and `/laelaps`) with a full-screen
