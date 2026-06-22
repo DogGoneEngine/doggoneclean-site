@@ -255,9 +255,13 @@ See `lock_it_in_capture` in the Oracle.
   doggoneclean.us NOW REDIRECTS (live 2026-06-22) to hurricanebath.com: a permanent 301 at the Caddy
   layer with an old-page map, with DNS pointed at the droplet and Google MX / email left untouched.
   The staging `X-Robots-Tag: noindex` was removed from hurricanebath.com at cutover so the live site
-  is indexable (noindex now lives only on `/preview`). Still open and Paul's: cancel Squarespace
-  (billing) and the reminder flip (stop Acuity, then flip `notifications_live` with in-window
-  suppression). See the parking-lot teardown. The deploy is now gated on the audit: `.github/workflows/deploy.yml`
+  is indexable (noindex now lives only on `/preview`). Reminders went LIVE 2026-06-22:
+  `notifications_live='true'` with in-window suppression, after the legacy book was made app-owned
+  (`source='gcal_sync'` re-labeled `'gcal_adopted'`, full snapshot in
+  `backups.bath_appointments_20260622`) so the calendar-sync prune can never delete it. Acuity is
+  canceled (now on the Free plan; its full account delete is blocked behind Squarespace billing until
+  mid-July, and Paul could not confirm its own reminders fully turned off, a residual-double risk he
+  accepted). Still open and Paul's: cancel Squarespace (billing). See the parking-lot teardown. The deploy is now gated on the audit: `.github/workflows/deploy.yml`
   runs `scripts/check.py` as a required `audit` job and the publish step `needs` it, so a push
   to `main` that fails the audit never reaches the droplet (wired 2026-05-29). A failing audit
   therefore cannot become a live deploy: live means it passed.

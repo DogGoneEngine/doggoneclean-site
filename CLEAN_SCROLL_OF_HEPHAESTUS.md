@@ -171,6 +171,36 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-22 (Acuity retired: legacy book made app-owned, reminders flipped LIVE)
+- Paul canceled Acuity. It bundles under Squarespace, so the full account delete is blocked until
+  mid-July; the cancel dropped it to the legacy Free plan. Acuity's automated email reminders likely
+  keep firing on Free, so canceling alone does not silence it; Paul also turned the reminder emails
+  off in Acuity settings (Client Emails, Reminders, Disable) but was not sure every one stuck. He
+  exported his Acuity client list to his Drive and is deliberately keeping it out of the app for now
+  (does not want its noise in Laelaps).
+- Closed a real data-loss hole BEFORE touching anything client-facing: the inbound calendar sync
+  prunes (`_sync_prune` deletes `bath_appointments` rows with `source='gcal_sync'` in the
+  2-days-back-to-366-forward window that are no longer on the feed). If canceling Acuity wiped its
+  events off Paul's primary Google calendar, the next 15-minute sync would have deleted those visits,
+  and the mirror would then have dropped them too. Fix: full snapshot to
+  `backups.bath_appointments_20260622` (236 rows), then re-labeled every at-risk visit
+  `source='gcal_sync'` to `'gcal_adopted'` (211 rows, all upcoming now app-owned). Verified 0 visits
+  remain prune-deletable. The mirror export is source-agnostic, so the "Dog Gone Clean" calendar
+  still shows them; `gcal_adopted` is non-null so confirmations stay suppressed and the prune can
+  never touch them; while the calendar events still exist the sync keeps UPDATING the rows by
+  `external_id`, it just can no longer DELETE them.
+- Flipped reminders LIVE: wired 3 client-record emails onto their visits; shielded the 9 visits
+  already inside a reminder window with `notification_log` rows (`status='sent'`,
+  `skip_reason='acuity_cutover_shield'`, dedup_key `suppress:<appt>:<kind>`) so the hourly dispatcher
+  skips them and no one gets a double of what Acuity already sent; then set
+  `app_secrets.notifications_live='true'`. Verified: switch on, dispatcher would send 0 right now,
+  the hourly `bath-reminders` cron is active (`select public.bath_dispatch_reminders()`), the Resend
+  pipeline is proven (a real `reminder_3d` delivered earlier today, no error), and 13 emailed visits
+  are lined up over the next 7 days. Confirmations did NOT blast the legacy book (source-gated).
+- Residual risk Paul accepted ("yolo it"): if Acuity's reminders did not fully turn off, a client
+  could still get one from Acuity and one from us on a FUTURE window over the coming days; the shield
+  only covers the transition windows. Offered to watch Paul's Gmail to confirm Acuity went quiet.
+
 ### 2026-06-22 (reminder pipeline proven; the REAL Acuity blocker found: empty availability windows)
 - Reminder pipeline proven end-to-end: fired a `reminder_3d` through the `send-notification` edge
   function (POST with `x-notifications-secret`) for a test subscriber on Paul's own email; Resend
