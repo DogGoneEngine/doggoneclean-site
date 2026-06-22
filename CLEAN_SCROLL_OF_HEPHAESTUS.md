@@ -171,6 +171,25 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-22 (Reschedule + cancel a visit, owner-side, in the app)
+- Closed the gap found this session: the app could book and complete visits but had no way to reschedule
+  or cancel one (the Calendar floor was read-only; the only reschedule/skip were the client-facing portal
+  functions, locked to the subscriber and blocked inside 24h). Migration 0228 adds owner-authority
+  `admin_reschedule_appointment(id, new_start)` and `admin_cancel_appointment(id)`, both gated by
+  `_is_admin()`. Owner override: move a visit to ANY time (keeps its length, no slot-engine gate, no 24h
+  lock) and cancel ANY upcoming visit; reschedule catches exclusion_violation and reports 'overlap'.
+- UI on the Calendar floor (CalendarView): each UPCOMING, open visit gets a low-key "manage" link that
+  opens deliberate Reschedule (datetime picker then Save new time) and Cancel (two-stage "Cancel this
+  visit? Yes / keep it") actions, styled to match the existing rows and built so a stray tap cannot fire
+  them. Past, completed, and cancelled rows stay look-only. Purely additive; `npm run build` clean (audit
+  plus Astro, 13 pages).
+- Both actions are plain UPDATEs, so the existing notify triggers fire as before: a client reschedule or
+  cancel email only for app-native (source-null) visits, and the owner Iris card plus Telegram ping on
+  every move or cancel (so Paul also gets a confirmation of his own action; can be muted for self-actions
+  later if it reads as noise). Verified the `_is_admin()` gate blocks a non-admin caller (not authorized).
+- DB functions are LIVE in dgc-prod (applied via MCP). The Calendar-floor buttons reach Paul's app only
+  on the next site deploy (push to main); held on the feature branch pending Paul's go to publish.
+
 ### 2026-06-22 (Owner schedule alerts: Today card live + dormant Telegram tail)
 - Built what Paul asked for right after the Acuity cutover: he is told when a visit is booked, moved,
   or canceled, on his Today screen now, and by Telegram DM for the first little while. Migration 0227.

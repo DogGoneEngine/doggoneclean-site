@@ -564,6 +564,15 @@ export async function adminOpenSlots(clientId, fromDate, days = 1) {
 export async function adminBookAppointment(clientId, startISO, override = false, dogIds = null) {
   return rpc('admin_book_appointment', { p_client_id: clientId, p_start: startISO, p_override: override, p_dog_ids: dogIds });
 }
+// Owner-authority reschedule and cancel of a single existing visit (admin_*),
+// distinct from the client-facing portal scheduler: the owner can move a visit to
+// any time and cancel any upcoming one. Both return { ok, ... }.
+export async function adminRescheduleAppointment(appointmentId, newStartISO) {
+  return rpc('admin_reschedule_appointment', { p_appointment_id: appointmentId, p_new_start: newStartISO });
+}
+export async function adminCancelAppointment(appointmentId) {
+  return rpc('admin_cancel_appointment', { p_appointment_id: appointmentId });
+}
 
 // Suggestions annotated with real drive minutes from the previous stop and to
 // the next stop per slot (suggest-drive edge fn, drive_cache behind it). Falls
