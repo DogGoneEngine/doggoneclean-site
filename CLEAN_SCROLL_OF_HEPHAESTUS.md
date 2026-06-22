@@ -171,6 +171,21 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-22 (CUTOVER LIVE: doggoneclean.us now redirects to hurricanebath.com)
+- The domain cutover shipped and is verified. Typing doggoneclean.us (or following an old link)
+  now 301-redirects to hurricanebath.com with a valid cert. The site itself was NOT edited for the
+  cutover (Paul's scope: "just what happens when people type the URL"). Two real catches landed
+  here: (1) hurricanebath.com carried a Caddy-level `X-Robots-Tag: noindex` staging guard that
+  would have made the 301 deindex the 20-year listing; removed it from the live site at cutover
+  while keeping noindex only on /preview. (2) The simple "cancel Acuity then flip reminders" plan
+  would double-send to in-window clients; recorded the suppression fix in the parking lot.
+- Mechanics: Caddy redirect block + noindex removal applied on the droplet via a fixed script;
+  Cloudflare DNS (apex A -> droplet, www CNAME -> apex, 4 Squarespace A records removed) flipped
+  by Claude with the stored token, leaving Google MX / email records untouched. Old-page map:
+  /how-we-operate -> /hurricane-bath, /new-clients-start-here -> /book, everything else -> home.
+- Paul's only remaining step on the website: cancel Squarespace (billing). Reminders (stop Acuity,
+  test to his inbox, flip `notifications_live` with the in-window suppression) stay a later step.
+
 ### 2026-06-22 (Squarespace cutover prep: new capacity is Jake, and /book shows a capacity waitlist until Stripe is live)
 - Locked `jake_takes_new_v2_clients`: Jake takes ALL new v2.0 (no-haircut Hurricane Bath) clients
   in both Ocala and The Villages; Paul keeps and serves the legacy full-grooming book, which shrinks
