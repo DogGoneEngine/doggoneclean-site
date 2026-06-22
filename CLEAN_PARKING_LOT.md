@@ -39,6 +39,20 @@ is the wall before the v2.0 online-payment surface and the remaining portal-pari
 (item 5) turns on text reminders. The bank/EIN/DBA (2-4) are the legal-entity spine Stripe and the
 bank sit on.
 
+## Acuity calendar cleanup: delete the leftover Acuity events from Paul's primary calendar (parked 2026-06-22, Paul's call)
+
+After the Acuity reminder cutover (2026-06-22), Acuity's appointment events still sit on Paul's
+primary "Paul" Google calendar (canceling Acuity did not remove them, and the full account delete is
+blocked behind Squarespace billing until mid-July). The app's own visits also mirror to the separate
+"Dog Gone Clean" calendar, so every visit currently shows TWICE in Paul's Google Calendar (the Acuity
+copy plus the app mirror). Deleting the Acuity copies is SAFE now: the legacy book was made app-owned
+(`source='gcal_adopted'`), so the calendar-sync prune cannot delete those visits, and the "Dog Gone
+Clean" mirror keeps its own copy regardless. Paul wants to control the timing and asked to park it.
+When unparked: clear ONLY the Acuity-origin events from the primary calendar (the app stores each
+event reference in `bath_appointments.external_id`, so they can be targeted precisely without touching
+any personal or family event), confirming the exact list before deleting. Result: one clean copy per
+visit (the mirror). Offered to do it for Paul; he will get back to it.
+
 ## Operator visibility lockdown (deferred until a second, regular employee joins)
 
 Surfaced 2026-06-20 while wiring Jake's My pay floor. The intended design (`orbit_roles_operator_masked`)
