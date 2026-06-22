@@ -151,6 +151,30 @@ an `agent_runs` provenance log per capture, broader field coverage (cadence/avai
 as first-class structured updates, not just freeform notes), and Paul's final name for it. Original
 spec kept below for the next passes.
 
+### Field gaps found in real use (2026-06-22, Emily Cummings appointment)
+
+Two concrete misroutes Clio made on a live appointment note ("make a note so it shows on the
+appointments to be careful about knocking, a baby may be sleeping"; and "Klaus was a 5, charged
+$105, paid $120 Apple Pay"). Both were corrected by hand on the record; these are the durable
+fixes so Clio gets them right next time:
+
+1. **Arrival / getting-in instructions must route to `clients.access_notes`, not the household
+   note.** The Today appointment card shows `access_notes` ("Getting in") and `onsite_people`
+   ("At the door"); it does NOT show the household `note`. Clio put a knock instruction in the
+   household note, where it would never appear at the door. Riker needs an `access_note` output
+   that writes `clients.access_notes` (a getting-in / gate / knock / arrival instruction), distinct
+   from `client_note` (household facts) and `onsite_update` (who is physically there). It should
+   keep Paul's wording faithfully rather than soften it ("be careful about knocking" became "knock
+   quietly", which weakened the instruction).
+2. **"Charged X, paid Y" should fill `charged_cents`, `amount_collected_cents`, and `tip_cents`
+   separately.** The visits table already has all three. Clio collapsed "charged $105, paid $120"
+   into a single $105 amount, losing the $120 collected and the $15 tip. The parse should map
+   charged -> charged_cents, paid/collected -> amount_collected_cents, and the difference (or a
+   stated tip) -> tip_cents.
+
+Both touch the `riker` edge-function prompt + plan schema and `admin_riker_apply`; verify on a real
+utterance before reporting done.
+
 ### Original spec / next passes
 
 Paul's model: Picard does not do the data entry, he tells Riker and Riker gets it done. Paul wants a
