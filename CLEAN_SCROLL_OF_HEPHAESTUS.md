@@ -186,12 +186,16 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   writes an `info` briefing ("New booking: NAME / time / dogs / service"). No frontend change needed:
   the existing Today briefings feed renders it with its Handle/Dismiss actions. Verified the emit
   builds a correct card on a real upcoming visit, then deleted the test card.
-- Telegram tail is DORMANT by design until armed: the emit sends a Telegram DM via `net.http_post`
-  only when app_secrets `owner_alerts_telegram`='true' AND `telegram_bot_token` AND
-  `telegram_owner_chat_id` are present. The switch is seeded 'false' and no telegram token lives in
-  dgc-prod yet. OPEN, Paul's: provide a bot token + his chat id (either a new Dog Gone Clean bot, the
-  clean/sellable choice, or the existing Mount Olympus ops bot token), then store the two secrets and
-  flip the switch on. Meant to be switched off once he trusts it; the card stays.
+- Telegram tail ARMED 2026-06-22: Paul created a Clean-owned bot named Iris on Telegram and pasted
+  its token into Clean's Key vault (Mount Olympus Basement -> the dgc-prod app_secrets editor) so it
+  never touched chat; the chat id was read via a one-time getUpdates call and stored as
+  `telegram_owner_chat_id`; `owner_alerts_telegram` was flipped to 'true'; a test DM was delivered
+  (Telegram returned ok). The emit sends via `net.http_post` to the Telegram Bot API only when the
+  switch is on and both secrets are present, so turning the phone pings off later is a single flip and
+  the Today card stays regardless. Iris (Clean's bookings bot) is deliberately SEPARATE from the Mount
+  Olympus ops bot, which stays reserved for server emergencies ONLY (Paul, 2026-06-22): a routine
+  booking stream must never dilute the drop-everything channel, and Clean keeps its own bot and token
+  for sellability.
 - Security: both functions are SECURITY DEFINER with a fixed search_path, and EXECUTE was revoked from
   public/anon/authenticated so neither is reachable through the REST RPC endpoint (trigger-only).
 - Distinct from the PARKED "Close the Laptop" plan (the automated watchdog that pings when something
