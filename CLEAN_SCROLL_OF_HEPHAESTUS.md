@@ -4839,3 +4839,45 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   CLEAN_MODULE_MAP.md ("a redesign must not bring back all-day-visible finished stops"). Known
   tradeoff Paul owns: once a stop is rolled out it is gone from Today, so an accidental roll-out or a
   step-back undo now happens from the client's record rather than the Today card.
+
+## Decisions log (2026-06-23, continued)
+
+- **Cutover day-2 reminder check; missing emails are deliberate, not a bug (2026-06-23).** Paul asked
+  who the new system has reminded and with what. Pulled from `notification_log`: real reminders went to
+  Karen Anderson (confirmation + day-of), Terri McDonnell (day-of + a new-booking confirmation), Emily
+  Cummings (day-of), Sally O'Laughlin (3-day), and Emily Walker (day-before). A 3:45am batch was held by
+  the `acuity_cutover_shield` so nobody gets doubled while Acuity may still fire. I wrongly reported
+  O'Laughlin and Walker as "nameless": the new-signup record had blank first/last, but the linked legacy
+  client record carries the name, which is why Laelaps shows it; the HR/notify joins must follow
+  `bath_subscribers.client_id` to `clients`, not read `bath_subscribers.first_name`. Lisa Irwin, Cynthia
+  Tieche, and Tonya Hunt have appointments but no email and got nothing: Paul confirmed this is
+  INTENTIONAL for frequent-visit clients, who would otherwise drown in reminder spam. Future home is
+  per-client reminder preferences (Paul controls now, clients self-serve later); parked, do not chase
+  those missing emails.
+
+- **HR floor was reading the wrong source; now reads the Time is Money sheet (2026-06-23).** Paul said
+  the HR floor's "per work day" (3.7h, then 4.6h after a first fix) was plainly wrong. Root cause, found
+  only after he pushed twice: `admin_hr_summary` was re-aggregating raw `public.visits` rows, which are
+  incomplete by design. A stop logged without the in-app timer (a voice/Clio capture, a manual entry)
+  lands with no duration, so busy days read near-empty (June 9: five real stops, only one had a time, so
+  the floor saw a 2.4h day). His master Time is Money sheet kept the real arrival and departure on every
+  stop the whole time. Fix (migration 0236): `admin_hr_summary` now reads the `_time_is_money_ledger()`
+  union, the frozen `time_is_money_history` master through the 2026-06-13 cutover plus live visits after,
+  using the sheet's own Appointment Duration (hands-on) and Cycle Time (door-to-door) and Paid columns,
+  parsed from H:MM:SS, never recomputed. Over the last 30 days this reads 5.2h hands-on and 6.6h
+  door-to-door across 12 work days, matching the sheet (a full year reads 4.9h / 6.0h across 162 days).
+  HRView now shows BOTH numbers side by side (Paul asked for both) and names the source on screen.
+  Future-dated rows are excluded everywhere; a phantom 2027-dated visit shell (Ligia Amyotte, created
+  during the cutover with no time) was deleted. Recorded as `hr_metrics_read_the_ledger` in the Oracle
+  and the BUSINESS_RULES index. LESSON: when a number looks wrong, check the SOURCE before re-deriving;
+  I shipped two wrong numbers from the wrong source before reading the sheet Paul trusts.
+
+- **Clio/Riker now captures visit time by voice (2026-06-23).** Secondary fix from the same thread, kept
+  because it closes the gap going forward even though the ledger is the real source for history.
+  `admin_riker_apply` (migration 0235) now takes arrival/departure clock times (and a spoken duration)
+  from a capture, derives on-site minutes the way the tracker does, and anchors `visited_at` to the real
+  arrival instead of the moment Paul spoke (the old default that stamped visits at odd hours like 2am).
+  No time given still stores no time (a real gap, never a guess). The riker edge function (v11) prompts
+  for the duration or arrive/depart times and flags when none was given. Migration 0234 (the first,
+  superseded fix that only excluded untimed days from the raw-visits average) stays in history; 0236 is
+  the source of truth now.

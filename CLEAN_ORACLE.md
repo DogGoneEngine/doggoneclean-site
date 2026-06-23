@@ -3075,3 +3075,20 @@ happens if the new volume lands on Jake instead of back on Paul. This drives the
 until Jake is taking paid clients, new-client signup shows an honest "at capacity, get on the list"
 waitlist rather than a payment funnel a new client cannot finish, and the public site never has to
 name Jake to be truthful about it. Decided 2026-06-22.
+
+`hr_metrics_read_the_ledger` (Clean: records):
+Every workload, hours, and earnings number on the HR floor (and any future operator/owner workload
+gauge) derives from the Time is Money ledger, `_time_is_money_ledger()` style: the frozen
+`time_is_money_history` master through the 2026-06-13 cutover unioned with live visits after it, using
+the sheet's own Appointment Duration (hands-on, arrival to departure) and Cycle Time (door-to-door,
+heading out to leaving the stop) and Paid columns. It NEVER recomputes hours by re-aggregating raw
+`public.visits` rows. Because the visits table is incomplete on purpose, a stop logged without the
+in-app timer (a voice/Clio capture, a manual entry) lands with no duration, while Paul's master sheet
+kept the real arrival and departure on every stop. Re-summing the visit rows silently drops those and
+reads low: it told Paul 3.7 then 4.6 hours per day when his sheet says 5.2 hands-on and 6.6
+door-to-door over the same 30 days. This is the HR-floor application of `time_is_money_is_source_of_truth`:
+durations are parsed from the sheet's H:MM:SS text, never invented, and a day counts toward an average
+only when it carries that figure. The teeth are `admin_hr_summary` (migration 0236) reading the union,
+and HRView showing both hands-on and door-to-door with the source named on screen. A future-dated row
+is never counted (a completed visit cannot be in the future). Decided 2026-06-23 after the floor twice
+showed a wrong hours number built from the wrong source.

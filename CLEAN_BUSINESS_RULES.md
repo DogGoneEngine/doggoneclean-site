@@ -246,6 +246,7 @@ even DGN has many rules sitting in only one or two layers.
 | client_sheet_surfaces_the_must_knows | Clean: clients | Oracle; decided 2026-06-18 | standing instructions (blades/tools) and a per-appointment special instruction both pinned to the TOP of the client sheet and heavily highlighted (build pending Paul's review) |
 | client_screen_reviewed_before_live | Clean: process | Oracle + CLAUDE.md hold; client-screen changes develop on the branch, not merged to main, until Paul has seen them | n/a (a standing review gate, not a build) |
 | clio_confirm_shows_fields | Clean: clients | Oracle; decided 2026-06-18 | the Clio confirm step shows each target FIELD and the value she will write into it, not a prose summary (build pending Paul's review) |
+| hr_metrics_read_the_ledger | Clean: records | Oracle; `admin_hr_summary` (migration 0236) reads the `_time_is_money_ledger()` union (frozen `time_is_money_history` through 2026-06-13 + live visits after), hands-on = Appointment Duration, door-to-door = Cycle Time, revenue = Paid; never re-aggregates raw `visits`; future-dated rows excluded; HRView shows both numbers and names the source | per-operator workload split once Jake is on the book |
 
 ## How to add a row
 
