@@ -57,7 +57,7 @@ export default function ProspectusView() {
         <Stat label="Revenue, last 12 months" value={money(ttm)}
           receipt="Sum of every visit's recorded take, visits table, trailing 365 days" />
         <Stat label="Recurring share" value={(v.recurring_share_pct ?? 0) + '%'}
-          receipt="Share of trailing-12-month revenue from clients on a standing cadence" />
+          receipt="Share of trailing-12-month revenue from recurring clients (on a set cadence)" />
         <Stat label="Median visit" value={money(m.median_visit_cents)}
           receipt="Median collected amount across paid visits, trailing 365 days" />
         {m.earned_per_hour_cents ? <Stat label="Earned per hour on site" value={money(m.earned_per_hour_cents)}
