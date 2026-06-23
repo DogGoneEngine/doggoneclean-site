@@ -4732,3 +4732,15 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   (v10) with the new prompt rules and JSON schema, and the confirm screen plus the "What can I tell Clio?"
   help list now show the getting-in note and the charge/paid/tip split. The live model parse proves out on
   the next real use; the database and UI halves are verified.
+
+- **Client sheet kept a finished visit pinned at the top; cause was the loader dropping the departed time
+  (2026-06-22).** Paul saw Emily Cummings' completed Klaus visit (departed 7:01pm) still pinned as
+  "Today's visit" at the top of her record on a fresh 8:05pm load, not in the Visit history. The client
+  sheet pins a visit when its day is today AND it has no departed time, and unpins the moment a departed
+  time is stamped (the 2026-06-12 rule). But admin_get_client builds each visit object field by field and
+  never included departed_at, so the sheet always saw the visit as not-departed and could only drop it off
+  the top when the calendar day rolled over. Verified from the live function text and the data (a single
+  visit row, departed_at set, 112 min, $120 + $15 tip). Migration 0232 rebuilt admin_get_client from its
+  live definition to include departed_at in each visit; the pin rule (already deployed) now sees the stamp
+  and a wrapped visit drops to the history on the next load. Lesson for future: a prior turn guessed
+  "stale view, just refresh" and was wrong; the fix came from reading the actual loader, not assuming.
