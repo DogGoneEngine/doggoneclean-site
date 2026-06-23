@@ -128,6 +128,9 @@ export default function TodayView({ onOpenClient }) {
   const [error, setError] = useState(null);
   const [me, setMe] = useState(null);
   const [team, setTeam] = useState([]);
+  // Counts that decide whether the day is clear (drives the rest screen below).
+  const [openTasks, setOpenTasks] = useState(0);
+  const [openFlags, setOpenFlags] = useState(0);
 
   // Who is looking, and who they can hand a card to. Only the owner delegates
   // and only the owner needs the team list.
@@ -142,14 +145,17 @@ export default function TodayView({ onOpenClient }) {
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const [b, a, t, r] = await Promise.all([
+      const [b, a, t, r, tasks, flags] = await Promise.all([
         listBriefings(), listAgents(), todayAppointments(),
         listReminders().catch(() => null),
+        listTasks().catch(() => []), fieldFlags().catch(() => []),
       ]);
       setBriefings(sortByValue(b.filter((x) => x.status === 'new' || x.status === 'read')));
       setAgents(a);
       setAppts(t);
       setReminders(r && Array.isArray(r.open) ? r.open : []);
+      setOpenTasks((tasks || []).filter((x) => x.status === 'open').length);
+      setOpenFlags((flags || []).filter((x) => !x.seen).length);
     } catch (e) { setError(e.message || 'load_failed'); }
     finally { setLoading(false); }
   }, []);
@@ -184,13 +190,26 @@ export default function TodayView({ onOpenClient }) {
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const activeHeads = agents.filter((a) => a.is_active).map((a) => a.label);
 
+  // The day is "clear" when nothing on the screen needs Paul: no live or
+  // upcoming stop, no reminder, no open briefing, no open task, and (owner) no
+  // field flag waiting. A wrapped-but-not-empty day still counts as clear, so
+  // the rest photo shows as a reward while the day's finished stops stay visible
+  // below it. When clear, the empty "nothing here" boxes are hidden so the photo
+  // stands alone instead of sitting under a stack of empty panels.
+  const pendingStops = appts.filter((a) => !['completed', 'cancelled', 'skipped'].includes(a.status)).length;
+  const dayIsClear = !loading && pendingStops === 0 && reminders.length === 0
+    && briefings.length === 0 && openTasks === 0 && (!isOwner || openFlags === 0);
+
   return (
     <>
       <h1>Today</h1>
       <p className="ad-sub">{today}. {isOwner ? 'Your stops for the day, then the feed from your AI department heads. Talk back to any of them.' : 'Your stops for the day.'}</p>
 
+      {dayIsClear && <RestfulToday />}
+
       <NowCard reloadKey={appts} onOpenClient={onOpenClient} />
 
+      {!(dayIsClear && appts.length === 0) && (
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
@@ -207,6 +226,7 @@ export default function TodayView({ onOpenClient }) {
           </div>
         )}
       </div>
+      )}
 
       {isOwner && reminders.length > 0 && (
         <div className="ad-panel" style={{ marginBottom: 16 }}>
@@ -247,15 +267,40 @@ export default function TodayView({ onOpenClient }) {
       {isOwner && (loading ? (
         <div className="ad-panel">Loading the feed…</div>
       ) : briefings.length === 0 ? (
+        dayIsClear ? null : (
         <div className="ad-panel" style={{ opacity: 0.7 }}>
           No open briefings. {activeHeads.length ? `${activeHeads.join(', ')} ${activeHeads.length === 1 ? 'is' : 'are'} watching.` : 'Bring a department head online to start the feed.'}
         </div>
+        )
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {briefings.map((b) => <BriefingCard key={b.id} b={b} team={team} isOwner={isOwner} onChanged={load} onError={setError} />)}
         </div>
       ))}
     </>
+  );
+}
+
+// The rest screen: when the day is clear (no stop, reminder, task, briefing, or
+// field flag waiting), Today shows this instead of a stack of empty panels. The
+// art is the "future paw salon" Paul picked. Quiet reward, not a call to action.
+function RestfulToday() {
+  return (
+    <div className="ad-panel" style={{ textAlign: 'center', padding: '20px 16px', marginBottom: 16 }}>
+      <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.15 }}>All clear</div>
+      <div style={{ fontSize: 14, opacity: 0.65, marginTop: 2, marginBottom: 16 }}>
+        Nothing needs you right now. Enjoy the quiet.
+      </div>
+      <img
+        src="/today-allclear.jpg"
+        alt="The future Dog Gone Clean paw salon"
+        loading="lazy"
+        style={{
+          width: '100%', maxWidth: 460, height: 'auto', display: 'block', margin: '0 auto',
+          borderRadius: 16, boxShadow: 'var(--ad-brand-glow, 0 8px 24px rgba(37,99,216,0.16))',
+        }}
+      />
+    </div>
   );
 }
 
