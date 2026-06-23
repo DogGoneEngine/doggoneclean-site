@@ -171,6 +171,41 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-22 (Field session: Clio capture hardening + the client-sheet pin bug, all from Paul on the route)
+- A run of real-appointment bug reports from Paul on his phone, each fixed durably so it cannot recur.
+  This session set the standing rule that a reported Clio miss becomes a permanent fix, not a one-off
+  hand-correction (Paul: "every time I tell Clio to do something and it doesn't do what I want, I tell
+  you in hopes of making it better for the future").
+- **Birthday on the Clio confirm screen.** At Karen Anderson's stop, telling Clio "Willie's birthday is
+  May 20th, 2015" parsed correctly but the on-sheet confirm review only rendered price and breed for a
+  dog update, so a birthday-only change showed as a blank "Card change for Willie" line and Paul backed
+  out. The apply side already wrote birthdays (migration 0185); only the confirm display was blind to it.
+  Fixed RikerCapture so the dog-update line lists every field it writes (price, breed, birthday with an
+  approximate tag). Willie's birthday was also set directly so the field goal was done on the spot.
+- **A contactless notify person no longer torches the whole save (migration 0230).** Asking to notify
+  Melody on Amy Blessing's sheet, with the phone given a breath earlier as a who's-on-site entry rather
+  than in the same sentence, produced a notify person with no phone or email; the upsert RPC correctly
+  raises on that, but the raise aborted the ENTIRE apply, so Paul got a bare error and nothing saved.
+  admin_riker_apply now checks for a phone or email first and, with neither, skips just that person and
+  reports it, so the rest of the plan still lands. The confirm screen flags a contactless notify person
+  before the tap. Melody was added directly with the number Paul already gave.
+- **Clio learned getting-in instructions and full charge/tip capture (migration 0231, riker edge fn v10).**
+  At Emily Cummings' stop, "be careful about knocking, a baby may be sleeping" got softened to "knock
+  quietly" and filed in the household note, which does not even show on the appointment; and "charged $105,
+  paid $120 Apple Pay" collapsed to a single $105. Paul's real rule was "do not knock, text instead." Clio
+  now emits an access_note for arrival/getting-in instructions, written to clients.access_notes (the
+  "Getting in" line on the appointment) in Paul's own words and not softened, and records charged_cents,
+  amount_collected_cents, and tip_cents separately. Emily's record was corrected by hand first.
+- **A finished visit stayed pinned at the top of the client sheet (migration 0232).** Paul's fresh
+  8:05pm load still showed Emily's completed, departed-stamped visit as "Today's visit" at the top instead
+  of in the history. Cause, found by reading the loader (not guessing; an earlier "stale view, just
+  refresh" guess this session was wrong and is recorded as the lesson): admin_get_client built each visit
+  object by hand and never included departed_at, so the sheet could never see a visit as finished and only
+  dropped it off the top when the day rolled over. The loader now sends departed_at; the pin rule, already
+  deployed, honors it. Paul confirmed fixed.
+- All four fixes are live in dgc-prod (DB via MCP, edge function deployed) and on `main`. Verified the
+  database and UI halves directly; the live Clio parse proves out on the next real use.
+
 ### 2026-06-22 (Reschedule + cancel a visit, owner-side, in the app)
 - Closed the gap found this session: the app could book and complete visits but had no way to reschedule
   or cancel one (the Calendar floor was read-only; the only reschedule/skip were the client-facing portal
