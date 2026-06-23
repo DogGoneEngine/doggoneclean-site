@@ -7,7 +7,7 @@
 // talk back.
 
 import { useCallback, useEffect, useState } from 'react';
-import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, adminDepart, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, fieldFlags, markFieldSeen, uploadTaskProof, signedPhotoUrl, nowCard } from './supabase.js';
+import { listBriefings, setBriefingStatus, replyBriefing, resolveBriefing, reopenBriefing, listAgents, todayAppointments, stampAppointmentTime, onMyWay, adminArrived, adminReturning, adminDepart, trackerUndo, trackerLocation, setEquipmentHoursByName, listReminders, setReminderDone, messageDraft, appointmentMeta, setAppointmentOperator, listTeam, adminSelf, listTasks, addTask, completeTask, dropTask, clearTask, clearDoneTasks, delegateBriefing, setVisitRequest, fieldFlags, markFieldSeen, uploadTaskProof, signedPhotoUrl, addTaskNote, addTaskFile, nowCard } from './supabase.js';
 import HelpToggle from './Help.jsx';
 
 const SERVICE_LABEL = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
@@ -375,6 +375,8 @@ function TasksPanel() {
   const [me, setMe] = useState(null);
   const [team, setTeam] = useState([]);
   const [title, setTitle] = useState('');
+  const [details, setDetails] = useState('');
+  const [file, setFile] = useState(null);
   const [assignee, setAssignee] = useState('');
   const [needsProof, setNeedsProof] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -401,9 +403,25 @@ function TasksPanel() {
     if (!title.trim() || !assignee) return;
     setBusy(true); setErr(null);
     try {
-      await addTask(title.trim(), assignee, null, needsProof);
-      setTitle(''); setAdding(false); load();
+      const id = await addTask(title.trim(), assignee, details.trim() || null, needsProof);
+      // A screenshot or paste rides along with the handoff. A failed attach
+      // never loses the task itself.
+      if (file && id) { try { await addTaskFile(id, file); } catch { /* task still created */ } }
+      setTitle(''); setDetails(''); setFile(null); setAdding(false); load();
     } catch (e) { setErr(e.message || 'add_failed'); }
+    finally { setBusy(false); }
+  }
+
+  // The assignee (or owner) types the answer, or attaches a screenshot/photo,
+  // onto an open task. This is how Jake enters the information he was asked for,
+  // separate from finishing the task.
+  async function addInfo(t, { note, file: f }) {
+    setBusy(true); setErr(null);
+    try {
+      if (note && note.trim()) await addTaskNote(t.id, note.trim());
+      if (f) await addTaskFile(t.id, f);
+      load();
+    } catch (e) { setErr(e.message || 'add_info_failed'); }
     finally { setBusy(false); }
   }
 
@@ -472,12 +490,20 @@ function TasksPanel() {
           <input className="pt-input" type="text" value={title} autoFocus placeholder="What needs doing? (e.g. clean the dryer intake filter)"
             onChange={(e) => setTitle(e.target.value)}
             style={{ width: '100%', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box' }} />
+          <textarea value={details} placeholder="Anything they need to know (paste it here). They can reply or attach a photo back."
+            onChange={(e) => setDetails(e.target.value)} rows={2}
+            style={{ width: '100%', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit' }} />
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
             <select value={assignee} onChange={(e) => setAssignee(e.target.value)}
               style={{ fontSize: 13, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }}>
               <option value="">Who does it?</option>
               {team.map((t) => <option key={t.id} value={t.id}>{t.first_name}{t.last_name ? ` ${t.last_name}` : ''}</option>)}
             </select>
+            <label className="ad-btn ad-btn--ghost ad-btn--sm" style={{ cursor: 'pointer' }}>
+              {file ? 'photo attached' : 'attach a photo'}
+              <input type="file" accept="image/*" disabled={busy} style={{ display: 'none' }}
+                onChange={(e) => setFile((e.target.files && e.target.files[0]) || null)} />
+            </label>
             <label style={{ display: 'flex', gap: 6, alignItems: 'center', cursor: 'pointer' }}>
               <input type="checkbox" checked={needsProof} onChange={(e) => setNeedsProof(e.target.checked)} />
               ask for a photo receipt
@@ -485,7 +511,7 @@ function TasksPanel() {
             <button className="ad-btn ad-btn--sm" disabled={busy || !title.trim() || !assignee} onClick={create}>
               {busy ? '…' : 'Assign'}
             </button>
-            <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => setAdding(false)}>Cancel</button>
+            <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => { setAdding(false); setFile(null); setDetails(''); }}>Cancel</button>
           </div>
         </div>
       )}
@@ -499,6 +525,8 @@ function TasksPanel() {
           {open.map((t) => (
             <OpenTaskRow key={t.id} t={t} isOwner={isOwner} busy={busy}
               onDone={markDone}
+              onAddInfo={addInfo}
+              onViewFile={viewReceipt}
               onTakeBack={takeBack}
               onDrop={async (task) => { try { await dropTask(task.id); load(); } catch (e) { setErr(e.message); } }} />
           ))}
@@ -514,6 +542,17 @@ function TasksPanel() {
                 <span style={{ display: 'block', fontSize: 12, opacity: 0.7 }}>
                   done by {t.assignee}{t.done_at ? ` · ${new Date(t.done_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}
                 </span>
+                {(t.attachments || []).map((x) => (
+                  x.kind === 'file' ? (
+                    <button key={x.id} className="ad-btn ad-btn--ghost ad-btn--sm" style={{ marginTop: 4 }} onClick={() => viewReceipt(x.storage_path)}>
+                      {x.author_name ? `${x.author_name}: ` : ''}view attachment
+                    </button>
+                  ) : (
+                    <span key={x.id} style={{ display: 'block', fontSize: 12, marginTop: 2 }}>
+                      {x.author_name ? <strong>{x.author_name}: </strong> : null}{x.body}
+                    </span>
+                  )
+                ))}
               </div>
               {t.proof_photo_path && (
                 <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={() => viewReceipt(t.proof_photo_path)}>Receipt</button>
@@ -534,48 +573,107 @@ function TasksPanel() {
 // the assignee enters the reading from their own task (the only way an operator
 // writes hours), which lands the value and closes the source card. Overdue and
 // from-a-card are surfaced so a delegated card cannot quietly rot.
-function OpenTaskRow({ t, isOwner, busy, onDone, onDrop, onTakeBack }) {
+function OpenTaskRow({ t, isOwner, busy, onDone, onDrop, onTakeBack, onAddInfo, onViewFile }) {
   const [hours, setHours] = useState('');
+  const [reply, setReply] = useState('');
+  const [replyOpen, setReplyOpen] = useState(false);
   const isHours = t.action && t.action.type === 'equipment_hours';
   const canDo = t.mine || isOwner;
+  const attachments = t.attachments || [];
+
+  function sendReply(f = null) {
+    if (!reply.trim() && !f) return;
+    onAddInfo?.(t, { note: reply, file: f });
+    setReply('');
+  }
+
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
       borderLeft: t.overdue ? '3px solid var(--ad-warn, #b9770a)' : '3px solid transparent',
       paddingLeft: 8,
     }}>
-      <div style={{ flex: 1, minWidth: 180, fontSize: 14 }}>
-        {t.title}
-        <span style={{ display: 'block', fontSize: 12, opacity: 0.6 }}>
-          {t.overdue && <strong style={{ color: 'var(--ad-warn, #b9770a)' }}>Overdue · </strong>}
-          {t.mine ? 'yours' : `waiting on ${t.assignee}`}
-          {t.from_card ? ' · from a card' : ''}
-          {t.needs_proof ? ' · photo receipt asked' : ''}
-        </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: 180, fontSize: 14 }}>
+          {t.title}
+          <span style={{ display: 'block', fontSize: 12, opacity: 0.6 }}>
+            {t.overdue && <strong style={{ color: 'var(--ad-warn, #b9770a)' }}>Overdue · </strong>}
+            {t.mine ? 'yours' : `waiting on ${t.assignee}`}
+            {t.from_card ? ' · from a card' : ''}
+            {t.needs_proof ? ' · photo receipt asked' : ''}
+          </span>
+        </div>
+        {canDo && isHours ? (
+          <>
+            <input type="number" inputMode="decimal" min="0" value={hours} disabled={busy}
+              onChange={(e) => setHours(e.target.value)} placeholder="Panel hours"
+              style={{ width: 110, fontSize: 13, padding: '6px 9px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
+            <button className="ad-btn ad-btn--sm" disabled={busy || !hours.trim()} onClick={() => onDone(t, null, hours.trim())}>
+              {busy ? '…' : 'Save hours'}
+            </button>
+          </>
+        ) : canDo && (t.needs_proof ? (
+          <label className="ad-btn ad-btn--sm" style={{ cursor: 'pointer' }}>
+            {busy ? '…' : 'Done with photo'}
+            <input type="file" accept="image/*" capture="environment" disabled={busy} style={{ display: 'none' }}
+              onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) onDone(t, f); }} />
+          </label>
+        ) : (
+          <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => onDone(t, null)}>Done</button>
+        ))}
+        {isOwner && (t.from_card
+          ? <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy}
+              title="Pull this card back onto your own list and cancel the handoff"
+              onClick={() => onTakeBack(t)}>Take back</button>
+          : <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => onDrop(t)}>Drop</button>
+        )}
       </div>
-      {canDo && isHours ? (
-        <>
-          <input type="number" inputMode="decimal" min="0" value={hours} disabled={busy}
-            onChange={(e) => setHours(e.target.value)} placeholder="Panel hours"
-            style={{ width: 110, fontSize: 13, padding: '6px 9px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)' }} />
-          <button className="ad-btn ad-btn--sm" disabled={busy || !hours.trim()} onClick={() => onDone(t, null, hours.trim())}>
-            {busy ? '…' : 'Save hours'}
+
+      {/* What the assigner handed over, then the running thread of notes and
+          files either side has added. This is how Jake reads the context Paul
+          attached and how Paul reads what Jake entered back. */}
+      {t.details && (
+        <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4, whiteSpace: 'pre-wrap' }}>{t.details}</div>
+      )}
+      {attachments.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 6 }}>
+          {attachments.map((x) => (
+            x.kind === 'file' ? (
+              <button key={x.id} className="ad-btn ad-btn--ghost ad-btn--sm" style={{ alignSelf: 'flex-start' }}
+                onClick={() => onViewFile?.(x.storage_path)}>
+                {x.author_name ? `${x.author_name}: ` : ''}view attachment
+              </button>
+            ) : (
+              <div key={x.id} style={{ fontSize: 13 }}>
+                {x.author_name ? <strong>{x.author_name}: </strong> : null}{x.body}
+              </div>
+            )
+          ))}
+        </div>
+      )}
+
+      {canDo && (
+        replyOpen ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
+            <textarea value={reply} onChange={(e) => setReply(e.target.value)} disabled={busy} rows={2} autoFocus
+              placeholder="Type the answer here (or attach a photo)"
+              style={{ width: '100%', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--ad-outline, #d8d8de)', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit' }} />
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button className="ad-btn ad-btn--sm" disabled={busy || !reply.trim()} onClick={() => sendReply(null)}>
+                {busy ? '…' : 'Send'}
+              </button>
+              <label className="ad-btn ad-btn--ghost ad-btn--sm" style={{ cursor: 'pointer' }}>
+                {busy ? '…' : 'Attach photo'}
+                <input type="file" accept="image/*" disabled={busy} style={{ display: 'none' }}
+                  onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) sendReply(f); }} />
+              </label>
+              <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => { setReplyOpen(false); setReply(''); }}>Close</button>
+            </div>
+          </div>
+        ) : (
+          <button className="ad-btn ad-btn--ghost ad-btn--sm" style={{ marginTop: 6 }} onClick={() => setReplyOpen(true)}>
+            Add info
           </button>
-        </>
-      ) : canDo && (t.needs_proof ? (
-        <label className="ad-btn ad-btn--sm" style={{ cursor: 'pointer' }}>
-          {busy ? '…' : 'Done with photo'}
-          <input type="file" accept="image/*" capture="environment" disabled={busy} style={{ display: 'none' }}
-            onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) onDone(t, f); }} />
-        </label>
-      ) : (
-        <button className="ad-btn ad-btn--sm" disabled={busy} onClick={() => onDone(t, null)}>Done</button>
-      ))}
-      {isOwner && (t.from_card
-        ? <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy}
-            title="Pull this card back onto your own list and cancel the handoff"
-            onClick={() => onTakeBack(t)}>Take back</button>
-        : <button className="ad-btn ad-btn--ghost ad-btn--sm" disabled={busy} onClick={() => onDrop(t)}>Drop</button>
+        )
       )}
     </div>
   );

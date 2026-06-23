@@ -724,6 +724,21 @@ export async function uploadTaskProof(taskId, file) {
   return path;
 }
 
+// Two-way task channel (task_attachments). Paul attaches context (a typed note
+// or a screenshot/photo) when handing a task off; the assignee attaches the
+// answer when finishing. Both land on the task and show in the same panel.
+export async function addTaskNote(taskId, body) {
+  return rpc('admin_add_task_attachment', { p_task_id: taskId, p_kind: 'note', p_body: body, p_storage_path: null });
+}
+export async function addTaskFile(taskId, file, caption = null) {
+  const f = await compressForUpload(file);
+  const ext = (f.name?.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `tasks/${taskId}/file-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+  const { error } = await sb().storage.from(PHOTO_BUCKET).upload(path, f, { contentType: f.type || 'application/octet-stream', upsert: false });
+  if (error) throw new Error(error.message);
+  return rpc('admin_add_task_attachment', { p_task_id: taskId, p_kind: 'file', p_body: caption, p_storage_path: path });
+}
+
 // Live infrastructure usage (database, storage) against plan limits. The
 // daily infra watcher cards Today at 70% of a limit; this is the live view.
 export async function adminInfraStatus() {

@@ -41,6 +41,7 @@ export function describeApplied(res) {
   if (res.notify_person_id) bits.push('notify person saved');
   if (res.reminder_id) bits.push('reminder set, it will surface on Today when due');
   if (res.wisdom_saved) bits.push('filed to the wisdom inbox');
+  if (res.task_attached) bits.push('attached to the open task');
   return { bits, missed: !!res.visit_update_missed, noNotifyContact: !!res.notify_person_missing_contact };
 }
 
@@ -80,7 +81,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
   function cancel() { setPlan(null); setPhase('idle'); setError(null); }
 
   const v = plan?.visit;
-  const canApply = plan && plan.matched !== false && (plan.client_id || plan.wisdom || plan.reminder);
+  const canApply = plan && plan.matched !== false && (plan.client_id || plan.wisdom || plan.reminder || plan.task_attachment);
 
   return (
     <div className="ad-panel" style={{ marginBottom: 16, borderLeft: '4px solid var(--ad-primary, #2563d8)' }}>
@@ -134,7 +135,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
           <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>
             Clio will write exactly this
           </div>
-          {plan.matched === false ? (
+          {plan.matched === false && !plan.wisdom && !plan.reminder && !plan.task_attachment ? (
             <div>
               <div style={{ fontSize: 14, color: 'var(--ad-warn, #b9770a)' }}>
                 {plan.summary || 'Could not tell which client you meant.'}
@@ -152,7 +153,7 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                   then obvious before the one-tap Confirm (clio_confirm_shows_fields). */}
               <div style={{ marginBottom: 6 }}>
                 <span style={{ opacity: 0.55 }}>Record: </span>
-                <strong>{plan.client_name || (plan.wisdom ? 'Business wisdom' : 'Client')}</strong>
+                <strong>{plan.client_name || (plan.wisdom ? 'Business wisdom' : plan.task_attachment ? 'An open task' : 'Client')}</strong>
               </div>
               <ul style={{ margin: '6px 0', paddingLeft: 18, fontSize: 13 }}>
                 {v && (
@@ -228,6 +229,9 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                 {plan.wisdom && (
                   <li>To the wisdom inbox (the Archivist files it): {plan.wisdom}</li>
                 )}
+                {plan.task_attachment && (
+                  <li>Onto the open task it answers: {plan.task_attachment.note}</li>
+                )}
                 {plan.reminder && (
                   <li>On your plate {plan.reminder.due ? `for ${plan.reminder.due}` : ''}: {plan.reminder.body}</li>
                 )}
@@ -285,7 +289,8 @@ export function RikerManual() {
         <li><strong>Dog roster:</strong> "Windsor moved away, archive him." Moved, passed away, no longer groomed, sometimes, or back on the roster. Reversible, never deleted.</li>
         <li><strong>People to notify:</strong> "Jane wants her husband Tom texted too, 352-555-0101" or "text the dog sitter Maria instead of Jane until July 10."</li>
         <li><strong>Reminders:</strong> "If I have not booked her by then, contact Mary in 2 weeks." It surfaces on Today when it comes due.</li>
-        <li><strong>Anything else:</strong> ideas, rules, decisions, business thoughts. If it is not about one client's record, it lands in the wisdom inbox and the Archivist files it. Say "because" so the reason rides along.</li>
+        <li><strong>Answer an open task:</strong> if a task is open asking for something (like the appliance wattages) and you say it, Clio attaches your answer right onto that task instead of the wisdom inbox.</li>
+        <li><strong>Anything else:</strong> ideas, rules, decisions, business thoughts. If it is not about one client's record and not the answer to an open task, it lands in the wisdom inbox and the Archivist files it. Say "because" so the reason rides along.</li>
       </ul>
       <div style={{ marginTop: 4, opacity: 0.8 }}>Nothing is written until you tap Confirm. Clio cannot book or move appointments or change business rules; booking lives on the contact sheet, rules go through Claude.</div>
     </details>

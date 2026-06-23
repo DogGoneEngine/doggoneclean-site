@@ -171,6 +171,26 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-23 (Tasks became a two-way channel: hand off context, enter the answer back, and Clio matches it)
+- Paul handed Jake a "find the appliance wattages" task and hit a wall twice: Jake had no way to ENTER
+  the answer back (Done only offered a photo or the equipment-hours number box), and Paul had no way to
+  ATTACH what he already knew (a screenshot, a paste) when handing it off. Worse, when Paul spoke the
+  wattages to Clio, she filed them to the wisdom inbox ("general business insights") because she could
+  not see the open task that was asking for exactly that.
+- Fix, all shipped this turn (migration 0241, applied to dgc-prod): a new `task_attachments` table hangs
+  an ordered, attributed thread off any task. Either side adds a typed note or a file (screenshot/photo
+  in the visit-photos bucket) through `admin_add_task_attachment` (owner, the assignee, or the creator
+  only; RLS-on, no policies, definer-RPC pattern like the rest of the admin surface). The assign form now
+  takes details + an attached photo; each open task shows Paul's handoff plus an "Add info" reply box
+  (text or photo) so Jake enters what he found; `admin_list_tasks` returns the thread inline so both
+  sides read it in the one panel.
+- Clio now sees open tasks: `admin_riker_context` lists them, the riker edge function (deployed v12)
+  matches a spoken answer to the single open task that asked for it and sets `task_attachment`
+  {task_id, note}, and `admin_riker_apply` lands it on the task instead of the wisdom inbox (falls back
+  to wisdom when no task clearly fits). Verified end to end by impersonating Paul and Jake in a
+  rolled-back transaction: details, both sides' notes, Clio's attach, and the open-task match all proved
+  out on real rows.
+
 ### 2026-06-23 (Appointment dog counts corrected: recurring count = regular roster dogs)
 - Paul saw today's appointments for Lisa Irwin and Cynthia Tieche showing one dog when each has two.
   Root cause: the legacy book was imported from Google Calendar, which never encoded a dog count, so
