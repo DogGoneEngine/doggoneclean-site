@@ -1574,6 +1574,22 @@ front, not routed. Pairs with `base_is_home_sw`.
 
 ## Copy and terminology
 
+`two_client_kinds` (copy):
+There are exactly two kinds of client and only two: a recurring client (holds a slot on a set
+cadence) and an on-demand client (books when they want). That truth lives in the
+`clients.client_type` column (recurring or on_demand), which is the one source every count and
+label reads from. The words "standing client", "one-off" (as a client label), and "repeat
+client" are retired from every buyer-facing and Paul-facing surface; say "recurring" or "on
+demand". Counts of the book come from `client_type`, never from a second list like raw
+`bath_subscriptions` rows, and always exclude `exclude_from_everything = true` records (banned,
+deceased, moved-away, inactive, merged, test). Because three overlapping words for the same two
+ideas, counted off two unreconciled lists, is exactly what let the prospectus report more
+recurring plans (36, off the subscription table, including a test plan and a non-recurring one)
+than standing clients (33, off the legacy status column), a contradiction Paul caught on sight.
+A single client kind on a single column cannot disagree with itself. Note: "one-off" survives
+only as a pricing term for a single non-recurring appointment (the purchase), never as a label
+for a person. Paul, 2026-06-23.
+
 `grooming_vocab` (copy):
 In customer-facing copy always write "dog grooming" and "dog groomer", never the bare words
 "grooming" or "groomer". The craft itself is correct for Clean (unlike DGN), but the

@@ -44,7 +44,7 @@ export default function ProspectusView() {
           {money(v.value_low_cents)} to {money(v.value_high_cents)}
         </div>
         <p style={{ fontSize: 14, marginTop: 6, marginBottom: 4 }}>
-          A turnkey mobile dog grooming route in Ocala, Florida with over 20 years of operating history, a recurring client book that runs on standing appointments, and a complete software operating system a buyer gets with the keys.
+          A turnkey mobile dog grooming route in Ocala, Florida with over 20 years of operating history, a recurring client book that runs on a set cadence, and a complete software operating system a buyer gets with the keys.
         </p>
         <Receipt>
           {v.method === 'sde'
@@ -67,10 +67,10 @@ export default function ProspectusView() {
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <Cap>The book a buyer inherits</Cap>
         <p style={{ fontSize: 14, marginTop: 8, marginBottom: 8 }}>
-          {book.standing_clients} standing clients on fixed rotations and {book.active_recurring_plans} active recurring plans, with {book.repeat_clients} repeat households on record. The average repeat client has been on the books {book.avg_tenure_years} years within our digital records alone, the longest {book.max_tenure_years} years, and the paper trail goes back two decades before that. These are not leads; they are relationships with names, gate codes, dog temperaments, and standing time windows, all in the database.
+          {book.recurring_clients} recurring clients on a set cadence and {book.on_demand_clients} on-demand clients who book when they want, all in the database. The longest-running client goes back {book.max_tenure_years} years within our digital records alone, the average {book.avg_tenure_years} years, and the paper trail goes back two decades before that. These are not leads; they are relationships with names, gate codes, dog temperaments, and hard time windows.
         </p>
         <Receipt>
-          {book.total_visits?.toLocaleString('en-US')} visits on record since {book.first_visit}; client and dog records carry per-dog grooming specs, access notes, and hard availability windows. Tenure measured from each repeat client's first to latest recorded visit (3+ visits), so it understates the true relationship length.
+          {book.total_visits?.toLocaleString('en-US')} visits on record since {book.first_visit}; client and dog records carry per-dog grooming specs, access notes, and hard availability windows. Tenure measured from each client's first to latest recorded visit, so it understates the true relationship length.
         </Receipt>
       </div>
 

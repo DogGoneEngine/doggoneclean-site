@@ -171,6 +171,26 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-23 (Prospectus contradiction fixed: two client kinds, one source of truth)
+- Paul caught the prospectus reporting more recurring plans (36) than standing clients (33), which is
+  impossible. Root cause: the page counted "standing clients" off the legacy `clients.status` column
+  and "active recurring plans" off a raw count of `bath_subscriptions`, two unreconciled lists. The 36
+  was 33 real recurring clients + Paul's own test plan + a non-recurring (one-off) plan + a recurring
+  client filed under a different status. The "61 repeat households" and the money figures ($120 median,
+  $86/hour, the value headline) also quietly swept in a banned client and a test visit.
+- Decision (Paul): there are exactly two kinds of client, recurring and on demand, and nothing else.
+  "Standing client", "one-off" (as a person), and "repeat client" are retired words. Recorded as Oracle
+  rule `two_client_kinds` with the index row.
+- Fix shipped (migration 0237): `admin_prospectus` and `_business_value` now count the book off the
+  clean `clients.client_type` column and exclude every `exclude_from_everything` record (banned,
+  deceased, moved-away, inactive, merged, test) and every test subscriber from the money math. The page
+  now reads "41 recurring clients and 44 on-demand clients" (one source, cannot self-contradict).
+  ProspectusView copy rewritten to match.
+- Data corrected: Karen Anderson (Paul's mother) is now a recurring, every-4-weeks, $0 family client
+  (was on-demand with a one-off plan). Confirmed Chris Votos is already merged into the one household
+  client Donna Rodriquez (husband and wife, shared dog Maggie; merged 2026-06-08); "Rodriguez" is the
+  misspelling and is held only as a searchable alias.
+
 ### 2026-06-23 (iPostal1 mailbox set up: tracked as a cost, filed in Mount Olympus, and dropped into the legal pages)
 - Paul set up an iPostal1 digital mailbox for Dog Gone Clean (a real street mailing address for the
   business, separate from his home). The session wired the new mailbox into the three places it belongs.
