@@ -73,8 +73,15 @@ the teeth live (the durable layer that survives a page rewrite).
     (severity first), not arrival time; the screen wake lock holds while sharing
     location.
   - Fix-times (inbound / arrived / departed) editable per stop.
+  - A rolled-out (completed/departed) stop drops off Today the instant it is
+    wrapped, and stays gone across refreshes; the list only shows what is still
+    ahead. The finished visit is never lost (it lives in the client's history).
+    Paul chose the clean screen over parking done stops here all day (2026-06-23).
+    A redesign must not bring back all-day-visible finished stops.
 - **Teeth:** `admin_arrived` / `admin_returning` / `admin_depart` /
-  `admin_stamp_appointment_time` on `bath_appointments` + `visits`.
+  `admin_stamp_appointment_time` on `bath_appointments` + `visits`. The drop-off is a
+  TodayView display choice (filter completed out of the stop list + remove on wrap),
+  reversible by design; the appointment row itself is untouched.
 
 ## Tracker - the client-facing "pizza tracker"
 - **File:** `/track` page + `public.tracker_status(token)` (DB function). Client name:

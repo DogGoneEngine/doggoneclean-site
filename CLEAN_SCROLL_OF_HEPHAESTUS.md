@@ -4801,3 +4801,18 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   November" while the Oracle note and 0077 say "block starting October"; left as-is since the calendar
   is the ground truth and only the August appointment is booked so far, but worth Paul confirming the
   resume month when she rebooks.
+
+- **A rolled-out stop now drops off the Today screen on the spot (2026-06-23).** The Today screen used
+  to keep every finished stop visible all day (greyed "Wrapped at HH:MM"), so by late afternoon the
+  next stop was buried under the ones already done. Paul weighed the options and chose the clean
+  screen: the moment he marks a stop rolled out, it leaves Today entirely, and the rare time he needs a
+  finished one he taps into that client's history (a couple taps, not buried). He explicitly accepted
+  losing the at-a-glance "look back at a done stop" in exchange for an uncluttered list, and confirmed
+  it is reversible before trying it. Built as a TodayView display choice, not a data change: completed
+  stops are filtered out of the stop list AND removed on the spot when a card wraps (departed stamped),
+  so it disappears instantly and stays gone across refreshes. The appointment row, the visit, and the
+  client history are all untouched. Consistent with the client sheet, which already drops a visit off
+  the top the moment a departed time is stamped (0232). Recorded in the TodayView contract in
+  CLEAN_MODULE_MAP.md ("a redesign must not bring back all-day-visible finished stops"). Known
+  tradeoff Paul owns: once a stop is rolled out it is gone from Today, so an accidental roll-out or a
+  step-back undo now happens from the client's record rather than the Today card.

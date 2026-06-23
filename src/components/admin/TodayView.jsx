@@ -197,6 +197,13 @@ export default function TodayView({ onOpenClient }) {
   // below it. When clear, the empty "nothing here" boxes are hidden so the photo
   // stands alone instead of sitting under a stack of empty panels.
   const pendingStops = appts.filter((a) => !['completed', 'cancelled', 'skipped'].includes(a.status)).length;
+  // A rolled-out (completed) stop drops off Today the instant it is wrapped, so
+  // the list only ever shows what is still ahead. Two parts hold this: dropStop
+  // removes it on the spot (before any refresh), and visibleAppts keeps it gone
+  // after a reload refetches the day's finished stops. Finished visits are never
+  // lost; each lives on in its client's history (Paul, 2026-06-23).
+  const visibleAppts = appts.filter((a) => a.status !== 'completed');
+  const dropStop = useCallback((id) => setAppts((prev) => prev.filter((a) => a.id !== id)), []);
   const dayIsClear = !loading && pendingStops === 0 && reminders.length === 0
     && briefings.length === 0 && openTasks === 0 && (!isOwner || openFlags === 0);
 
@@ -209,20 +216,22 @@ export default function TodayView({ onOpenClient }) {
 
       <NowCard reloadKey={appts} onOpenClient={onOpenClient} />
 
-      {!(dayIsClear && appts.length === 0) && (
+      {!(dayIsClear && visibleAppts.length === 0) && (
       <div className="ad-panel" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
             <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6 }}>Today's stops</span>
             <HelpToggle label="What can I do with a stop?" items={STOP_HELP} />
           </div>
-          <span style={{ fontSize: 12, opacity: 0.6 }}>{appts.length} {appts.length === 1 ? 'stop' : 'stops'}</span>
+          <span style={{ fontSize: 12, opacity: 0.6 }}>{visibleAppts.length} {visibleAppts.length === 1 ? 'stop' : 'stops'}</span>
         </div>
-        {appts.length === 0 ? (
-          <div style={{ opacity: 0.65, fontSize: 14 }}>Nothing on the calendar for today.</div>
+        {visibleAppts.length === 0 ? (
+          <div style={{ opacity: 0.65, fontSize: 14 }}>
+            {appts.length > 0 ? 'All stops done for today.' : 'Nothing on the calendar for today.'}
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {appts.map((a) => <StopCard key={a.id} appt={a} onOpenClient={onOpenClient} />)}
+            {visibleAppts.map((a) => <StopCard key={a.id} appt={a} onOpenClient={onOpenClient} onDone={dropStop} />)}
           </div>
         )}
       </div>
@@ -768,7 +777,7 @@ const CLOCKS = [['inbound', 'Inbound'], ['arrived', 'Arrived'], ['departed', 'De
 // Layout rule: the whole header is the open-the-record target, the visit flow
 // is ONE big button showing only the next step, and the three time cells hide
 // behind a small "fix times" link for the forgot-to-tap case.
-function StopCard({ appt, onOpenClient }) {
+function StopCard({ appt, onOpenClient, onDone }) {
   const [status, setStatus] = useState(appt.status);
   const [times, setTimes] = useState({
     inbound: appt.inbound_at || null,
@@ -793,6 +802,17 @@ function StopCard({ appt, onOpenClient }) {
     catch { return null; }
   }
   useEffect(() => { if (clickable || appt.id) loadMeta(); }, [appt.id]);
+
+  // Roll out and the stop leaves Today on the spot. The moment it is wrapped
+  // (departed time stamped, whether by the big "rolling out" button or the fix
+  // times cell), tell the floor to drop it so the screen only shows what is
+  // still ahead. A card only mounts when it is NOT already done, so this fires
+  // on the real roll-out, not on load. Nothing is lost: the finished visit lives
+  // on in the client's history, a couple taps away (Paul chose the clean screen
+  // over parking done stops here all day, 2026-06-23).
+  useEffect(() => {
+    if (status === 'completed' || times.departed) onDone?.(appt.id);
+  }, [status, times.departed]);
 
   // The tracker link is never fleeting: this works at ANY stage, shares on
   // phones with a share sheet and copies everywhere else, as many times as
