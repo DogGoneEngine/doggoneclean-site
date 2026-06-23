@@ -171,6 +171,29 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-23 (iPostal1 mailbox set up: tracked as a cost, filed in Mount Olympus, and dropped into the legal pages)
+- Paul set up an iPostal1 digital mailbox for Dog Gone Clean (a real street mailing address for the
+  business, separate from his home). The session wired the new mailbox into the three places it belongs.
+- **Tracked as a recurring cost in Laelaps.** Added the iPostal1 subscription to the recurring-costs
+  list (Finance tab): "iPostal1 digital mailbox", Business Green Plan 30, $14.99/mo, billed the 23rd,
+  category "other", vendor iPostal1. Written straight into `dgc-prod.public.recurring_costs`. It is the
+  first cost in that list carrying a real dollar amount; the rest (droplet, Supabase, domains, etc.) are
+  still listed with no amount, so the monthly-burn total is not complete yet (offered to fill them in,
+  Paul has not yet said to).
+- **Filed in Mount Olympus.** Added the mailbox as a door in the Dog Gone Clean Basement group on the
+  owner dashboard: links to the iPostal1 portal (portal.ipostal1.com/mailbox/4014602) and shows the
+  mailing address and the login (username doggoneclean) in the door description. Logged in that repo's
+  LOG.md.
+- **Dropped into the legal pages.** The business mailing address is now LIVE on the site. Replaced the
+  "[mailing address added after iPostal1 setup]" placeholder in BOTH the Privacy Policy (Identity of the
+  Business) and the Terms of Service (Contact Information) with the real address: 6160 SW Highway 200,
+  Ste 110 PMB 610, Ocala, FL 34476. The SMS Terms page has no address block and did not need one: the
+  carrier rules for a texting program ask for the messaging disclosures (what is sent, frequency, STOP /
+  HELP, rates) and the SMS page links to the Privacy Policy for the business identity, which is the
+  standard and compliant setup. Two of the three legal docs needed the address, not all three.
+- The mailing address is not legal advice; if the A2P texting registration ever needs it bulletproof,
+  that is the moment for a professional glance, but the website itself is in good shape.
+
 ### 2026-06-22 (Field session: Clio capture hardening + the client-sheet pin bug, all from Paul on the route)
 - A run of real-appointment bug reports from Paul on his phone, each fixed durably so it cannot recur.
   This session set the standing rule that a reported Clio miss becomes a permanent fix, not a one-off
