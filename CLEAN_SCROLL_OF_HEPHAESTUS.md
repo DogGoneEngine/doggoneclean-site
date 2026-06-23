@@ -193,14 +193,15 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 - Flagged for Paul, not an appointment error: Colleen Smith (4), Becky Swinford (2), Eric Shannon (2)
   have multiple regular dogs on file but no recurring appointments on the calendar at all. Parked the
   import-default root cause so the calendar sync stops defaulting new appointments to one dog.
-- Root cause fixed the same turn (migration 0239): `_sync_appointments` (the Google Calendar importer,
-  the single source of the bug, since it created the rolling legacy appointments) now falls back to the
-  client's regular roster count and dog ids when the calendar carries no dog count, instead of defaulting
-  to 1. The funnel signup (`bath_start_subscription`) was already correct (count comes from the customer's
-  dog selection). REMAINING for Paul: `_client_booking_context` (the fallback when the owner books a
-  client without picking dogs) counts regular PLUS occasional dogs, which disagrees with the regular-only
-  rule (it would assume 4 for Tonya vs her recurring 2); whether an occasional dog auto-joins a booking is
-  Paul's call because it moves block time and price. Parked.
+- Root cause fixed the same turn (migrations 0239 + 0240): `_sync_appointments` (the Google Calendar
+  importer, the single source of the bug, since it created the rolling legacy appointments) now falls
+  back to the client's regular roster count and dog ids when the calendar carries no dog count, instead
+  of defaulting to 1. The funnel signup (`bath_start_subscription`) was already correct (count comes from
+  the customer's dog selection). And `_client_booking_context` (the owner-books-without-picking-dogs
+  fallback) was aligned to count regular dogs only, not regular+occasional. All three creation paths now
+  agree: regular dogs are the default count; an occasional dog is added to the specific appointment when
+  it actually comes. (I briefly mis-framed the last one as a question for Paul; it wasn't, the sensible
+  default is obvious, so I just made it consistent.)
 
 ### 2026-06-23 (Prospectus contradiction fixed: two client kinds, one source of truth)
 - Paul caught the prospectus reporting more recurring plans (36) than standing clients (33), which is
