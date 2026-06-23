@@ -108,16 +108,6 @@ changes Paul's calendar or his Acuity workflow.
   read by neither. The calendar is the durable Nails/Clean boundary (serves `clean_stays_saleable`).
 - **Two-way enrichment:** stamp each appointment's service address + gate code back into the
   calendar event so they are on Paul's phone at the stop (system stays the master record).
-- **Dog count must come from the regular roster, never default to 1 (found and fully fixed
-  2026-06-23).** The legacy Google Calendar import (`_sync_appointments`) carried no dog count, so every
-  synced appointment defaulted to `dog_count = 1` with empty `dog_ids`, which made multi-dog households
-  show one dog (Lisa, Cynthia, Tonya). Fixed end-to-end: existing upcoming appointments corrected in
-  dgc-prod; the importer fixed (migration 0239) to fall back to the client's regular roster
-  (`dogs.roster_status='regular'`) and stamp the dog ids; and the owner-booking fallback
-  `_client_booking_context` aligned (migration 0240) to count regular dogs only, not regular+occasional
-  (it had assumed 4 for Tonya vs her recurring 2). All three creation paths now agree with
-  `appointment_counts_regular_dogs`: regular dogs are the default count, and an occasional (on-demand)
-  dog is added to the specific appointment when it actually comes (admin_book_appointment p_dog_ids).
 
 **Do NOT start any step until Paul says go.** Until then the default calendar stays the working
 truth and the admin view stays a test mirror.
