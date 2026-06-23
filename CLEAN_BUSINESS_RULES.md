@@ -44,6 +44,7 @@ even DGN has many rules sitting in only one or two layers.
 | classify_by_frequency | Roster | `legacy/data/clients.json` `status`; `legacy/data/README.md` | `business_rules` row |
 | active_set | Roster | `legacy/data/clients.json` scope; `check.py` (count=33) | `business_rules` row |
 | banned_excluded | Roster | `legacy/data/clients.json` `exclude_from_everything`; **`check.py`** (record flag + absent from route) | `business_rules` row |
+| appointment_counts_regular_dogs | Roster | Oracle; **`dogs.roster_status`** ('regular' = recurring; deceased/former/moved/occasional excluded); `bath_appointments.dog_count`/`dog_ids` set from the regular roster (data corrected in dgc-prod 2026-06-23) | appointment generator + calendar sync to set dog_count from the regular roster, not default to 1 |
 | toes_over_the_precipice | Roster | Oracle; convention (runtime judgment call at the moment of the incident) | client-status flag (`ended_for_cause`) when the operator app has a client-management surface |
 | one_off_not_routed | Roster | `legacy/data/clients.json` `routed:false`; `legacy/data/route_template.md`; **`check.py`** (absent from route) | route-generation code |
 | no_doodles | Roster | Oracle; convention | intake/booking gate; `business_rules` row |

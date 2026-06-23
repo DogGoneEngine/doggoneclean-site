@@ -171,6 +171,29 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-23 (Appointment dog counts corrected: recurring count = regular roster dogs)
+- Paul saw today's appointments for Lisa Irwin and Cynthia Tieche showing one dog when each has two.
+  Root cause: the legacy book was imported from Google Calendar, which never encoded a dog count, so
+  every synced appointment defaulted to `dog_count = 1` with empty `dog_ids` (amount_cents 0, legacy
+  pays in person, so no charge was affected). The client and dog records were right all along; only the
+  appointment rows were wrong.
+- The right rule (Paul corrected my first over-counting pass): a recurring appointment's dog count is the
+  client's REGULAR roster dogs only, read from `dogs.roster_status='regular'`. Dogs marked deceased,
+  former, moved, or occasional (on-demand) are NOT part of the recurring count. Tonya Hunt is the model
+  case: 2 recurring (Kai, Lydia), the rest occasional/former/deceased. Recorded as Oracle rule
+  `appointment_counts_regular_dogs`.
+- My first pass wrongly counted every dog row (including archived/dead dogs) and flagged a bunch of
+  clients as "ambiguous" that were never wrong (Erich Blunt, Chloe Castellano, Chester Weber, Bradley
+  Johnson, Donna Rodriquez all correctly have 1 regular dog; the extras are deceased/former/moved). The
+  corrected pass set every upcoming active appointment's `dog_count` and `dog_ids` from the regular
+  roster. Genuinely-fixed multi-dog clients: Lisa, Cynthia, Tonya (now 2), Emily Walker (3), Amy
+  Blessing, Heather Albinson, Ligia Amyotte (4), Mary Beth Anderson, Mary Jane Hunt (3), Michelle
+  Reiners, Patty Brown, Steve Crandall (4). Verified zero mismatches remaining (data fix in dgc-prod,
+  not a migration).
+- Flagged for Paul, not an appointment error: Colleen Smith (4), Becky Swinford (2), Eric Shannon (2)
+  have multiple regular dogs on file but no recurring appointments on the calendar at all. Parked the
+  import-default root cause so the calendar sync stops defaulting new appointments to one dog.
+
 ### 2026-06-23 (Prospectus contradiction fixed: two client kinds, one source of truth)
 - Paul caught the prospectus reporting more recurring plans (36) than standing clients (33), which is
   impossible. Root cause: the page counted "standing clients" off the legacy `clients.status` column

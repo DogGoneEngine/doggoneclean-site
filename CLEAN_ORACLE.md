@@ -385,6 +385,18 @@ been ended; this rule is the strategic rule for when to end it).
 One-off and at-will clients are served on request and are not placed in the recurring route.
 Because the route template is the standing backbone; on-request work fills gaps around it.
 
+`appointment_counts_regular_dogs` (roster):
+A recurring appointment's dog count and dog list are the client's REGULAR roster dogs, read from
+`dogs.roster_status = 'regular'`. Dogs marked deceased, former, moved, or occasional are excluded:
+deceased/former/moved are gone, and occasional dogs are on-demand extras that book their own visits,
+not part of the recurring visit. Tonya Hunt is the model: two recurring dogs (Kai, Lydia), the others
+occasional or former, so her recurring appointment is two dogs. Because the dog count drives the visit
+block time and (once card-on-file is live) the per-visit price, so counting an archived or on-demand
+dog overstates both. The failure this prevents: the legacy Google Calendar import carried no dog count
+and defaulted every appointment to one dog, so multi-dog households (Lisa Irwin, Cynthia Tieche, Tonya)
+showed one; an earlier fix attempt then over-corrected by counting dead and moved dogs. The count must
+come from the live regular roster, never a raw dog-row count and never the calendar. Paul, 2026-06-23.
+
 `no_doodles` (roster):
 Decline doodles. Because a doodle's coat takes so long that its revenue-per-hour falls far
 below what the same time earns on other dogs (Paul could finish several short-coat dogs in the
