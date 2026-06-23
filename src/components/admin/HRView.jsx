@@ -107,11 +107,20 @@ export default function HRView() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
-            <Stat label="Hours worked" value={data.hours != null ? `${data.hours}h` : 'n/a'} sub={`over ${data.work_days} work days`} big />
-            <Stat label="Per work day" value={data.avg_hours_per_workday != null ? `${data.avg_hours_per_workday}h` : 'n/a'} sub={`${data.avg_visits_per_workday ?? 0} visits/day`} />
+            <Stat label="Door-to-door / day" value={data.avg_door_to_door_per_workday != null ? `${data.avg_door_to_door_per_workday}h` : 'n/a'}
+              sub={data.door_to_door_days ? `first stop to last, over ${data.door_to_door_days} clocked days` : 'needs clocked arrive/depart times'} big />
+            <Stat label="Hands-on / day" value={data.avg_hands_on_per_workday != null ? `${data.avg_hands_on_per_workday}h` : 'n/a'}
+              sub={`dog grooming time · ${data.avg_visits_per_workday ?? 0} visits/day`} big />
+            <Stat label="Hours worked" value={data.hours != null ? `${data.hours}h` : 'n/a'} sub={`hands-on, over ${data.work_days} work days`} />
             <Stat label="Visits" value={String(data.visits)} sub={`in ${data.window_days} days`} />
             <Stat label="Earned" value={money(data.revenue)} sub="collected this window" />
           </div>
+
+          {data.untimed_visits > 0 && (
+            <div className="ad-panel" style={{ marginTop: 12, fontSize: 13, opacity: 0.8 }}>
+              {data.untimed_visits} {data.untimed_visits === 1 ? 'visit' : 'visits'} in this window {data.untimed_visits === 1 ? 'has' : 'have'} no time recorded yet, so {data.untimed_visits === 1 ? 'it is' : 'they are'} left out of the hour averages above. Logging arrive and depart times (or saying how long a job took when you capture it by voice) fills the gap, and these numbers climb toward the real day.
+            </div>
+          )}
 
           {data.busiest_day && (
             <div className="ad-panel" style={{ marginTop: 16 }}>
