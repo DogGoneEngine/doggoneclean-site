@@ -190,6 +190,19 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   (was on-demand with a one-off plan). Confirmed Chris Votos is already merged into the one household
   client Donna Rodriquez (husband and wife, shared dog Maggie; merged 2026-06-08); "Rodriguez" is the
   misspelling and is held only as a searchable alias.
+- Full prospectus sweep after the fix (Paul asked to check the rest for contradictions). The rest tied
+  out against live data: median visit $120, recurring share ~86%, growth ~+12%, value headline ~$44k to
+  ~$68k (revenue method, expenses still $0), two hour-metered generators matching the "dual generators"
+  claim, agent-head counts internally consistent, tenure and first-visit (2021) correct. Two consistency
+  fixes shipped (migration 0238 + copy): `dog_records` was counting every dog (153) including dogs of
+  excluded clients while `client_records` is the live book (85), so dogs now count on the same live-book
+  basis (141); and the "Recurring share" stat receipt still said "standing cadence", now "recurring".
+- Known optics item, NOT a contradiction, left for Paul's call: the page shows avg ~115 min on site and
+  ~$84/hr earned, which reads slow next to the "fast, high-revenue-per-hour, no-haircut" pitch. The
+  number is honest (today's recorded visits are legacy full grooms; the fast bath has almost no visits
+  yet) and self-corrects as bath visits accumulate. Recommended leaving as-is; option to label it
+  "legacy full-groom time" if Paul wants the distinction drawn. Recorded so a future session does not
+  re-flag it as a bug.
 
 ### 2026-06-23 (iPostal1 mailbox set up: tracked as a cost, filed in Mount Olympus, and dropped into the legal pages)
 - Paul set up an iPostal1 digital mailbox for Dog Gone Clean (a real street mailing address for the
