@@ -108,19 +108,18 @@ export default function HRView() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
             <Stat label="Door-to-door / day" value={data.avg_door_to_door_per_workday != null ? `${data.avg_door_to_door_per_workday}h` : 'n/a'}
-              sub={data.door_to_door_days ? `first stop to last, over ${data.door_to_door_days} clocked days` : 'needs clocked arrive/depart times'} big />
+              sub={data.door_to_door_days ? `cycle time, over ${data.door_to_door_days} days` : 'no cycle times yet'} big />
             <Stat label="Hands-on / day" value={data.avg_hands_on_per_workday != null ? `${data.avg_hands_on_per_workday}h` : 'n/a'}
-              sub={`dog grooming time · ${data.avg_visits_per_workday ?? 0} visits/day`} big />
+              sub={`time on the dogs · ${data.avg_visits_per_workday ?? 0} visits/day`} big />
             <Stat label="Hours worked" value={data.hours != null ? `${data.hours}h` : 'n/a'} sub={`hands-on, over ${data.work_days} work days`} />
             <Stat label="Visits" value={String(data.visits)} sub={`in ${data.window_days} days`} />
             <Stat label="Earned" value={money(data.revenue)} sub="collected this window" />
           </div>
 
-          {data.untimed_visits > 0 && (
-            <div className="ad-panel" style={{ marginTop: 12, fontSize: 13, opacity: 0.8 }}>
-              {data.untimed_visits} {data.untimed_visits === 1 ? 'visit' : 'visits'} in this window {data.untimed_visits === 1 ? 'has' : 'have'} no time recorded yet, so {data.untimed_visits === 1 ? 'it is' : 'they are'} left out of the hour averages above. Logging arrive and depart times (or saying how long a job took when you capture it by voice) fills the gap, and these numbers climb toward the real day.
-            </div>
-          )}
+          <div style={{ marginTop: 8, fontSize: 12, opacity: 0.6 }}>
+            Straight from your Time is Money sheet: hands-on is each appointment's duration, door-to-door is the cycle time from heading out to leaving the stop.
+            {data.untimed_visits > 0 && ` ${data.untimed_visits} stop${data.untimed_visits === 1 ? '' : 's'} in this window ${data.untimed_visits === 1 ? 'has' : 'have'} no duration on the sheet and ${data.untimed_visits === 1 ? 'is' : 'are'} left out of the hands-on average.`}
+          </div>
 
           {data.busiest_day && (
             <div className="ad-panel" style={{ marginTop: 16 }}>
