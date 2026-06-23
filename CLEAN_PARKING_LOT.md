@@ -108,12 +108,16 @@ changes Paul's calendar or his Acuity workflow.
   read by neither. The calendar is the durable Nails/Clean boundary (serves `clean_stays_saleable`).
 - **Two-way enrichment:** stamp each appointment's service address + gate code back into the
   calendar event so they are on Paul's phone at the stop (system stays the master record).
-- **Dog count must come from the regular roster, never default to 1 (found 2026-06-23).** The
-  legacy Google Calendar import carried no dog count, so every synced appointment defaulted to
-  `dog_count = 1` with empty `dog_ids`, which made multi-dog households show one dog (Lisa, Cynthia,
-  Tonya). Existing upcoming appointments were corrected in dgc-prod, but the importer/appointment
-  generator still needs to set `dog_count`/`dog_ids` from `dogs.roster_status='regular'` so new
-  synced or generated appointments are right at the source (rule `appointment_counts_regular_dogs`).
+- **Dog count must come from the regular roster, never default to 1 (found 2026-06-23, source fixed
+  same day).** The legacy Google Calendar import (`_sync_appointments`) carried no dog count, so every
+  synced appointment defaulted to `dog_count = 1` with empty `dog_ids`, which made multi-dog households
+  show one dog (Lisa, Cynthia, Tonya). Existing upcoming appointments were corrected in dgc-prod AND the
+  importer was fixed (migration 0239) to fall back to the client's regular roster
+  (`dogs.roster_status='regular'`) and stamp the dog ids, so new synced appointments are right at the
+  source (rule `appointment_counts_regular_dogs`). REMAINING OPEN, needs Paul: `_client_booking_context`
+  (used when the owner books a client without picking dogs, via `admin_book_appointment`) counts regular
+  PLUS occasional dogs, so it would assume 4 for Tonya where her recurring is 2. Decide whether an
+  occasional (on-demand) dog should be auto-included in a booking; it affects block time and price.
 
 **Do NOT start any step until Paul says go.** Until then the default calendar stays the working
 truth and the admin view stays a test mirror.
