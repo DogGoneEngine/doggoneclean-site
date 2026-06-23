@@ -4779,3 +4779,25 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   live definition to include departed_at in each visit; the pin rule (already deployed) now sees the stamp
   and a wrapped visit drops to the history on the next load. Lesson for future: a prior turn guessed
   "stale view, just refresh" and was wrong; the fix came from reading the actual loader, not assuming.
+
+- **The retention agent now honors the win-back suppression and a future booking, so a seasonal
+  self-rebooker is left alone (2026-06-23).** Paul: Mary Jane Hunt keeps showing on his Today
+  "win-back" cards even though she has an August appointment booked and is a known seasonal client
+  (away roughly half the year, books her own block when she returns, `suppress_winback = true`).
+  Root cause: there are two "chase a lapsed standing client" agents that raise the same card, and
+  only one obeyed the controls. The win-back view already skipped her (it honors `suppress_winback`
+  AND any upcoming requested/confirmed/tentative appointment), but `_retention_scan` checked neither,
+  so its "Overdue: Mary Jane Hunt" card (created 2026-06-19, still open) kept her on the feed. To
+  Paul both cards are the same thing, so suppressing one and not the other did nothing. Migration
+  0233 brings retention in line with win-back: it now skips archived clients, `suppress_winback`
+  clients, shadow/banned (already), and any client holding an upcoming booked appointment. It also
+  resolved the one stale "Overdue" card for any now-skipped client (only Mary Jane matched, no
+  collateral). Verified live: a fresh `_retention_scan()` creates 0 cards, she is no longer a
+  candidate, and her open briefing count is 0. The future-appointment guard is the general fix Paul
+  asked for (a client with an appointment in the schedule is never pursued as fallen-through-cracks);
+  `suppress_winback` covers the gap between her August visit and her next self-booked block. Oracle
+  `client_no_winback_flag` and the BUSINESS_RULES index updated to say both agents honor the flag and
+  the future-appointment guard. Note for later: her `availability_seasonal` text says "resumes
+  November" while the Oracle note and 0077 say "block starting October"; left as-is since the calendar
+  is the ground truth and only the August appointment is booked so far, but worth Paul confirming the
+  resume month when she rebooks.

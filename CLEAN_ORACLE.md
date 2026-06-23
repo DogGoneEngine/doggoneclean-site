@@ -2674,16 +2674,23 @@ manual edit does not. Keying by name (stable across reseeds) rather than id make
 re-apply correctly even when ids are regenerated. Decided 2026-06-09.
 
 `client_no_winback_flag` (Clean: clients):
-`clients.suppress_winback` leaves a client in the active book but out of the win-back agent, the
-lever for an active client who self-manages: a seasonal regular who rebooks on their own, a VIP, a
-client who is away part of the year. It is distinct from `exclude_from_everything` (which hides the
-record entirely) and from `archived_at` (dormant, auto-restored). `_winback_due_view` excludes
-suppressed clients. Mary Jane Hunt is the first: she is away roughly half the year and books her
-own block starting in October, so she should never be auto win-backed; once her future appointments
-are on the books the existing future-appointment guard also suppresses win-back on its own, but the
-flag holds regardless of how far out those appointments are or whether they have synced yet. Because
-nudging a client who manages their own cadence is noise that erodes the relationship, and the right
-control is a quiet per-client suppression, not a ban and not removal from the book. Decided 2026-06-09.
+`clients.suppress_winback` leaves a client in the active book but out of BOTH proactive
+"chase a lapsed client" agents, win-back and retention, the lever for an active client who
+self-manages: a seasonal regular who rebooks on their own, a VIP, a client who is away part of
+the year. It is distinct from `exclude_from_everything` (which hides the record entirely) and
+from `archived_at` (dormant, auto-restored). `_winback_due_view` excludes suppressed clients,
+and `_retention_scan` skips them too (0233): the two agents raise the same kind of card ("overdue,
+send a message to rebook"), so suppressing one without the other still chased the client. Both
+agents also skip any client who already holds an upcoming requested/confirmed/tentative appointment
+(the future-appointment guard): a client with an appointment in the schedule has not fallen through
+the cracks and is never pursued as if they had. Mary Jane Hunt is the first: she is away roughly
+half the year and books her own block starting in October, so she should never be auto win-backed
+or retention-nagged; once her future appointments are on the books the future-appointment guard
+suppresses the chase on its own, but the flag holds regardless of how far out those appointments
+are or whether they have synced yet, covering the gap between her one August visit and her next
+self-booked block. Because nudging a client who manages their own cadence is noise that erodes the
+relationship, and the right control is a quiet per-client suppression, not a ban and not removal
+from the book. Decided 2026-06-09; extended to retention 2026-06-23.
 
 `visit_notes_are_observations_only` (Clean: clients):
 The `visits.visit_notes` field holds behavior and condition observations only, never payment status.
