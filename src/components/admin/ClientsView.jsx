@@ -6,7 +6,7 @@
 // top, the growing visit history below. "Log a visit" appends to the ledger.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, ensureVisit, setAppointmentDogs, setClientType, setClientLifecycle } from './supabase.js';
+import { listClients, getClient, logVisit, setClientStatus, setDogStanding, setDogStatus, setDogNote, setDogHandling, setDogDoorHandling, setClientAccess, setClientAlt, setClientOnsite, setClientPlus, setClientThoughts, setDogBirthday, listDogFollowups, addDogFollowup, resolveDogFollowup, dropDogFollowup, messageDraft, listNofly, listArchivedClients, unarchiveClient, listAliases, addAlias, removeAlias, listNotifyPeople, upsertNotifyPerson, setNotifyPersonActive, deleteNotifyPerson, adminOpenSlots, adminBookAppointment, suggestSlotsWithDrive, ensureVisit, setAppointmentDogs, setClientType, setClientLifecycle, adminRescheduleAppointment, adminCancelAppointment } from './supabase.js';
 import RikerCapture from './RikerCapture.jsx';
 import HelpToggle from './Help.jsx';
 
@@ -377,10 +377,7 @@ function ClientSheet({ clientId, onChanged }) {
         <div className="ad-panel">
           <div className="ad-eyebrow">Upcoming</div>
           {upcoming.map((a) => (
-            <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 14 }}>
-              <span>{fmtDate(a.scheduled_start)} · {SERVICE_LABELS[a.service_type] || a.service_type}</span>
-              <span className="ad-mono" style={{ opacity: 0.7 }}>{a.status} · {money(a.amount_cents)}</span>
-            </div>
+            <UpcomingApptRow key={a.id} a={a} onChanged={load} />
           ))}
         </div>
       )}
@@ -404,6 +401,99 @@ function ClientSheet({ clientId, onChanged }) {
       {/* Client status (shadow ban / hard ban). Tucked at the bottom on purpose:
           a rare, deliberate action, not something to fat-finger from the header. */}
       <ClientStatusControl client={c} onChanged={() => { load(); onChanged?.(); }} />
+    </div>
+  );
+}
+
+// One Upcoming row with reschedule/cancel built in, so a time change happens
+// right where Paul reads the client's record instead of only on the Calendar
+// floor. Same admin_* RPCs the Calendar's manage link uses (the durable logic
+// lives in the RPC). Controls show only for a still-actionable future visit
+// (requested/confirmed/tentative); a started or past one stays read-only.
+const RESCHEDULE_ERR = {
+  overlap: 'That time runs into another visit. Pick a different time.',
+  not_reschedulable: 'This visit can no longer be moved.',
+  not_found: 'Could not find that visit, try reloading.',
+  no_time: 'Pick a date and time first.',
+};
+const QUIET_LINK = { background: 'transparent', border: 0, padding: 0, fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', textDecoration: 'underline', cursor: 'pointer' };
+// The visit's current start as a datetime-local value in Paul's local (Eastern)
+// time, so the picker opens on the existing time instead of blank.
+function toLocalInput(ts) {
+  const d = new Date(ts);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function UpcomingApptRow({ a, onChanged }) {
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState(null); // null | 'reschedule' | 'cancel'
+  const [when, setWhen] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+
+  const actionable = ['requested', 'confirmed', 'tentative'].includes(a.status)
+    && new Date(a.scheduled_start).getTime() >= Date.now();
+
+  function close() { setOpen(false); setMode(null); setErr(null); }
+
+  async function doReschedule() {
+    if (!when) { setErr(RESCHEDULE_ERR.no_time); return; }
+    setBusy(true); setErr(null);
+    try {
+      const res = await adminRescheduleAppointment(a.id, new Date(when).toISOString());
+      if (res && res.ok) { close(); onChanged?.(); }
+      else setErr(RESCHEDULE_ERR[res && res.error] || 'Could not reschedule, try again.');
+    } catch (e) { setErr(e.message || 'Could not reschedule, try again.'); }
+    finally { setBusy(false); }
+  }
+  async function doCancel() {
+    setBusy(true); setErr(null);
+    try {
+      const res = await adminCancelAppointment(a.id);
+      if (res && res.ok) { close(); onChanged?.(); }
+      else setErr(res && res.error === 'not_found' ? 'Could not find that visit, try reloading.' : 'Could not cancel, try again.');
+    } catch (e) { setErr(e.message || 'Could not cancel, try again.'); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div style={{ padding: '4px 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14, gap: 10 }}>
+        <span>{fmtDate(a.scheduled_start)} · {SERVICE_LABELS[a.service_type] || a.service_type}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          <span className="ad-mono" style={{ opacity: 0.7 }}>{a.status} · {money(a.amount_cents)}</span>
+          {actionable && (
+            <button type="button" style={QUIET_LINK} onClick={() => (open ? close() : setOpen(true))}>{open ? 'close' : 'manage'}</button>
+          )}
+        </span>
+      </div>
+
+      {open && actionable && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', padding: '8px 0 4px' }}>
+          {mode === null && (
+            <>
+              <button type="button" className="ad-btn ad-btn--sm ad-btn--ghost" onClick={() => { setWhen(toLocalInput(a.scheduled_start)); setMode('reschedule'); setErr(null); }}>Reschedule</button>
+              <button type="button" className="ad-btn ad-btn--sm ad-btn--ghost" onClick={() => { setMode('cancel'); setErr(null); }}>Cancel visit</button>
+            </>
+          )}
+          {mode === 'reschedule' && (
+            <>
+              <input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)}
+                className="ad-mono" style={{ fontSize: 13, padding: '5px 8px', borderRadius: 8, border: '1px solid var(--ad-outline,#d8d8de)' }} />
+              <button type="button" className="ad-btn ad-btn--sm" disabled={busy || !when} onClick={doReschedule}>{busy ? '…' : 'Save new time'}</button>
+              <button type="button" style={QUIET_LINK} disabled={busy} onClick={() => { setMode(null); setErr(null); }}>back</button>
+            </>
+          )}
+          {mode === 'cancel' && (
+            <>
+              <span style={{ fontSize: 13 }}>Cancel this visit?</span>
+              <button type="button" className="ad-btn ad-btn--sm" disabled={busy} onClick={doCancel}>{busy ? '…' : 'Yes, cancel'}</button>
+              <button type="button" style={QUIET_LINK} disabled={busy} onClick={() => { setMode(null); setErr(null); }}>keep it</button>
+            </>
+          )}
+          {err && <span style={{ fontSize: 12, color: 'var(--ad-bad,#dc2626)', width: '100%' }}>{err}</span>}
+        </div>
+      )}
     </div>
   );
 }
