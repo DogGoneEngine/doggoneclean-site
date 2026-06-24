@@ -171,6 +171,20 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-24 (Google sign-in fixed: Auth Site URL had a space in the domain)
+- Jake and Paul's mom both got a 500 "unexpected_failure" trying to sign in with Google. Root cause:
+  the dgc-prod Auth Site URL was saved as `http://hurricane bath.com` (a literal space, and http not
+  https), so GoTrue could not parse the OAuth redirect and 500'd every Google login. Not Jake-specific.
+- Fixed to `https://hurricanebath.com` (redirect allowlist to `https://hurricanebath.com/**`). The
+  Auth URL config is not in the database and no MCP tool edits it, so it was changed via the Supabase
+  Management API. Per the credential procedure: Paul dropped a Supabase Personal Access Token (`sbp_`)
+  into the `app_secrets` vault, a one-shot edge function read it server-side and PATCHed the config
+  (token never surfaced in chat), then the function was neutered. The token stays in the vault for
+  future auth/config changes.
+- Process lesson locked into CLAUDE.md (secrets to the vault not chat; vault prep is an EMPTY cell;
+  terminal work via the chores queue; never make Paul the human API). See CLAUDE.md "Secrets and
+  terminal work" and Mount Olympus CLAUDE.md "credential vault."
+
 ### 2026-06-24 (Breathing room in every visit block: flat 30 min)
 - Paul noticed a block ran exactly his on-site time (e.g. 12:00 to 1:50 = his work time), with no
   room to arrive late and still finish inside it. Root cause: clean_effective_duration_minutes built

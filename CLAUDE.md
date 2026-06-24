@@ -181,6 +181,27 @@ See `lock_it_in_capture` in the Oracle.
 - **Do the work; don't punt it.** Anything doable with your tools, do. Don't hand Paul task
   lists for tool-accessible work. His plate is decisions, physical-world actions, and
   credentials/dashboards no tool exposes.
+- **Secrets and terminal work: use the established procedure, never improvise (Paul, 2026-06-24,
+  after this failed four ways in one session).** Four hard rules, no exceptions:
+  1. **A secret Paul gives you goes into the VAULT, never the chat.** The vault is the
+     `app_secrets` table in dgc-prod. To take one in: prepare the row yourself first
+     (`insert into app_secrets (name, value) values ('<snake_case>', '') on conflict (name) do
+     nothing`, value left EMPTY so there is a blank cell), then tell Paul to open the Mount
+     Olympus "🔑 Key vault" link and paste his value into that empty cell and save. NEVER ask Paul
+     to paste a secret into the chat (that is a leak), and never fight, re-route, or second-guess
+     this drop flow.
+  2. **Use a vault secret server-side and never echo it.** Read it with a definer RPC or an edge
+     function (service role) and act; do not print the value back into the conversation. Example
+     this session: an edge function read the Supabase management token from the vault and fixed the
+     Auth Site URL, and the token never surfaced.
+  3. **Terminal work goes through the queue, never a copy-paste script.** Append the exact commands
+     to the Mount Olympus `SERVER_TASKS.md`, commit, and tell Paul one line: open Claude at the
+     Chromebook terminal and say "run the server chores." Handing Paul raw commands or a script to
+     run himself is the human-API failure.
+  4. **If a stored credential would let you do it, get/store the credential and DO it.** The only
+     ever-manual step is minting a token that does not yet exist. Walking Paul through dashboards is
+     a system failure. Canonical procedure: Mount Olympus CLAUDE.md, "credential vault" + "Hold the
+     keys."
 - **Read before redesign.** Before any redesign, read CLEAN_SCROLL_OF_HEPHAESTUS.md and
   CLEAN_ORACLE.md in full, and the module's contract in CLEAN_MODULE_MAP.md. A redesign that
   drops an existing rule OR a contracted "must not break" feature is rejected. After the
