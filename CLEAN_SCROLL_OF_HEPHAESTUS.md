@@ -189,6 +189,18 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   cushion equal (and hide) the lateness. Adherence is already tracked (migration 0164), so the swap is
   feasible when Paul asks.
 
+### 2026-06-24 (Amy Blessing stale pencil-in cancelled silently; cancel-notification behavior confirmed)
+- Amy was pencilled in at one July 22 time, but the real booking landed at a different time (noon,
+  confirmed), so the stale 2:00 pm pencil-in (tentative) needed deleting, and Paul wanted it gone with
+  no notification firing to Amy.
+- Confirmed and done: the bath_appointment_notify trigger sends the client a 'cancellation' notice on a
+  cancel UNLESS the appointment has a non-null source, in which case it returns early and sends nothing.
+  The pencil-in was source='gcal_adopted', so cancelling it was silent (verified: zero notification_log
+  rows). The separate noon confirmed booking (source null) was left intact.
+- Operational takeaway: the record/Calendar "Cancel visit" button is silent for calendar-adopted visits
+  but DOES text the client for app-booked (source-null) ones. Check the source before cancelling a
+  source-null booking if a silent cancel is wanted.
+
 ### 2026-06-24 (Reschedule/cancel an upcoming visit from the client record)
 - Paul moved Marilyn Jamison's next visit to noon, then she said she could not do noon. He went to
   her record to switch it to 3:00 and found the Upcoming visit was read-only there: no reschedule.
@@ -217,8 +229,10 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   dogs.standing_instructions as a replace. (4) admin_riker_context now exposes each dog's current
   standing_instructions + notes on the open-sheet path so an addition merges instead of clobbering.
   (5) The confirm screen shows the standing instruction before save. Build + audit clean, shipped
-  to main. Open flag for Paul: Winnie's old freeform note still reads "don't cut eyelashes (later:
-  Mark ok'd)," which contradicts the new instruction; left as-is pending his call.
+  to main. Follow-up resolved same day: Winnie's old note read "don't cut eyelashes (later: Mark
+  ok'd)," which Paul said was backwards (the household always says never cut them; Mark was repeating
+  that, not okaying a cut). Corrected to "don't cut eyelashes (Mark repeated: never cut them)" so the
+  note and the standing instruction now agree.
 
 ### 2026-06-24 (Tracker-share text rewritten: personalized and glanceable)
 - Paul's complaint: the message the operator copies/shares to hand a client their tracker link was one
