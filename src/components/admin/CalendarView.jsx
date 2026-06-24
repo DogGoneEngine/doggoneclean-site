@@ -86,8 +86,11 @@ function ApptRow({ a, onChanged }) {
         {a.amount_cents != null && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
         <span className="ad-mono" style={{ fontSize: 11, color: STATUS_COLOR[a.status] || 'var(--ad-text-dim,#565b6c)', fontStyle: a.status === 'tentative' ? 'italic' : 'normal', width: 76, textAlign: 'right' }}>{STATUS_LABEL[a.status] || a.status}</span>
         {actionable
-          ? <button type="button" style={{ ...LINK, width: 52, textAlign: 'right' }} onClick={() => (open ? close() : setOpen(true))}>{open ? 'close' : 'manage'}</button>
-          : <span style={{ width: 52 }} />}
+          ? <button type="button" style={{ ...LINK, width: 60, textAlign: 'right' }} onClick={() => (open ? close() : setOpen(true))}>{open ? 'close' : 'manage'}</button>
+          : (a.cycle_rate != null
+              ? <span className="ad-mono" title="Cycle rate: pay per door-to-door hour, drive time included"
+                  style={{ width: 60, textAlign: 'right', fontSize: 12, fontWeight: 600, color: 'var(--ad-good,#1f8a4b)' }}>${a.cycle_rate}/hr</span>
+              : <span style={{ width: 60 }} />)}
       </div>
 
       {open && actionable && (
@@ -190,7 +193,7 @@ export default function CalendarView() {
           ))}
         </div>
       )}
-      <div style={{ fontSize: 12, opacity: 0.5, marginTop: 10 }}>Reschedule or cancel an upcoming visit with its "manage" link. New bookings come in through the /book funnel.</div>
+      <div style={{ fontSize: 12, opacity: 0.5, marginTop: 10 }}>Reschedule or cancel an upcoming visit with its "manage" link. New bookings come in through the /book funnel. Past visits show their cycle rate on the right, your pay per door-to-door hour with drive time included.</div>
     </>
   );
 }
