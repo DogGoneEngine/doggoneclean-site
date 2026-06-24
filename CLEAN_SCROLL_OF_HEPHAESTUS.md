@@ -171,6 +171,28 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-24 (Tracker-share text rewritten: personalized and glanceable)
+- Paul's complaint: the message the operator copies/shares to hand a client their tracker link was one
+  run-on sentence ("Dog Gone Clean is rolling your way! Track our drive...right through to done: <link>"),
+  a wall of letters easy to ignore. He wanted it formatted so a client takes it in at a glance instead of
+  bouncing off it.
+- New copy (locked, approved this turn) greets the client by first name, names the specialist and the
+  dog(s), and breaks into spaced beats with a blank line between each: a one-line greeting + arrival, the
+  link on its own line, then "Right now" (live map) / "Once we're parked" (the bath) / "When we're done"
+  (before and after photos), closing with the no-pressure "Peek whenever you feel like it. No need to
+  watch. It'll be there when you want it." The real per-client tracker link (hurricanebath.com/track?t=...)
+  is kept; the prompt's stray doggonenails.com/portal was wrong-business + would drop the code, so it was
+  not used.
+- Singular vs plural dogs handled: one dog reads "follow Cooper's bath," two or more reads "follow their
+  baths" with names joined naturally ("Cooper and Tilly", "Daisy, Lucy, Sissy and Tank") via a new
+  `joinNames` helper (none existed to reuse). The specialist defaults to "Paul" when no operator is
+  assigned, matching the rest of the stop card.
+- Durable home: `admin_appointment_meta` (migration 0243, applied to dgc-prod) now also returns
+  `dog_names`, using the same dog selection as `admin_now_card` (the appointment's explicit dog_ids when
+  set, else the household's regular/occasional roster). Verified against real records. One shared builder
+  (`trackerShareText`) feeds both send-spots in TodayView.jsx: the "On my way" auto-copy and the
+  always-available "Tracker link" button, so they stay identical. Build clean, shipped to main, deployed.
+
 ### 2026-06-23 (Tasks became a two-way channel: hand off context, enter the answer back, and Clio matches it)
 - Paul handed Jake a "find the appliance wattages" task and hit a wall twice: Jake had no way to ENTER
   the answer back (Done only offered a photo or the equipment-hours number box), and Paul had no way to
