@@ -37,6 +37,7 @@ export function describeApplied(res) {
   if (res.access_appended) bits.push("saved to the getting-in note (shows on the appointment)");
   if (res.client_note_appended) bits.push('household note added');
   if (n(res.dog_notes_appended) > 0) bits.push(`${n(res.dog_notes_appended)} dog note${n(res.dog_notes_appended) === 1 ? '' : 's'} added`);
+  if (n(res.dog_standing_set) > 0) bits.push(`standing instructions set for ${n(res.dog_standing_set)} dog${n(res.dog_standing_set) === 1 ? '' : 's'}`);
   if (n(res.dog_status_changes) > 0) bits.push('dog roster updated');
   if (res.notify_person_id) bits.push('notify person saved');
   if (res.reminder_id) bits.push('reminder set, it will surface on Today when due');
@@ -219,6 +220,9 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
                 {plan.client_note && <li>Add to the contact sheet: {plan.client_note}</li>}
                 {(plan.dog_notes || []).map((d, i) => (
                   <li key={i}>Note on {d.dog_name || 'dog'}: {d.text}</li>
+                ))}
+                {(plan.dog_standing || []).map((d, i) => (
+                  <li key={`std${i}`}>Standing instructions for <strong>{d.dog_name || 'dog'}</strong> (replaces what's there): {d.text}</li>
                 ))}
                 {(plan.dog_status || []).map((s, i) => (
                   <li key={`st${i}`}>
