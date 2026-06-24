@@ -171,6 +171,24 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-24 (Breathing room in every visit block: flat 30 min)
+- Paul noticed a block ran exactly his on-site time (e.g. 12:00 to 1:50 = his work time), with no
+  room to arrive late and still finish inside it. Root cause: clean_effective_duration_minutes built
+  the block from his real typical on-site time (median of recent visits) but hb_buffer_minutes was 0
+  in both Ocala and The Villages, and even a non-zero buffer only ever applied on the history-rich
+  median path, never the static estimate or city default. So zero cushion, everywhere.
+- Shipped (migration 0245): the per-city buffer is now added to EVERY block (median, static estimate,
+  city default), rounded up to 5 and floored at the minimum stop; hb_buffer_minutes set to 30 for both
+  cities. Verified: Amy Blessing went 110 -> 140. Affects newly built blocks going forward; existing
+  appointments are not retroactively widened.
+- Paul's reasoning (recorded for the future swap): a flat 30 now, deliberately NOT tied to his actual
+  lateness, because a cushion that equals how late he runs would absorb the lateness, make adherence
+  always look on-time, and remove the pressure to tighten up. As he improves he wants to revisit toward
+  a smaller cushion. Claude's note for that revisit: keep the cushion a small honest margin and keep
+  schedule-adherence as its own separate, visible metric driven toward zero, rather than letting the
+  cushion equal (and hide) the lateness. Adherence is already tracked (migration 0164), so the swap is
+  feasible when Paul asks.
+
 ### 2026-06-24 (Reschedule/cancel an upcoming visit from the client record)
 - Paul moved Marilyn Jamison's next visit to noon, then she said she could not do noon. He went to
   her record to switch it to 3:00 and found the Upcoming visit was read-only there: no reschedule.
