@@ -870,6 +870,42 @@ function hhmmToISO(hhmm) {
 
 const CLOCKS = [['inbound', 'Inbound'], ['arrived', 'Arrived'], ['departed', 'Departed']];
 
+// Join dog names the way a person says them: "Cooper", "Cooper and Tilly",
+// "Cooper, Tilly and Max". No existing helper did this, so this is the one.
+function joinNames(names) {
+  const n = (names || []).filter(Boolean);
+  if (n.length === 0) return '';
+  if (n.length === 1) return n[0];
+  if (n.length === 2) return `${n[0]} and ${n[1]}`;
+  return `${n.slice(0, -1).join(', ')} and ${n[n.length - 1]}`;
+}
+
+// The paste-ready tracker text the operator sends a client, personalized with
+// the client's first name, the specialist's first name, and the dog name(s),
+// and spaced out (blank line between every beat) so it reads at a glance
+// instead of as a wall of text. One dog reads "follow Cooper's bath"; two or
+// more reads "follow their baths".
+function trackerShareText({ url, clientName, operatorName, dogNames }) {
+  const clientFirst = (clientName || '').trim().split(/\s+/)[0] || 'there';
+  const specialist = operatorName ? operatorName.split(' ')[0] : 'Paul';
+  const names = (dogNames || []).filter(Boolean);
+  const dogs = joinNames(names);
+  const arrivingAt = dogs || 'your pup';
+  const parked = names.length >= 2
+    ? 'follow their baths right there on the screen.'
+    : names.length === 1
+      ? `follow ${names[0]}'s bath right there on the screen.`
+      : 'follow the bath right there on the screen.';
+  return [
+    `Hi ${clientFirst}! ${specialist} is on the way to ${arrivingAt} now.`,
+    `Here's your window into the whole visit: ${url}`,
+    'Right now: a live map, so you can watch the truck roll up.',
+    `Once we're parked: ${parked}`,
+    "When we're done: before and after photos worth showing someone.",
+    "Peek whenever you feel like it. No need to watch. It'll be there when you want it.",
+  ].join('\n\n');
+}
+
 // One stop, one card (Paul 2026-06-10: the old dense row mixed the open-the-
 // record tap with a strip of small buttons and everything fat-fingered).
 // Layout rule: the whole header is the open-the-record target, the visit flow
@@ -919,7 +955,7 @@ function StopCard({ appt, onOpenClient, onDone }) {
     const m = meta || await loadMeta();
     if (!m || !m.tracker_token) { setErr(true); return; }
     const url = `https://hurricanebath.com/track?t=${m.tracker_token}`;
-    const text = `Dog Gone Clean is rolling your way! Track our drive to your door on the live map, then follow the whole visit, photos and all, right through to done: ${url}`;
+    const text = trackerShareText({ url, clientName: appt.client, operatorName: m.operator_name, dogNames: m.dog_names });
     if (navigator.share) {
       try { await navigator.share({ text }); setShareState('shared'); return; }
       catch { /* sheet closed; fall through to copy */ }
@@ -961,8 +997,9 @@ function StopCard({ appt, onOpenClient, onDone }) {
         if (!times.inbound) set('inbound', new Date().toISOString());
         setStatus('on_the_way');
         startLocationShare(appt.id);
-        const url = `https://hurricanebath.com/track?t=${res.tracker_token}`;
-        const text = `Dog Gone Clean is rolling your way! Track our drive to your door on the live map, then follow the whole visit, photos and all, right through to done: ${url}`;
+        const m = meta || await loadMeta();
+        const url = `https://hurricanebath.com/track?t=${res.tracker_token || m?.tracker_token}`;
+        const text = trackerShareText({ url, clientName: appt.client, operatorName: m?.operator_name, dogNames: m?.dog_names });
         if (navigator.share) {
           try { await navigator.share({ text }); setShareState('shared'); }
           catch { setShareState(null); } // user closed the sheet; no-op
