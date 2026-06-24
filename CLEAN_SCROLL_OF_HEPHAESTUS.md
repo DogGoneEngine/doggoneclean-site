@@ -171,6 +171,26 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-24 (Clio learns standing instructions vs notes)
+- Paul reported Clio "getting it wrong" on Marilyn Jamison: he dictated Winnie's grooming spec
+  (10mm comb on the head sides and occiput, 7/8 inch on top, 13mm on body, no sanitary shave she
+  gets itchy, do not cut eyelashes) and said "this is specifically standing instructions not a
+  note," and Clio still filed it as a note. The riker_log confirmed it: her plan put it in
+  dog_notes both times.
+- Root cause: a dog has three fields (standing_instructions = the operator-facing groom spec,
+  handling, notes), but Clio's schema only ever had dog_notes. Her prompt literally said standing
+  instructions go in dog_notes. She had no slot for standing_instructions, so she could not honor
+  "not a note."
+- Fix shipped: (1) Winnie's standing_instructions set directly to the dictated spec. (2) Clio
+  (riker v13) gained a dog_standing field and a prompt rule routing per-dog grooming specs there,
+  with dog_notes reserved for durable facts; "this is a standing instruction, not a note" always
+  means dog_standing. (3) admin_riker_apply (migration 0244) writes dog_standing to
+  dogs.standing_instructions as a replace. (4) admin_riker_context now exposes each dog's current
+  standing_instructions + notes on the open-sheet path so an addition merges instead of clobbering.
+  (5) The confirm screen shows the standing instruction before save. Build + audit clean, shipped
+  to main. Open flag for Paul: Winnie's old freeform note still reads "don't cut eyelashes (later:
+  Mark ok'd)," which contradicts the new instruction; left as-is pending his call.
+
 ### 2026-06-24 (Tracker-share text rewritten: personalized and glanceable)
 - Paul's complaint: the message the operator copies/shares to hand a client their tracker link was one
   run-on sentence ("Dog Gone Clean is rolling your way! Track our drive...right through to done: <link>"),
