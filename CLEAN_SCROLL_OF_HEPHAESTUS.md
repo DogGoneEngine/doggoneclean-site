@@ -171,6 +171,17 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-24 (Reschedule/cancel an upcoming visit from the client record)
+- Paul moved Marilyn Jamison's next visit to noon, then she said she could not do noon. He went to
+  her record to switch it to 3:00 and found the Upcoming visit was read-only there: no reschedule.
+- The reschedule/cancel capability already existed (admin_reschedule_appointment /
+  admin_cancel_appointment, added 2026-06-22) but its only UI was the Calendar floor's "manage" link.
+  The client record never got it.
+- Fixed both: (1) Marilyn's July 22 visit moved 12:00 -> 15:00 Eastern (110-min slot preserved,
+  original noon kept in original_scheduled_start). (2) Each Upcoming row on the client record now
+  carries the same low-key manage link (Reschedule / Cancel visit) for a still-actionable future
+  visit, through the same RPCs, reloading the sheet on success. Build + audit clean, shipped to main.
+
 ### 2026-06-24 (Clio learns standing instructions vs notes)
 - Paul reported Clio "getting it wrong" on Marilyn Jamison: he dictated Winnie's grooming spec
   (10mm comb on the head sides and occiput, 7/8 inch on top, 13mm on body, no sanitary shave she
