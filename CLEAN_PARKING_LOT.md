@@ -728,6 +728,28 @@ Kernels for the site copy, captured so they are not lost. Not approved and not f
   ~2 to 3 units once photo records exist (one Astro route, one React island, one edge
   function for the tokenized photo fetch).
 
+## Operator-set notification preferences, by voice and from the record (parked 2026-06-25, Paul's call)
+
+When a client tells Paul in person "text me instead of email" (or which reminders they want), there
+is no way for Paul to honor it from his side today. The email/text reminder toggles
+(`notification_preferences`, keyed to the client's portal login) can only be read or written by the
+logged-in client through their own portal, scoped to `auth.uid()`. Paul's client record (the floor)
+has no control for it, Clio does not capture it, and a legacy client who never signed up for the
+portal has no such setting at all.
+
+The build, when un-parked: an operator-side way to set a client's reminder preferences from their
+record on the floor, plus a Clio voice path ("set the Hunts to text-only reminders"). Needs a
+definer RPC that sets `notification_preferences` for a target subscriber (admin-scoped, not
+`auth.uid()`-scoped), a control in ClientsView, and a new riker field + apply branch. Works for
+email the moment it ships.
+
+Hard dependency NOT in this build, and the reason "text instead of email" cannot fully happen yet:
+texting sends nothing today. The SMS channel is a stored preference that the `send-notification`
+function skips with `twilio_not_configured`; only email actually dispatches. Real texting waits on
+Twilio + A2P 10DLC (launch-blocker item 5, Paul's physical-world paperwork, `notification_email_first`).
+So the text half goes live only after that paperwork clears; build the operator-set control now if
+wanted, but it is email-only until Twilio is wired.
+
 ## Service eligibility ideas (parked, needs work before use)
 
 - **The Breed Firewall classification (draft).** Paul's idea, 2026-05-25. A coat-type rule for
