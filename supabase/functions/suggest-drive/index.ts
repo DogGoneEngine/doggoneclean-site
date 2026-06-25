@@ -84,14 +84,16 @@ Deno.serve(async (req) => {
   try {
     const auth = req.headers.get("Authorization") || "";
     if (!auth) return json({ ok: false, error: "unauthorized" }, 401);
-    const { client_id } = await req.json();
+    const { client_id, dog_ids } = await req.json();
     if (!client_id) return json({ ok: false, error: "no client" }, 400);
 
-    // 1. Suggestions, authorized as the caller (raises for non-admins).
+    // 1. Suggestions, authorized as the caller (raises for non-admins). The dogs
+    // going (dog_ids) size the block, so the suggested open times shrink when a
+    // dog is left off (a subset; null means the whole roster).
     const sugRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_suggest_slots`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: ANON, Authorization: auth },
-      body: JSON.stringify({ p_client_id: client_id }),
+      body: JSON.stringify({ p_client_id: client_id, p_dog_ids: dog_ids ?? null }),
     });
     if (!sugRes.ok) return json({ ok: false, error: "not authorized" }, 403);
     const sug = await sugRes.json();

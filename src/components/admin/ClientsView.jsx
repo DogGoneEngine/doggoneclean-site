@@ -1748,18 +1748,41 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
 
-  async function openPanel() {
-    setOpen(true); setBusy(true); setErr(null);
-    setDogSel(new Set(dogs.map((d) => d.id)));
-    try { setSugg(await suggestSlotsWithDrive(clientId)); }
-    catch (e) { setErr(e.message || 'suggest_failed'); }
-    finally { setBusy(false); }
+  // The dogs actually going. A proper subset rides as an explicit list (which
+  // shortens the block); the full roster stays null (the everyone-goes default).
+  function goingDogIds() {
+    return dogs.length > 1 && dogSel.size > 0 && dogSel.size < dogs.length ? [...dogSel] : null;
   }
+  const dogKey = [...dogSel].sort().join(',');
+
+  function openPanel() {
+    setOpen(true); setErr(null); setBooked(null); setConflict(null); setSlots(null); setMore(false);
+    setDogSel(new Set(dogs.map((d) => d.id)));
+  }
+
+  // Fetch the suggested times when the panel opens, and refetch whenever the
+  // dogs-going selection changes, so the open times and the shown length both
+  // recalculate to fit only the dogs coming. Stale manual times are cleared so
+  // they cannot linger at the wrong length.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    (async () => {
+      setBusy(true); setErr(null); setSlots(null);
+      try {
+        const s = await suggestSlotsWithDrive(clientId, goingDogIds());
+        if (!cancelled) setSugg(s);
+      } catch (e) { if (!cancelled) setErr(e.message || 'suggest_failed'); }
+      finally { if (!cancelled) setBusy(false); }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, dogKey, clientId]);
 
   async function loadSlots() {
     setBusy(true); setErr(null); setSlots(null); setConflict(null);
     try {
-      const res = await adminOpenSlots(clientId, date, 1);
+      const res = await adminOpenSlots(clientId, date, 1, goingDogIds());
       setSlots(res?.slots || []);
     } catch (e) { setErr(e.message || 'slots_failed'); }
     finally { setBusy(false); }
@@ -1767,10 +1790,7 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
 
   async function book(startISO, override = false) {
     setBusy(true); setErr(null);
-    // A proper subset of the roster rides as an explicit assignment; the full
-    // roster stays null (the everyone-goes default).
-    const dogIds = dogs.length > 1 && dogSel.size > 0 && dogSel.size < dogs.length
-      ? [...dogSel] : null;
+    const dogIds = goingDogIds();
     try {
       const res = await adminBookAppointment(clientId, startISO, override, dogIds);
       if (res?.ok) {

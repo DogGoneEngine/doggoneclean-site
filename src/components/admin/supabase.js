@@ -555,11 +555,11 @@ export async function runCapacityCheck() {
 // The intelligent half of booking: due date from the client's real cadence
 // and last visit, candidate days around it filtered by THEIR constraints,
 // each with its offset from due and the stops already on that day.
-export async function adminSuggestSlots(clientId) {
-  return rpc('admin_suggest_slots', { p_client_id: clientId });
+export async function adminSuggestSlots(clientId, dogIds = null) {
+  return rpc('admin_suggest_slots', { p_client_id: clientId, p_dog_ids: dogIds });
 }
-export async function adminOpenSlots(clientId, fromDate, days = 1) {
-  return rpc('admin_open_slots', { p_client_id: clientId, p_from: fromDate, p_days: days });
+export async function adminOpenSlots(clientId, fromDate, days = 1, dogIds = null) {
+  return rpc('admin_open_slots', { p_client_id: clientId, p_from: fromDate, p_days: days, p_dog_ids: dogIds });
 }
 export async function adminBookAppointment(clientId, startISO, override = false, dogIds = null) {
   return rpc('admin_book_appointment', { p_client_id: clientId, p_start: startISO, p_override: override, p_dog_ids: dogIds });
@@ -577,12 +577,12 @@ export async function adminCancelAppointment(appointmentId) {
 // Suggestions annotated with real drive minutes from the previous stop and to
 // the next stop per slot (suggest-drive edge fn, drive_cache behind it). Falls
 // back to the plain RPC so booking never breaks if the annotator is down.
-export async function suggestSlotsWithDrive(clientId) {
+export async function suggestSlotsWithDrive(clientId, dogIds = null) {
   try {
-    const out = await callAdminEdge('suggest-drive', { client_id: clientId });
+    const out = await callAdminEdge('suggest-drive', { client_id: clientId, dog_ids: dogIds });
     if (out && out.suggestions) return out.suggestions;
   } catch { /* fall through to plain suggestions */ }
-  return rpc('admin_suggest_slots', { p_client_id: clientId });
+  return rpc('admin_suggest_slots', { p_client_id: clientId, p_dog_ids: dogIds });
 }
 
 // Reminders: time-based commitments. In through Riker or code, out on Today.
