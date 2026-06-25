@@ -171,6 +171,19 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-25 (PayPal, Cash App, and Venmo get their own payment labels)
+- Paul logged Steve Crandall as paying by PayPal and Clio filed it as the generic "wallet". Cause:
+  the visits.payment_method taxonomy only had square_in_person, stripe_card, cash, wallet, so Clio
+  bucketed PayPal into the nearest one. But "wallet" should mean a phone tap that settles through
+  Square (Apple, Google, Samsung Pay); PayPal, Cash App, and Venmo each land in their own account,
+  so filing them as wallet made them look like they belonged in the Square deposits and muddied
+  reconciliation.
+- Fix: widened the visits.payment_method CHECK to also allow paypal, cashapp, venmo (migration
+  0248, applied live); taught the riker (Clio) edge function to map those words to their own values
+  and to keep them out of wallet; added the labels to RikerCapture, FinanceView, and ClientsView.
+- Steve Crandall pays only by PayPal (confirmed by Paul); relabeled his whole paid history (37
+  visits) from wallet to paypal. The 3 unpaid/upcoming rows were left untouched.
+
 ### 2026-06-24 (Fix a wrapped visit's times from the Calendar; Steve Crandall departure corrected)
 - Paul tapped "All done" for Steve Crandall about an hour late, stamping departed at 10:31 PM; the
   wrapped stop then dropped off Today (the settled clean-Today rule), leaving no way to reach it and
