@@ -171,6 +171,21 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-25 (Booking length now recalculates when a dog is taken off; equal-share-per-dog decision)
+- Scheduling a visit with a dog deselected did not shorten the appointment, so the slot engine kept
+  reserving the full time and refused the slot Paul wanted (hit while rebooking Tonya Hunt with Koa
+  out). Cause: the length was one whole-visit block (clean_effective_duration_minutes) and the dog
+  checkboxes only changed who was assigned and the price. The engine had NO per-dog time at all.
+- Decision (Paul, 2026-06-25): each dog is an EQUAL SHARE of the visit. Dropping one of four dogs
+  trims about a quarter off the block; the full roster is unchanged. A per-dog-minutes model can come
+  later if real timings warrant it.
+- Fix (migration 0252, applied live): the dogs going size the block in admin_open_slots,
+  admin_suggest_slots, and admin_book_appointment, scaled by (dogs going / non-archived roster dogs),
+  floored at the city minimum stop and rounded up to 5, via the shared
+  _clean_minutes_for_dog_selection. suggest-drive forwards the selection (deployed); the Book panel
+  passes the dogs going to every time lookup and refetches on change. Verified on Tonya: 270 min for
+  4 dogs, 205 for 3, unchanged at 270 for the full roster.
+
 ### 2026-06-25 (Clio can now file a household member's phone; new contacts default to notify-off)
 - Paul gave Clio "add a phone number to Bo" on Tonya Hunt's sheet and Clio dropped it, saying there
   was no one named Bo, even though he had just added "Bo Hunt" as a household name. Three gaps: (1)
