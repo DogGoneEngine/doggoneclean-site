@@ -171,6 +171,22 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-25 (Clio can now file a household member's phone; new contacts default to notify-off)
+- Paul gave Clio "add a phone number to Bo" on Tonya Hunt's sheet and Clio dropped it, saying there
+  was no one named Bo, even though he had just added "Bo Hunt" as a household name. Three gaps: (1)
+  admin_riker_context did not include the open client's aliases, so the parser could not see the
+  household name to resolve "Bo"; (2) Clio's rules had no home for a non-client person's phone (only
+  the client's own contact or "someone who gets the messages"); (3) a person added by phone always
+  landed active.
+- Decision (Paul): a household member's number should go ON FILE with notifications OFF, and Paul
+  toggles them on from the record's "People to notify" panel when he wants them messaged. Saved Bo
+  Hunt (husband, +13528957134) as a notify person, active false.
+- Fix (migration 0251 + riker prompt, both applied/deployed live): context now surfaces aliases on
+  the open client; Clio routes a non-client person's phone/email into notify_person, reuses an
+  existing alias/notify-person to identify them, and never refuses a known name; notify_person
+  carries an active flag and admin_riker_apply defaults a brand-new contact to off (honoring an
+  explicit active when Paul says to message them).
+
 ### 2026-06-25 (Notification greeting fixed: legacy one-offs were getting "Hi there")
 - Sally O'Laughlin (a one_off legacy client) replied to her appointment email; it opened "Hi there"
   with no name. Cause: the Google Calendar sync (_sync_appointments) gets-or-makes a bath_subscribers
