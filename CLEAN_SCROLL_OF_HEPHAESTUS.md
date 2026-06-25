@@ -171,6 +171,21 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-25 (Notification greeting fixed: legacy one-offs were getting "Hi there")
+- Sally O'Laughlin (a one_off legacy client) replied to her appointment email; it opened "Hi there"
+  with no name. Cause: the Google Calendar sync (_sync_appointments) gets-or-makes a bath_subscribers
+  row for the matched client but, when it CREATED that row, only set client_id, leaving first_name
+  NULL. The standing book seed (0030) populated names via split_part, but one_off / at_will clients
+  were never in that seed, so their synced subscriber row was nameless, and send-notification renders
+  `first_name || 'there'`. All six templates (confirmation, three reminders, cancellation, reschedule)
+  pull the same name field, so every one of them greeted those clients "Hi there"; the wording itself
+  was fine.
+- Fix (migration 0250, applied live): _sync_appointments now carries the client's name (and email /
+  phone) onto a newly created subscriber and backfills the name onto an existing bare row, plus a
+  one-time backfill of every nameless subscriber from public.clients. Verified live: Sally now reads
+  "Sally O'Laughlin" and zero subscribers remain nameless. Added a defensive fallback in the
+  send-notification edge function (deployed) so a nameless row can never greet "there" again.
+
 ### 2026-06-25 (PayPal, Cash App, and Venmo get their own payment labels)
 - Paul logged Steve Crandall as paying by PayPal and Clio filed it as the generic "wallet". Cause:
   the visits.payment_method taxonomy only had square_in_person, stripe_card, cash, wallet, so Clio
