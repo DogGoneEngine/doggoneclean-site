@@ -209,6 +209,16 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
   terminal work via the chores queue; never make Paul the human API). See CLAUDE.md "Secrets and
   terminal work" and Mount Olympus CLAUDE.md "credential vault."
 
+### 2026-06-24 (Jake set up as a legacy client for a portal demo)
+- So Jake could show Paul the client portal, his existing record (Jake Nickerson) was switched from
+  on-demand bath to a standing, recurring, full-groom legacy client, and his phone (+13524266507) and
+  email (jakewnickerson@gmail.com) were added so the portal's `bath_claim_legacy_account` links his login
+  to the record. He signs in at hurricanebath.com/portal (SMS code or Google). NOTE for anyone reading
+  metrics: Jake now counts as a real standing client in the book, routes, and counts; he is staff/family,
+  not a real grooming customer, so discount him. He is deliberately NOT hidden, because
+  `exclude_from_everything` would also block his portal login. (This demo is what surfaced the Google
+  sign-in 500 fixed in the entry above.)
+
 ### 2026-06-24 (Breathing room in every visit block: flat 30 min)
 - Paul noticed a block ran exactly his on-site time (e.g. 12:00 to 1:50 = his work time), with no
   room to arrive late and still finish inside it. Root cause: clean_effective_duration_minutes built
