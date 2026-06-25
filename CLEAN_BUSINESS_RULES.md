@@ -62,6 +62,8 @@ even DGN has many rules sitting in only one or two layers.
 | realistic_daily_load | Routing | `legacy/data/route_template.md` capacity notes | scheduling engine |
 | the_slot_is_the_clients | Scheduling | Oracle; `legacy/data/route_template.md` | booking engine |
 | protect_the_operator | Scheduling | Oracle | scheduling engine constants |
+| book_length_scales_with_dogs | Scheduling | Oracle; migration 0252 (`_clean_minutes_for_dog_selection`; `admin_open_slots`/`admin_suggest_slots`/`admin_book_appointment`); `BookVisitPanel` | scheduling engine |
+| book_offers_spread_across_day | Scheduling | Oracle; migration 0253 (`admin_suggest_slots` spread) | booking engine |
 | income_target_caps_the_day | Scheduling | Oracle | scheduling engine constants |
 | heads_up_on_the_way | Scheduling | Oracle | pizza tracker; notifications code |
 | lock_in_timing | Scheduling | Oracle | scheduling engine; notifications code |

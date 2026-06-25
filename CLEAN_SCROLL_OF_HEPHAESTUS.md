@@ -179,12 +179,21 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 - Decision (Paul, 2026-06-25): each dog is an EQUAL SHARE of the visit. Dropping one of four dogs
   trims about a quarter off the block; the full roster is unchanged. A per-dog-minutes model can come
   later if real timings warrant it.
-- Fix (migration 0252, applied live): the dogs going size the block in admin_open_slots,
-  admin_suggest_slots, and admin_book_appointment, scaled by (dogs going / non-archived roster dogs),
-  floored at the city minimum stop and rounded up to 5, via the shared
+- Fix part 1, the length (migration 0252, applied live): the dogs going size the block in
+  admin_open_slots, admin_suggest_slots, and admin_book_appointment, scaled by (dogs going /
+  non-archived roster dogs), floored at the city minimum stop and rounded up to 5, via the shared
   _clean_minutes_for_dog_selection. suggest-drive forwards the selection (deployed); the Book panel
   passes the dogs going to every time lookup and refetches on change. Verified on Tonya: 270 min for
   4 dogs, 205 for 3, unchanged at 270 for the full roster.
+- Fix part 2, the visibility (the real complaint): even with the length scaling, the offered times
+  did not appear to change, because the suggestions showed only the 6 EARLIEST starts of a day, and
+  start times sit on a fixed 15-minute clock, so the earliest starts (12:00, 12:15...) are identical
+  no matter the visit length. The whole afternoon was hidden and the only part that moves with dog
+  count (the latest-fitting start) was never shown. Migration 0253 changed admin_suggest_slots to show
+  a spread across the whole open window and ALWAYS include the latest-fitting start, so the offered set
+  genuinely changes with the dogs. Verified on Tonya open day: 4 dogs ends 3:30, 3 dogs ends 4:30, 2
+  dogs ends 5:45. Also added a live "visit Xh Ym" length chip beside the dog toggles. Recorded as
+  Oracle rules book_length_scales_with_dogs and book_offers_spread_across_day. Paul confirmed it works.
 
 ### 2026-06-25 (Clio can now file a household member's phone; new contacts default to notify-off)
 - Paul gave Clio "add a phone number to Bo" on Tonya Hunt's sheet and Clio dropped it, saying there

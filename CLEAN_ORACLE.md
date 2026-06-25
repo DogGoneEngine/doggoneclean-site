@@ -499,6 +499,26 @@ The workday has a capped length and an earliest-start floor, raised only when Pa
 more work, never by the system. Because mobile grooming at volume is physically demanding
 and protecting the operator first is the longer bet.
 
+`book_length_scales_with_dogs` (scheduling):
+When a visit is booked with fewer than the whole roster, the appointment length scales by the
+dogs going, each dog counting as an equal share of the visit: dropping one of four trims about a
+quarter off the block, and the full roster is unchanged. The rule lives server-side in
+`_clean_minutes_for_dog_selection` and is applied by `admin_open_slots`, `admin_suggest_slots`,
+and `admin_book_appointment` (migration 0252), and the booking panel passes the dogs going to
+each. Because a visit with a dog left off genuinely takes less time and has to fit where the
+full crew could not; the operator deselects a dog and the schedule has to reflect it, not keep
+reserving the missing dog's time. Equal-share is the start with the data on hand (whole-visit
+times only); a per-dog-minutes model can replace it later if real timings warrant.
+
+`book_offers_spread_across_day` (scheduling):
+The booking suggestions show a spread of open times across the whole open window and ALWAYS
+include the latest-fitting start, not just the earliest few (migration 0253, `admin_suggest_slots`).
+Because start times sit on a fixed 15-minute clock, so the earliest starts are identical no
+matter the visit length and only the latest-fitting start moves with it; showing just the early
+times hid the whole afternoon and made adding or removing a dog look like it changed nothing.
+The whole-day spread with the latest start included is what makes a shorter visit visibly open
+up later times.
+
 `income_target_caps_the_day` (scheduling):
 Decide the target income for a day and schedule as close to that as possible; do not stack
 extra appointments onto an already-lucrative day. Because energy depletes by how hard the day
