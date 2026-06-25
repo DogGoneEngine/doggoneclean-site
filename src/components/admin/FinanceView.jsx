@@ -16,7 +16,7 @@ function money(cents) {
   return '$' + Math.round(cents / 100).toLocaleString('en-US');
 }
 const SERVICE = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails', unknown: 'Unspecified' };
-const PAYMENT = { square_in_person: 'Square', stripe_card: 'Stripe', cash: 'Cash', wallet: 'Wallet', invoice_or_other: 'Invoice / other' };
+const PAYMENT = { square_in_person: 'Square', stripe_card: 'Stripe', cash: 'Cash', wallet: 'Wallet', paypal: 'PayPal', cashapp: 'Cash App', venmo: 'Venmo', invoice_or_other: 'Invoice / other' };
 
 export default function FinanceView() {
   const [data, setData] = useState(null);

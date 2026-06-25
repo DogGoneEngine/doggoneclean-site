@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { rikerParse, rikerApply, addAlias } from './supabase.js';
 
 const SERVICE = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
-const PAY = { square_in_person: 'Square', stripe_card: 'Stripe', cash: 'Cash', wallet: 'Wallet' };
+const PAY = { square_in_person: 'Square', stripe_card: 'Stripe', cash: 'Cash', wallet: 'Wallet', paypal: 'PayPal', cashapp: 'Cash App', venmo: 'Venmo' };
 function money(c) { return c == null ? null : '$' + (c / 100).toFixed(2).replace(/\.00$/, ''); }
 // Format a YYYY-MM-DD birthday for the confirm line without a timezone shift
 // (new Date('2015-05-20') would render the day before in US time zones).

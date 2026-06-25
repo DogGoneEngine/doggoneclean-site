@@ -650,6 +650,9 @@ function LogVisitForm({ clientId, subscriberId, defaultService, dogs, onLogged }
             <option value="stripe_card">Stripe</option>
             <option value="cash">Cash</option>
             <option value="wallet">Wallet</option>
+            <option value="paypal">PayPal</option>
+            <option value="cashapp">Cash App</option>
+            <option value="venmo">Venmo</option>
             <option value="invoice">Invoice</option>
             <option value="check">Check</option>
           </select>
