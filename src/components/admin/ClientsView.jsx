@@ -1812,6 +1812,7 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
   const fmtSlot = (iso) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   const fmtDay = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const offsetLabel = (n) => n == null ? 'soonest' : n === 0 ? 'on time' : n > 0 ? `${n} day${n === 1 ? '' : 's'} late` : `${-n} day${n === -1 ? '' : 's'} early`;
+  const fmtLen = (m) => { if (m == null) return ''; const h = Math.floor(m / 60), mm = m % 60; return h ? (mm ? `${h}h ${mm}m` : `${h}h`) : `${mm}m`; };
   function manualISO() {
     if (!manualTime) return null;
     return new Date(`${date}T${manualTime}:00`).toISOString();
@@ -1912,6 +1913,13 @@ function BookVisitPanel({ clientId, clientName, dogs = [], onBooked }) {
                   </button>
                 );
               })}
+              {sugg?.duration_minutes != null && (
+                <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 10px', borderRadius: 999,
+                  background: 'var(--ad-primary-container, #e6edfc)', color: 'var(--ad-primary, #2f5fd0)',
+                  opacity: busy ? 0.5 : 1 }}>
+                  {busy ? 'updating...' : `visit ${fmtLen(sugg.duration_minutes)}`}
+                </span>
+              )}
             </div>
           )}
 
