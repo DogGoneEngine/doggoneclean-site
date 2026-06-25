@@ -1236,7 +1236,7 @@ function StopCard({ appt, onOpenClient, onDone }) {
   );
 }
 
-function TimeCell({ label, value, busy, onStampNow, onSet, onClear }) {
+export function TimeCell({ label, value, busy, onStampNow, onSet, onClear }) {
   const [editing, setEditing] = useState(false);
   const shown = fmtClock(value);
 

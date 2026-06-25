@@ -8,7 +8,8 @@
 // RPCs and reload the agenda on success.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { calendar, adminRescheduleAppointment, adminCancelAppointment } from './supabase.js';
+import { calendar, adminRescheduleAppointment, adminCancelAppointment, stampAppointmentTime } from './supabase.js';
+import { TimeCell } from './TodayView.jsx';
 
 const SERVICE = { full_groom: 'Full groom', bath: 'Bath', nails: 'Nails' };
 const STATUS_COLOR = { confirmed: 'var(--ad-good,#1f8a4b)', tentative: 'var(--ad-accent,#2563eb)', requested: 'var(--ad-warn,#b9770a)', completed: 'var(--ad-text-dim,#565b6c)', cancelled: 'var(--ad-bad,#dc2626)', no_show: 'var(--ad-bad,#dc2626)' };
@@ -39,9 +40,48 @@ function toLocalInput(ts) {
 
 const LINK = { background: 'transparent', border: 0, padding: 0, fontSize: 12, color: 'var(--ad-text-dim,#565b6c)', textDecoration: 'underline', cursor: 'pointer' };
 
+// A stop that has started or wrapped can have its three clocks corrected from
+// here, the way back into a visit that already dropped off Today. Same RPC and
+// editor as Today. A typed time lands on the appointment's OWN date (not today),
+// so an old visit keeps its date.
+const FIX_FIELDS = [['inbound', 'Inbound'], ['arrived', 'Arrived'], ['departed', 'Departed']];
+const STARTED_STATUS = new Set(['on_the_way', 'on_site', 'in_service', 'returning', 'completed']);
+const hasStarted = (a) => STARTED_STATUS.has(a.status) || !!(a.inbound_at || a.arrived_at || a.departed_at);
+function hhmmOnApptDateISO(refIso, hhmm) {
+  const d = new Date(refIso);
+  return new Date(`${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${hhmm}:00`).toISOString();
+}
+function FixTimes({ a, onChanged }) {
+  const [times, setTimes] = useState({ inbound: a.inbound_at || null, arrived: a.arrived_at || null, departed: a.departed_at || null });
+  const [busyField, setBusyField] = useState(null);
+  const [err, setErr] = useState(false);
+  async function set(field, at) {
+    const prev = times;
+    setTimes((t) => ({ ...t, [field]: at }));   // optimistic
+    setBusyField(field); setErr(false);
+    try { await stampAppointmentTime(a.id, field, at); onChanged?.(); }
+    catch { setTimes(prev); setErr(true); }     // revert on failure
+    finally { setBusyField(null); }
+  }
+  return (
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start', padding: '8px 0 4px 82px' }}>
+      {FIX_FIELDS.map(([field, label]) => (
+        <TimeCell key={field} label={label} value={times[field]} busy={busyField === field}
+          onStampNow={() => set(field, new Date().toISOString())}
+          onSet={(hhmm) => set(field, hhmmOnApptDateISO(a.scheduled_start, hhmm))}
+          onClear={() => set(field, null)} />
+      ))}
+      <span style={{ width: '100%', fontSize: 11, opacity: 0.55 }}>Typing a Departed time closes the stop; clearing it reopens. The little × clears a mistaken time.</span>
+      {err && <span style={{ fontSize: 11, color: 'var(--ad-bad,#dc2626)', width: '100%' }}>save failed, try again</span>}
+    </div>
+  );
+}
+
 // One agenda row. The visible line is exactly the old read-only row; the manage
 // affordance and its actions are additive and only render for upcoming visits.
 function ApptRow({ a, onChanged }) {
+  const [fixing, setFixing] = useState(false);
+  const started = hasStarted(a);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState(null); // null | 'reschedule' | 'cancel'
   const [when, setWhen] = useState('');
@@ -85,13 +125,22 @@ function ApptRow({ a, onChanged }) {
         </span>
         {a.amount_cents != null && <span className="ad-mono" style={{ fontSize: 12, opacity: 0.7 }}>{money(a.amount_cents)}</span>}
         <span className="ad-mono" style={{ fontSize: 11, color: STATUS_COLOR[a.status] || 'var(--ad-text-dim,#565b6c)', fontStyle: a.status === 'tentative' ? 'italic' : 'normal', width: 76, textAlign: 'right' }}>{STATUS_LABEL[a.status] || a.status}</span>
-        {actionable
-          ? <button type="button" style={{ ...LINK, width: 60, textAlign: 'right' }} onClick={() => (open ? close() : setOpen(true))}>{open ? 'close' : 'manage'}</button>
-          : (a.cycle_rate != null
-              ? <span className="ad-mono" title="Cycle rate: pay per door-to-door hour, drive time included"
-                  style={{ width: 60, textAlign: 'right', fontSize: 12, fontWeight: 600, color: 'var(--ad-good,#1f8a4b)' }}>${a.cycle_rate}/hr</span>
-              : <span style={{ width: 60 }} />)}
+        {actionable ? (
+          <button type="button" style={{ ...LINK, width: 60, textAlign: 'right' }} onClick={() => (open ? close() : setOpen(true))}>{open ? 'close' : 'manage'}</button>
+        ) : (
+          <span style={{ width: 96, display: 'inline-flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
+            {a.cycle_rate != null && (
+              <span className="ad-mono" title="Cycle rate: pay per door-to-door hour, drive time included"
+                style={{ fontSize: 12, fontWeight: 600, color: 'var(--ad-good,#1f8a4b)' }}>${a.cycle_rate}/hr</span>
+            )}
+            {started && (
+              <button type="button" style={LINK} onClick={() => setFixing((v) => !v)}>{fixing ? 'close' : 'fix times'}</button>
+            )}
+          </span>
+        )}
       </div>
+
+      {fixing && started && <FixTimes a={a} onChanged={onChanged} />}
 
       {open && actionable && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', padding: '8px 0 4px 82px' }}>

@@ -171,6 +171,17 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-24 (Fix a wrapped visit's times from the Calendar; Steve Crandall departure corrected)
+- Paul tapped "All done" for Steve Crandall about an hour late, stamping departed at 10:31 PM; the
+  wrapped stop then dropped off Today (the settled clean-Today rule), leaving no way to reach it and
+  correct the time. Corrected the visit directly: departed set to 9:56 PM, on-site recomputed to 62 min.
+- Built the re-entry Paul asked for: `admin_calendar` now carries each visit's actual times and visit_id
+  (migration 0247), and the Calendar row shows a "fix times" link on any started or wrapped stop that
+  opens the same three clocks (Inbound / Arrived / Departed) as Today, saved through
+  `admin_stamp_appointment_time`. A typed time lands on the appointment's OWN date (not today, so old
+  visits keep their date); a Departed time closes the stop and clearing it reopens. `TimeCell` is now
+  exported from TodayView and reused so the editor is identical. Build clean, shipped.
+
 ### 2026-06-24 (Emperor override now beats the hard overlap rule)
 - Paul forced a custom time in Laelaps (7:00 PM, overlapping an existing stop), tapped "Yes, book
   it," and still got "That time overlaps an existing stop minute for minute. Pick another." The owner
