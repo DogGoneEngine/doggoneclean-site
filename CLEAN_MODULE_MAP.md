@@ -119,6 +119,12 @@ the teeth live (the durable layer that survives a page rewrite).
 - **Must not break:** one-tap voice capture; the confirm step shows the parsed
   FIELDS (not a prose summary) before applying; household-name -> alias; one person
   goes in one place; reuse a known phone; nothing is written until Paul confirms.
+  A dog price change reprices that client's already-booked upcoming appointments in
+  the same write, via `reprice_upcoming_appointments_for_client`, so the calendar
+  never keeps a straggler at the old price; an appointment whose total cannot be known
+  for certain (a dogless multi-dog appointment, or a listed dog with no price on file)
+  is left alone and reported as "needs a look" instead of guessed at. Any future
+  path that changes a dog's price must call that repricer too.
 
 ## Client Portal - the whole client-facing account (`/portal`)
 - **Files:** `src/components/portal/PortalApp.jsx` (shell + auth), `PortalViews.jsx`

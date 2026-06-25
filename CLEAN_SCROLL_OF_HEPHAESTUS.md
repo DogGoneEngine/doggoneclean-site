@@ -5112,3 +5112,21 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   for the duration or arrive/depart times and flags when none was given. Migration 0234 (the first,
   superseded fix that only excluded untimed days from the raw-visits average) stays in history; 0236 is
   the source of truth now.
+
+## Decisions log (2026-06-25)
+
+- Dog price changes now keep the calendar honest. When Clio writes a new dog price, the apply
+  step reprices that client's already-booked upcoming appointments to match, so a price change
+  never leaves a straggler sitting at the old price (this came up live: Buddy / Peter Moran went
+  to $105 but his next appointment still read $100). The teeth are a reusable database function,
+  `reprice_upcoming_appointments_for_client`, called from `admin_riker_apply` (migration 0249); it
+  only touches appointments that include the changed dog, and only when the total can be known for
+  certain (a listed-dogs appointment with every price set, or a single-dog client). An appointment
+  whose total is ambiguous (a dogless appointment for a multi-dog client, or a listed dog with no
+  price on file) is left alone and surfaced to Paul as "needs a look," never guessed. Clio's
+  one-tap confirmation now reports both: "N upcoming appointment(s) updated to match the new price"
+  and the needs-a-look warning. Verified on real data (Peter's appointment repriced $100 -> $105;
+  a 4-dog no-price client correctly flagged, not guessed).
+- Earlier same day: PayPal, Cash App, and Venmo became their own payment labels (they settle to
+  their own accounts, not Square); Steve Crandall's history relabeled wallet -> paypal
+  (migration 0248). See the parking-lot entry for operator-set notification preferences (parked).

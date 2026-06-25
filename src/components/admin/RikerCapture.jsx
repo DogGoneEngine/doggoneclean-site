@@ -32,6 +32,7 @@ export function describeApplied(res) {
   if (n(res.scores_applied) > 0) bits.push(`${n(res.scores_applied)} vibe score${n(res.scores_applied) === 1 ? '' : 's'} saved`);
   if (n(res.dogs_added) > 0) bits.push(`${n(res.dogs_added)} dog card${n(res.dogs_added) === 1 ? '' : 's'} created`);
   if (n(res.dogs_updated) > 0) bits.push(`${n(res.dogs_updated)} dog card${n(res.dogs_updated) === 1 ? '' : 's'} changed`);
+  if (n(res.appointments_synced) > 0) bits.push(`${n(res.appointments_synced)} upcoming appointment${n(res.appointments_synced) === 1 ? '' : 's'} updated to match the new price`);
   if (res.client_updated) bits.push('contact sheet facts updated');
   if (res.onsite_appended) bits.push("added to who's on site");
   if (res.access_appended) bits.push("saved to the getting-in note (shows on the appointment)");
@@ -43,7 +44,7 @@ export function describeApplied(res) {
   if (res.reminder_id) bits.push('reminder set, it will surface on Today when due');
   if (res.wisdom_saved) bits.push('filed to the wisdom inbox');
   if (res.task_attached) bits.push('attached to the open task');
-  return { bits, missed: !!res.visit_update_missed, noNotifyContact: !!res.notify_person_missing_contact };
+  return { bits, missed: !!res.visit_update_missed, noNotifyContact: !!res.notify_person_missing_contact, needLook: n(res.appointments_need_look) };
 }
 
 export default function RikerCapture({ clientId = null, clientName = null, onApplied }) {
@@ -121,6 +122,11 @@ export default function RikerCapture({ clientId = null, clientName = null, onApp
               {done.noNotifyContact && (
                 <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
                   Did not add the notify person: no phone or email was given, so they cannot be messaged. Say the name again with a phone number to add them.
+                </div>
+              )}
+              {done.needLook > 0 && (
+                <div style={{ color: 'var(--ad-warn, #b9770a)' }}>
+                  {done.needLook} upcoming appointment{done.needLook === 1 ? '' : 's'} could not be auto-priced (more than one dog with no set price on the card). Open the appointment and set the price by hand.
                 </div>
               )}
             </div>
@@ -282,7 +288,7 @@ export function RikerManual() {
         <li><strong>Log a visit:</strong> "Bella was a five today, full groom, 90 minutes, collected 120 cash." Service, minutes, money, payment method, what was done. Past visits work too: "at the previous appointment, Sammy was a four."</li>
         <li><strong>Vibe scores:</strong> per dog, 1 to 5, only when you actually give one.</li>
         <li><strong>New dogs:</strong> "Add Maverick, French Bulldog, 75 dollars, and Sammy, mini Aussie, 105." Real dog cards with breed and price.</li>
-        <li><strong>Price and breed changes:</strong> "Change the price to 50 dollars each." Lands on the dog cards, not as a note.</li>
+        <li><strong>Price and breed changes:</strong> "Change the price to 50 dollars each." Lands on the dog cards, not as a note. Any upcoming appointment already on the calendar is updated to match the new price in the same breath.</li>
         <li><strong>Who is at the house:</strong> "Alan answers the door." Lands in the Who's-on-site field.</li>
         <li><strong>Getting in:</strong> "Do not knock, text on arrival, a baby may be sleeping" or "gate code is 4411." Lands in the Getting-in line that shows on the appointment, kept in your words.</li>
         <li><strong>Household names:</strong> "Add her husband Zach as a household name." Lands in the Also-known-as field, so a search for that name opens the household.</li>
