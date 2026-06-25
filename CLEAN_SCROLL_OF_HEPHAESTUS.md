@@ -171,6 +171,19 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-24 (Emperor override now beats the hard overlap rule)
+- Paul forced a custom time in Laelaps (7:00 PM, overlapping an existing stop), tapped "Yes, book
+  it," and still got "That time overlaps an existing stop minute for minute. Pick another." The owner
+  override (`operator_override_with_confirm`) only bypassed the SOFT availability check; the HARD DB
+  exclusion constraint `bath_appointments_no_overlap` still rejected the minute-for-minute overlap, so
+  the insert came back `overlaps_existing`.
+- Fixed (migration 0246): added an `overridden` flag to `bath_appointments`; `admin_book_appointment`
+  stamps it true when a not-open slot is force-booked; the no-overlap exclusion constraint now exempts
+  overridden rows. So the emperor can stack a stop (e.g. two operators out at once). Normal bookings
+  stay protected (the constraint still covers source-null, non-overridden rows), and override bookings
+  keep `source` NULL so the client still gets the booking confirmation. Verified with a rollback test:
+  an overridden overlapping insert is accepted, a normal one is still blocked.
+
 ### 2026-06-24 (Google sign-in fixed: Auth Site URL had a space in the domain)
 - Jake and Paul's mom both got a 500 "unexpected_failure" trying to sign in with Google. Root cause:
   the dgc-prod Auth Site URL was saved as `http://hurricane bath.com` (a literal space, and http not
