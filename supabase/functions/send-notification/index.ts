@@ -64,9 +64,20 @@ async function loadCtx(sb: SupabaseClient, appointmentId: string): Promise<Ctx |
     .eq('id', appointmentId).maybeSingle();
   if (!appt) return null;
   const { data: sub } = await sb.from('bath_subscribers')
-    .select('id, first_name, last_name, email, phone_e164, address_line_1, address_city, address_state, address_zip')
+    .select('id, client_id, first_name, last_name, email, phone_e164, address_line_1, address_city, address_state, address_zip')
     .eq('id', appt.subscriber_id).maybeSingle();
   if (!sub) return null;
+  // A subscriber synced from the legacy book can be missing its name (the row was
+  // created from the calendar with only client_id). Fall back to the linked
+  // client's name so the greeting is never "Hi there". See migration 0250.
+  if ((!sub.first_name || !String(sub.first_name).trim()) && sub.client_id) {
+    const { data: client } = await sb.from('clients').select('name').eq('id', sub.client_id).maybeSingle();
+    const full = (client?.name as string | undefined)?.trim();
+    if (full) {
+      sub.first_name = full.split(' ')[0];
+      if (!sub.last_name) sub.last_name = full.slice(full.split(' ')[0].length).trim() || null;
+    }
+  }
   const { data: dogs } = await sb.from('bath_dogs').select('name').eq('subscriber_id', sub.id).eq('active', true);
   return { appt, sub, dogNames: joinNames((dogs ?? []).map((d) => d.name)) };
 }
