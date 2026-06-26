@@ -15,7 +15,7 @@ import { useState, useEffect, useRef } from 'react';
 import './portal.css';
 import {
   pauseSubscription, resumeSubscription, cancelSubscription, changeCadence,
-  skipAppointment, rescheduleAppointment, getOpenSlots,
+  skipAppointment, rescheduleAppointment, getSmartSlots,
   addDog, updateDog, removeDog, reactivateDog,
   updateProfile, updateServiceAddress, toE164US,
   getNotificationPrefs, setNotificationPrefs,
@@ -1008,37 +1008,53 @@ function VisitActions({ appt, city, onChanged, toast }) {
   );
 }
 
-// ── Slot picker: live open times from bath_open_slots ──────────────────
+// ── Slot picker: smart suggestions from bath_suggest_slots ─────────────
+// Defaults to a curated handful of good open times around the client's own
+// cadence timing (the same engine the operator books with). The "specific week"
+// control aims the same engine at a week the client chooses instead. No lateness
+// framing: it only ever shows good open times.
 function SlotPicker({ city, busy, onPick, onCancel }) {
   const [state, setState] = useState('loading'); // 'loading' | 'ready' | 'error'
-  const [slots, setSlots] = useState([]);
+  const [days, setDays] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [weekChoice, setWeekChoice] = useState(''); // '' = cadence default, else yyyy-mm-dd
 
   useEffect(() => {
     let alive = true;
     (async () => {
-      if (!city || !city.id) { setState('ready'); setSlots([]); return; }
-      const res = await getOpenSlots(city.id);
+      setState('loading'); setSelected(null);
+      const res = await getSmartSlots(weekChoice ? { targetDate: weekChoice, targetSpan: 7 } : {});
       if (!alive) return;
       if (res.error) { setState('error'); return; }
-      setSlots(res.slots || []);
+      setDays((res.days || []).filter((d) => d.times.length > 0));
       setState('ready');
     })();
     return () => { alive = false; };
-  }, [city]);
+  }, [weekChoice]);
 
-  // Group slots by local calendar day.
-  const days = [];
-  const byDay = new Map();
-  for (const s of slots) {
-    const key = new Date(s.slot_start).toLocaleDateString('en-US', { timeZone: tz(city) });
-    if (!byDay.has(key)) { byDay.set(key, []); days.push(key); }
-    byDay.get(key).push(s);
-  }
+  // The earliest a client may aim is tomorrow.
+  const minWeek = (() => {
+    const d = new Date(Date.now() + 86400000);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  })();
 
   return (
     <div className="pt-slotpicker">
       <div className="pt-slotpicker__head">Pick a new time</div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-xs)', marginBottom: 'var(--space-sm)' }}>
+        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary, #555)' }}>
+          {weekChoice ? 'Showing the week you picked.' : 'Showing your best open times.'}
+        </span>
+        <input type="date" className="pt-input" value={weekChoice} min={minWeek}
+          style={{ width: 'auto', padding: '4px 8px' }} aria-label="Aim at a specific week"
+          onChange={(e) => setWeekChoice(e.target.value)} />
+        {weekChoice && (
+          <button type="button" className="pt-btn pt-btn-ghost pt-btn-sm" onClick={() => setWeekChoice('')}>
+            Best times
+          </button>
+        )}
+      </div>
 
       {state === 'loading' && (
         <div className="pt-slotpicker__msg"><span className="pt-spinner-sm" /> Loading open times...</div>
@@ -1046,23 +1062,27 @@ function SlotPicker({ city, busy, onPick, onCancel }) {
       {state === 'error' && (
         <div className="pt-slotpicker__msg">Could not load open times. Try again.</div>
       )}
-      {state === 'ready' && slots.length === 0 && (
-        <div className="pt-slotpicker__msg">No open times right now. Check back soon.</div>
+      {state === 'ready' && days.length === 0 && (
+        <div className="pt-slotpicker__msg">
+          {weekChoice
+            ? 'No open times that week. Try another week, or switch back to your best times.'
+            : 'No open times right now. Check back soon.'}
+        </div>
       )}
 
-      {state === 'ready' && slots.length > 0 && (
+      {state === 'ready' && days.length > 0 && (
         <div className="pt-slotpicker__days">
           {days.map(day => (
-            <div className="pt-slot-day" key={day}>
-              <div className="pt-slot-day__label">{fmtDate(byDay.get(day)[0].slot_start, city)}</div>
+            <div className="pt-slot-day" key={day.date}>
+              <div className="pt-slot-day__label">{fmtDate(day.times[0], city)}</div>
               <div className="pt-slot-grid">
-                {byDay.get(day).map(s => (
+                {day.times.map(t => (
                   <button
-                    key={s.slot_start}
-                    className={`pt-slot${selected === s.slot_start ? ' pt-slot--selected' : ''}`}
-                    onClick={() => setSelected(s.slot_start)}
+                    key={t}
+                    className={`pt-slot${selected === t ? ' pt-slot--selected' : ''}`}
+                    onClick={() => setSelected(t)}
                   >
-                    {fmtTime(s.slot_start, city)}
+                    {fmtTime(t, city)}
                   </button>
                 ))}
               </div>

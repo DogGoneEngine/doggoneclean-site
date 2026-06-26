@@ -246,6 +246,30 @@ export async function getOpenSlotsBetween(cityId, from, to) {
   return { slots: data || [] };
 }
 
+// Smart reschedule suggestions: a curated handful of good open times that
+// default to the client's own cadence timing (or the soonest open times when
+// that timing is already past or beyond what they may self-book). This is the
+// SAME engine the operator uses, behind the client door (bath_suggest_slots
+// resolves the caller's own record and never returns another client's stops).
+// Pass { targetDate } with optional targetSpan (1 = that day, 7 = that week) to
+// aim at a specific stretch instead of the cadence default. Returns
+// { days: [{ date, times: [ISO] }], dueDate } or { error, days: [] }.
+export async function getSmartSlots({ targetDate = null, targetSpan = null } = {}) {
+  const client = sb();
+  if (!client) return { error: 'no_client', days: [] };
+  const { data, error } = await client.rpc('bath_suggest_slots', {
+    p_target_date: targetDate,
+    p_target_span: targetSpan,
+    p_dog_ids: null,
+  });
+  if (error) return { error: error.message, days: [] };
+  const days = (data?.days || []).map((d) => ({
+    date: d.date,
+    times: Array.isArray(d.slots) ? d.slots : [],
+  }));
+  return { days, dueDate: data?.due_date || null, targetDate: data?.target_date || null };
+}
+
 // Submit the signup. Books anonymously (no auth session): identity is the
 // phone number; the RPC creates the subscriber, dogs, subscription, and
 // first appointment. The card (stripe_payment_method_id) is null on the

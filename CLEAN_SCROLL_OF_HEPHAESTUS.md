@@ -5268,3 +5268,24 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   until Acuity is cancelled" status across the Oracle and the index: reminders went live 2026-06-22
   (`notifications_live='true'`), Acuity is cancelled, and the Telegram owner-watch above depends on real
   sends. Reality wins; corrected in place.
+
+- **Booking suggestions: long-cadence clients showed "none available," now fixed; one smart engine behind
+  both the operator and the client (shipped, migrations 0255 + 0256).** Paul hit "none available" trying to
+  rebook Debbie Koerner (Gabe + Gibbs) at the appointment. Koerner comes every 98 days, so her next visit
+  is due in October, but the suggester capped its search at 60 days (the city `hb_booking_horizon_days`)
+  and `bath_open_slots` refused to generate any availability past it, so the right month was simply empty.
+  Two-layer fix: (1) the suggester now aims its window at the client's real next-visit timing whatever it
+  is, with no absolute ceiling, and when the cadence date is already past it shows the soonest open times
+  forward instead, with NO lateness framing (Paul: stay away from lateness, it is a terrible idea and out
+  of scope); (2) `bath_open_slots` gained an optional horizon override that ONLY the operator doors pass,
+  so the operator reaches a standing client's cadence (and the "More options" specific-day flow does too)
+  while the public `/book` funnel and the client portal stay at the 60-day policy, unchanged. The booking
+  brains are now one shared engine (`_suggest_slots_core`) behind two doors: `admin_suggest_slots` for the
+  operator (full route stops) and the new client-callable `bath_suggest_slots` (resolves the caller's own
+  record, never returns another client's stops). The client portal reschedule picker now uses it: curated
+  good times defaulting to the client's cadence (soonest-forward fallback rather than an empty screen when
+  their cadence date sits beyond what they may self-book), plus a "specific week" control that aims the
+  same engine at a week the client picks. Verified on real data: Koerner now offers 7 days around her Oct 2
+  due date; the public funnel still caps at 60 days. Open question left to Paul (a real business call, not a
+  bug): whether CLIENTS should be allowed to self-book further than 60 days out the way the operator now
+  can. Files: `supabase/migrations/0255_*`, `0256_*`, `portal/supabase.js`, `portal/PortalViews.jsx`.
