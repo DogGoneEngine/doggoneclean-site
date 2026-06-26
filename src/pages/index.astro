@@ -215,7 +215,7 @@ const recurringSteps = [
           fig.style.animationDelay = (idx * 0.05) + 's';
           const img = document.createElement('img');
           img.src = p.url;
-          img.loading = 'lazy';
+          img.loading = 'eager';
           img.alt = p.dog_name ? `${p.dog_name}, freshly bathed by Dog Gone Clean` : 'A freshly bathed dog from Dog Gone Clean';
           fig.append(img);
           if (p.dog_name) {
@@ -225,6 +225,39 @@ const recurringSteps = [
           }
           return fig;
         }));
+
+        // Justified wall: keep every photo's full shape (no cropping) and scale
+        // each row to line up flush on both edges. Runs once the natural sizes
+        // are known, and again on resize. Falls back gracefully to the CSS
+        // even-height row if the measure never completes.
+        const justify = () => {
+          const items = Array.from(grid.children);
+          if (!items.length) return;
+          if (!items.every((f) => { const im = f.querySelector('img'); return im && im.naturalWidth > 0; })) {
+            return window.setTimeout(justify, 60);
+          }
+          const W = grid.clientWidth;
+          const gap = 10;
+          const targetH = window.innerWidth < 760 ? 210 : 260;
+          const arr = items.map((f) => { const im = f.querySelector('img'); return { el: f, ar: im.naturalWidth / im.naturalHeight }; });
+          let row = [], rowAR = 0;
+          const flush = (last) => {
+            if (!row.length) return;
+            const avail = W - gap * (row.length - 1);
+            let h = avail / rowAR;
+            if (last && h > targetH) h = targetH;
+            row.forEach((it) => { it.el.style.width = Math.floor(h * it.ar) + 'px'; it.el.style.height = Math.floor(h) + 'px'; });
+            row = []; rowAR = 0;
+          };
+          arr.forEach((it) => {
+            row.push(it); rowAR += it.ar;
+            if ((W - gap * (row.length - 1)) / rowAR <= targetH) flush(false);
+          });
+          flush(true);
+        };
+        justify();
+        let rt;
+        window.addEventListener('resize', () => { window.clearTimeout(rt); rt = window.setTimeout(justify, 150); });
       }).catch(() => { /* the gallery is a bonus; the curated shots stand on their own */ });
     }
   </script>
@@ -812,25 +845,30 @@ const recurringSteps = [
   @media (min-width: 760px) {
     .gallery { grid-template-columns: repeat(3, 1fr); }
   }
-  /* The live wall of approved dogs: uniform 4:5 tiles in a tidy grid, all the
-     same shape so the mixed phone photos read as one composed wall instead of a
-     loose pile. The crop sits high (object-position) so faces and dogs are kept
-     and never chopped. Two columns on a phone, three on a wide screen. Name
-     caption, hover zoom, and fade-in kept. (Chosen by rendering the real photos
-     and comparing layouts side by side, 2026-06-26.) */
+  /* The live wall of approved dogs: a justified wall. Every photo keeps its full
+     shape and is NEVER cropped; each row is scaled so both edges line up flush,
+     so the mixed phone photos read as one clean, composed wall instead of a
+     ragged pile. The inline gallery script measures the photos and sizes each
+     row; this CSS is the no-JS fallback, an even-height wrapping row. (Chosen by
+     rendering the real photos and comparing layouts, 2026-06-26.) */
   .gallery--live {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-content: flex-start;
+    grid-template-columns: none;
+  }
+  .gallery--live .gallery__item {
+    height: 210px;
+    margin: 0;
   }
   @media (min-width: 760px) {
-    .gallery--live { grid-template-columns: repeat(3, 1fr); }
+    .gallery--live .gallery__item { height: 260px; }
   }
   .gallery--live .gallery__item img {
-    aspect-ratio: 4 / 5;
-    height: auto;
-    object-fit: cover;
-    object-position: 50% 28%;
+    width: auto;
+    height: 100%;
+    aspect-ratio: auto;
   }
   .gallery__item {
     position: relative;
