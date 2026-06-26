@@ -1356,3 +1356,16 @@ on today's appointment (name + breed + photo only), the same instinct as knowing
 the door; you might meet the dog even when you are not grooming it. So the v1 dog data on the
 card is: photo + name + breed + standing instructions + handling + follow-ups + price for the
 groomed dogs, and photo + name + breed for the others on site.
+
+## Teardown: owner notification watch (Telegram), self-expiring 2026-07-06
+
+Migration 0254 (2026-06-26) DMs Paul on Telegram every time a client message is sent, just the
+client name and which message, while `app_secrets.owner_notify_copy_until` is in the future (set to
+2026-07-06). It was a temporary watch while reminders were freshly live. After the window:
+
+- It is already silent on its own (the trigger no-ops once the date passes), so there is no urgency.
+- When convenient, drop the dead weight: `drop trigger owner_notify_copy_trg on public.notification_log;`
+  then `drop function public.owner_notify_copy_emit();` and delete the `owner_notify_copy_until` row.
+- If Paul decides he wants it permanently, do the opposite: remove the date gate from
+  `owner_notify_copy_emit()` (or bump `owner_notify_copy_until` far out) and record it as a standing
+  rule in the Oracle, no longer a parked teardown.

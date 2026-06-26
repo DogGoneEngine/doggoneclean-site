@@ -5185,3 +5185,86 @@ Append-only across sessions; grouped for readability, with no decision dropped.
 - Earlier same day: PayPal, Cash App, and Venmo became their own payment labels (they settle to
   their own accounts, not Square); Steve Crandall's history relabeled wallet -> paypal
   (migration 0248). See the parking-lot entry for operator-set notification preferences (parked).
+
+## Decisions log (2026-06-26)
+
+- **Clients floor: No-fly and Archived moved to the bottom (shipped).** The Clients floor rendered the
+  No-fly list and the Archived list ABOVE the search box and the client book, so the active list was
+  something to scroll past. Both panels now render below the book; the search and the active clients are
+  the first thing on the floor. The panels keep their empty-state hide and stay off the mobile
+  detail-only view. UI only, `ClientsView.jsx`.
+
+- **Client record: "Book next visit" pinned to the top (shipped).** Booking the next appointment sat
+  halfway down the record, below the details panel and the log-visit form, a scroll-and-hunt on a
+  multi-dog client. It now sits just under the name and Clio, the same spot on every record, above the
+  details and history. It stays collapsed to one button until tapped. UI only, `ClientsView.jsx`.
+
+- **Calendar floor: Emperor-only day total per day card (shipped).** Each day card on the Calendar floor
+  now shows the total money scheduled that day in the upper-right corner, in green. Owner (Emperor) only:
+  gated on the owner role in the UI, and the calendar data already strips amounts for the operator (Jake)
+  server-side (`admin_calendar` drops amount_cents / payment_status / cycle_rate for the operator role,
+  the money mask from migration 0226), while the viewer (Kristin) has no Calendar floor at all, so the
+  figure is the owner's alone. Cancelled and no-show visits are excluded; a day with no priced appointment
+  shows NO total rather than a misleading $0. Known gap: legacy visits whose price lives on the dog cards
+  but not on the appointment amount do not add to the total yet, so a day made only of those reads blank
+  (offered to extend the total to pull dog-card prices; parked until Paul asks). UI only,
+  `CalendarView.jsx` + `AdminApp.jsx`. Consistent with `orbit_roles_operator_masked`.
+
+- **Owner notification watch: Telegram ping on every client message, self-expiring (shipped, migration
+  0254).** With client reminders freshly live, Paul wanted to watch them for a week or so. Every time a
+  client message actually goes out, a one-line Telegram DM now reaches Paul: the client's name and which
+  message (for example "Ray Russell: Booking confirmation"), never the body. A trigger on
+  `notification_log` fires only for `status='sent'` rows and only while `now()` is before
+  `app_secrets.owner_notify_copy_until` (set to 2026-07-06), so it switches itself off with no teardown.
+  Reuses the already-stored `telegram_bot_token` + `telegram_owner_chat_id` (the Iris bot, same channel as
+  the booking alerts from migration 0227). Verified live: a test send returned 200 / ok from Telegram.
+  Paul asked for a true SMS first; real SMS is still blocked on the A2P / Twilio setup, so Telegram is the
+  working phone channel. Teardown reminder parked in CLEAN_PARKING_LOT.md (drop the dead trigger after the
+  window unless Paul makes it permanent).
+
+- **Clio is the settled name; the plumbing key stays `riker` (confirmed, no code change).** "Riker" was a
+  placeholder; the persona is Clio. The visible name is already Clio everywhere it shows (the capture box
+  "Tell Clio", "Send to Clio", "What can I tell Clio?"). The only remaining "Riker" is internal plumbing
+  the user never sees (the `riker_*` RPC names, the `riker` edge function, the `RikerCapture` file, the
+  `riker_parses` field). That key is deliberately left as the stable internal layer, exactly like
+  "operator" in the DB behind "String of Pearls" and "admin" behind "Orbit". Recorded as
+  `clio_is_the_persona_name` in the Oracle.
+
+- **Imported visits never auto-message the client on a reschedule or cancel; only app-native visits do
+  (recorded, came up live).** Paul moved Bradley Johnson and asked whether Bradley got an email. He did
+  not. The notify trigger `bath_appointment_notify` (migration 0035) returns early when `source is not
+  null`, so a calendar-imported / legacy visit (source `gcal_adopted` / `gcal_sync`) never fires a client
+  message on a reschedule or cancel; only a visit born in the app (source NULL) does. To notify a legacy
+  client of a moved visit, cancel-and-rebook: canceling the imported visit is silent, and booking a fresh
+  one in Laelaps is app-native and sends a booking confirmation for the new time (Bradley has an email on
+  file; one clean message, no cancellation notice). Recorded as `imported_visits_dont_auto_notify` in the
+  Oracle.
+
+- **Google Calendar cleanup is safe and fires nothing (answered, no code change).** Paul is moving his
+  work into Laelaps and using Google Calendar only as a second view. Deleting the old yellow (banana =
+  pencilled / tentative, like Ray Russell's year of monthly placeholders) and red (Acuity-imported)
+  calendar entries fires NO client notifications: the calendar-sync prune only ever DELETEs the app's own
+  copy and never sends mail, the notify trigger is insert/update only and ignores imported rows, and the
+  imported rows are `gcal_adopted` so the prune cannot remove them anyway. The blue "app mirror" events on
+  the Dog Gone Clean calendar are app-owned and redraw from the app within 15 minutes, so deleting them on
+  the calendar does not stick; the real removal is in Laelaps (also silent for a tentative). Net: clean up
+  the calendar freely, nobody is messaged.
+
+- **Calendar sync stays at 15 minutes (decided, no change).** Paul considered making his app changes show
+  on Google Calendar faster than 15 minutes. The lag is the Google Apps Script trigger in his own Google
+  account (the app -> calendar export direction), which could run as often as about every 2 to 3 minutes,
+  but a personal Google account caps that helper's total daily run time, so true every-minute is not
+  reliable. Paul declined: he is moving everything into Laelaps and uses Google Calendar only as a glance,
+  so the 15-minute mirror is fine. No work done.
+
+- **Disk and Supabase headroom: no concern (answered, no change).** The droplet holds only the static
+  site (a few MB) and does not grow with the business; everything that grows lives in Supabase. Supabase
+  is on the free plan and barely touched: database 21 MB of 500 MB (about 4%), file storage 53 MB of 1 GB
+  (about 5%, 160 visit photos). Records grow slowly; visit photos are the only meaningful climb, with a
+  year-plus of runway and a cheap fix (bump the plan or move old photos to cold storage) long before it
+  matters. Nothing to do.
+
+- **Correction: reminders are LIVE, not muted.** Tidied the stale "notifications muted / do not flip on
+  until Acuity is cancelled" status across the Oracle and the index: reminders went live 2026-06-22
+  (`notifications_live='true'`), Acuity is cancelled, and the Telegram owner-watch above depends on real
+  sends. Reality wins; corrected in place.

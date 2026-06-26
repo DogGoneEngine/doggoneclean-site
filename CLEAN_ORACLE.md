@@ -1508,16 +1508,31 @@ reads it and sends nothing unless its value is exactly the text `true`. The OFF 
 ABSENCE of the row (a missing value coalesces to `false`), so the system is silent by default and
 goes live only when someone creates that row on purpose. This is why the hourly
 `bath_dispatch_reminders` cron can run against real appointments, find matches, and still send
-zero email: every send short-circuits at the gate. Status as of 2026-06-21: the row does NOT
-exist, so reminders are muted; the `send-notification` edge function, the Resend key, the verified
-`doggoneclean.us` sending domain, and the cron are all in place and tested (a test reminder reached
-Paul's Gmail 2026-06-21), waiting only on this switch. Do NOT create the `notifications_live=true`
-row until Acuity is cancelled, or clients get doubled reminders from both systems. Because
+zero email when the gate is off: every send short-circuits at the gate. Status: reminders went LIVE
+2026-06-22 (`notifications_live='true'`), after Acuity was cancelled and the legacy book was made
+app-owned (`source='gcal_sync'` re-labeled `'gcal_adopted'`) so the calendar-sync prune cannot delete
+it and double reminders cannot fire from both systems. The earlier hold (do not flip on until Acuity
+is cancelled, or clients get doubled reminders) is now satisfied and lifted; the `send-notification`
+edge function, the Resend key, the verified `doggoneclean.us` sending domain, and the cron are all
+live. Because
 automated messages reaching real clients is the single most expensive mistake this system can
 make, the safe state must be the default-on-absence one, and the go-live must be one explicit,
 reversible act, not a side effect of any other change. Corrects the loose earlier description of a
 row "set to off"; reality is the row is absent and absence is off. Pairs with
 `confirmations_and_reminders_via_supabase` and `legacy_folds_into_v2`.
+
+`imported_visits_dont_auto_notify` (architecture: notifications):
+Automatic client messages fire only for appointments born in the app. The notify trigger
+`bath_appointment_notify` (migration 0035) returns early when `source is not null`, so a
+calendar-imported or legacy visit (source `gcal_adopted` / `gcal_sync`) never sends the client a
+booking confirmation, reschedule, or cancellation message; only an app-native visit (source NULL)
+does. To tell a legacy client about a moved visit, cancel-and-rebook: canceling the imported visit
+is silent, and booking a fresh visit in Laelaps is app-native and sends one booking confirmation for
+the new time. Because the imported book was migrated in bulk and those clients were never enrolled in
+the app's messaging on purpose; auto-firing on every synced or hand-moved legacy row would spray
+confusing or doubled emails at people who never opted into it, so the app stays silent on imported
+rows and notifies only what it originated. Came up live 2026-06-26 (a Bradley Johnson reschedule sent
+nothing, by design). Pairs with `notifications_have_a_master_live_gate`.
 
 `if_payments_added_handle_money_safely` (money):
 If online payment is ever added, store all money in cents (convert to dollars only at the
@@ -3092,6 +3107,17 @@ edits every time. This is a standing per-surface hold that overrides the default
 for the client screen ONLY; other surfaces still ship to completion. Because shipping a client-sheet
 redesign Paul has not laid eyes on guarantees a live site that does not match how he works on a
 stop. Decided 2026-06-18.
+
+`clio_is_the_persona_name` (Clean: clients):
+The voice-capture persona is named Clio everywhere a person can see it (the capture box reads "Tell
+Clio", "Send to Clio", "What can I tell Clio?"); "Riker" was the placeholder and is retired from all
+display copy. The internal plumbing key stays `riker` on purpose: the `riker_*` RPC names, the
+`riker` edge function, the `RikerCapture` component file, and the `riker_parses` field are the stable
+machine layer and are not renamed. Because the user-facing name and the internal key are two
+different things, exactly like "operator" in the database behind the product name "String of Pearls"
+and "admin" behind "Orbit"; renaming working RPCs, an edge function, and columns to chase a display
+label is real regression risk for zero visible gain, so the display layer carries the name and the
+plumbing keeps its key. Settled 2026-06-26.
 
 `clio_confirm_shows_fields` (Clean: clients):
 The Clio (Riker) one-tap confirm shows the exact target FIELDS and the values she will write into
