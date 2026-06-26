@@ -825,8 +825,13 @@ const recurringSteps = [
     font-size: var(--text-lg);
   }
   .friendly__card p:last-child { margin-bottom: 0; }
+</style>
 
-  /* GALLERY */
+<style is:global>
+  /* GALLERY (global on purpose: the live wall's photos are created by the
+     homepage script AFTER the page loads, so Astro's scoped styles never attach
+     to those script-made elements. Global rules do. This is what makes the live
+     wall actually render the way it is designed, fixed 2026-06-26.) */
   .gallery {
     display: grid;
     grid-template-columns: 1fr;
