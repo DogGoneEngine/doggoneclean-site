@@ -812,35 +812,25 @@ const recurringSteps = [
   @media (min-width: 760px) {
     .gallery { grid-template-columns: repeat(3, 1fr); }
   }
-  /* The live wall of approved dogs: a swipeable filmstrip. One scrolling row of
-     full, uncropped photos at a consistent height; visitors swipe through and
-     each photo snaps into place. Name caption, hover zoom, and fade-in kept.
-     (Replaced the masonry and square-crop versions, 2026-06-26.) */
+  /* The live wall of approved dogs: uniform 4:5 tiles in a tidy grid, all the
+     same shape so the mixed phone photos read as one composed wall instead of a
+     loose pile. The crop sits high (object-position) so faces and dogs are kept
+     and never chopped. Two columns on a phone, three on a wide screen. Name
+     caption, hover zoom, and fade-in kept. (Chosen by rendering the real photos
+     and comparing layouts side by side, 2026-06-26.) */
   .gallery--live {
-    display: flex;
-    grid-template-columns: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-md);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    padding-bottom: 10px;
-  }
-  .gallery--live .gallery__item {
-    flex: 0 0 auto;
-    width: auto;
-    height: 240px;
-    margin: 0;
-    scroll-snap-align: center;
   }
   @media (min-width: 760px) {
-    .gallery--live .gallery__item { height: 320px; }
+    .gallery--live { grid-template-columns: repeat(3, 1fr); }
   }
   .gallery--live .gallery__item img {
-    width: auto;
-    height: 100%;
-    aspect-ratio: auto;
+    aspect-ratio: 4 / 5;
+    height: auto;
     object-fit: cover;
+    object-position: 50% 28%;
   }
   .gallery__item {
     position: relative;
