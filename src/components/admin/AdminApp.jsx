@@ -262,7 +262,7 @@ export default function AdminApp() {
         {effectiveSection === 'knowledge' && <KnowledgeView />}
         {effectiveSection === 'vendors' && <VendorsView />}
         {effectiveSection === 'growth' && <GrowthView />}
-        {effectiveSection === 'calendar' && <CalendarView />}
+        {effectiveSection === 'calendar' && <CalendarView isOwner={isOwner} />}
         {effectiveSection === 'hr' && <HRView />}
         {effectiveSection === 'geography' && <GeographyView />}
         {effectiveSection === 'library' && <LibraryView />}

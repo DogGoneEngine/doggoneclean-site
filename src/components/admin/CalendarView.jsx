@@ -28,6 +28,13 @@ const RESCHEDULE_ERR = {
 };
 
 function money(c) { return c == null ? '' : '$' + Math.round(c / 100); }
+// The day's scheduled money: every appointment that day except the ones that
+// will not happen (cancelled / no_show). Shown only to the Emperor (owner); the
+// operator's calendar data carries no amounts and the viewer has no Calendar
+// floor, so this number is the owner's alone (Paul, 2026-06-26).
+function dayMoney(items) {
+  return items.reduce((sum, a) => (a.status === 'cancelled' || a.status === 'no_show' ? sum : sum + (a.amount_cents || 0)), 0);
+}
 function dayKey(ts) { return new Date(ts).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }); }
 function time(ts) { try { return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch { return ''; } }
 function pad2(n) { return String(n).padStart(2, '0'); }
@@ -172,7 +179,7 @@ function ApptRow({ a, onChanged }) {
   );
 }
 
-export default function CalendarView() {
+export default function CalendarView({ isOwner = false }) {
   const [appts, setAppts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -231,7 +238,14 @@ export default function CalendarView() {
           {groups.map((g) => (
             <div key={g.key} ref={g === anchor ? todayRef : null} style={{ scrollMarginTop: 12 }}>
             <div className="ad-panel" style={{ opacity: g.isPast ? 0.6 : 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{g.key}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
+                <span style={{ fontSize: 13, fontWeight: 700 }}>{g.key}</span>
+                {isOwner && dayMoney(g.items) > 0 && (
+                  <span className="ad-mono" title="Total money scheduled this day" style={{ fontSize: 13, fontWeight: 700, color: 'var(--ad-good,#1f8a4b)' }}>
+                    {money(dayMoney(g.items))}
+                  </span>
+                )}
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {g.items.map((a) => (
                   <ApptRow key={a.id} a={a} onChanged={load} />
