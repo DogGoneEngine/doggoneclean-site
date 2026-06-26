@@ -812,28 +812,35 @@ const recurringSteps = [
   @media (min-width: 760px) {
     .gallery { grid-template-columns: repeat(3, 1fr); }
   }
-  /* The live wall of approved dogs: full photos, nothing cropped. Tiled into a
-     balanced masonry so mixed portrait and landscape shots sit cleanly and the
-     wall always reads full, with name captions and a gentle staggered fade-in.
-     (Replaced the square 1/1 crop that chopped tall dog photos, 2026-06-26.) */
+  /* The live wall of approved dogs: a swipeable filmstrip. One scrolling row of
+     full, uncropped photos at a consistent height; visitors swipe through and
+     each photo snaps into place. Name caption, hover zoom, and fade-in kept.
+     (Replaced the masonry and square-crop versions, 2026-06-26.) */
   .gallery--live {
-    display: block;
+    display: flex;
     grid-template-columns: none;
-    column-count: 2;
-    column-gap: var(--space-md);
-  }
-  @media (min-width: 760px) {
-    .gallery--live { column-count: 3; }
+    gap: var(--space-md);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 10px;
   }
   .gallery--live .gallery__item {
-    width: 100%;
-    margin: 0 0 var(--space-md);
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
+    flex: 0 0 auto;
+    width: auto;
+    height: 240px;
+    margin: 0;
+    scroll-snap-align: center;
+  }
+  @media (min-width: 760px) {
+    .gallery--live .gallery__item { height: 320px; }
   }
   .gallery--live .gallery__item img {
+    width: auto;
+    height: 100%;
     aspect-ratio: auto;
-    height: auto;
+    object-fit: cover;
   }
   .gallery__item {
     position: relative;
