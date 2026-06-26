@@ -812,14 +812,28 @@ const recurringSteps = [
   @media (min-width: 760px) {
     .gallery { grid-template-columns: repeat(3, 1fr); }
   }
-  /* The live wall of approved dogs: a tighter responsive grid with name
-     captions and a gentle staggered fade-in. */
+  /* The live wall of approved dogs: full photos, nothing cropped. Tiled into a
+     balanced masonry so mixed portrait and landscape shots sit cleanly and the
+     wall always reads full, with name captions and a gentle staggered fade-in.
+     (Replaced the square 1/1 crop that chopped tall dog photos, 2026-06-26.) */
   .gallery--live {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
+    display: block;
+    grid-template-columns: none;
+    column-count: 2;
+    column-gap: var(--space-md);
   }
   @media (min-width: 760px) {
-    .gallery--live { grid-template-columns: repeat(3, 1fr); }
+    .gallery--live { column-count: 3; }
+  }
+  .gallery--live .gallery__item {
+    width: 100%;
+    margin: 0 0 var(--space-md);
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+  .gallery--live .gallery__item img {
+    aspect-ratio: auto;
+    height: auto;
   }
   .gallery__item {
     position: relative;
