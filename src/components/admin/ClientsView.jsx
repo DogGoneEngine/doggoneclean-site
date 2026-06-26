@@ -278,6 +278,16 @@ function ClientSheet({ clientId, onChanged }) {
       {/* Riker rides at the top too: mid-appointment he is the most-used tool. */}
       <RikerCapture clientId={clientId} clientName={c.name} onApplied={() => { load(); onChanged?.(); }} />
 
+      {/* Book the next visit sits up here, just under the name and Riker, in the
+          same spot on every record, so booking is never a scroll-and-hunt down
+          past the details and the visit history (Paul, 2026-06-26). Collapsed to
+          a single button until tapped, then it expands in place. Admin booking:
+          the engine's open times sized to this client's real duration, with
+          Paul's soft override per operator_override_with_confirm. */}
+      <BookVisitPanel clientId={clientId} clientName={c.name}
+        dogs={dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status))}
+        onBooked={() => { load(); onChanged?.(); }} />
+
       {/* Semi-permanent header */}
       <div className="ad-panel" style={{ position: 'relative' }}>
         <HelpToggle corner items={[
@@ -368,13 +378,6 @@ function ClientSheet({ clientId, onChanged }) {
         dogs={dogs}
         onLogged={() => { load(); onChanged?.(); }}
       />
-
-      {/* Book the next visit, in the system (admin booking; the engine's open
-          times sized to this client's real duration, with Paul's soft
-          override per operator_override_with_confirm). */}
-      <BookVisitPanel clientId={clientId} clientName={c.name}
-        dogs={dogs.filter((d) => !['former', 'deceased', 'moved'].includes(d.roster_status))}
-        onBooked={() => { load(); onChanged?.(); }} />
 
       {/* Upcoming */}
       {upcoming.length > 0 && (
