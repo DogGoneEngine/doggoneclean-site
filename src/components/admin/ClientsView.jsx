@@ -107,8 +107,6 @@ export default function ClientsView({ focus = null }) {
       {!showDetailOnly && (
         <p className="ad-sub">The contact-sheet book. {clients.length} active clients (seen within the past year). Pick one to open its sheet.</p>
       )}
-      {!showDetailOnly && <NoFlyPanel onChanged={load} />}
-      {!showDetailOnly && <ArchivedPanel onChanged={load} />}
 
       {showDetailOnly ? (
         <div>
@@ -174,6 +172,12 @@ export default function ClientsView({ focus = null }) {
           )}
         </div>
       )}
+
+      {/* No-fly and Archived live at the BOTTOM, below the book, so the active
+          client list and its search are the first thing on the floor instead of
+          two panels to scroll past every time (Paul, 2026-06-26). */}
+      {!showDetailOnly && <NoFlyPanel onChanged={load} />}
+      {!showDetailOnly && <ArchivedPanel onChanged={load} />}
     </>
   );
 }
