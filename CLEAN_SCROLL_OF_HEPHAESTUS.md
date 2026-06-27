@@ -5289,3 +5289,12 @@ Append-only across sessions; grouped for readability, with no decision dropped.
   due date; the public funnel still caps at 60 days. Open question left to Paul (a real business call, not a
   bug): whether CLIENTS should be allowed to self-book further than 60 days out the way the operator now
   can. Files: `supabase/migrations/0255_*`, `0256_*`, `portal/supabase.js`, `portal/PortalViews.jsx`.
+  Recorded as `suggester_reaches_real_cadence` + `no_lateness_framing_to_clients` in the Oracle.
+
+- **Clients stay capped at the 60-day horizon for now; the long-cadence outliers are parked, not closed
+  (Paul, 2026-06-27).** Paul agreed not to widen the public calendar for the few every-3-months clients
+  (they are operator-booked anyway), and named the tension to keep in view: he wants a system that can
+  handle reality when it comes up, so this is deferred, not dismissed. Parked in CLEAN_PARKING_LOT.md
+  ("Let clients self-book past the 60-day public horizon"). The plumbing is already in place
+  (`_suggest_slots_core.p_extend_horizon`, `bath_open_slots.p_horizon_days`); the open piece is the
+  business decision of how far ahead a customer may commit the calendar themselves.

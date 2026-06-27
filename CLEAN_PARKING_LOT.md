@@ -1369,3 +1369,26 @@ client name and which message, while `app_secrets.owner_notify_copy_until` is in
 - If Paul decides he wants it permanently, do the opposite: remove the date gate from
   `owner_notify_copy_emit()` (or bump `owner_notify_copy_until` far out) and record it as a standing
   rule in the Oracle, no longer a parked teardown.
+
+## Let clients self-book past the 60-day public horizon (long-cadence outliers)
+
+Decided 2026-06-27 alongside `suggester_reaches_real_cadence`. The operator can now reach a standing
+client's true cadence however far out it is, but CLIENTS booking themselves are still capped at the
+public 60-day horizon (`cities.hb_booking_horizon_days`). For the handful of every-3-months (and longer)
+clients, that means a client cannot self-book their own next regular visit when it falls past 60 days;
+they see the soonest open times instead, never a blank screen (the soonest-forward fallback in
+`bath_suggest_slots`).
+
+Paul's call (2026-06-27): leave clients capped for now, deal with the outliers later. He named the real
+tension worth keeping in view: he agrees the few outliers do not justify opening the public calendar
+wider, AND he wants a system that can handle reality when it comes up. So this is parked, not closed.
+
+- Affects ~3 active clients today (cadence longer than ~66 days: Koerner and two others). The rest
+  (cadence within 60 days) already get the full client-side smart suggestions with no gap.
+- The plumbing is already in place: `_suggest_slots_core` takes `p_extend_horizon`, and `bath_open_slots`
+  takes an optional `p_horizon_days`. Today only the operator doors pass them. To let clients reach
+  further, decide a client-facing ceiling (their own cadence plus a buffer, or a flat larger number) and
+  pass it from `bath_suggest_slots` instead of null, OR raise `hb_booking_horizon_days` (which also widens
+  the cold `/book` funnel, a bigger customer-facing change).
+- The decision to make first is a business one, not a code one: how far ahead should a customer be able
+  to commit the calendar themselves? Bring Paul that question when he is ready, not a menu of mechanisms.

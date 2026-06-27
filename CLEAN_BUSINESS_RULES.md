@@ -253,6 +253,8 @@ even DGN has many rules sitting in only one or two layers.
 | client_screen_reviewed_before_live | Clean: process | Oracle + CLAUDE.md hold; client-screen changes develop on the branch, not merged to main, until Paul has seen them | n/a (a standing review gate, not a build) |
 | clio_confirm_shows_fields | Clean: clients | Oracle; decided 2026-06-18 | the Clio confirm step shows each target FIELD and the value she will write into it, not a prose summary (build pending Paul's review) |
 | hr_metrics_read_the_ledger | Clean: records | Oracle; `admin_hr_summary` (migration 0236) reads the `_time_is_money_ledger()` union (frozen `time_is_money_history` through 2026-06-13 + live visits after), hands-on = Appointment Duration, door-to-door = Cycle Time, revenue = Paid; never re-aggregates raw `visits`; future-dated rows excluded; HRView shows both numbers and names the source | per-operator workload split once Jake is on the book |
+| suggester_reaches_real_cadence | Clean: booking | Oracle; migrations 0255 + 0256 (`_suggest_slots_core` shared engine behind `admin_suggest_slots` + `bath_suggest_slots`; `bath_open_slots` optional horizon override that only the operator doors pass; the `/book` funnel and client portal stay at the 60-day `hb_booking_horizon_days`); portal reschedule picker | clients self-booking past the public horizon for long-cadence outliers (parked, Paul's call) |
+| no_lateness_framing_to_clients | Clean: booking | Oracle; `bath_suggest_slots` (`p_include_stops=false`) + portal `SlotPicker` render only good open times, soonest-forward when overdue, never an overdue/late label | operator view keeps internal early/late routing labels |
 
 ## How to add a row
 

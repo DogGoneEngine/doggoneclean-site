@@ -3166,3 +3166,32 @@ only when it carries that figure. The teeth are `admin_hr_summary` (migration 02
 and HRView showing both hands-on and door-to-door with the source named on screen. A future-dated row
 is never counted (a completed visit cannot be in the future). Decided 2026-06-23 after the floor twice
 showed a wrong hours number built from the wrong source.
+
+`suggester_reaches_real_cadence` (Clean: booking):
+The booking suggester aims its search window at a client's real next-visit timing, whatever it is, with
+no fixed look-ahead ceiling. On a future cadence it offers a spread of good open times around the due
+date; when the cadence date is already past it shows the soonest open times forward instead. The
+slot-generation horizon (`cities.hb_booking_horizon_days`, 60 days) is the PUBLIC guardrail and stays
+put for the `/book` funnel and the client portal, but `bath_open_slots` takes an optional horizon
+override that ONLY the operator doors pass, so the operator (and the "More options" specific-day flow)
+reaches a standing client's true cadence even when it is months past the public horizon. One shared
+engine, `_suggest_slots_core`, sits behind two doors: `admin_suggest_slots` (operator, full route stops)
+and the client-callable `bath_suggest_slots` (resolves the caller's own record, never returns another
+client's stops), so the operator and client experiences cannot drift apart or break separately. Either
+door can aim at a specific day or week (`p_target_date` + `p_target_span`) instead of the cadence
+default. Because the original suggester capped its search at 60 days and the calendar generated no
+availability past it, so a client on a 98-day cadence (Debbie Koerner) hit a flat "none available" at
+the exact moment of rebooking, while the public booking distance must stay bounded; the fix reaches real
+cadences for the operator without opening the public calendar wider. Teeth: migrations 0255 + 0256,
+`_suggest_slots_core` / `admin_suggest_slots` / `bath_suggest_slots` / `admin_open_slots` /
+`bath_open_slots`, and the portal reschedule picker. Decided and shipped 2026-06-27.
+
+`no_lateness_framing_to_clients` (Clean: booking):
+The client-facing booking surfaces never tell a client they are late, overdue, or behind. When a
+client's regular timing has passed, the tool simply shows the soonest good open times with no mention of
+lateness, and when their cadence date sits beyond what they may self-book it falls back to those soonest
+times rather than an empty screen. The operator's own view may keep internal timing labels (days early
+or late against the rhythm) because that is operational routing information for Paul, not a message to
+the customer. Because shaming a customer for falling behind is a terrible idea and out of scope for the
+booking tool (Paul, 2026-06-27); the client door passes `p_include_stops=false` and carries no offset
+copy. Teeth: `bath_suggest_slots` and the portal `SlotPicker`, which render only good open times.
