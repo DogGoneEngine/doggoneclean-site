@@ -32,6 +32,7 @@ export default function GrowthView() {
   if (loading || !data) return <><h1>Growth</h1><div className="ad-panel">Loading…</div></>;
 
   const cand = data.candidates || [];
+  const wait = data.waitlist || [];
   return (
     <>
       <h1>Growth</h1>
@@ -51,8 +52,36 @@ export default function GrowthView() {
           <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>Winnable now</div>
           <div style={{ fontSize: 20, fontWeight: 700, marginTop: 2 }}>{cand.length}</div>
         </div>
+        <div className="ad-panel" style={{ padding: '10px 14px' }}>
+          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.55 }}>Waitlist signups</div>
+          <div style={{ fontSize: 20, fontWeight: 700, marginTop: 2 }}>{wait.length}</div>
+        </div>
         <button className="ad-btn ad-btn--ghost ad-btn--sm" onClick={runCheck}>Run check now</button>
         {checkMsg && <span style={{ fontSize: 13, opacity: 0.7 }}>{checkMsg}</span>}
+      </div>
+
+      <div className="ad-panel" style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4, opacity: 0.6, marginBottom: 6 }}>Waitlist</div>
+        {wait.length === 0 ? (
+          <div style={{ opacity: 0.7 }}>No one has joined a city waitlist yet. New signups land here and ping you on Today the moment they come in.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {wait.map((w, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, padding: '4px 0', borderBottom: '1px solid var(--ad-outline, #ececf1)' }}>
+                <span style={{ width: 110, fontWeight: 600 }}>{w.city}</span>
+                <span className="ad-mono" style={{ flex: 1, minWidth: 0, fontSize: 12, opacity: w.email ? 0.85 : 0.45, color: w.email ? 'inherit' : 'var(--ad-warn, #b9770a)' }}>
+                  {w.email || 'no email'}
+                  {(w.zip_code || w.dog_count) && (
+                    <span style={{ opacity: 0.55, marginLeft: 6 }}>
+                      {w.zip_code || ''}{w.zip_code && w.dog_count ? ' · ' : ''}{w.dog_count ? `${w.dog_count} dog${w.dog_count === 1 ? '' : 's'}` : ''}
+                    </span>
+                  )}
+                </span>
+                <span style={{ fontSize: 12, opacity: 0.55, whiteSpace: 'nowrap' }}>{w.joined}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="ad-panel">

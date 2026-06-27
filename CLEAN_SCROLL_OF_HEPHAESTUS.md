@@ -171,6 +171,20 @@ To resume cold: read CLAUDE.md, then this Scroll, then CLEAN_ORACLE.md.
 
 ## Session history
 
+### 2026-06-27 (Waitlist signups now reach Paul: Today card + armed Telegram, and a list on the Growth floor)
+- The city waitlist (the Ocala page and the capacity fallback on /book both write to public.waitlist)
+  was a one-way drop: anyone could join, but nothing read it back and nothing told Paul, so a real
+  lead landed in a table no one watched. Paul asked whether a signup reaches him or goes into the void;
+  it went into the void.
+- Fix (migration 0257): a trigger on public.waitlist insert reuses the proven owner-alert machinery
+  from 0227. Every signup writes a "Front desk" (Iris) card to the Today feed the moment it lands, and
+  sends Paul a Telegram DM when owner_alerts_telegram is armed (same token/chat as the booking alerts).
+  admin_growth_summary now also returns the whole waitlist (newest first, city-labeled), and the Growth
+  view shows it with a count tile. No new agent, no new switch.
+- NOT YET LIVE: this session had no Supabase database key, so migration 0257 is committed but not yet
+  applied to dgc-prod, and the current waitlist could not be read. The list and the ping switch on the
+  moment 0257 is applied. The website/Growth code degrades gracefully until then (empty waitlist panel).
+
 ### 2026-06-25 (Booking length now recalculates when a dog is taken off; equal-share-per-dog decision)
 - Scheduling a visit with a dog deselected did not shorten the appointment, so the slot engine kept
   reserving the full time and refused the slot Paul wanted (hit while rebooking Tonya Hunt with Koa
